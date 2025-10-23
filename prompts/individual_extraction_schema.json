@@ -1,0 +1,46 @@
+{
+  "type": "object",
+  "properties": {
+    "variant_discussed": {
+      "type": "boolean",
+      "description": "Whether this specific variant is discussed in the paper"
+    },
+    "evidence": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "finding": {
+            "type": "string",
+            "description": "A specific factual claim about the variant from the paper"
+          },
+          "citations": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "box_id": {
+                  "type": "integer",
+                  "description": "The bounding box ID from the source text"
+                },
+                "commentary": {
+                  "type": "string",
+                  "description": "What this specific text states/demonstrates (appears as annotation in highlighted PDF for curator validation)"
+                }
+              },
+              "required": ["box_id", "commentary"],
+              "additionalProperties": false
+            },
+            "minItems": 1,
+            "description": "Citations supporting this finding"
+          }
+        },
+        "required": ["finding", "citations"],
+        "additionalProperties": false
+      },
+      "description": "List of evidence findings extracted from the paper"
+    }
+  },
+  "required": ["variant_discussed", "evidence"],
+  "additionalProperties": false
+}

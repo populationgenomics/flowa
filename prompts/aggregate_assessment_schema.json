@@ -1,0 +1,47 @@
+{
+  "type": "object",
+  "properties": {
+    "classification": {
+      "type": "string",
+      "enum": ["Pathogenic", "Likely Pathogenic", "VUS", "Likely Benign", "Benign"],
+      "description": "The selected ACMG classification term based on the aggregated evidence"
+    },
+    "classification_rationale": {
+      "type": "string",
+      "description": "Brief explanation of why this classification was selected based on case counts and evidence quality"
+    },
+    "description": {
+      "type": "string",
+      "description": "The mandatory template for the selected classification, filled in with specific details from the evidence"
+    },
+    "notes": {
+      "type": "string",
+      "description": "Detailed curator-style synthesis in Markdown format with structure: per-paper findings ([PMID: X](link) | Author Year: findings) → synthesis if needed"
+    },
+    "citations": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "pmid": {
+            "type": "integer",
+            "description": "PubMed ID of the source paper"
+          },
+          "box_id": {
+            "type": "integer",
+            "description": "The bounding box ID from the source text in the paper"
+          },
+          "commentary": {
+            "type": "string",
+            "description": "What this specific evidence states (appears as annotation in highlighted PDF)"
+          }
+        },
+        "required": ["pmid", "box_id", "commentary"],
+        "additionalProperties": false
+      },
+      "description": "All citations supporting factual claims in the detailed notes, used to annotate source PDFs"
+    }
+  },
+  "required": ["classification", "classification_rationale", "description", "notes", "citations"],
+  "additionalProperties": false
+}

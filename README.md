@@ -1,6 +1,43 @@
-# CPG Python Template
+# Flowa
 
-Template repository based on the [CPG team-docs](https://github.com/populationgenomics/team-docs/blob/main/new_repository.md) content.
+Variant literature assessment pipeline with AI extraction.
 
-This contains python and markdown linting configuration, and a github linting action.
-Before making a new repository based on this template, it may be worth auditing the versions of linting tools and GitHub Actions listed in _.pre-commit-config.yaml_ and _.github/workflows_.
+## Installation
+
+```bash
+uv sync --extra dev
+
+```
+
+On macOS: add `--extra macos` for faster Docling conversion.
+
+## Configuration
+
+Copy `.env.example` to `.env` and configure your API keys.
+
+All variant information and processing state is stored in `data/db.sqlite`.
+
+## Workflow
+
+```bash
+VARIANT=GAA_variant
+
+# 1. Query literature
+uv run flowa query --gene GAA --hgvs "c.2238G>C" --id $VARIANT --source litvar
+
+# 2. Download PDFs
+# Note: Reports which papers are not open-access and must be downloaded manually
+uv run flowa download --id $VARIANT
+
+# 3. Convert PDFs to Docling JSON (manual step)
+cd data/papers && uv run docling --to json --pipeline vlm --vlm-model granite_docling *.pdf && cd ../..
+
+# 4. Extract and aggregate evidence
+uv run flowa process --id $VARIANT
+
+# 5. Annotate PDFs
+uv run flowa annotate --id $VARIANT
+
+# 6. Generate report
+uv run flowa report --id $VARIANT --output reports/$VARIANT/index.html
+```
