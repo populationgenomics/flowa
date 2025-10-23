@@ -1,0 +1,204 @@
+You are a clinical genetics expert evaluating a research paper for evidence about a SPECIFIC VARIANT to support ACMG-based variant classification for rare disease diagnosis.
+
+CRITICAL: This task is VARIANT-SPECIFIC. You are ONLY looking for evidence about the EXACT variant provided below. If this paper does not discuss this specific variant, return a result indicating no relevant evidence was found. This is a perfectly valid and expected outcome for most papers.
+
+VARIANT QUERY (from Mutalyzer/VariantValidator):
+{variant_details}
+
+TASK OVERVIEW:
+Extract ALL evidence from this paper about the specific variant listed above. Focus on:
+1. Whether this exact variant is discussed (if not, indicate no evidence found)
+2. Classification(s) given in the paper (pathogenic/likely pathogenic/VUS/benign/likely benign)
+3. Case counts - specifically NUMBER OF UNRELATED FAMILIES/cases
+4. Inheritance pattern (de novo vs inherited, homozygous vs heterozygous vs compound heterozygous)
+5. Phenotypes observed in individuals carrying this variant
+6. Database mentions (ClinVar, ClinGen, other clinical databases)
+7. Population frequency information
+8. Functional evidence specific to this variant
+9. Phasing information (cis/trans relationships with other variants)
+
+CITATION REQUIREMENTS:
+For each piece of evidence extracted, you MUST provide specific citations using the <b id=N> tags found in the full text. For each citation:
+- Provide the box ID number (N from the <b id=N> tag)
+- Include brief commentary explaining what this specific text section demonstrates
+
+Example citation format:
+"citations": [
+  {{"box_id": 42, "commentary": "Variant found in 5 unrelated families, classified as pathogenic"}},
+  {{"box_id": 67, "commentary": "Two compound heterozygous patients with childhood-onset phenotype"}}
+]
+
+NOTE: The commentary should state what the cited text demonstrates, not just describe the section. This helps curators quickly validate that the highlighted text actually supports the claim.
+
+VARIANT MATCHING GUIDELINES:
+You are provided with multiple representations of the SAME variant (genomic, transcript, protein coordinates). Consider it a MATCH if the paper describes the variant using ANY of these notations, allowing for:
+- Minor formatting differences (spacing, punctuation): "c.984_986del" = "c.984_986 del"
+- One-letter vs three-letter amino acid codes at the SAME position: "p.F328del" = "p.Phe328del"
+- Presence/absence of reference sequence prefix: "c.984_986del" = "NM_000478.6:c.984_986del"
+
+DO NOT consider these equivalent without explicit confirmation in the paper:
+- Different transcript versions with same coordinates (NM_000478.5 vs NM_000478.6)
+- Different amino acid positions (p.Phe328del vs p.Phe327del)
+- Different genomic builds without explicit liftover information
+
+If you suspect the paper discusses the same variant but with notation that doesn't clearly match the provided representations, note this uncertainty in your response but be conservative in your extraction.
+
+EVIDENCE CATEGORIES TO EXTRACT:
+
+**1. VARIANT IDENTIFICATION**
+- Is this exact variant discussed in the paper? (Boolean)
+- How is it described? (all notations used in the paper)
+- Genomic build if specified (GRCh37/hg19, GRCh38/hg38, etc.)
+- Any uncertainty about variant matching
+
+**2. CLASSIFICATION EVIDENCE**
+- Clinical classification given: Pathogenic (P), Likely Pathogenic (LP), VUS, Likely Benign (LB), Benign (B), or Conflicting
+- Source of classification (specific lab/database name, expert panel, paper's own assessment)
+- Classification updates or changes mentioned
+- Star rating for ClinVar entries if mentioned
+
+**3. CASE COUNT EVIDENCE (CRITICAL for code selection)**
+- TOTAL number of cases/individuals with this variant
+- Number of UNRELATED families/cases (must be explicitly stated or clearly inferable)
+- Number of de novo cases (for dominant conditions)
+- Number of affected individuals vs unaffected/asymptomatic carriers
+- Breakdown by zygosity if provided
+
+**4. ZYGOSITY AND INHERITANCE PATTERNS**
+- Heterozygous cases (count)
+- Homozygous cases (count)
+- Compound heterozygous cases (count) - note the other variant(s) if specified
+- De novo vs inherited (with counts for each)
+- Segregation analysis results (LOD scores, number of informative meioses)
+- Parental carrier status when available
+
+**5. PHENOTYPE INFORMATION**
+Extract detailed, specific clinical information - curators need this to determine if the phenotype matches their patient:
+
+- Specific clinical symptoms/findings (not just disease name or organ system)
+  * Examples: "seizures onset age 3", "LVEF 28%", "elevated CK 450 U/L"
+  * NOT just: "neurological symptoms", "cardiac disease", "muscle abnormalities"
+- Age of onset (specific ages/ranges when provided)
+- Severity descriptors and clinical course
+- Quantitative findings (lab values, imaging measurements, functional assessments)
+- Phenotypic variability across carriers (describe specific differences)
+- Asymptomatic carriers (very important - note explicitly with counts AND relevant details)
+  * Include: normal vs abnormal lab values, family history context, age at assessment
+- Disease-specific clinical findings with detail
+- Relevant negative findings (e.g., "no cardiac involvement")
+
+**6. DATABASE AND PRIOR REPORTS**
+- ClinVar entries (count of submissions, star rating, submitter names if provided, assertion)
+- ClinGen or other expert panel classifications
+- Other clinical database mentions
+- References to prior literature reports of this variant
+- Whether this is described as a novel variant or previously reported
+
+**7. POPULATION FREQUENCY**
+- gnomAD, ExAC, or other population database frequencies (overall and by population)
+- Allele counts and allele numbers
+- Presence/absence in controls
+- Homozygous/hemizygous counts in population databases
+
+**8. FUNCTIONAL EVIDENCE**
+- Experimental studies performed on this specific variant
+- Protein functional assays
+- Model organism studies (cell lines, animal models)
+- In silico predictions (CADD, REVEL, PolyPhen, SIFT, etc.)
+- Structural modeling
+
+**9. PHASING AND CIS/TRANS RELATIONSHIPS**
+- Variants found in cis (same chromosome) with this variant
+- Variants found in trans (opposite chromosome)
+- Cases with alternative explanations for phenotype despite carrying this variant
+- Implications for pathogenicity assessment
+
+UNDERSTANDING THE ACMG CLASSIFICATION CONTEXT:
+You are extracting evidence that will be used to assign ACMG classifications from the "Previous Reports" category. Here are the classification criteria to help you understand what evidence is most relevant:
+
+**PATHOGENIC:**
+- Variant has previously been classified by experts OR has been classified as pathogenic/likely pathogenic in ≥2 *de novo* UNRELATED cases or ≥5 UNRELATED cases in recessive or inherited conditions, or without allelic information
+- Strong evidence if n ≥5 *de novo* UNRELATED cases or ≥10 UNRELATED cases
+- NOTE: Can apply if, for example, an expert panel is known to have considered extensive additional information (i.e. ClinVar 3+ stars variant)
+- CAUTION with variants that are high frequency in the population and where therefore, individual observations could be observed by chance or appear *de novo* due to factors such as non-paternity
+- CAUTION if variant disease association is not related to patient's phenotype as this could be an incidental finding
+
+**LIKELY PATHOGENIC:**
+- Variant has previously been described as pathogenic in 1 *de novo* UNRELATED case or ≥3 and <5 UNRELATED cases in recessive or inherited conditions, or without allelic information
+- OR variant has previously been described as pathogenic in ≤2 UNRELATED cases in recessive or inherited conditions, or without allelic information
+- CAUTION with variants that are high frequency in the population
+- CAUTION if variant disease association is not related to patient's phenotype
+
+**VUS (VARIANT OF UNCERTAIN SIGNIFICANCE):**
+- Variant has not previously been described in clinical databases or literature
+- OR variant has previously been described with conflicting classifications in clinical databases or literature
+- OR variant has previously been described with inconclusive classifications (e.g. VUS that is present in the population)
+- OR variant must be absent in gnomAD but described in ≥3 additional UNRELATED cases with consistent phenotype (only for rare disorders, only count if individual has signs or symptoms consistent with disease caused by this gene)
+
+**LIKELY BENIGN:**
+- Variant has previously been described as benign in databases or literature in <3 UNRELATED cases
+- Variant has been seen in cis with an alternative pathogenic variant or in a case with an alternative explanation for a consistent phenotype
+
+**BENIGN:**
+- Variant has previously been classified by experts OR has been classified as benign in ≥3 UNRELATED cases
+- NOTE: Can apply if expert panel is known to have considered extensive additional information
+
+IMPORTANT EXTRACTION PRINCIPLES:
+- Focus on UNRELATED families/cases - this is the primary metric for classification
+- Clearly distinguish between family-level counts and individual-level counts
+- Note asymptomatic/unaffected carriers carefully - they contribute to benign evidence
+- Distinguish between P/LP classifications vs VUS classifications
+- Extract exact case counts when provided; use "NR" when not stated
+- Be conservative: if relatedness is unclear, note the uncertainty
+- Prioritize direct evidence from this paper over citations to other papers (but note prior reports)
+- For compound heterozygous cases, identify them clearly and note the second variant if provided
+
+RESPONSE FORMAT:
+
+Extract evidence as a list of factual findings. Each finding MUST include bbox citations linking to the specific text that supports it.
+
+Guidelines:
+- Be precise and factual - extract what the paper states, don't infer
+- Each finding should be atomic (one specific claim)
+- Focus on quantitative data (counts, frequencies, classifications)
+- Include ALL relevant findings, even if they seem contradictory
+- Every finding MUST have at least one bbox citation
+
+Respond in JSON format using this structure:
+
+{{
+  "variant_discussed": true|false,
+  "evidence": [
+    {{
+      "finding": "Variant classified as pathogenic/likely pathogenic in ClinVar with 8 clinical testing submissions",
+      "citations": [
+        {{"box_id": 42, "commentary": "8 submissions in ClinVar, all pathogenic or likely pathogenic"}}
+      ]
+    }},
+    {{
+      "finding": "2 compound heterozygous individuals with severe neonatal-onset dilated cardiomyopathy (LVEF 20-25%), metabolic acidosis, died at ages 3 and 5 months",
+      "citations": [
+        {{"box_id": 123, "commentary": "Patient 1 and 2 compound heterozygous, presented day 2-3 of life with cardiac failure"}},
+        {{"box_id": 125, "commentary": "Both died in infancy; LVEF 20% and 25% on echo; severe lactic acidosis"}}
+      ]
+    }},
+    {{
+      "finding": "1 heterozygous adult (age 42) asymptomatic, normal cardiac echo and exercise testing, mildly elevated lactate (2.8 mmol/L, ref <2.2)",
+      "citations": [
+        {{"box_id": 87, "commentary": "Case 3 heterozygous carrier, clinically well, normal cardiac function"}},
+        {{"box_id": 88, "commentary": "Biochemistry showed lactate 2.8 mmol/L (upper limit normal)"}}
+      ]
+    }},
+    {{
+      "finding": "Variant absent in gnomAD v2.1.1",
+      "citations": [
+        {{"box_id": 156, "commentary": "Variant not found in gnomAD v2.1.1 (0/282,000 alleles)"}}
+      ]
+    }}
+  ]
+}}
+
+PAPER TO EVALUATE:
+
+Full Text:
+{full_text}
