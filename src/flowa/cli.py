@@ -1,11 +1,11 @@
 """Main CLI entry point for Flowa."""
 
 import logging
+import sys
 
 import typer
 
-from flowa import __version__
-from flowa.commands import annotate, download, process, query, report
+from flowa import __version__, aggregate, annotate, convert, download, extract, query, report
 
 app = typer.Typer(
     name='flowa',
@@ -13,24 +13,15 @@ app = typer.Typer(
     add_completion=False,
 )
 
-
-def setup_logging(log_level: str) -> None:
-    """Configure logging for the application.
-
-    Args:
-        log_level: Logging level (DEBUG, INFO, WARNING, ERROR)
-    """
-    level_map = {
-        'DEBUG': logging.DEBUG,
-        'INFO': logging.INFO,
-        'WARNING': logging.WARNING,
-        'ERROR': logging.ERROR,
-    }
-
-    logging.basicConfig(
-        level=level_map.get(log_level.upper(), logging.INFO),
-        format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
-    )
+# Configure root logger to write to stderr (stdout reserved for structured output)
+# Done after imports because some libraries (metapub) configure logging on import
+logging.basicConfig(
+    level=logging.INFO,
+    format='%(asctime)s %(levelname)s %(name)s: %(message)s',
+    datefmt='%Y-%m-%d %H:%M:%S',
+    stream=sys.stderr,
+    force=True,  # Override any existing configuration
+)
 
 
 @app.callback()
@@ -43,13 +34,16 @@ def main(
     ),
 ) -> None:
     """Flowa - Variant literature assessment pipeline."""
-    setup_logging(log_level)
+    level = getattr(logging, log_level.upper(), logging.INFO)
+    logging.getLogger().setLevel(level)
 
 
 # Register commands
 app.command(name='query')(query.query_pmids)
-app.command(name='download')(download.download_pdfs)
-app.command(name='process')(process.process_variant)
+app.command(name='download')(download.download_paper)
+app.command(name='convert')(convert.convert_paper)
+app.command(name='extract')(extract.extract_paper)
+app.command(name='aggregate')(aggregate.aggregate_evidence)
 app.command(name='annotate')(annotate.annotate_pdfs)
 app.command(name='report')(report.generate_report)
 
@@ -57,7 +51,7 @@ app.command(name='report')(report.generate_report)
 @app.command()
 def version() -> None:
     """Show version information."""
-    typer.echo(f'Flowa version {__version__}')
+    print(f'Flowa version {__version__}')
 
 
 if __name__ == '__main__':
