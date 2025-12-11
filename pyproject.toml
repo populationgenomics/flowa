@@ -3,32 +3,36 @@ name = "flowa"
 version = "0.1.0"
 description = "Variant literature assessment pipeline with AI extraction"
 readme = "README.md"
-requires-python = "==3.12.*"
+requires-python = ">=3.13"
 license = { file = "LICENSE" }
 dependencies = [
-    "typer",
-    "httpx",
-    "requests",
-    "openai",
+    "defusedxml",
     "docling",
-    "pypdf",
-    "metapub",
-    "rich",
+    "fsspec",
+    "gcsfs",  # GCS support for fsspec
+    "httpx",
     "jinja2",
     "markdown",
-    "defusedxml",
+    "metapub",
+    "pydantic-ai",
     "pydantic-settings",
+    "pypdf",
+    "s3fs",   # S3/MinIO support for fsspec
+    "typer",
 ]
 
 [project.optional-dependencies]
-dev = ["ruff", "mypy", "pytest", "types-Markdown", "types-requests", "types-defusedxml"]
-macos = ["mlx-vlm"]  # Faster Docling on Mac
+dev = ["ruff", "mypy", "pytest", "types-Markdown", "types-defusedxml"]
 
 [project.scripts]
 flowa = "flowa.cli:app"
 
+[tool.mypy]
+python_version = "3.13"
+disable_error_code = ["import-untyped"]
+
 [tool.ruff]
-target-version = "py312"
+target-version = "py313"
 line-length = 120
 src = ["src"]
 
