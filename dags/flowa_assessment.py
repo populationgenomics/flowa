@@ -19,7 +19,7 @@ Trigger via UI or REST API with params:
 
 import json
 import logging
-from datetime import timedelta
+from datetime import datetime, timedelta
 
 import httpx
 from airflow import DAG
@@ -27,7 +27,6 @@ from airflow.decorators import task
 from airflow.models import Variable
 from airflow.models.param import Param
 from airflow.operators.python import get_current_context
-from airflow.utils.dates import days_ago
 from airflow.utils.trigger_rule import TriggerRule
 from flowa_operator import flowa_task, flowa_task_partial
 
@@ -82,7 +81,7 @@ with DAG(
     default_args=default_args,
     description='Variant literature assessment with AI extraction',
     schedule=None,
-    start_date=days_ago(1),
+    start_date=datetime(2025, 1, 1),  # manually triggered
     catchup=False,
     max_active_tasks=50,
     render_template_as_native_obj=True,
