@@ -12,11 +12,11 @@ When running as an Airflow DAG, configuration is stored in **Airflow Variables**
 
 ### Core Variables
 
-| Variable | Description | Example |
-|----------|-------------|---------|
-| `FLOWA_STORAGE_BASE` | Storage path for PDFs, extractions, results | `s3://bucket`, `gs://bucket`, `file:///path` |
-| `FLOWA_MODEL` | LLM model ([pydantic-ai format](https://ai.pydantic.dev/models/)) | `bedrock:anthropic.claude-...`, `openai:gpt-...`, `google-gla:gemini-...` |
-| `FLOWA_QUERY_SOURCE` | Literature query source | `litvar`, `mastermind` |
+| Variable             | Description                                                       | Example                                                                   |
+| -------------------- | ----------------------------------------------------------------- | ------------------------------------------------------------------------- |
+| `FLOWA_STORAGE_BASE` | Storage path for PDFs, extractions, results                       | `s3://bucket`, `gs://bucket`, `file:///path`                              |
+| `FLOWA_MODEL`        | LLM model ([pydantic-ai format](https://ai.pydantic.dev/models/)) | `bedrock:anthropic.claude-...`, `openai:gpt-...`, `google-gla:gemini-...` |
+| `FLOWA_QUERY_SOURCE` | Literature query source                                           | `litvar`, `mastermind`                                                    |
 
 ### LLM Providers
 
@@ -28,20 +28,83 @@ Set `FLOWA_MODEL` to one of:
 
 Provider credentials:
 
-| Provider | Required Variables |
-|----------|-------------------|
-| AWS Bedrock | `AWS_PROFILE` + `AWS_REGION`, or `AWS_ACCESS_KEY_ID` + `AWS_SECRET_ACCESS_KEY` + `AWS_REGION` |
-| Google Gemini | `GOOGLE_API_KEY` |
-| OpenAI | `OPENAI_API_KEY` |
+| Provider      | Required Variables                                                                            |
+| ------------- | --------------------------------------------------------------------------------------------- |
+| AWS Bedrock   | `AWS_PROFILE` + `AWS_REGION`, or `AWS_ACCESS_KEY_ID` + `AWS_SECRET_ACCESS_KEY` + `AWS_REGION` |
+| Google Gemini | `GOOGLE_API_KEY`                                                                              |
+| OpenAI        | `OPENAI_API_KEY`                                                                              |
 
 ### Storage Backends
 
-| Backend | `FLOWA_STORAGE_BASE` | Additional Variables |
-|---------|---------------------|---------------------|
-| AWS S3 | `s3://bucket-name` | AWS credentials (see above) |
-| Google Cloud Storage | `gs://bucket-name` | `GOOGLE_APPLICATION_CREDENTIALS` or workload identity |
-| S3-compatible (MinIO) | `s3://bucket-name` | `FSSPEC_S3_ENDPOINT_URL`, `FSSPEC_S3_KEY`, `FSSPEC_S3_SECRET` |
-| Local filesystem | `file:///path` | — |
+| Backend               | `FLOWA_STORAGE_BASE` | Additional Variables                                          |
+| --------------------- | -------------------- | ------------------------------------------------------------- |
+| AWS S3                | `s3://bucket-name`   | AWS credentials (see above)                                   |
+| Google Cloud Storage  | `gs://bucket-name`   | `GOOGLE_APPLICATION_CREDENTIALS` or workload identity         |
+| S3-compatible (MinIO) | `s3://bucket-name`   | `FSSPEC_S3_ENDPOINT_URL`, `FSSPEC_S3_KEY`, `FSSPEC_S3_SECRET` |
+| Local filesystem      | `file:///path`       | —                                                             |
+
+## Prompt Customization
+
+Flowa supports site-specific prompt sets for different integrations. Each prompt set is a directory under `prompts/` containing prompt templates and Pydantic schema modules.
+
+### Configuration
+
+| Variable           | Description                             | Default   |
+| ------------------ | --------------------------------------- | --------- |
+| `FLOWA_PROMPT_SET` | Name of the prompt set directory to use | `generic` |
+
+### Prompt Set Structure
+
+Each prompt set must contain:
+
+```
+prompts/{prompt_set}/
+├── extraction_prompt.txt      # Prompt template for individual paper extraction
+├── extraction_schema.py       # Pydantic model defining ExtractionResult
+├── aggregate_prompt.txt       # Prompt template for cross-paper aggregation
+└── aggregate_schema.py        # Pydantic model defining AggregateResult
+```
+
+### Interface Requirements
+
+Schema modules must define Pydantic models with specific fields that Flowa's validation logic depends on:
+
+**extraction_schema.py** must define `ExtractionResult` with:
+
+- `evidence[].citations[].box_id` (int) - for bounding box validation
+
+**aggregate_schema.py** must define `AggregateResult` with:
+
+- `citations[].pmid` (int) - for paper reference validation
+- `citations[].box_id` (int) - for bounding box validation
+
+All other fields can be customized freely. See `prompts/generic/` for the default implementation.
+
+### Creating a Custom Prompt Set
+
+1. Create a directory under `prompts/` (e.g., `prompts/mysite/`)
+2. Copy and modify the prompt templates from `prompts/generic/`
+3. Create schema modules with Pydantic models satisfying the interface requirements
+4. Set `FLOWA_PROMPT_SET=mysite`
+
+### CI Integration (Injecting Prompts at Build Time)
+
+For private prompt sets that shouldn't be in the Flowa repository:
+
+```bash
+# In your CI pipeline
+git clone https://github.com/org/flowa.git
+cp -r /path/to/my-prompts flowa/prompts/mysite/
+docker build -t flowa-worker-mysite .
+```
+
+**Note:** Use `cp -r` to copy prompt files into the build context. Symlinks don't work because Docker copies the symlink itself, not the target, so the path becomes broken inside the container.
+
+Then set the `FLOWA_PROMPT_SET` Airflow Variable:
+
+```bash
+docker compose exec airflow-scheduler airflow variables set FLOWA_PROMPT_SET mysite
+```
 
 ## Local Development
 
@@ -210,10 +273,10 @@ docker compose down -v
 
 The DAG uses a portable operator abstraction that supports multiple deployment targets. Set `FLOWA_PLATFORM` (required) to select the platform:
 
-| Platform | Operator | Use Case |
-|----------|----------|----------|
-| `docker` | DockerOperator | Local development |
-| `ecs` | EcsRunTaskOperator | AWS MWAA / Fargate |
+| Platform     | Operator              | Use Case             |
+| ------------ | --------------------- | -------------------- |
+| `docker`     | DockerOperator        | Local development    |
+| `ecs`        | EcsRunTaskOperator    | AWS MWAA / Fargate   |
 | `kubernetes` | KubernetesPodOperator | GKE / Cloud Composer |
 
 ### Resource Profiles
@@ -222,8 +285,8 @@ Define resource profiles in `FLOWA_RESOURCE_PROFILES` to control CPU/memory allo
 
 ```json
 {
-  "default": {"cpu": "0.5", "memory": "1Gi"},
-  "heavy": {"cpu": "2", "memory": "8Gi"}
+  "default": { "cpu": "0.5", "memory": "1Gi" },
+  "heavy": { "cpu": "2", "memory": "8Gi" }
 }
 ```
 
@@ -305,6 +368,7 @@ kubectl annotate serviceaccount flowa-worker-ksa \
 ### Worker Image
 
 Set `FLOWA_WORKER_IMAGE` to your container registry URL:
+
 - Local: `flowa-worker:latest` (default)
 - ECS: `123456789.dkr.ecr.region.amazonaws.com/flowa-worker:latest`
 - GKE: `gcr.io/project/flowa-worker:latest`

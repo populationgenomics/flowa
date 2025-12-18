@@ -55,6 +55,8 @@ def _get_worker_env() -> dict[str, str]:
         # Required
         'FLOWA_STORAGE_BASE': Variable.get('FLOWA_STORAGE_BASE'),
         'FLOWA_MODEL': Variable.get('FLOWA_MODEL'),
+        # Required (with default)
+        'FLOWA_PROMPT_SET': Variable.get('FLOWA_PROMPT_SET', default_var='generic'),
         # Optional - only set if configured
         'FSSPEC_S3_ENDPOINT_URL': get_optional('FSSPEC_S3_ENDPOINT_URL'),
         'FSSPEC_S3_KEY': get_optional('FSSPEC_S3_KEY'),
