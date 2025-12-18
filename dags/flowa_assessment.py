@@ -162,13 +162,6 @@ with DAG(
         WORKER_ENV,
     )
 
-    report_task = flowa_task(
-        'generate_report',
-        "flowa report --variant-id '{{ params.variant_id }}' "
-        "--output '{{ var.value.FLOWA_STORAGE_BASE }}/assessments/{{ params.variant_id }}/report.html'",
-        WORKER_ENV,
-    )
-
     callback_task = send_callback()
 
     # =========================================================================
@@ -176,7 +169,7 @@ with DAG(
     # =========================================================================
     # query -> build_process_commands -> process_paper[] -> aggregate_results (ALL_DONE)
     #                                                               |
-    #                                                      annotate_pdfs -> generate_report -> send_callback (ALL_DONE)
+    #                                                      annotate_pdfs -> send_callback (ALL_DONE)
 
     query_task >> process_commands >> process_tasks >> aggregate_task
-    aggregate_task >> annotate_task >> report_task >> callback_task
+    aggregate_task >> annotate_task >> callback_task

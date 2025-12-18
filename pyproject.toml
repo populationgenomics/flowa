@@ -11,8 +11,6 @@ dependencies = [
     "fsspec",
     "gcsfs",  # GCS support for fsspec
     "httpx",
-    "jinja2",
-    "markdown",
     "metapub",
     "pydantic-ai",
     "pydantic-settings",
@@ -22,7 +20,7 @@ dependencies = [
 ]
 
 [project.optional-dependencies]
-dev = ["ruff", "mypy", "pytest", "types-Markdown", "types-defusedxml"]
+dev = ["ruff", "mypy", "pytest", "types-defusedxml"]
 
 [project.scripts]
 flowa = "flowa.cli:app"
