@@ -13,7 +13,6 @@ WORKDIR /app
 COPY pyproject.toml uv.lock LICENSE README.md ./
 COPY src/ ./src/
 COPY prompts/ ./prompts/
-COPY templates/ ./templates/
 
 # Export dependencies and install system-wide to use system certs
 RUN uv export --frozen --no-hashes --no-dev -o requirements.txt && \

@@ -3,61 +3,42 @@
 import json
 import logging
 import os
-from pathlib import Path
 from typing import Any
 
 import typer
-from pydantic import BaseModel, Field
+from pydantic import BaseModel
 from pydantic_ai import Agent, ModelRetry, RunContext
 
 from flowa.docling import load_bbox_mapping
 from flowa.models import create_model, get_thinking_settings
+from flowa.prompts import load_model, load_prompt
 from flowa.storage import assessment_url, exists, paper_url, read_json, write_bytes, write_json
 
 log = logging.getLogger(__name__)
 
 
-# Pydantic models for structured output
-class AggregateCitation(BaseModel):
-    """A citation to a specific bbox in a source paper."""
-
-    pmid: int = Field(description='PubMed ID of the source paper')
-    box_id: int = Field(description='The bounding box ID from the source text in the paper')
-    commentary: str = Field(description='What this specific evidence states (appears as annotation in highlighted PDF)')
-
-
-class AggregateResult(BaseModel):
-    """Result of aggregate assessment across all papers."""
-
-    classification: str = Field(
-        description='ACMG classification: Pathogenic, Likely Pathogenic, VUS, Likely Benign, or Benign'
-    )
-    classification_rationale: str = Field(description='Brief explanation of why this classification was selected')
-    description: str = Field(description='The mandatory template filled in with specific details from the evidence')
-    notes: str = Field(description='Detailed curator-style synthesis in Markdown format')
-    citations: list[AggregateCitation] = Field(
-        description='All citations supporting factual claims in the detailed notes'
-    )
-
-
 def create_aggregate_agent(
     model: str,
     bbox_mappings: dict[int, dict[int, Any]],
-) -> Agent[None, AggregateResult]:
+    output_type: type[BaseModel],
+) -> Agent[None, BaseModel]:
     """Create a Pydantic AI agent with citation validation across all papers."""
-    agent: Agent[None, AggregateResult] = Agent(
+    agent: Agent[None, BaseModel] = Agent(
         create_model(model),
-        output_type=AggregateResult,
+        output_type=output_type,
         retries=3,
         model_settings=get_thinking_settings(model, 'aggregation'),
     )
 
     @agent.output_validator
-    def validate_citations(ctx: RunContext[None], result: AggregateResult) -> AggregateResult:
-        """Validate that all citation (pmid, box_id) pairs exist."""
+    def validate_citations(ctx: RunContext[None], result: BaseModel) -> BaseModel:
+        """Validate that all citation (pmid, box_id) pairs exist.
+
+        Requires: result.citations[].pmid and result.citations[].box_id
+        """
         invalid = []
 
-        for citation in result.citations:
+        for citation in result.citations:  # type: ignore[attr-defined]
             pmid = citation.pmid
             if pmid not in bbox_mappings:
                 invalid.append(f'pmid={pmid} (paper not found)')
@@ -143,9 +124,9 @@ def aggregate_evidence(
 
     log.info('Aggregating evidence from %d papers (model: %s)', len(evidence_extractions), model)
 
-    # Load prompt template
-    prompts_dir = Path('prompts')
-    prompt_template = (prompts_dir / 'aggregate_assessment_prompt.txt').read_text()
+    # Load prompt and schema from prompt set
+    prompt_template = load_prompt('aggregate_prompt')
+    output_type = load_model('aggregate_schema', 'AggregateResult')
 
     prompt = prompt_template.format(
         variant_details=variant_details,
@@ -161,7 +142,7 @@ def aggregate_evidence(
         return
 
     # Create agent with citation validation
-    agent = create_aggregate_agent(model, bbox_mappings)
+    agent = create_aggregate_agent(model, bbox_mappings, output_type)
 
     log.info('Calling LLM for aggregate assessment')
     result = agent.run_sync(prompt)
@@ -173,8 +154,7 @@ def aggregate_evidence(
     write_bytes(aggregate_raw_url, result.all_messages_json())
 
     log.info(
-        'Aggregated variant %s: classification=%s, %d citations',
+        'Aggregated variant %s: %d citations',
         variant_id,
-        result.output.classification,
-        len(result.output.citations),
+        len(result.output.citations),  # type: ignore[attr-defined]
     )
