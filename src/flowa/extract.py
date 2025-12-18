@@ -3,15 +3,15 @@
 import json
 import logging
 import os
-from pathlib import Path
 from typing import Any
 
 import typer
-from pydantic import BaseModel, Field
+from pydantic import BaseModel
 from pydantic_ai import Agent, ModelRetry, RunContext
 
 from flowa.docling import serialize_with_bbox_ids
 from flowa.models import create_model, get_thinking_settings
+from flowa.prompts import load_model, load_prompt
 from flowa.storage import assessment_url, exists, paper_url, read_json, write_bytes, write_json
 
 log = logging.getLogger(__name__)
@@ -19,30 +19,6 @@ log = logging.getLogger(__name__)
 # Maximum tokens per paper (heuristic: 1 token ≈ 4 chars)
 MAX_PAPER_TOKENS = 60000
 MAX_PAPER_CHARS = MAX_PAPER_TOKENS * 4
-
-
-# Pydantic models for structured output
-class Citation(BaseModel):
-    """A citation to a specific bbox in the source document."""
-
-    box_id: int = Field(description='The bounding box ID from the source text')
-    commentary: str = Field(
-        description='What this specific text states/demonstrates (appears as annotation in highlighted PDF)'
-    )
-
-
-class EvidenceFinding(BaseModel):
-    """A specific factual finding from the paper."""
-
-    finding: str = Field(description='A specific factual claim about the variant from the paper')
-    citations: list[Citation] = Field(description='Citations supporting this finding', min_length=1)
-
-
-class ExtractionResult(BaseModel):
-    """Result of evidence extraction from a single paper."""
-
-    variant_discussed: bool = Field(description='Whether this specific variant is discussed in the paper')
-    evidence: list[EvidenceFinding] = Field(description='List of evidence findings extracted from the paper')
 
 
 def truncate_paper_text(full_text: str, pmid: int) -> str:
@@ -57,21 +33,28 @@ def truncate_paper_text(full_text: str, pmid: int) -> str:
     return full_text[:available_chars] + truncation_note
 
 
-def create_extraction_agent(model: str, bbox_mapping: dict[int, Any]) -> Agent[None, ExtractionResult]:
+def create_extraction_agent(
+    model: str,
+    bbox_mapping: dict[int, Any],
+    output_type: type[BaseModel],
+) -> Agent[None, BaseModel]:
     """Create a Pydantic AI agent with citation validation."""
-    agent: Agent[None, ExtractionResult] = Agent(
+    agent: Agent[None, BaseModel] = Agent(
         create_model(model),
-        output_type=ExtractionResult,
+        output_type=output_type,
         retries=3,
         model_settings=get_thinking_settings(model, 'extraction'),
     )
 
     @agent.output_validator
-    def validate_citations(ctx: RunContext[None], result: ExtractionResult) -> ExtractionResult:
-        """Validate that all citation box_ids exist in bbox_mapping."""
+    def validate_citations(ctx: RunContext[None], result: BaseModel) -> BaseModel:
+        """Validate that all citation box_ids exist in bbox_mapping.
+
+        Requires: result.evidence[].citations[].box_id
+        """
         invalid = []
 
-        for finding in result.evidence:
+        for finding in result.evidence:  # type: ignore[attr-defined]
             for citation in finding.citations:
                 if citation.box_id not in bbox_mapping:
                     invalid.append(f'box_id={citation.box_id}')
@@ -125,9 +108,9 @@ def extract_paper(
     full_text, bbox_mapping = serialize_with_bbox_ids(docling_json)
     full_text = truncate_paper_text(full_text, pmid)
 
-    # Load prompt template
-    prompts_dir = Path('prompts')
-    prompt_template = (prompts_dir / 'individual_extraction_prompt.txt').read_text()
+    # Load prompt and schema from prompt set
+    prompt_template = load_prompt('extraction_prompt')
+    output_type = load_model('extraction_schema', 'ExtractionResult')
 
     prompt = prompt_template.format(
         variant_details=variant_details,
@@ -136,7 +119,7 @@ def extract_paper(
     )
 
     # Create agent with citation validation
-    agent = create_extraction_agent(model, bbox_mapping)
+    agent = create_extraction_agent(model, bbox_mapping, output_type)
 
     log.info('Calling LLM for extraction')
     result = agent.run_sync(prompt)
@@ -150,6 +133,6 @@ def extract_paper(
     log.info(
         'Extracted PMID %s: variant_discussed=%s, %d findings',
         pmid,
-        result.output.variant_discussed,
-        len(result.output.evidence),
+        result.output.variant_discussed,  # type: ignore[attr-defined]
+        len(result.output.evidence),  # type: ignore[attr-defined]
     )

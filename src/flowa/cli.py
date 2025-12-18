@@ -5,7 +5,7 @@ import sys
 
 import typer
 
-from flowa import __version__, aggregate, annotate, convert, download, extract, query, report
+from flowa import __version__, aggregate, annotate, convert, download, extract, query
 
 app = typer.Typer(
     name='flowa',
@@ -45,7 +45,6 @@ app.command(name='convert')(convert.convert_paper)
 app.command(name='extract')(extract.extract_paper)
 app.command(name='aggregate')(aggregate.aggregate_evidence)
 app.command(name='annotate')(annotate.annotate_pdfs)
-app.command(name='report')(report.generate_report)
 
 
 @app.command()

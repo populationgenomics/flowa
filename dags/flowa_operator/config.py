@@ -5,10 +5,13 @@ validated into dataclasses at DAG parse time for early error detection.
 """
 
 import json
+import logging
 from dataclasses import dataclass, field
 from typing import Any, Literal
 
 from airflow.models import Variable
+
+log = logging.getLogger(__name__)
 
 Platform = Literal['docker', 'ecs', 'kubernetes']
 
@@ -74,14 +77,13 @@ def _parse_json_variable(name: str, default: str = '{}') -> dict[str, Any]:
 def get_platform() -> Platform:
     """Get the configured platform.
 
-    Raises if FLOWA_PLATFORM is not set.
+    Defaults to 'docker' with a warning if FLOWA_PLATFORM is not set.
     """
     try:
         platform = Variable.get('FLOWA_PLATFORM')
-    except KeyError as e:
-        raise ValueError(
-            'FLOWA_PLATFORM Airflow Variable is required. Set it to one of: docker, ecs, kubernetes'
-        ) from e
+    except KeyError:
+        log.warning('FLOWA_PLATFORM not set, defaulting to docker')
+        return 'docker'
     if platform not in ('docker', 'ecs', 'kubernetes'):
         raise ValueError(f"Invalid FLOWA_PLATFORM: '{platform}'. Must be one of: docker, ecs, kubernetes")
     return platform  # type: ignore[return-value]
