@@ -24,7 +24,6 @@ from datetime import datetime, timedelta
 import httpx
 from airflow import DAG
 from airflow.decorators import task
-from airflow.models import Variable
 from airflow.models.param import Param
 from airflow.operators.python import get_current_context
 from airflow.utils.trigger_rule import TriggerRule
@@ -41,39 +40,28 @@ default_args = {
 }
 
 
-def _get_worker_env() -> dict[str, str]:
-    """Build worker environment from Airflow variables.
-
-    Required variables raise if missing. Optional variables are omitted if not set.
-    """
-
-    def get_optional(name: str) -> str | None:
-        return Variable.get(name, default_var=None)
-
-    env = {
-        # Required
-        'FLOWA_STORAGE_BASE': Variable.get('FLOWA_STORAGE_BASE'),
-        'FLOWA_MODEL': Variable.get('FLOWA_MODEL'),
-        # Required (with default)
-        'FLOWA_PROMPT_SET': Variable.get('FLOWA_PROMPT_SET', default_var='generic'),
-        # Optional - only set if configured
-        'FSSPEC_S3_ENDPOINT_URL': get_optional('FSSPEC_S3_ENDPOINT_URL'),
-        'FSSPEC_S3_KEY': get_optional('FSSPEC_S3_KEY'),
-        'FSSPEC_S3_SECRET': get_optional('FSSPEC_S3_SECRET'),
-        'AWS_ACCESS_KEY_ID': get_optional('AWS_ACCESS_KEY_ID'),
-        'AWS_SECRET_ACCESS_KEY': get_optional('AWS_SECRET_ACCESS_KEY'),
-        'AWS_DEFAULT_REGION': get_optional('AWS_DEFAULT_REGION'),
-        'GOOGLE_APPLICATION_CREDENTIALS': get_optional('GOOGLE_APPLICATION_CREDENTIALS'),
-        'OPENAI_API_KEY': get_optional('OPENAI_API_KEY'),
-        'OPENAI_BASE_URL': get_optional('OPENAI_BASE_URL'),
-        'GOOGLE_API_KEY': get_optional('GOOGLE_API_KEY'),
-        'MASTERMIND_API_TOKEN': get_optional('MASTERMIND_API_TOKEN'),
-        'NCBI_API_KEY': get_optional('NCBI_API_KEY'),
-    }
-    return {k: v for k, v in env.items() if v is not None}
-
-
-WORKER_ENV = _get_worker_env()
+# Worker environment using Jinja templates - resolved at task runtime, not parse time.
+# Required vars will fail at runtime if not set. Optional vars default to empty string.
+WORKER_ENV = {
+    # Required
+    'FLOWA_STORAGE_BASE': '{{ var.value.FLOWA_STORAGE_BASE }}',
+    'FLOWA_MODEL': '{{ var.value.FLOWA_MODEL }}',
+    # Required (with default)
+    'FLOWA_PROMPT_SET': '{{ var.value.get("FLOWA_PROMPT_SET", "generic") }}',
+    # Optional - empty string if not configured
+    'FSSPEC_S3_ENDPOINT_URL': '{{ var.value.get("FSSPEC_S3_ENDPOINT_URL", "") }}',
+    'FSSPEC_S3_KEY': '{{ var.value.get("FSSPEC_S3_KEY", "") }}',
+    'FSSPEC_S3_SECRET': '{{ var.value.get("FSSPEC_S3_SECRET", "") }}',
+    'AWS_ACCESS_KEY_ID': '{{ var.value.get("AWS_ACCESS_KEY_ID", "") }}',
+    'AWS_SECRET_ACCESS_KEY': '{{ var.value.get("AWS_SECRET_ACCESS_KEY", "") }}',
+    'AWS_DEFAULT_REGION': '{{ var.value.get("AWS_DEFAULT_REGION", "") }}',
+    'GOOGLE_APPLICATION_CREDENTIALS': '{{ var.value.get("GOOGLE_APPLICATION_CREDENTIALS", "") }}',
+    'OPENAI_API_KEY': '{{ var.value.get("OPENAI_API_KEY", "") }}',
+    'OPENAI_BASE_URL': '{{ var.value.get("OPENAI_BASE_URL", "") }}',
+    'GOOGLE_API_KEY': '{{ var.value.get("GOOGLE_API_KEY", "") }}',
+    'MASTERMIND_API_TOKEN': '{{ var.value.get("MASTERMIND_API_TOKEN", "") }}',
+    'NCBI_API_KEY': '{{ var.value.get("NCBI_API_KEY", "") }}',
+}
 
 
 with DAG(

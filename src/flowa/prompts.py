@@ -31,7 +31,7 @@ log = logging.getLogger(__name__)
 
 def get_prompt_set() -> str:
     """Return current prompt set name from FLOWA_PROMPT_SET env var."""
-    return os.environ.get('FLOWA_PROMPT_SET', 'generic')
+    return os.environ.get('FLOWA_PROMPT_SET') or 'generic'
 
 
 def get_prompts_dir() -> Path:
