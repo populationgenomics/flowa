@@ -117,11 +117,17 @@ docker compose up -d
 docker compose build flowa-worker
 ```
 
+To also start a local MinIO instance (optional, use `--profile minio`):
+
+```bash
+docker compose --profile minio up -d
+```
+
 **Services:**
 
 - Airflow UI: <http://localhost:18080> (admin/admin)
-- MinIO Console: <http://localhost:19001> (minioadmin/minioadmin)
-- MinIO S3 API: <http://localhost:19000>
+- MinIO Console: <http://localhost:9004> (admin/password) — only with `--profile minio`
+- MinIO S3 API: <http://localhost:9003> — only with `--profile minio`
 
 ### Architecture
 
@@ -154,16 +160,16 @@ Or use the Airflow UI: **Admin → Variables**
 
 #### MinIO + Bedrock
 
-Uses the built-in MinIO service (bucket `flowa` is created automatically on startup).
+Connects to a MinIO instance at `localhost:9003`. If using `--profile minio`, the bucket `flowa` is created automatically.
 
 ```bash
 docker compose exec airflow-scheduler airflow variables set FLOWA_PLATFORM docker
 docker compose exec airflow-scheduler airflow variables set FLOWA_STORAGE_BASE "s3://flowa"
 docker compose exec airflow-scheduler airflow variables set FLOWA_MODEL "bedrock:au.anthropic.claude-sonnet-4-5-20250929-v1:0"
 docker compose exec airflow-scheduler airflow variables set FLOWA_QUERY_SOURCE litvar
-docker compose exec airflow-scheduler airflow variables set FSSPEC_S3_ENDPOINT_URL "http://minio:9000"
-docker compose exec airflow-scheduler airflow variables set FSSPEC_S3_KEY "minioadmin"
-docker compose exec airflow-scheduler airflow variables set FSSPEC_S3_SECRET "minioadmin"
+docker compose exec airflow-scheduler airflow variables set FSSPEC_S3_ENDPOINT_URL "http://host.docker.internal:9003"
+docker compose exec airflow-scheduler airflow variables set FSSPEC_S3_KEY "admin"
+docker compose exec airflow-scheduler airflow variables set FSSPEC_S3_SECRET "password"
 docker compose exec airflow-scheduler airflow variables set AWS_DEFAULT_REGION "ap-southeast-2"
 ```
 
@@ -237,13 +243,13 @@ uv run flowa convert --pmid 12345678
 uv run flowa extract --variant-id test --pmid 12345678
 ```
 
-Using the built-in MinIO:
+Using MinIO at localhost:9003:
 
 ```bash
 FLOWA_STORAGE_BASE=s3://flowa \
-FSSPEC_S3_ENDPOINT_URL=http://localhost:19000 \
-FSSPEC_S3_KEY=minioadmin \
-FSSPEC_S3_SECRET=minioadmin \
+FSSPEC_S3_ENDPOINT_URL=http://localhost:9003 \
+FSSPEC_S3_KEY=admin \
+FSSPEC_S3_SECRET=password \
 uv run flowa convert --pmid 12345678
 ```
 
