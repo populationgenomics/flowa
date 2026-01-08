@@ -34,16 +34,17 @@ def create_aggregate_agent(
     def validate_citations(ctx: RunContext[None], result: BaseModel) -> BaseModel:
         """Validate that all citation (pmid, box_id) pairs exist.
 
-        Requires: result.citations[].pmid and result.citations[].box_id
+        Requires: result.results[category].citations[].pmid and .box_id
         """
         invalid = []
 
-        for citation in result.citations:  # type: ignore[attr-defined]
-            pmid = citation.pmid
-            if pmid not in bbox_mappings:
-                invalid.append(f'pmid={pmid} (paper not found)')
-            elif citation.box_id not in bbox_mappings[pmid]:
-                invalid.append(f'pmid={pmid}, box_id={citation.box_id}')
+        for category, cat_result in result.results.items():  # type: ignore[attr-defined]
+            for citation in cat_result.citations:
+                pmid = citation.pmid
+                if pmid not in bbox_mappings:
+                    invalid.append(f'pmid={pmid} (paper not found)')
+                elif citation.box_id not in bbox_mappings[pmid]:
+                    invalid.append(f'pmid={pmid}, box_id={citation.box_id}, category={category}')
 
         if invalid:
             raise ModelRetry(f'Invalid citations not found in documents: {", ".join(invalid)}')
@@ -153,8 +154,11 @@ def aggregate_evidence(
     # Store raw LLM conversation for debugging
     write_bytes(aggregate_raw_url, result.all_messages_json())
 
+    results_map = result.output.results  # type: ignore[attr-defined]
+    total_citations = sum(len(cat_result.citations) for cat_result in results_map.values())
     log.info(
-        'Aggregated variant %s: %d citations',
+        'Aggregated variant %s: %d categories, %d citations',
         variant_id,
-        len(result.output.citations),  # type: ignore[attr-defined]
+        len(results_map),
+        total_citations,
     )

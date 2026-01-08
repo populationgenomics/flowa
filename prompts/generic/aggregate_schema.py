@@ -4,7 +4,7 @@ This module defines the output structure for aggregate assessment across papers.
 The AggregateResult class is loaded dynamically by Flowa.
 
 Interface requirements (accessed by Flowa's validation logic):
-    - citations[].pmid and citations[].box_id must exist for bbox validation
+    - results[category].citations[].pmid and .box_id must exist for bbox validation
 """
 
 from pydantic import BaseModel, Field
@@ -18,15 +18,26 @@ class AggregateCitation(BaseModel):
     commentary: str = Field(description='What this specific evidence states (appears as annotation in highlighted PDF)')
 
 
-class AggregateResult(BaseModel):
-    """Result of aggregate assessment across all papers."""
+class CategoryResult(BaseModel):
+    """Result for a single assessment category."""
 
     classification: str = Field(
         description='ACMG classification: Pathogenic, Likely Pathogenic, VUS, Likely Benign, or Benign'
     )
     classification_rationale: str = Field(description='Brief explanation of why this classification was selected')
-    description: str = Field(description='The mandatory template filled in with specific details from the evidence')
+    description: str = Field(description='Summary filled in with specific details from the evidence')
     notes: str = Field(description='Detailed curator-style synthesis in Markdown format')
     citations: list[AggregateCitation] = Field(
-        description='All citations supporting factual claims in the detailed notes'
+        description='All citations supporting factual claims in the notes'
+    )
+
+
+class AggregateResult(BaseModel):
+    """Multi-category aggregate result for ACMG-style variant assessment.
+
+    Keys are assessment category identifiers (e.g., 'acmg_classification').
+    """
+
+    results: dict[str, CategoryResult] = Field(
+        description='Map from category identifier to the assessment result for that category'
     )

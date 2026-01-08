@@ -17,9 +17,17 @@ log = logging.getLogger(__name__)
 
 
 def load_aggregate_citations(variant_id: str) -> list[dict[str, Any]]:
-    """Load citations from assessments/{variant_id}/aggregate.json."""
+    """Load citations from assessments/{variant_id}/aggregate.json.
+
+    Collects citations from all categories in results map, embedding the category
+    in each citation for annotation purposes.
+    """
     aggregate_data = read_json(assessment_url(variant_id, 'aggregate.json'))
-    citations: list[dict[str, Any]] = aggregate_data.get('citations', [])
+    results = aggregate_data.get('results', {})
+    citations: list[dict[str, Any]] = []
+    for category, cat_result in results.items():
+        for citation in cat_result.get('citations', []):
+            citations.append({**citation, 'category': category})
     if not citations:
         log.info('No citations found in aggregate for %s', variant_id)
     return citations
@@ -51,6 +59,7 @@ def organize_citations_by_pmid(
             {
                 'box_id': box_id,
                 'commentary': commentary,
+                'category': citation.get('category', ''),
                 'page': bbox_info['page'],
                 'bbox': bbox_info['bbox'],
                 'coord_origin': bbox_info.get('coord_origin'),
@@ -141,7 +150,9 @@ def create_pdf_annotations(
                 highlight_color='ffeb3b',
             )
 
-            content = citation['commentary']
+            category = citation.get('category', '')
+            commentary = citation['commentary']
+            content = f'[{category}] {commentary}' if category else commentary
             highlight_annotation.update(
                 {
                     NameObject('/Contents'): TextStringObject(content),
