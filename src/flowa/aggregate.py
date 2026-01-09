@@ -148,8 +148,20 @@ def aggregate_evidence(
     log.info('Calling LLM for aggregate assessment')
     result = agent.run_sync(prompt)
 
+    # Enrich citations with bbox info from bbox_mappings
+    aggregate_dict = result.output.model_dump()
+    for cat_result in aggregate_dict['results'].values():
+        for citation in cat_result['citations']:
+            pmid = citation['pmid']
+            box_id = citation['box_id']
+            bbox_info = bbox_mappings[pmid][box_id]
+            citation['page'] = bbox_info['page']
+            citation['bbox'] = bbox_info['bbox']
+            if 'coord_origin' in bbox_info:
+                citation['coord_origin'] = bbox_info['coord_origin']
+
     # Store structured aggregate result
-    write_json(aggregate_url, result.output.model_dump())
+    write_json(aggregate_url, aggregate_dict)
 
     # Store raw LLM conversation for debugging
     write_bytes(aggregate_raw_url, result.all_messages_json())
