@@ -12,6 +12,7 @@ from pydantic_ai import Agent, ModelRetry, RunContext
 from flowa.docling import load_bbox_mapping
 from flowa.models import create_model, get_thinking_settings
 from flowa.prompts import load_model, load_prompt
+from flowa.schema import AGGREGATE_SCHEMA_VERSION, with_schema_version
 from flowa.storage import assessment_url, exists, paper_url, read_json, write_bytes, write_json
 
 log = logging.getLogger(__name__)
@@ -161,7 +162,7 @@ def aggregate_evidence(
                 citation['coord_origin'] = bbox_info['coord_origin']
 
     # Store structured aggregate result
-    write_json(aggregate_url, aggregate_dict)
+    write_json(aggregate_url, with_schema_version(aggregate_dict, AGGREGATE_SCHEMA_VERSION))
 
     # Store raw LLM conversation for debugging
     write_bytes(aggregate_raw_url, result.all_messages_json())

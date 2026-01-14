@@ -15,6 +15,7 @@ from metapub import PubMedFetcher  # type: ignore[import-untyped]
 from metapub.ncbi_errors import NCBIServiceError  # type: ignore[import-untyped]
 from pypdf import PdfWriter
 
+from flowa.schema import METADATA_SCHEMA_VERSION, with_schema_version
 from flowa.storage import exists, paper_url, write_bytes, write_json
 
 log = logging.getLogger(__name__)
@@ -221,13 +222,13 @@ def download_paper(
 
     if pdf_bytes is None:
         # Store metadata to mark as "tried" - absence of PDF means unavailable
-        write_json(metadata_url, metadata)
+        write_json(metadata_url, with_schema_version(metadata, METADATA_SCHEMA_VERSION))
         log.info('PMID %s not available in PMC: %s', pmid, message)
         return
 
     # Store PDF and metadata
     write_bytes(pdf_url, pdf_bytes)
-    write_json(metadata_url, metadata)
+    write_json(metadata_url, with_schema_version(metadata, METADATA_SCHEMA_VERSION))
 
     log.info('Downloaded PMID %s: %s (%d bytes)', pmid, message, len(pdf_bytes))
 
