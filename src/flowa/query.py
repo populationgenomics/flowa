@@ -9,6 +9,7 @@ import httpx
 import typer
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
+from flowa.schema import QUERY_SCHEMA_VERSION, with_schema_version
 from flowa.storage import assessment_url, read_json, write_json
 
 
@@ -190,7 +191,7 @@ def query_pmids(
         raise typer.Exit(1) from e
 
     # Cache result to object storage
-    write_json(cache_url, asdict(result))
+    write_json(cache_url, with_schema_version(asdict(result), QUERY_SCHEMA_VERSION))
     log.info('Cached query results to %s', cache_url)
 
     # Output PMID list to stdout for Airflow XCom
