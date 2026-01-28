@@ -69,8 +69,10 @@ class KubernetesConfig:
 
 
 def _parse_json_variable(name: str, default: str = '{}') -> dict[str, Any]:
-    """Parse a JSON Airflow Variable, returning default if not set."""
+    """Parse a JSON Airflow Variable, returning default if not set or empty."""
     raw = Variable.get(name, default_var=default)
+    if not raw:
+        raw = default
     return json.loads(raw) if isinstance(raw, str) else raw
 
 
