@@ -320,7 +320,10 @@ Set `FLOWA_ECS_CONFIG` (required when `FLOWA_PLATFORM=ecs`):
 }
 ```
 
-**Task Definition Requirements:** The ECS Task Definition must be registered with CPU/memory that can accommodate your largest resource profile. Fargate allows overriding these values down but not up beyond the task definition limits. Since the `heavy` profile requires 2 vCPU / 8Gi, register your task definition with at least these values.
+**Task Definition Requirements:**
+
+- The Task Definition specifies the **container image** (e.g., ECR URL). `FLOWA_WORKER_IMAGE` is not used for ECS; update the Task Definition to change the image.
+- CPU/memory must accommodate your largest resource profile. Fargate allows overriding these values down but not up beyond the task definition limits. Since the `heavy` profile requires 2 vCPU / 8Gi, register your task definition with at least these values.
 
 ### Kubernetes / Cloud Composer Configuration
 
@@ -373,8 +376,7 @@ kubectl annotate serviceaccount flowa-worker-ksa \
 
 ### Worker Image
 
-Set `FLOWA_WORKER_IMAGE` to your container registry URL:
+Set `FLOWA_WORKER_IMAGE` to your container registry URL (Docker and Kubernetes only; ECS uses the image from the Task Definition):
 
 - Local: `flowa-worker:latest` (default)
-- ECS: `123456789.dkr.ecr.region.amazonaws.com/flowa-worker:latest`
 - GKE: `gcr.io/project/flowa-worker:latest`
