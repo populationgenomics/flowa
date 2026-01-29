@@ -54,6 +54,11 @@ ignore = [
     "B008",   # Do not perform function call in argument defaults - false positive with Typer
 ]
 
+[tool.uv]
+# Use CPU-only PyTorch (saves ~2GB vs CUDA version)
+extra-index-url = ["https://download.pytorch.org/whl/cpu"]
+index-strategy = "unsafe-best-match"
+
 [build-system]
 requires = ["hatchling"]
 build-backend = "hatchling.build"
