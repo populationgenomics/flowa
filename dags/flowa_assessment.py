@@ -24,6 +24,7 @@ from datetime import datetime, timedelta
 import httpx
 from airflow import DAG
 from airflow.decorators import task
+from airflow.models import Variable
 from airflow.models.param import Param
 from airflow.operators.python import get_current_context
 from airflow.utils.trigger_rule import TriggerRule
@@ -40,27 +41,42 @@ default_args = {
 }
 
 
-# Worker environment using Jinja templates - resolved at task runtime, not parse time.
-# Required vars will fail at runtime if not set. Optional vars default to empty string.
+def _optional_env(name: str) -> dict[str, str]:
+    """Include env var only if the Airflow Variable is set and non-empty.
+
+    Parse-time Variable access is intentional here: empty strings cause bugs in
+    libraries like fsspec (FSSPEC_S3_ENDPOINT_URL="" → "Invalid endpoint" error).
+    This is acceptable for ~12 checks in one DAG. Don't "fix" by using Jinja defaults.
+    """
+    try:
+        if Variable.get(name):
+            return {name: f'{{{{ var.value.{name} }}}}'}
+    except KeyError:
+        pass
+    return {}
+
+
+# Worker environment variables.
+# Required vars use Jinja templates (fail at runtime if missing).
+# Optional vars checked at parse time - only included if set (see _optional_env).
 WORKER_ENV = {
     # Required
     'FLOWA_STORAGE_BASE': '{{ var.value.FLOWA_STORAGE_BASE }}',
     'FLOWA_MODEL': '{{ var.value.FLOWA_MODEL }}',
-    # Required (with default)
     'FLOWA_PROMPT_SET': '{{ var.value.get("FLOWA_PROMPT_SET", "generic") }}',
-    # Optional - empty string if not configured
-    'FSSPEC_S3_ENDPOINT_URL': '{{ var.value.get("FSSPEC_S3_ENDPOINT_URL", "") }}',
-    'FSSPEC_S3_KEY': '{{ var.value.get("FSSPEC_S3_KEY", "") }}',
-    'FSSPEC_S3_SECRET': '{{ var.value.get("FSSPEC_S3_SECRET", "") }}',
-    'AWS_ACCESS_KEY_ID': '{{ var.value.get("AWS_ACCESS_KEY_ID", "") }}',
-    'AWS_SECRET_ACCESS_KEY': '{{ var.value.get("AWS_SECRET_ACCESS_KEY", "") }}',
-    'AWS_DEFAULT_REGION': '{{ var.value.get("AWS_DEFAULT_REGION", "") }}',
-    'GOOGLE_APPLICATION_CREDENTIALS': '{{ var.value.get("GOOGLE_APPLICATION_CREDENTIALS", "") }}',
-    'OPENAI_API_KEY': '{{ var.value.get("OPENAI_API_KEY", "") }}',
-    'OPENAI_BASE_URL': '{{ var.value.get("OPENAI_BASE_URL", "") }}',
-    'GOOGLE_API_KEY': '{{ var.value.get("GOOGLE_API_KEY", "") }}',
-    'MASTERMIND_API_TOKEN': '{{ var.value.get("MASTERMIND_API_TOKEN", "") }}',
-    'NCBI_API_KEY': '{{ var.value.get("NCBI_API_KEY", "") }}',
+    # Optional
+    **_optional_env('FSSPEC_S3_ENDPOINT_URL'),
+    **_optional_env('FSSPEC_S3_KEY'),
+    **_optional_env('FSSPEC_S3_SECRET'),
+    **_optional_env('AWS_ACCESS_KEY_ID'),
+    **_optional_env('AWS_SECRET_ACCESS_KEY'),
+    **_optional_env('AWS_DEFAULT_REGION'),
+    **_optional_env('GOOGLE_APPLICATION_CREDENTIALS'),
+    **_optional_env('OPENAI_API_KEY'),
+    **_optional_env('OPENAI_BASE_URL'),
+    **_optional_env('GOOGLE_API_KEY'),
+    **_optional_env('MASTERMIND_API_TOKEN'),
+    **_optional_env('NCBI_API_KEY'),
 }
 
 
