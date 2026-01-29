@@ -14,6 +14,7 @@ from defusedxml import ElementTree
 from metapub import PubMedFetcher  # type: ignore[import-untyped]
 from metapub.ncbi_errors import NCBIServiceError  # type: ignore[import-untyped]
 from pypdf import PdfWriter
+from tenacity import retry, stop_after_attempt, wait_exponential
 
 from flowa.schema import METADATA_SCHEMA_VERSION, with_schema_version
 from flowa.storage import exists, paper_url, write_bytes, write_json
@@ -100,6 +101,7 @@ def process_tgz_archive(tgz_content: bytes, output_path: Path) -> tuple[bool, st
             return False, f'Failed to concatenate PDFs: {e}'
 
 
+@retry(stop=stop_after_attempt(3), wait=wait_exponential(), reraise=True)
 def fetch_pmc_pdf(pmid: int, client: httpx.Client, email: str, tool: str) -> tuple[bytes | None, str]:
     """Attempt to fetch PDF from PMC for a given PMID.
 
@@ -215,9 +217,7 @@ def download_paper(
     fetcher = PubMedFetcher()
     metadata = fetch_pubmed_metadata(pmid, fetcher)
 
-    # Try to download PDF from PMC
-    transport = httpx.HTTPTransport(retries=3)
-    with httpx.Client(timeout=timeout, transport=transport) as client:
+    with httpx.Client(timeout=timeout) as client:
         pdf_bytes, message = fetch_pmc_pdf(pmid, client, email, tool)
 
     if pdf_bytes is None:

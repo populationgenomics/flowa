@@ -16,6 +16,7 @@ dependencies = [
     "pydantic-settings",
     "pypdf",
     "s3fs",   # S3/MinIO support for fsspec
+    "tenacity",
     "typer",
 ]
 
