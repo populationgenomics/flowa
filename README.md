@@ -316,9 +316,12 @@ Set `FLOWA_ECS_CONFIG` (required when `FLOWA_PLATFORM=ecs`):
     }
   },
   "awslogs_group": "/ecs/flowa",
-  "awslogs_region": "ap-southeast-2"
+  "awslogs_region": "ap-southeast-2",
+  "awslogs_stream_prefix": "worker/flowa-worker"
 }
 ```
+
+The `awslogs_stream_prefix` must include the container name because CloudWatch names streams as `{task_def_prefix}/{container_name}/{task_id}`, but Airflow looks for `{awslogs_stream_prefix}/{task_id}`.
 
 **Task Definition Requirements:**
 
