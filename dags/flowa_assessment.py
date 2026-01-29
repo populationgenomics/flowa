@@ -44,27 +44,27 @@ default_args = {
 def _optional_env(name: str) -> dict[str, str]:
     """Include env var only if the Airflow Variable is set and non-empty.
 
-    Parse-time Variable access is intentional here: empty strings cause bugs in
-    libraries like fsspec (FSSPEC_S3_ENDPOINT_URL="" → "Invalid endpoint" error).
-    This is acceptable for ~12 checks in one DAG. Don't "fix" by using Jinja defaults.
+    Parse-time Variable access is required for dynamically mapped tasks (.expand())
+    because Jinja templates inside XCom-backed mapped values don't get rendered.
     """
     try:
-        if Variable.get(name):
-            return {name: f'{{{{ var.value.{name} }}}}'}
+        value = Variable.get(name)
+        if value:
+            return {name: value}
     except KeyError:
         pass
     return {}
 
 
-# Worker environment variables.
-# Required vars use Jinja templates (fail at runtime if missing).
-# Optional vars checked at parse time - only included if set (see _optional_env).
+# Worker environment variables resolved at parse time.
+# Parse-time resolution is required for dynamically mapped tasks (.expand())
+# because Jinja templates inside XCom-backed mapped values don't get rendered.
 WORKER_ENV = {
-    # Required
-    'FLOWA_STORAGE_BASE': '{{ var.value.FLOWA_STORAGE_BASE }}',
-    'FLOWA_MODEL': '{{ var.value.FLOWA_MODEL }}',
-    'FLOWA_PROMPT_SET': '{{ var.value.get("FLOWA_PROMPT_SET", "generic") }}',
-    # Optional
+    # Required (fail at parse time if missing)
+    'FLOWA_STORAGE_BASE': Variable.get('FLOWA_STORAGE_BASE'),
+    'FLOWA_MODEL': Variable.get('FLOWA_MODEL'),
+    'FLOWA_PROMPT_SET': Variable.get('FLOWA_PROMPT_SET', default_var='generic'),
+    # Optional (omitted if not set)
     **_optional_env('FSSPEC_S3_ENDPOINT_URL'),
     **_optional_env('FSSPEC_S3_KEY'),
     **_optional_env('FSSPEC_S3_SECRET'),
