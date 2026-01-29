@@ -22,6 +22,12 @@ RUN uv export --frozen --no-hashes --no-dev -o requirements.txt && \
 # Support for custom build steps (post deps-install)
 RUN bash -c 'for i in $(ls /build.d/*.sh 2>/dev/null | sort) ; do source $i ; done'
 
+# Pre-download docling models to avoid runtime HuggingFace access
+RUN docling-tools models download layout tableformer
+
+# Point docling to its cache directory (avoids HuggingFace Hub lookups)
+ENV DOCLING_ARTIFACTS_PATH=/root/.cache/docling/models
+
 # No entrypoint - commands are executed directly
 # Use "bash -c '...'" in DAG for chained commands
 ENTRYPOINT []
