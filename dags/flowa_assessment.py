@@ -3,9 +3,8 @@
 Orchestrates variant literature assessment:
 1. Query LitVar/Mastermind for PMIDs (or use cached results)
 2. For each paper (parallel): download PDF, convert via Docling, extract evidence via LLM
-3. Aggregate evidence across all papers
-4. Annotate PDFs with highlights
-5. Send callback notification
+3. Aggregate evidence across all papers and annotate PDFs with highlights
+4. Send callback notification
 
 Storage: S3-compatible object storage (MinIO/S3/GCS) via fsspec.
 Workers: DockerOperator spawns flowa-worker containers.
@@ -165,17 +164,14 @@ with DAG(
         resource_profile='heavy',
     ).expand(command=process_commands)
 
-    aggregate_task = flowa_task(
-        'aggregate_results',
-        "flowa aggregate --variant-id '{{ params.variant_id }}'",
+    # Aggregate + annotate run in a single container to avoid ECS startup overhead.
+    # Both steps require the same S3 data (extractions, PDFs) and run sequentially.
+    aggregate_and_annotate_task = flowa_task(
+        'aggregate_and_annotate',
+        "bash -c 'flowa aggregate --variant-id \"{{ params.variant_id }}\" && "
+        "flowa annotate --variant-id \"{{ params.variant_id }}\"'",
         WORKER_ENV,
         trigger_rule=TriggerRule.ALL_DONE,
-    )
-
-    annotate_task = flowa_task(
-        'annotate_pdfs',
-        "flowa annotate --variant-id '{{ params.variant_id }}'",
-        WORKER_ENV,
     )
 
     callback_task = send_callback()
@@ -183,9 +179,6 @@ with DAG(
     # =========================================================================
     # Task dependencies
     # =========================================================================
-    # query -> build_process_commands -> process_paper[] -> aggregate_results (ALL_DONE)
-    #                                                               |
-    #                                                      annotate_pdfs -> send_callback (ALL_DONE)
+    # query -> build_process_commands -> process_paper[] -> aggregate_and_annotate (ALL_DONE) -> send_callback (ALL_DONE)
 
-    query_task >> process_commands >> process_tasks >> aggregate_task
-    aggregate_task >> annotate_task >> callback_task
+    query_task >> process_commands >> process_tasks >> aggregate_and_annotate_task >> callback_task
