@@ -22,7 +22,7 @@ When running as an Airflow DAG, configuration is stored in **Airflow Variables**
 
 Set `FLOWA_MODEL` to one of:
 
-- **AWS Bedrock**: `bedrock:au.anthropic.claude-sonnet-4-5-20250929-v1:0`
+- **AWS Bedrock**: `bedrock:au.anthropic.claude-opus-4-6-v1`
 - **Google Gemini**: `google-gla:gemini-3-pro`
 - **OpenAI**: `openai:gpt-5.2`
 
@@ -165,7 +165,7 @@ Connects to a MinIO instance at `localhost:9003`. If using `--profile minio`, th
 ```bash
 docker compose exec airflow-scheduler airflow variables set FLOWA_PLATFORM docker
 docker compose exec airflow-scheduler airflow variables set FLOWA_STORAGE_BASE "s3://flowa"
-docker compose exec airflow-scheduler airflow variables set FLOWA_MODEL "bedrock:au.anthropic.claude-sonnet-4-5-20250929-v1:0"
+docker compose exec airflow-scheduler airflow variables set FLOWA_MODEL "bedrock:au.anthropic.claude-opus-4-6-v1"
 docker compose exec airflow-scheduler airflow variables set FLOWA_QUERY_SOURCE litvar
 docker compose exec airflow-scheduler airflow variables set FSSPEC_S3_ENDPOINT_URL "http://host.docker.internal:9003"
 docker compose exec airflow-scheduler airflow variables set FSSPEC_S3_KEY "admin"
