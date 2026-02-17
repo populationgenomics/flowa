@@ -11,7 +11,7 @@ from pydantic_ai import Agent, ModelRetry, RunContext
 
 from flowa.docling import serialize_with_bbox_ids
 from flowa.models import create_model, get_thinking_settings
-from flowa.prompts import load_model, load_prompt
+from flowa.prompts import load_prompt
 from flowa.storage import assessment_url, exists, paper_url, read_json, write_bytes, write_json
 
 log = logging.getLogger(__name__)
@@ -109,8 +109,7 @@ def extract_paper(
     full_text = truncate_paper_text(full_text, pmid)
 
     # Load prompt and schema from prompt set
-    prompt_template = load_prompt('extraction_prompt')
-    output_type = load_model('extraction_schema', 'ExtractionResult')
+    prompt_template, output_type = load_prompt('extraction')
 
     prompt = prompt_template.format(
         variant_details=variant_details,
