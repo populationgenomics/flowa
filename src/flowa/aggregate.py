@@ -118,8 +118,9 @@ def aggregate_evidence(
         )
 
     if not evidence_extractions:
-        log.error('No papers discussed this variant - cannot aggregate')
-        raise typer.Exit(1)
+        log.warning('No papers discussed this variant - writing empty aggregate')
+        write_json(aggregate_url, with_schema_version({'results': {}}, AGGREGATE_SCHEMA_VERSION))
+        return
 
     # Sort by PMID descending (most recent/highest first)
     evidence_extractions.sort(key=lambda x: x['pmid'], reverse=True)
