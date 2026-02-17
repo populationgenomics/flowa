@@ -86,7 +86,7 @@ with DAG(
     schedule=None,
     start_date=datetime(2025, 1, 1),  # manually triggered
     catchup=False,
-    max_active_tasks=50,
+    max_active_tasks=128,
     render_template_as_native_obj=True,
     params={
         'variant_id': Param(type='string', description='Unique variant identifier'),
