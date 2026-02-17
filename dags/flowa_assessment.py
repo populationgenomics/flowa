@@ -162,6 +162,7 @@ with DAG(
         'process_paper',
         WORKER_ENV,
         resource_profile='heavy',
+        execution_timeout=timedelta(minutes=30),
     ).expand(command=process_commands)
 
     # Aggregate + annotate run in a single container to avoid ECS startup overhead.
