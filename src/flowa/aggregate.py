@@ -11,7 +11,7 @@ from pydantic_ai import Agent, ModelRetry, RunContext
 
 from flowa.docling import load_bbox_mapping
 from flowa.models import create_model, get_thinking_settings
-from flowa.prompts import load_model, load_prompt
+from flowa.prompts import load_prompt
 from flowa.schema import AGGREGATE_SCHEMA_VERSION, with_schema_version
 from flowa.storage import assessment_url, exists, paper_url, read_json, write_bytes, write_json
 
@@ -127,8 +127,7 @@ def aggregate_evidence(
     log.info('Aggregating evidence from %d papers (model: %s)', len(evidence_extractions), model)
 
     # Load prompt and schema from prompt set
-    prompt_template = load_prompt('aggregate_prompt')
-    output_type = load_model('aggregate_schema', 'AggregateResult')
+    prompt_template, output_type = load_prompt('aggregate')
 
     prompt = prompt_template.format(
         variant_details=variant_details,

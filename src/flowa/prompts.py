@@ -29,54 +29,39 @@ if TYPE_CHECKING:
 log = logging.getLogger(__name__)
 
 
-def get_prompt_set() -> str:
-    """Return current prompt set name from FLOWA_PROMPT_SET env var."""
-    return os.environ.get('FLOWA_PROMPT_SET') or 'generic'
+def load_prompt(step: str) -> tuple[str, 'type[BaseModel]']:
+    """Load prompt template and schema model for a pipeline step.
 
+    Resolves the prompt set directory from FLOWA_PROMPT_SET (default: 'generic'),
+    then loads ``{step}_prompt.txt`` and the ``{Step}Result`` class from
+    ``{step}_schema.py``.
 
-def get_prompts_dir() -> Path:
-    """Return path to current prompt set directory.
+    Args:
+        step: Pipeline step name (e.g. 'extraction', 'aggregate').
+
+    Returns:
+        Tuple of (prompt_template, result_model_class).
 
     Raises:
         ValueError: If the prompt set directory does not exist.
     """
-    prompt_set = get_prompt_set()
+    prompt_set = os.environ.get('FLOWA_PROMPT_SET') or 'generic'
     prompts_dir = Path('prompts') / prompt_set
 
     if not prompts_dir.exists():
         available = [p.name for p in Path('prompts').iterdir() if p.is_dir()]
-        raise ValueError(f"Prompt set '{prompt_set}' not found at {prompts_dir}. Available prompt sets: {available}")
+        raise ValueError(f"Prompt set '{prompt_set}' not found at {prompts_dir}. Available: {available}")
 
     log.info('Using prompt set: %s', prompt_set)
-    return prompts_dir
 
+    # Load prompt template
+    prompt_text = (prompts_dir / f'{step}_prompt.txt').read_text()
 
-def load_prompt(name: str) -> str:
-    """Load a prompt template (.txt) from current prompt set.
+    # Load schema model
+    module_path = prompts_dir / f'{step}_schema.py'
+    class_name = f'{step.title()}Result'
 
-    Args:
-        name: Base name of the prompt file (without .txt extension)
-
-    Returns:
-        The prompt template content as a string.
-    """
-    prompt_path = get_prompts_dir() / f'{name}.txt'
-    return prompt_path.read_text()
-
-
-def load_model(name: str, class_name: str) -> 'type[BaseModel]':
-    """Load a Pydantic model class from a schema module in the current prompt set.
-
-    Args:
-        name: Base name of the schema file (without .py extension)
-        class_name: Name of the Pydantic model class to load
-
-    Returns:
-        The Pydantic model class.
-    """
-    module_path = get_prompts_dir() / f'{name}.py'
-
-    spec = importlib.util.spec_from_file_location(f'{get_prompt_set()}_{name}', module_path)
+    spec = importlib.util.spec_from_file_location(f'{prompt_set}_{step}_schema', module_path)
     if spec is None or spec.loader is None:
         raise ImportError(f'Could not load module from {module_path}')
 
@@ -86,4 +71,4 @@ def load_model(name: str, class_name: str) -> 'type[BaseModel]':
     if not hasattr(module, class_name):
         raise AttributeError(f"Module {module_path} does not define '{class_name}'")
 
-    return getattr(module, class_name)
+    return prompt_text, getattr(module, class_name)
