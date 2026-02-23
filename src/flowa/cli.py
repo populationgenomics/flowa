@@ -39,7 +39,7 @@ def main(
 
 
 # Register commands
-app.command(name='query')(query.query_pmids)
+app.command(name='query')(query.query_dois)
 app.command(name='download')(download.download_paper)
 app.command(name='convert')(convert.convert_paper)
 app.command(name='extract')(extract.extract_paper)
