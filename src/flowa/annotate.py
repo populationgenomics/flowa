@@ -33,29 +33,29 @@ def load_aggregate_citations(variant_id: str) -> list[dict[str, Any]]:
     return citations
 
 
-def organize_citations_by_pmid(
+def organize_citations_by_doi(
     citations: list[dict[str, Any]],
-    bbox_mappings: dict[int, dict[int, dict[str, Any]]],
-) -> dict[int, list[dict[str, Any]]]:
-    """Group citations by PMID and attach page/bbox info from mappings."""
-    citations_by_pmid: dict[int, list[dict[str, Any]]] = defaultdict(list)
+    bbox_mappings: dict[str, dict[int, dict[str, Any]]],
+) -> dict[str, list[dict[str, Any]]]:
+    """Group citations by DOI and attach page/bbox info from mappings."""
+    citations_by_doi: dict[str, list[dict[str, Any]]] = defaultdict(list)
 
     for citation in citations:
-        pmid = citation['pmid']
+        doi = citation['doi']
         box_id = citation['box_id']
         commentary = citation.get('commentary', '')
 
-        if pmid not in bbox_mappings:
-            log.warning('Skipping citation: PMID %s missing bbox mapping', pmid)
+        if doi not in bbox_mappings:
+            log.warning('Skipping citation: %s missing bbox mapping', doi)
             continue
 
-        bbox_mapping = bbox_mappings[pmid]
+        bbox_mapping = bbox_mappings[doi]
         if box_id not in bbox_mapping:
-            log.warning('Skipping citation: PMID %s box_id %s not found', pmid, box_id)
+            log.warning('Skipping citation: %s box_id %s not found', doi, box_id)
             continue
 
         bbox_info = bbox_mapping[box_id]
-        citations_by_pmid[pmid].append(
+        citations_by_doi[doi].append(
             {
                 'box_id': box_id,
                 'commentary': commentary,
@@ -66,7 +66,7 @@ def organize_citations_by_pmid(
             },
         )
 
-    return citations_by_pmid
+    return citations_by_doi
 
 
 def _to_pdf_coordinates(
@@ -122,7 +122,7 @@ def create_pdf_annotations(
             box_id = citation['box_id']
 
             if box_id not in bbox_mapping:
-                log.warning('Box ID %s not found for PMID page %s', box_id, page_num)
+                log.warning('Box ID %s not found on page %s', box_id, page_num)
                 continue
 
             x1, y1, x2, y2 = _to_pdf_coordinates(
@@ -190,44 +190,44 @@ def annotate_pdfs(
     if not citations:
         return
 
-    pmids = {c['pmid'] for c in citations}
-    bbox_mappings: dict[int, dict[int, dict[str, Any]]] = {}
+    dois = {c['doi'] for c in citations}
+    bbox_mappings: dict[str, dict[int, dict[str, Any]]] = {}
 
-    for pmid in pmids:
+    for doi in dois:
         try:
-            bbox_mappings[pmid] = load_bbox_mapping(pmid)
+            bbox_mappings[doi] = load_bbox_mapping(doi)
         except FileNotFoundError:
-            log.warning('docling.json not found for PMID %s - skipping annotations for this paper', pmid)
+            log.warning('docling.json not found for %s - skipping annotations for this paper', doi)
         except Exception as exc:
-            log.error('Failed to load bbox mapping for PMID %s: %s', pmid, exc)
+            log.error('Failed to load bbox mapping for %s: %s', doi, exc)
 
     if not bbox_mappings:
         log.warning('No bbox mappings available - nothing to annotate')
         return
 
-    citations_by_pmid = organize_citations_by_pmid(citations, bbox_mappings)
-    if not citations_by_pmid:
+    citations_by_doi = organize_citations_by_doi(citations, bbox_mappings)
+    if not citations_by_doi:
         log.warning('No valid citations after bbox lookup - nothing to annotate')
         return
 
     successful = 0
     failed = 0
 
-    for pmid, pmid_citations in citations_by_pmid.items():
-        pdf_url = paper_url(pmid, 'source.pdf')
-        output_url = assessment_url(variant_id, 'annotated', f'{pmid}.pdf')
+    for doi, doi_citations in citations_by_doi.items():
+        pdf_url = paper_url(doi, 'source.pdf')
+        output_url = assessment_url(variant_id, 'annotated', f'{doi}.pdf')
 
         if not exists(pdf_url):
-            log.warning('Original PDF missing for PMID %s at %s', pmid, pdf_url)
+            log.warning('Original PDF missing for %s at %s', doi, pdf_url)
             failed += 1
             continue
 
-        log.info('Creating %d annotations for PMID %s', len(pmid_citations), pmid)
+        log.info('Creating %d annotations for %s', len(doi_citations), doi)
         success = create_pdf_annotations(
             pdf_url=pdf_url,
             output_url=output_url,
-            citations=pmid_citations,
-            bbox_mapping=bbox_mappings[pmid],
+            citations=doi_citations,
+            bbox_mapping=bbox_mappings[doi],
             variant_label=variant_id,
         )
 
