@@ -154,7 +154,9 @@ def _fetch_pubmed_metadata(pmid: int, fetcher: PubMedFetcher) -> dict[str, Any]:
     """Fetch metadata for a paper from PubMed with retry on rate limit."""
     article = fetcher.article_by_pmid(pmid)
     authors = '; '.join(
-        f'{au.last_name}, {au.fore_name}' if au.fore_name else au.last_name for au in article.author_list
+        f'{au.last_name}, {au.fore_name}' if au.fore_name else au.last_name
+        for au in article.author_list
+        if au.last_name
     )
     return {
         'doi': article.doi,
