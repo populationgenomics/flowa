@@ -136,8 +136,8 @@ def serialize_with_bbox_ids(docling_json: dict) -> tuple[str, dict[int, dict[str
     return result.text, serializer.bbox_mapping
 
 
-def load_bbox_mapping(pmid: int) -> dict[int, dict[str, Any]]:
-    """Load and compute bbox mapping from papers/{pmid}/docling.json."""
-    docling_json = read_json(paper_url(pmid, 'docling.json'))
+def load_bbox_mapping(doi: str) -> dict[int, dict[str, Any]]:
+    """Load and compute bbox mapping from papers/{doi}/docling.json."""
+    docling_json = read_json(paper_url(doi, 'docling.json'))
     _, bbox_mapping = serialize_with_bbox_ids(docling_json)
     return bbox_mapping
