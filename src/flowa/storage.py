@@ -14,9 +14,9 @@ Configuration via environment:
         GOOGLE_APPLICATION_CREDENTIALS - Path to service account JSON file
 
 Storage layout:
-    papers/{pmid}/                     # Corpus-wide, shared across variants
-        source.pdf
-        source_hash.txt
+    papers/{doi}/                      # Corpus-wide, shared across variants
+        source.pdf                     # DOI contains '/' which creates natural nesting
+        source_hash.txt                # e.g. papers/10.1038/s41586-020-2308-7/source.pdf
         docling.json
         metadata.json
 
@@ -25,16 +25,16 @@ Storage layout:
         mastermind_response.json
         aggregate.json
         aggregate_raw.json
-        extractions/{pmid}.json
-        extractions/{pmid}_raw.json
-        extractions/{pmid}_bbox.json
-        annotated/{pmid}.pdf
+        extractions/{doi}.json
+        extractions/{doi}_raw.json
+        extractions/{doi}_bbox.json
+        annotated/{doi}.pdf
 
 Usage:
     from flowa.storage import paper_url, assessment_url, read_json, write_json
 
     # Corpus-wide paper files
-    metadata = read_json(paper_url(12345678, 'metadata.json'))
+    metadata = read_json(paper_url('10.1038/s41586-020-2308-7', 'metadata.json'))
 
     # Variant-specific files
     write_json(assessment_url('var123', 'aggregate.json'), result)
@@ -60,17 +60,17 @@ def exists(url: str) -> bool:
     return fs.exists(path)
 
 
-def paper_url(pmid: int, filename: str) -> str:
+def paper_url(doi: str, filename: str) -> str:
     """Build URL for corpus-wide paper files (shared across variants).
 
     Examples:
-        paper_url(12345678, 'source.pdf')
-        -> 's3://bucket/papers/12345678/source.pdf'
+        paper_url('10.1038/s41586-020-2308-7', 'source.pdf')
+        -> 's3://bucket/papers/10.1038/s41586-020-2308-7/source.pdf'
 
-        paper_url(12345678, 'docling.json')
-        -> 's3://bucket/papers/12345678/docling.json'
+        paper_url('10.1038/s41586-020-2308-7', 'docling.json')
+        -> 's3://bucket/papers/10.1038/s41586-020-2308-7/docling.json'
     """
-    return f'{_get_base()}/papers/{pmid}/{filename}'
+    return f'{_get_base()}/papers/{doi}/{filename}'
 
 
 def assessment_url(variant_id: str, *parts: str) -> str:
