@@ -4,20 +4,15 @@ import logging
 import re
 import tarfile
 import tempfile
-import time
 from pathlib import Path
-from typing import Any
 
 import httpx
 import typer
 from defusedxml import ElementTree
-from metapub import PubMedFetcher  # type: ignore[import-untyped]
-from metapub.ncbi_errors import NCBIServiceError  # type: ignore[import-untyped]
 from pypdf import PdfWriter
 from tenacity import retry, stop_after_attempt, wait_exponential
 
-from flowa.schema import METADATA_SCHEMA_VERSION, with_schema_version
-from flowa.storage import exists, paper_url, write_bytes, write_json
+from flowa.storage import exists, paper_url, read_json, write_bytes
 
 log = logging.getLogger(__name__)
 
@@ -159,79 +154,43 @@ def fetch_pmc_pdf(pmid: int, client: httpx.Client, email: str, tool: str) -> tup
         return None, f'HTTP error: {e}'
 
 
-def fetch_pubmed_metadata(pmid: int, fetcher: PubMedFetcher, max_retries: int = 5) -> dict[str, Any]:
-    """Fetch metadata for a paper from PubMed with retry on rate limit."""
-    log.info('Fetching PubMed metadata for PMID %s', pmid)
-
-    for attempt in range(max_retries):
-        try:
-            article = fetcher.article_by_pmid(pmid)
-            return {
-                'pmid': pmid,
-                'title': article.title,
-                'authors': article.authors or [],
-                'date': article.history['entrez'].date().isoformat(),
-                'journal': article.journal,
-                'abstract': article.abstract,
-            }
-        except NCBIServiceError as e:
-            if attempt == max_retries - 1:
-                raise
-            wait = 2**attempt  # 1, 2, 4, 8, 16 seconds
-            log.warning('NCBI rate limit (attempt %d/%d), retrying in %ds: %s', attempt + 1, max_retries, wait, e)
-            time.sleep(wait)
-
-    raise RuntimeError('Unreachable')
-
-
 def download_paper(
-    pmid: int = typer.Option(..., '--pmid', help='PubMed ID to download'),
+    doi: str = typer.Option(..., '--doi', help='DOI of the paper'),
     email: str = typer.Option('flowa@populationgenomics.org.au', '--email', help='Email for NCBI API'),
     tool: str = typer.Option('flowa', '--tool', help='Tool name for NCBI API'),
     timeout: float = typer.Option(60.0, '--timeout', help='HTTP timeout in seconds'),
 ) -> None:
     """Download PDF from PMC for a single paper.
 
-    Stores to object storage at papers/{pmid}/source.pdf and papers/{pmid}/metadata.json.
+    Reads papers/{doi}/metadata.json (written by query step) to get the PMID
+    for PMC lookup. Stores PDF to papers/{doi}/source.pdf.
 
     Skip logic:
     - PDF exists → already have it (downloaded or manually added)
-    - metadata.json exists but no PDF → previously tried and failed (not in PMC)
-
-    To manually add a paper: just upload the PDF to papers/{pmid}/source.pdf.
+    - No metadata.json → paper not resolved by query step
+    - No PMID in metadata → not a PubMed-indexed paper (future: download preprints via DOI)
     """
-    pdf_url = paper_url(pmid, 'source.pdf')
-    metadata_url = paper_url(pmid, 'metadata.json')
+    pdf_url = paper_url(doi, 'source.pdf')
 
     if exists(pdf_url):
-        log.info('PDF already exists: %s', pmid)
+        log.info('PDF already exists: %s', doi)
         return
 
-    if exists(metadata_url):
-        log.info('Skipping PMID %s: previously tried, not available in PMC', pmid)
+    metadata = read_json(paper_url(doi, 'metadata.json'))
+    pmid = metadata.get('pmid')
+
+    if not pmid:
+        log.info('%s: no PMID in metadata, skipping PMC download', doi)
         return
 
-    log.info('Processing PMID %s', pmid)
-
-    # Fetch PubMed metadata first (always useful to have)
-    fetcher = PubMedFetcher()
-    metadata = fetch_pubmed_metadata(pmid, fetcher)
+    log.info('Downloading %s (PMID %s)', doi, pmid)
 
     with httpx.Client(timeout=timeout) as client:
         pdf_bytes, message = fetch_pmc_pdf(pmid, client, email, tool)
 
     if pdf_bytes is None:
-        # Store metadata to mark as "tried" - absence of PDF means unavailable
-        write_json(metadata_url, with_schema_version(metadata, METADATA_SCHEMA_VERSION))
-        log.info('PMID %s not available in PMC: %s', pmid, message)
+        log.info('%s not available in PMC: %s', doi, message)
         return
 
-    # Store PDF and metadata
     write_bytes(pdf_url, pdf_bytes)
-    write_json(metadata_url, with_schema_version(metadata, METADATA_SCHEMA_VERSION))
-
-    log.info('Downloaded PMID %s: %s (%d bytes)', pmid, message, len(pdf_bytes))
-
-
-# Keep old function name for backwards compatibility during transition
-download_pdfs = download_paper
+    log.info('Downloaded %s: %s (%d bytes)', doi, message, len(pdf_bytes))
