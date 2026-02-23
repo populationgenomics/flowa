@@ -153,11 +153,15 @@ def query_litvar(gene: str, hgvs_c: str) -> list[int]:
 def _fetch_pubmed_metadata(pmid: int, fetcher: PubMedFetcher) -> dict[str, Any]:
     """Fetch metadata for a paper from PubMed with retry on rate limit."""
     article = fetcher.article_by_pmid(pmid)
+    authors = '; '.join(
+        f'{au.last_name}, {au.fore_name}' if au.fore_name else au.last_name
+        for au in article.author_list
+    )
     return {
         'doi': article.doi,
         'pmid': pmid,
         'title': article.title,
-        'authors': article.authors or [],
+        'authors': authors,
         'date': article.history['entrez'].date().isoformat(),
         'journal': article.journal,
         'abstract': article.abstract,
