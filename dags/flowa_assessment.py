@@ -1,7 +1,7 @@
 """Flowa Literature Assessment DAG.
 
 Orchestrates variant literature assessment:
-1. Query LitVar/Mastermind for PMIDs (or use cached results)
+1. Query LitVar/Mastermind for PMIDs, resolve to DOIs (or use cached results)
 2. For each paper (parallel): download PDF, convert via Docling, extract evidence via LLM
 3. Aggregate evidence across all papers and annotate PDFs with highlights
 4. Send callback notification
@@ -103,13 +103,13 @@ with DAG(
 
     @task
     def build_process_commands(query_output: str, variant_id: str) -> list[str]:
-        """Parse PMIDs from query output and build per-paper processing commands."""
-        pmids = json.loads(query_output)
+        """Parse DOIs from query output and build per-paper processing commands."""
+        dois = json.loads(query_output)
         return [
-            f"bash -c 'flowa download --pmid {p} && "
-            f'flowa convert --pmid {p} && '
-            f'flowa extract --variant-id "{variant_id}" --pmid {p}\''
-            for p in pmids
+            f"bash -c 'flowa download --doi {doi} && "
+            f'flowa convert --doi {doi} && '
+            f'flowa extract --variant-id "{variant_id}" --doi {doi}\''
+            for doi in dois
         ]
 
     @task(trigger_rule=TriggerRule.ALL_DONE)
@@ -150,7 +150,7 @@ with DAG(
         "--hgvs-c '{{ params.hgvs_c }}' "
         "--source '{{ var.value.FLOWA_QUERY_SOURCE }}'",
         WORKER_ENV,
-        do_xcom_push=True,  # Capture stdout as XCom (JSON array of PMIDs)
+        do_xcom_push=True,  # Capture stdout as XCom (JSON array of DOIs)
     )
 
     process_commands = build_process_commands(query_task.output, '{{ params.variant_id }}')
