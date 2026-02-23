@@ -10,7 +10,7 @@ You have been provided with evidence extractions from multiple papers about this
 2. **COUNT UNRELATED CASES**: Determine total number of unrelated families/cases with this variant
 3. **SELECT CLASSIFICATION**: Choose ONE ACMG classification term based on the aggregated evidence
 4. **GENERATE DESCRIPTION**: Fill in the mandatory template for your selected classification
-5. **GENERATE DETAILED NOTES**: Curator-style synthesis with PMID+bbox citations
+5. **GENERATE DETAILED NOTES**: Curator-style synthesis with paper_id+bbox citations
 
 CRITICAL AGGREGATION PRINCIPLES:
 
@@ -106,7 +106,7 @@ When filling in {{DETAILS}} placeholders, include:
   * Severity spectrum when variable
   * Key phenotypic distinctions (e.g., het carriers vs biallelic cases)
   * Asymptomatic carriers with relevant context (biochemical findings, family history)
-- Key sources (specific PMIDs if particularly informative)
+- Key sources (specific papers if particularly informative)
 
 Examples:
 GOOD: "compound heterozygous cases with neonatal-onset cardiomyopathy and metabolic decompensation; heterozygous carriers asymptomatic or mild myopathy"
@@ -121,7 +121,7 @@ DETAILED NOTES GENERATION:
 
 Generate concise curator-style notes synthesizing evidence across papers using **Markdown formatting**. Structure:
 
-1. **Per-paper findings**: Key findings from each paper with PMID link
+1. **Per-paper findings**: Key findings from each paper with paper_id
 2. **Synthesis**: Overall interpretation, total case counts, phenotypic patterns, reasoning for code selection
 
 Style guidelines:
@@ -158,24 +158,23 @@ Include when available:
 - Phenotypic variability within families or across unrelated cases
 
 Format (use Markdown):
-- One concise entry per paper: "[PMID: [number]](https://pubmed.ncbi.nlm.nih.gov/[number]) | First Author Year: [findings]."
-- Use the first author from the authors list and year from the date field
+- One concise entry per paper using the paper_id: "**paper_id:** [findings]."
 - End with synthesis paragraph if needed for complex cases
 
 Example structure (adapt to your evidence):
 ```
-- **[PMID: 33777089](https://pubmed.ncbi.nlm.nih.gov/33777089) | Chang 2021:** 2x cHet with severe neonatal-onset skeletal dysplasia, respiratory insufficiency; both died <6 months.
-- **[PMID: 38374822](https://pubmed.ncbi.nlm.nih.gov/38374822) | Smith 2022:** 1x het adult female, asymptomatic, low serum ALP (22 U/L). 4x cHet individuals: 2 perinatal lethal, 2 childhood-onset with fractures and dental anomalies.
-- **[PMID: 31707452](https://pubmed.ncbi.nlm.nih.gov/31707452) | Tanaka 2020:** 1x het child, mild bone pain onset age 8, premature tooth loss; only variant identified.
+- **Chang2021:** 2x cHet with severe neonatal-onset skeletal dysplasia, respiratory insufficiency; both died <6 months.
+- **Smith2022:** 1x het adult female, asymptomatic, low serum ALP (22 U/L). 4x cHet individuals: 2 perinatal lethal, 2 childhood-onset with fractures and dental anomalies.
+- **Tanaka2020:** 1x het child, mild bone pain onset age 8, premature tooth loss; only variant identified.
 
 Classification is Pathogenic based on >10 reports of cHet individuals. Het carriers show variable penetrance: some asymptomatic with biochemical findings only, others with mild-moderate skeletal/dental symptoms. Severe disease associated with biallelic variants.
 ```
 
-Note: Papers are provided sorted by PMID (descending, most recent first), with metadata including title, authors list, and date (ISO format).
+Note: Papers are provided sorted by date (descending, most recent first), with metadata including title, authors list, and date (ISO format).
 
 CITATIONS:
 
-All factual claims in your detailed notes should be traceable to the input evidence. Collect all relevant citations (pmid + box_id + commentary) and include them in the citations array. These will be used to annotate the source PDFs.
+All factual claims in your detailed notes should be traceable to the input evidence. Collect all relevant citations (paper_id + box_id + commentary) and include them in the citations array. These will be used to annotate the source PDFs.
 
 RESPONSE FORMAT:
 
@@ -188,16 +187,16 @@ Respond in JSON using this structure:
 
   "description": "The mandatory template filled in with specific details from the evidence",
 
-  "notes": "Detailed curator-style synthesis in Markdown. Structure: per-paper findings ([PMID: X](link) | Author Year: findings) → synthesis if needed",
+  "notes": "Detailed curator-style synthesis in Markdown. Structure: per-paper findings (paper_id: findings) → synthesis if needed",
 
   "citations": [
     {{
-      "pmid": 33777089,
+      "paper_id": "Chang2021",
       "box_id": 123,
       "commentary": "What this evidence states"
     }},
     {{
-      "pmid": 38374822,
+      "paper_id": "Smith2022",
       "box_id": 456,
       "commentary": "What this evidence states"
     }}

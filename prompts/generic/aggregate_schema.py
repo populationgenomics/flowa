@@ -4,7 +4,7 @@ This module defines the output structure for aggregate assessment across papers.
 The AggregateResult class is loaded dynamically by Flowa.
 
 Interface requirements (accessed by Flowa's validation logic):
-    - results[category].citations[].pmid and .box_id must exist for bbox validation
+    - results[category].citations[].paper_id and .box_id must exist for bbox validation
 """
 
 from pydantic import BaseModel, Field
@@ -13,7 +13,7 @@ from pydantic import BaseModel, Field
 class AggregateCitation(BaseModel):
     """A citation to a specific bbox in a source paper."""
 
-    pmid: int = Field(description='PubMed ID of the source paper')
+    paper_id: str = Field(description='Paper ID (e.g. "Smith2024")')
     box_id: int = Field(description='The bounding box ID from the source text in the paper')
     commentary: str = Field(description='What this specific evidence states (appears as annotation in highlighted PDF)')
 
