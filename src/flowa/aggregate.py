@@ -230,8 +230,7 @@ def aggregate_evidence(
 
     # Add paper_id_mapping so the UI can cross-reference prose with papers
     aggregate_dict['paper_id_mapping'] = {
-        pid: {'doi': doi, 'pmid': metadata_cache[doi].get('pmid')}
-        for pid, doi in paper_id_to_doi.items()
+        pid: {'doi': doi, 'pmid': metadata_cache[doi].get('pmid')} for pid, doi in paper_id_to_doi.items()
     }
 
     # Store structured aggregate result
