@@ -21,12 +21,12 @@ MAX_PAPER_TOKENS = 60000
 MAX_PAPER_CHARS = MAX_PAPER_TOKENS * 4
 
 
-def truncate_paper_text(full_text: str, pmid: int) -> str:
+def truncate_paper_text(full_text: str, doi: str) -> str:
     """Truncate paper text if it exceeds MAX_PAPER_CHARS."""
     if len(full_text) <= MAX_PAPER_CHARS:
         return full_text
 
-    log.warning('Paper %s exceeds %d tokens (%d chars) - truncating', pmid, MAX_PAPER_TOKENS, len(full_text))
+    log.warning('Paper %s exceeds %d tokens (%d chars) - truncating', doi, MAX_PAPER_TOKENS, len(full_text))
 
     truncation_note = '\n\n[NOTE: This paper was truncated due to length.]'
     available_chars = MAX_PAPER_CHARS - len(truncation_note)
@@ -69,13 +69,13 @@ def create_extraction_agent(
 
 def extract_paper(
     variant_id: str = typer.Option(..., '--variant-id', help='Variant identifier'),
-    pmid: int = typer.Option(..., '--pmid', help='PubMed ID to extract'),
+    doi: str = typer.Option(..., '--doi', help='DOI of the paper'),
 ) -> None:
     """Extract evidence from a single paper via LLM.
 
-    Reads docling.json from papers/{pmid}/ and variant_details.json from
+    Reads docling.json from papers/{doi}/ and variant_details.json from
     assessments/{variant_id}/, calls LLM for extraction, stores result to
-    assessments/{variant_id}/extractions/{pmid}.json.
+    assessments/{variant_id}/extractions/{doi}.json.
 
     Model is configured via FLOWA_MODEL environment variable.
     """
@@ -84,8 +84,8 @@ def extract_paper(
         log.error('FLOWA_MODEL environment variable not set')
         raise typer.Exit(1)
 
-    extraction_url = assessment_url(variant_id, 'extractions', f'{pmid}.json')
-    extraction_raw_url = assessment_url(variant_id, 'extractions', f'{pmid}_raw.json')
+    extraction_url = assessment_url(variant_id, 'extractions', f'{doi}.json')
+    extraction_raw_url = assessment_url(variant_id, 'extractions', f'{doi}_raw.json')
 
     # Check if already extracted
     if exists(extraction_url):
@@ -94,26 +94,25 @@ def extract_paper(
 
     # Load docling JSON - skip if not available
     try:
-        docling_json = read_json(paper_url(pmid, 'docling.json'))
+        docling_json = read_json(paper_url(doi, 'docling.json'))
     except FileNotFoundError:
-        log.info('Skipping PMID %s: docling.json not available', pmid)
+        log.info('Skipping %s: docling.json not available', doi)
         return
 
     # Load variant details (stored by query command)
     variant_details = json.dumps(read_json(assessment_url(variant_id, 'variant_details.json')))
 
-    log.info('Extracting evidence from PMID %s (model: %s)', pmid, model)
+    log.info('Extracting evidence from %s (model: %s)', doi, model)
 
     # Serialize to markdown with bbox IDs
     full_text, bbox_mapping = serialize_with_bbox_ids(docling_json)
-    full_text = truncate_paper_text(full_text, pmid)
+    full_text = truncate_paper_text(full_text, doi)
 
     # Load prompt and schema from prompt set
     prompt_template, output_type = load_prompt('extraction')
 
     prompt = prompt_template.format(
         variant_details=variant_details,
-        pmid=pmid,
         full_text=full_text,
     )
 
@@ -130,8 +129,8 @@ def extract_paper(
     write_bytes(extraction_raw_url, result.all_messages_json())
 
     log.info(
-        'Extracted PMID %s: variant_discussed=%s, %d findings',
-        pmid,
+        'Extracted %s: variant_discussed=%s, %d findings',
+        doi,
         result.output.variant_discussed,  # type: ignore[attr-defined]
         len(result.output.evidence),  # type: ignore[attr-defined]
     )
