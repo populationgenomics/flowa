@@ -3,6 +3,7 @@
 import json
 import logging
 import os
+import re
 from typing import Any
 
 import typer
@@ -18,9 +19,69 @@ from flowa.storage import assessment_url, exists, paper_url, read_json, write_by
 log = logging.getLogger(__name__)
 
 
+# Paper ID generation ({LastName}{Year} format), ported from palit.
+
+
+def _extract_first_author_last_name(authors: str) -> str:
+    """Extract first author's last name from authors string.
+
+    Authors are semicolon-separated in "Last, First" format:
+    "Smith, John A; Doe, Jane B; ..." -> "Smith"
+    "van der Berg, Anna; Doe, Jane; ..." -> "VanDerBerg"
+    """
+    if not authors:
+        return 'Unknown'
+    first_author = authors.split(';')[0].strip()
+    # Take everything before the comma (the last name portion)
+    last_name = first_author.split(',')[0].strip()
+    if not last_name:
+        return 'Unknown'
+    parts = last_name.split()
+    # Join multi-word last names, capitalize each part, remove non-alpha
+    return ''.join(re.sub(r'[^A-Za-z]', '', p).capitalize() for p in parts)
+
+
+def generate_paper_ids(
+    evidence_list: list[dict[str, Any]],
+) -> tuple[dict[str, str], dict[str, str]]:
+    """Generate {LastName}{Year} paper IDs from evidence list.
+
+    Each item must have 'doi', 'authors', and 'date' keys.
+
+    Returns:
+        Tuple of (paper_id_to_doi, doi_to_paper_id) mappings.
+        Collisions are disambiguated with letter suffixes (a, b, c).
+    """
+    base_id_to_dois: dict[str, list[str]] = {}
+
+    for evidence in evidence_list:
+        doi = evidence['doi']
+        authors = evidence.get('authors', '')
+        date = evidence.get('date', '')
+        last_name = _extract_first_author_last_name(authors)
+        year = date[:4] if date and len(date) >= 4 else 'Unknown'
+        base_id = f'{last_name}{year}'
+        base_id_to_dois.setdefault(base_id, []).append(doi)
+
+    paper_id_to_doi: dict[str, str] = {}
+    doi_to_paper_id: dict[str, str] = {}
+    for base_id, dois in base_id_to_dois.items():
+        if len(dois) == 1:
+            paper_id_to_doi[base_id] = dois[0]
+            doi_to_paper_id[dois[0]] = base_id
+        else:
+            for i, doi in enumerate(sorted(dois)):
+                suffixed_id = f'{base_id}{chr(ord("a") + i)}'
+                paper_id_to_doi[suffixed_id] = doi
+                doi_to_paper_id[doi] = suffixed_id
+
+    return paper_id_to_doi, doi_to_paper_id
+
+
 def create_aggregate_agent(
     model: str,
-    bbox_mappings: dict[int, dict[int, Any]],
+    paper_id_to_doi: dict[str, str],
+    bbox_mappings: dict[str, dict[int, Any]],
     output_type: type[BaseModel],
 ) -> Agent[None, BaseModel]:
     """Create a Pydantic AI agent with citation validation across all papers."""
@@ -33,19 +94,19 @@ def create_aggregate_agent(
 
     @agent.output_validator
     def validate_citations(ctx: RunContext[None], result: BaseModel) -> BaseModel:
-        """Validate that all citation (pmid, box_id) pairs exist.
+        """Validate that all citation (paper_id, box_id) pairs exist.
 
-        Requires: result.results[category].citations[].pmid and .box_id
+        Requires: result.results[category].citations[].paper_id and .box_id
         """
         invalid = []
 
         for category, cat_result in result.results.items():  # type: ignore[attr-defined]
             for citation in cat_result.citations:
-                pmid = citation.pmid
-                if pmid not in bbox_mappings:
-                    invalid.append(f'pmid={pmid} (paper not found)')
-                elif citation.box_id not in bbox_mappings[pmid]:
-                    invalid.append(f'pmid={pmid}, box_id={citation.box_id}, category={category}')
+                doi = paper_id_to_doi.get(citation.paper_id)
+                if doi is None or doi not in bbox_mappings:
+                    invalid.append(f'paper_id={citation.paper_id} (paper not found)')
+                elif citation.box_id not in bbox_mappings[doi]:
+                    invalid.append(f'paper_id={citation.paper_id}, box_id={citation.box_id}, category={category}')
 
         if invalid:
             raise ModelRetry(f'Invalid citations not found in documents: {", ".join(invalid)}')
@@ -63,7 +124,7 @@ def aggregate_evidence(
 
     Reads extraction results from assessments/{variant_id}/extractions/,
     variant details from variant_details.json, and paper metadata from
-    papers/{pmid}/metadata.json. Calls LLM for aggregate assessment and
+    papers/{doi}/metadata.json. Calls LLM for aggregate assessment and
     stores result to assessments/{variant_id}/aggregate.json.
 
     Model is configured via FLOWA_MODEL environment variable.
@@ -79,37 +140,33 @@ def aggregate_evidence(
     # Load variant details and query data (stored by query command)
     variant_details = json.dumps(read_json(assessment_url(variant_id, 'variant_details.json')))
     query_data = read_json(assessment_url(variant_id, 'query.json'))
-    pmids = query_data['pmids']
+    dois = query_data['dois']
 
-    # Load extractions and build evidence list
-    evidence_extractions = []
-    bbox_mappings: dict[int, dict[int, Any]] = {}
+    # Load extractions, bbox mappings, and metadata for each paper
+    evidence_extractions: list[dict[str, Any]] = []
+    bbox_mappings: dict[str, dict[int, Any]] = {}
+    metadata_cache: dict[str, dict[str, Any]] = {}
 
-    for pmid in pmids:
-        extraction_url = assessment_url(variant_id, 'extractions', f'{pmid}.json')
+    for doi in dois:
+        extraction_url = assessment_url(variant_id, 'extractions', f'{doi}.json')
 
-        # Skip if extraction doesn't exist (paper wasn't processed)
         if not exists(extraction_url):
-            log.info('Skipping PMID %s: no extraction', pmid)
+            log.info('Skipping %s: no extraction', doi)
             continue
 
-        # Load extraction
         extraction_data = read_json(extraction_url)
 
-        # Skip papers where variant was not discussed
         if not extraction_data.get('variant_discussed'):
-            log.info('Skipping PMID %s: variant not discussed', pmid)
+            log.info('Skipping %s: variant not discussed', doi)
             continue
 
-        # Load bbox mapping on-the-fly from docling.json
-        bbox_mappings[pmid] = load_bbox_mapping(pmid)
-
-        # Load PubMed metadata (stored by download command)
-        metadata = read_json(paper_url(pmid, 'metadata.json'))
+        bbox_mappings[doi] = load_bbox_mapping(doi)
+        metadata = read_json(paper_url(doi, 'metadata.json'))
+        metadata_cache[doi] = metadata
 
         evidence_extractions.append(
             {
-                'pmid': int(pmid),
+                'doi': doi,
                 'title': metadata['title'],
                 'authors': metadata['authors'],
                 'date': metadata['date'],
@@ -122,8 +179,14 @@ def aggregate_evidence(
         write_json(aggregate_url, with_schema_version({'results': {}}, AGGREGATE_SCHEMA_VERSION))
         return
 
-    # Sort by PMID descending (most recent/highest first)
-    evidence_extractions.sort(key=lambda x: x['pmid'], reverse=True)
+    # Generate paper_ids and replace DOIs with human-readable IDs for the LLM
+    paper_id_to_doi, doi_to_paper_id = generate_paper_ids(evidence_extractions)
+
+    for entry in evidence_extractions:
+        entry['paper_id'] = doi_to_paper_id[entry.pop('doi')]
+
+    # Sort by date descending (most recent first)
+    evidence_extractions.sort(key=lambda x: x['date'], reverse=True)
 
     log.info('Aggregating evidence from %d papers (model: %s)', len(evidence_extractions), model)
 
@@ -138,28 +201,38 @@ def aggregate_evidence(
     if dry_run:
         print('=== PROMPT ===')
         print(prompt)
-        print('\n=== BBOX MAPPINGS (PMIDs with box counts) ===')
-        for pmid, boxes in bbox_mappings.items():
-            print(f'  {pmid}: {len(boxes)} boxes (ids: {min(boxes)}..{max(boxes)})')
+        print('\n=== BBOX MAPPINGS (DOIs with box counts) ===')
+        for doi, boxes in bbox_mappings.items():
+            print(f'  {doi}: {len(boxes)} boxes (ids: {min(boxes)}..{max(boxes)})')
+        print('\n=== PAPER ID MAPPING ===')
+        for pid, doi in paper_id_to_doi.items():
+            print(f'  {pid} -> {doi}')
         return
 
-    # Create agent with citation validation
-    agent = create_aggregate_agent(model, bbox_mappings, output_type)
+    # Create agent with citation validation (resolves paper_id -> DOI -> bbox)
+    agent = create_aggregate_agent(model, paper_id_to_doi, bbox_mappings, output_type)
 
     log.info('Calling LLM for aggregate assessment')
     result = agent.run_sync(prompt)
 
-    # Enrich citations with bbox info from bbox_mappings
+    # Post-LLM: replace paper_id with DOI in citations, enrich with bbox info
     aggregate_dict = result.output.model_dump()
     for cat_result in aggregate_dict['results'].values():
         for citation in cat_result['citations']:
-            pmid = citation['pmid']
+            doi = paper_id_to_doi[citation.pop('paper_id')]
+            citation['doi'] = doi
             box_id = citation['box_id']
-            bbox_info = bbox_mappings[pmid][box_id]
+            bbox_info = bbox_mappings[doi][box_id]
             citation['page'] = bbox_info['page']
             citation['bbox'] = bbox_info['bbox']
             if 'coord_origin' in bbox_info:
                 citation['coord_origin'] = bbox_info['coord_origin']
+
+    # Add paper_id_mapping so the UI can cross-reference prose with papers
+    aggregate_dict['paper_id_mapping'] = {
+        pid: {'doi': doi, 'pmid': metadata_cache[doi].get('pmid')}
+        for pid, doi in paper_id_to_doi.items()
+    }
 
     # Store structured aggregate result
     write_json(aggregate_url, with_schema_version(aggregate_dict, AGGREGATE_SCHEMA_VERSION))
