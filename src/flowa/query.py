@@ -54,8 +54,21 @@ def query_variant_validator(hgvs_c: str) -> dict:
         return response.json()
 
 
+MAX_ARTICLES = 50
+"""Cap on articles fetched per source.  Both Mastermind and LitVar return
+relevance-ranked results, so the top entries are the most useful."""
+
+# Mastermind returns 5 articles per page.
+_MASTERMIND_PAGE_SIZE = 5
+_MASTERMIND_MAX_PAGES = MAX_ARTICLES // _MASTERMIND_PAGE_SIZE
+
+# LitVar search returns 10 results per page.
+_LITVAR_PAGE_SIZE = 10
+_LITVAR_MAX_PAGES = MAX_ARTICLES // _LITVAR_PAGE_SIZE
+
+
 def query_mastermind(gene: str, hgvs_c: str, api_token: str) -> list[int]:
-    """Query Mastermind API for PMIDs."""
+    """Query Mastermind API for PMIDs (relevance-ranked, capped)."""
     hgvs_c_stripped = hgvs_c.split(':', 1)[-1]
     variant = f'{gene}:{hgvs_c_stripped}'
     log.info('Querying Mastermind for %s', variant)
@@ -88,19 +101,28 @@ def query_mastermind(gene: str, hgvs_c: str, api_token: str) -> list[int]:
             if page >= total_pages:
                 break
 
+            if page >= _MASTERMIND_MAX_PAGES:
+                total_articles = data.get('article_count', total_pages * _MASTERMIND_PAGE_SIZE)
+                log.warning(
+                    'Capping Mastermind results at %d/%d articles',
+                    len(pmids),
+                    total_articles,
+                )
+                break
+
             page += 1
 
     return sorted(pmids)
 
 
 def query_litvar(gene: str, hgvs_c: str) -> list[int]:
-    """Query LitVar API for PMIDs."""
+    """Query LitVar API for PMIDs (relevance-ranked, capped)."""
     hgvs_c_stripped = hgvs_c.split(':', 1)[-1]
     query = f'{gene} {hgvs_c_stripped}'
     log.info('Querying LitVar for %s', query)
 
     autocomplete_url = 'https://www.ncbi.nlm.nih.gov/research/litvar2-api/variant/autocomplete/'
-    publications_base = 'https://www.ncbi.nlm.nih.gov/research/litvar2-api/variant/get'
+    search_url = 'https://www.ncbi.nlm.nih.gov/research/litvar2-api/search/'
 
     with httpx.Client(timeout=30.0) as client:
         log.debug('Finding variant matches')
@@ -132,16 +154,45 @@ def query_litvar(gene: str, hgvs_c: str) -> list[int]:
             selected.get('pmids_count', 0),
         )
 
-        # Get publications
-        log.debug('Fetching publications')
-        litvar_variant_id_encoded = litvar_variant_id.replace('@', '%40').replace('#', '%23')
-        publications_url = f'{publications_base}/{litvar_variant_id_encoded}/publications'
+        # Fetch publications via search endpoint (supports relevance sorting + pagination)
+        pmids: list[int] = []
+        page = 1
 
-        response = client.get(publications_url)
-        response.raise_for_status()
+        while True:
+            log.debug('Fetching page %d', page)
 
-        data = response.json()
-        return sorted(data.get('pmids', []))
+            response = client.get(
+                search_url,
+                params={
+                    'variant': litvar_variant_id,
+                    'sort': 'score desc',
+                    'page': page,
+                },
+            )
+            response.raise_for_status()
+
+            data = response.json()
+
+            for result in data.get('results', []):
+                if pmid := result.get('pmid'):
+                    pmids.append(int(pmid))
+
+            total_pages = data.get('total_pages', 0)
+            if page >= total_pages:
+                break
+
+            if page >= _LITVAR_MAX_PAGES:
+                total_count = data.get('count', 0)
+                log.warning(
+                    'Capping LitVar results at %d/%d articles',
+                    len(pmids),
+                    total_count,
+                )
+                break
+
+            page += 1
+
+        return sorted(pmids)
 
 
 @retry(
