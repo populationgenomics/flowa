@@ -12,7 +12,7 @@ from pydantic_ai import Agent, ModelRetry, RunContext
 from flowa.docling import serialize_with_bbox_ids
 from flowa.models import create_model, get_thinking_settings
 from flowa.prompts import load_prompt
-from flowa.storage import assessment_url, exists, paper_url, read_json, write_bytes, write_json
+from flowa.storage import assessment_url, encode_doi, exists, paper_url, read_json, write_bytes, write_json
 
 log = logging.getLogger(__name__)
 
@@ -73,9 +73,9 @@ def extract_paper(
 ) -> None:
     """Extract evidence from a single paper via LLM.
 
-    Reads docling.json from papers/{doi}/ and variant_details.json from
+    Reads docling.json from papers/{encoded_doi}/ and variant_details.json from
     assessments/{variant_id}/, calls LLM for extraction, stores result to
-    assessments/{variant_id}/extractions/{doi}.json.
+    assessments/{variant_id}/extractions/{encoded_doi}.json.
 
     Model is configured via FLOWA_MODEL environment variable.
     """
@@ -84,8 +84,9 @@ def extract_paper(
         log.error('FLOWA_MODEL environment variable not set')
         raise typer.Exit(1)
 
-    extraction_url = assessment_url(variant_id, 'extractions', f'{doi}.json')
-    extraction_raw_url = assessment_url(variant_id, 'extractions', f'{doi}_raw.json')
+    encoded_doi = encode_doi(doi)
+    extraction_url = assessment_url(variant_id, 'extractions', f'{encoded_doi}.json')
+    extraction_raw_url = assessment_url(variant_id, 'extractions', f'{encoded_doi}_raw.json')
 
     # Check if already extracted
     if exists(extraction_url):

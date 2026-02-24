@@ -162,8 +162,8 @@ def download_paper(
 ) -> None:
     """Download PDF from PMC for a single paper.
 
-    Reads papers/{doi}/metadata.json (written by query step) to get the PMID
-    for PMC lookup. Stores PDF to papers/{doi}/source.pdf.
+    Reads papers/{encoded_doi}/metadata.json (written by query step) to get the PMID
+    for PMC lookup. Stores PDF to papers/{encoded_doi}/source.pdf.
 
     Skip logic:
     - PDF exists → already have it (downloaded or manually added)

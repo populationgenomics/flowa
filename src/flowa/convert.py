@@ -19,8 +19,8 @@ def convert_paper(
 ) -> None:
     """Convert PDF to Docling JSON.
 
-    Reads PDF from papers/{doi_slug}/source.pdf in object storage.
-    Stores result to papers/{doi_slug}/docling.json.
+    Reads PDF from papers/{encoded_doi}/source.pdf in object storage.
+    Stores result to papers/{encoded_doi}/docling.json.
     Exits with error if conversion fails.
     """
     pdf_url = paper_url(doi, 'source.pdf')

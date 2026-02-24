@@ -14,7 +14,7 @@ from flowa.docling import load_bbox_mapping
 from flowa.models import create_model, get_thinking_settings
 from flowa.prompts import load_prompt
 from flowa.schema import AGGREGATE_SCHEMA_VERSION, with_schema_version
-from flowa.storage import assessment_url, exists, paper_url, read_json, write_bytes, write_json
+from flowa.storage import assessment_url, encode_doi, exists, paper_url, read_json, write_bytes, write_json
 
 log = logging.getLogger(__name__)
 
@@ -124,7 +124,7 @@ def aggregate_evidence(
 
     Reads extraction results from assessments/{variant_id}/extractions/,
     variant details from variant_details.json, and paper metadata from
-    papers/{doi}/metadata.json. Calls LLM for aggregate assessment and
+    papers/{encoded_doi}/metadata.json. Calls LLM for aggregate assessment and
     stores result to assessments/{variant_id}/aggregate.json.
 
     Model is configured via FLOWA_MODEL environment variable.
@@ -148,7 +148,7 @@ def aggregate_evidence(
     metadata_cache: dict[str, dict[str, Any]] = {}
 
     for doi in dois:
-        extraction_url = assessment_url(variant_id, 'extractions', f'{doi}.json')
+        extraction_url = assessment_url(variant_id, 'extractions', f'{encode_doi(doi)}.json')
 
         if not exists(extraction_url):
             log.info('Skipping %s: no extraction', doi)
