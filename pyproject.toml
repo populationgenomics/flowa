@@ -3,7 +3,7 @@ name = "flowa"
 version = "0.1.0"
 description = "Variant literature assessment pipeline with AI extraction"
 readme = "README.md"
-requires-python = ">=3.13"
+requires-python = "==3.13.*"
 license = { file = "LICENSE" }
 dependencies = [
     "defusedxml",
