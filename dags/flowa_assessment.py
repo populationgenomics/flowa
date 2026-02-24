@@ -18,6 +18,7 @@ Trigger via UI or REST API with params:
 
 import json
 import logging
+import shlex
 from datetime import datetime, timedelta
 
 import httpx
@@ -105,10 +106,11 @@ with DAG(
     def build_process_commands(query_output: str, variant_id: str) -> list[str]:
         """Parse DOIs from query output and build per-paper processing commands."""
         dois = json.loads(query_output)
+        vid_q = shlex.quote(variant_id)
         return [
-            f"bash -c 'flowa download --doi {doi} && "
-            f'flowa convert --doi {doi} && '
-            f'flowa extract --variant-id "{variant_id}" --doi {doi}\''
+            f'flowa download --doi {shlex.quote(doi)} && '
+            f'flowa convert --doi {shlex.quote(doi)} && '
+            f'flowa extract --variant-id {vid_q} --doi {shlex.quote(doi)}'
             for doi in dois
         ]
 
@@ -169,8 +171,8 @@ with DAG(
     # Both steps require the same S3 data (extractions, PDFs) and run sequentially.
     aggregate_and_annotate_task = flowa_task(
         'aggregate_and_annotate',
-        "bash -c 'flowa aggregate --variant-id \"{{ params.variant_id }}\" && "
-        "flowa annotate --variant-id \"{{ params.variant_id }}\"'",
+        "flowa aggregate --variant-id '{{ params.variant_id }}' && "
+        "flowa annotate --variant-id '{{ params.variant_id }}'",
         WORKER_ENV,
         trigger_rule=TriggerRule.ALL_DONE,
     )

@@ -238,9 +238,9 @@ export FLOWA_MODEL=openai:gpt-5.2
 export OPENAI_API_KEY=sk-...
 
 uv run flowa query --variant-id test --gene GAA --hgvs-c "c.2238G>C" --source litvar
-uv run flowa download --pmid 12345678
-uv run flowa convert --pmid 12345678
-uv run flowa extract --variant-id test --pmid 12345678
+uv run flowa download --doi '10.1038/s41586-020-2308-7'
+uv run flowa convert --doi '10.1038/s41586-020-2308-7'
+uv run flowa extract --variant-id test --doi '10.1038/s41586-020-2308-7'
 ```
 
 Using MinIO at localhost:9003:
@@ -250,7 +250,7 @@ FLOWA_STORAGE_BASE=s3://flowa \
 FSSPEC_S3_ENDPOINT_URL=http://localhost:9003 \
 FSSPEC_S3_KEY=admin \
 FSSPEC_S3_SECRET=password \
-uv run flowa convert --pmid 12345678
+uv run flowa convert --doi '10.1038/s41586-020-2308-7'
 ```
 
 ### Useful Commands

@@ -11,7 +11,7 @@ from pypdf.annotations import Highlight
 from pypdf.generic import ArrayObject, FloatObject, NameObject, TextStringObject
 
 from flowa.docling import load_bbox_mapping
-from flowa.storage import assessment_url, exists, paper_url, read_bytes, read_json, write_bytes
+from flowa.storage import assessment_url, encode_doi, exists, paper_url, read_bytes, read_json, write_bytes
 
 log = logging.getLogger(__name__)
 
@@ -215,7 +215,7 @@ def annotate_pdfs(
 
     for doi, doi_citations in citations_by_doi.items():
         pdf_url = paper_url(doi, 'source.pdf')
-        output_url = assessment_url(variant_id, 'annotated', f'{doi}.pdf')
+        output_url = assessment_url(variant_id, 'annotated', f'{encode_doi(doi)}.pdf')
 
         if not exists(pdf_url):
             log.warning('Original PDF missing for %s at %s', doi, pdf_url)
