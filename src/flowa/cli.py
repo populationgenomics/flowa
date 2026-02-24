@@ -14,7 +14,7 @@ app = typer.Typer(
 )
 
 # Configure root logger to write to stderr (stdout reserved for structured output)
-# Done after imports because some libraries (metapub) configure logging on import
+# Done after imports so force=True overrides any library-configured logging
 logging.basicConfig(
     level=logging.INFO,
     format='%(asctime)s %(levelname)s %(name)s: %(message)s',

@@ -4,11 +4,11 @@ import json
 import logging
 from dataclasses import asdict, dataclass
 from typing import Any, Literal
+from xml.etree.ElementTree import Element
 
 import httpx
 import typer
-from metapub import PubMedFetcher  # type: ignore[import-untyped]
-from metapub.ncbi_errors import NCBIServiceError  # type: ignore[import-untyped]
+from defusedxml import ElementTree
 from pydantic_settings import BaseSettings, SettingsConfigDict
 from tenacity import retry, retry_if_exception_type, stop_after_attempt, wait_exponential
 
@@ -195,29 +195,119 @@ def query_litvar(gene: str, hgvs_c: str) -> list[int]:
         return sorted(pmids)
 
 
+EFETCH_URL = 'https://eutils.ncbi.nlm.nih.gov/entrez/eutils/efetch.fcgi'
+
+
+def _extract_element_text(elem: Element | None) -> str:
+    """Extract all text from an XML element, flattening any inline markup."""
+    if elem is None:
+        return ''
+    return ''.join(elem.itertext()).strip()
+
+
+def _parse_article_metadata(article_elem: Element) -> dict[str, Any]:
+    """Parse metadata from a PubmedArticle XML element."""
+    # Extract article IDs (DOI, PMID) from ArticleIdList
+    article_ids: dict[str, str] = {}
+    for article_id in article_elem.findall('.//PubmedData/ArticleIdList/ArticleId'):
+        id_type = article_id.get('IdType')
+        if id_type and article_id.text:
+            article_ids[id_type] = article_id.text.strip()
+
+    doi = article_ids.get('doi')
+    pmid_str = article_ids.get('pubmed')
+    pmid = int(pmid_str) if pmid_str else None
+
+    # Title (may contain inline elements like <i>, <sup>)
+    title = _extract_element_text(article_elem.find('.//MedlineCitation/Article/ArticleTitle'))
+
+    # Authors — skip entries without LastName (consortiums, per commit ced10cc)
+    author_parts: list[str] = []
+    for author in article_elem.findall('.//MedlineCitation/Article/AuthorList/Author'):
+        last_name_elem = author.find('LastName')
+        if last_name_elem is None or not last_name_elem.text:
+            continue
+        fore_name_elem = author.find('ForeName')
+        if fore_name_elem is not None and fore_name_elem.text:
+            author_parts.append(f'{last_name_elem.text}, {fore_name_elem.text}')
+        else:
+            author_parts.append(last_name_elem.text)
+    authors = '; '.join(author_parts)
+
+    # Journal
+    journal_elem = article_elem.find('.//MedlineCitation/Article/Journal/Title')
+    journal = journal_elem.text.strip() if journal_elem is not None and journal_elem.text else None
+
+    # Abstract — join all AbstractText elements
+    abstract_elems = article_elem.findall('.//MedlineCitation/Article/Abstract/AbstractText')
+    abstract_parts = [_extract_element_text(elem) for elem in abstract_elems]
+    abstract = ' '.join(p for p in abstract_parts if p) or None
+
+    # Entrez date
+    entrez_date_elem = article_elem.find('.//PubmedData/History/PubMedPubDate[@PubStatus="entrez"]')
+    entrez_date = _extract_date(entrez_date_elem)
+
+    return {
+        'doi': doi,
+        'pmid': pmid,
+        'title': title,
+        'authors': authors,
+        'date': entrez_date,
+        'journal': journal,
+        'abstract': abstract,
+    }
+
+
+def _extract_date(date_elem: Element | None) -> str | None:
+    """Extract YYYY-MM-DD date from a PubMedPubDate element."""
+    if date_elem is None:
+        return None
+    year_elem = date_elem.find('Year')
+    month_elem = date_elem.find('Month')
+    day_elem = date_elem.find('Day')
+    if (
+        year_elem is None
+        or month_elem is None
+        or day_elem is None
+        or year_elem.text is None
+        or month_elem.text is None
+        or day_elem.text is None
+    ):
+        return None
+    try:
+        return f'{int(year_elem.text):04d}-{int(month_elem.text):02d}-{int(day_elem.text):02d}'
+    except ValueError:
+        return None
+
+
 @retry(
     stop=stop_after_attempt(5),
     wait=wait_exponential(),
-    retry=retry_if_exception_type(NCBIServiceError),
+    retry=retry_if_exception_type(httpx.HTTPStatusError),
     reraise=True,
 )
-def _fetch_pubmed_metadata(pmid: int, fetcher: PubMedFetcher) -> dict[str, Any]:
-    """Fetch metadata for a paper from PubMed with retry on rate limit."""
-    article = fetcher.article_by_pmid(pmid)
-    authors = '; '.join(
-        f'{au.last_name}, {au.fore_name}' if au.fore_name else au.last_name
-        for au in article.author_list
-        if au.last_name
-    )
-    return {
-        'doi': article.doi,
-        'pmid': pmid,
-        'title': article.title,
-        'authors': authors,
-        'date': article.history['entrez'].date().isoformat(),
-        'journal': article.journal,
-        'abstract': article.abstract,
-    }
+def _fetch_pubmed_metadata_batch(pmids: list[int]) -> dict[int, dict[str, Any]]:
+    """Fetch metadata for multiple papers from PubMed in a single EFetch request."""
+    with httpx.Client(timeout=30.0) as client:
+        response = client.get(
+            EFETCH_URL,
+            params={
+                'db': 'pubmed',
+                'id': ','.join(str(p) for p in pmids),
+                'retmode': 'xml',
+            },
+        )
+        response.raise_for_status()
+
+    root = ElementTree.fromstring(response.content)
+    results: dict[int, dict[str, Any]] = {}
+    for article_elem in root.findall('PubmedArticle'):
+        metadata = _parse_article_metadata(article_elem)
+        pmid = metadata.get('pmid')
+        if pmid is not None:
+            results[pmid] = metadata
+
+    return results
 
 
 def resolve_pmids_to_dois(pmids: list[int]) -> list[str]:
@@ -225,13 +315,20 @@ def resolve_pmids_to_dois(pmids: list[int]) -> list[str]:
 
     Papers without a DOI are skipped.
     """
-    fetcher = PubMedFetcher()
+    if not pmids:
+        return []
+
+    metadata_by_pmid = _fetch_pubmed_metadata_batch(pmids)
     dois: list[str] = []
 
     for pmid in pmids:
-        metadata = _fetch_pubmed_metadata(pmid, fetcher)
-        doi = metadata.get('doi')
+        metadata = metadata_by_pmid.get(pmid)
 
+        if metadata is None:
+            log.warning('Skipping PMID %s: not found in EFetch response', pmid)
+            continue
+
+        doi = metadata.get('doi')
         if not doi:
             log.warning('Skipping PMID %s: no DOI available', pmid)
             continue

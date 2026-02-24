@@ -11,11 +11,11 @@ dependencies = [
     "fsspec",
     "gcsfs",  # GCS support for fsspec
     "httpx",
-    "metapub",
     "pydantic-ai",
     "pydantic-settings",
     "pypdf",
     "s3fs",   # S3/MinIO support for fsspec
+    "markupsafe==3.0.2",  # 3.0.3 on PyTorch CPU index only has cp314 wheels
     "tenacity",
     "typer",
 ]
