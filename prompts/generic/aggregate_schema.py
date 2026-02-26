@@ -26,9 +26,13 @@ class CategoryResult(BaseModel):
     )
     classification_rationale: str = Field(description='Brief explanation of why this classification was selected')
     description: str = Field(description='Summary filled in with specific details from the evidence')
-    notes: str = Field(description='Detailed curator-style synthesis in Markdown format')
+    notes: str = Field(
+        description='Detailed curator-style synthesis in Markdown format. '
+        'Use inline citation links [text](#cite:paper_id:box_id) to reference specific evidence locations.'
+    )
     citations: list[AggregateCitation] = Field(
-        description='All citations supporting factual claims in the notes'
+        description='All citations supporting factual claims in the notes. '
+        'Each #cite:paper_id:box_id link in the notes must have a corresponding entry here.'
     )
 
 

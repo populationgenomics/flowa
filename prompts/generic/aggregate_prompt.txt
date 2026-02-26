@@ -10,7 +10,7 @@ You have been provided with evidence extractions from multiple papers about this
 2. **COUNT UNRELATED CASES**: Determine total number of unrelated families/cases with this variant
 3. **SELECT CLASSIFICATION**: Choose ONE ACMG classification term based on the aggregated evidence
 4. **GENERATE DESCRIPTION**: Fill in the mandatory template for your selected classification
-5. **GENERATE DETAILED NOTES**: Curator-style synthesis with paper_id+bbox citations
+5. **GENERATE DETAILED NOTES**: Curator-style synthesis with inline citation links
 
 CRITICAL AGGREGATION PRINCIPLES:
 
@@ -158,14 +158,19 @@ Include when available:
 - Phenotypic variability within families or across unrelated cases
 
 Format (use Markdown):
-- One concise entry per paper using the paper_id: "**paper_id:** [findings]."
+- One concise entry per paper, with the paper_id in bold as the leading identifier
+- Use inline Markdown citation links to reference specific evidence locations: `[link text](#cite:paper_id:box_id)`
+- The link text is free-form — use the paper_id label, a descriptive phrase, or a specific claim, whatever reads most naturally
+- Be generous with links: whenever a factual claim can be traced to a specific evidence location, link it
+- The href format `#cite:paper_id:box_id` is required exactly — the application uses it to link to the evidence viewer
+- Each citation link must reference a valid entry in the citations array (same paper_id and box_id)
 - End with synthesis paragraph if needed for complex cases
 
 Example structure (adapt to your evidence):
 ```
-- **Chang2021:** 2x cHet with severe neonatal-onset skeletal dysplasia, respiratory insufficiency; both died <6 months.
-- **Smith2022:** 1x het adult female, asymptomatic, low serum ALP (22 U/L). 4x cHet individuals: 2 perinatal lethal, 2 childhood-onset with fractures and dental anomalies.
-- **Tanaka2020:** 1x het child, mild bone pain onset age 8, premature tooth loss; only variant identified.
+- [**Chang2021**](#cite:Chang2021:42): 2x cHet with [severe neonatal-onset skeletal dysplasia](#cite:Chang2021:43), respiratory insufficiency; both died <6 months.
+- **Smith2022**: [1x het adult female](#cite:Smith2022:105), asymptomatic, low serum ALP (22 U/L). [4x cHet individuals](#cite:Smith2022:203): 2 perinatal lethal, 2 childhood-onset with fractures and dental anomalies.
+- **Tanaka2020**: [1x het child](#cite:Tanaka2020:78), mild bone pain onset age 8, premature tooth loss; only variant identified.
 
 Classification is Pathogenic based on >10 reports of cHet individuals. Het carriers show variable penetrance: some asymptomatic with biochemical findings only, others with mild-moderate skeletal/dental symptoms. Severe disease associated with biallelic variants.
 ```
@@ -174,7 +179,7 @@ Note: Papers are provided sorted by date (descending, most recent first), with m
 
 CITATIONS:
 
-All factual claims in your detailed notes should be traceable to the input evidence. Collect all relevant citations (paper_id + box_id + commentary) and include them in the citations array. These will be used to annotate the source PDFs.
+Each citation link in the notes (identified by `#cite:paper_id:box_id` href) must correspond to an entry in the citations array with the same paper_id and box_id. All factual claims in your detailed notes should be traceable to the input evidence. Collect all relevant citations (paper_id + box_id + commentary) and include them in the citations array. These will be used to annotate the source PDFs.
 
 RESPONSE FORMAT:
 
