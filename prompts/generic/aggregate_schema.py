@@ -28,7 +28,9 @@ class CategoryResult(BaseModel):
     description: str = Field(description='Summary filled in with specific details from the evidence')
     notes: str = Field(
         description='Detailed curator-style synthesis in Markdown format. '
-        'Use inline citation links [text](#cite:paper_id:box_id) to reference specific evidence locations.'
+        'Use inline citation links [text](#cite:paper_id:box_id) to reference specific evidence locations. '
+        'Structure: summary (classification rationale, aggregate counts, refuting evidence callout) '
+        '-> supporting evidence -> refuting evidence if any.'
     )
     citations: list[AggregateCitation] = Field(
         description='All citations supporting factual claims in the notes. '
