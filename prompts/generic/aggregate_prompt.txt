@@ -34,20 +34,28 @@ CRITICAL AGGREGATION PRINCIPLES:
 - Be explicit about de novo cases vs inherited cases
 - Note asymptomatic carriers separately (evidence for benign assertion)
 
-**Evaluating ClinVar Submissions:**
-- **ClinGen expert panels** follow ACMG guidelines rigorously and warrant special attention. Present their conclusions, criteria applied, and reasoning in full.
-- **Other submissions**: Evaluate critically, just as you would a paper. For each submission that provides reasoning, assess: did they cite evidence? Is their reasoning sound? Do you agree with how they applied criteria?
-- Submissions that provide no evidence or reasoning to support their classification label should be disregarded for the assessment (they contribute to the submission count only).
-- Focus on the *why* behind each classification, not just the label. A well-reasoned VUS submission may be more informative than an unsupported Pathogenic one.
-- Consider recency: a 2024 paper may present population data that undermines an older ClinVar submission from 2015.
+**Evaluating Evidence Quality:**
 
-**Handling Conflicting Evidence:**
-- If papers or ClinVar submissions disagree on classifications, assess the quality and recency of evidence on each side
-- For ClinVar "Conflicting interpretations": examine the distribution (39 P + 1 VUS is near-unanimous; 20 P + 15 B is genuinely conflicting) and the quality of reasoning behind each position
-- Note conflicts explicitly in detailed notes
-- Consider whether phenotypic differences or zygosity patterns explain conflicts
+A classification label (P, LP, VUS) from any source — paper or ClinVar — is a claim, not evidence. Always evaluate the underlying basis:
+
+- Assess what evidence supports each classification: de novo, segregation, wet-lab functional assays, case-control data, or computational predictions only?
+- In-silico predictions alone (PP3) cannot support LP/P under current ACMG/AMP standards, regardless of how many tools agree. Older papers that classified variants as LP based solely on in-silico suites do not meet current evidence standards.
+- Variant type matters: LoF variants (frameshift, nonsense, canonical splice) with established haploinsufficiency have high prior probability — presence in an affected individual is meaningful. Missense variants require stronger independent evidence (de novo, segregation, validated functional assays, or compound het with known pathogenic variant).
+- "Described as pathogenic" in the classification criteria below means the evidence supports pathogenicity under current standards — not just that a source applied the label.
+
+**ClinVar submissions:**
+- ClinGen expert panels: present their conclusions, applied criteria, and reasoning in full.
+- Other submissions: evaluate critically — disregard those without evidence or reasoning (submission count only).
+- Consider recency: newer evidence may undermine older submissions.
+
+**Conflicting evidence:**
+- Assess quality and recency on each side
+- For ClinVar "Conflicting interpretations": examine distribution (39P + 1VUS ≠ 20P + 15B) and reasoning quality
+- Note conflicts in detailed notes; consider whether phenotypic or zygosity differences explain them
 
 ACMG CLASSIFICATION CRITERIA (Previous Reports Category):
+
+IMPORTANT: "Described as pathogenic" and "classified by experts" in the criteria below refer to evidence quality, not labels. Evaluate the underlying evidence as described above.
 
 **PATHOGENIC:**
 - Variant classified by experts OR classified as pathogenic/likely pathogenic in ≥2 *de novo* UNRELATED cases or ≥5 UNRELATED cases in recessive or inherited conditions, or without allelic information
