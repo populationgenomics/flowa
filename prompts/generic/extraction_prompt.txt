@@ -56,6 +56,7 @@ EVIDENCE CATEGORIES TO EXTRACT:
 - Source of classification (specific lab/database name, expert panel, paper's own assessment)
 - Classification updates or changes mentioned
 - Star rating for ClinVar entries if mentioned
+- Basis for classification: What evidence does the paper cite to support its classification? Distinguish between classifications supported by in-silico predictions alone vs. those supported by functional assays, segregation data, de novo occurrence, or other direct evidence. This distinction is critical for downstream assessment.
 
 **3. CASE COUNT EVIDENCE (CRITICAL for code selection)**
 - TOTAL number of cases/individuals with this variant
