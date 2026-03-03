@@ -8,6 +8,8 @@ __pycache__/
 # local irrelevant files
 .idea
 .DS_Store
+CLAUDE.md
+specs/
 
 # C extensions
 *.so
