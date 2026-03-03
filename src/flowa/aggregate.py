@@ -10,6 +10,7 @@ import typer
 from pydantic import BaseModel
 from pydantic_ai import Agent, ModelRetry, RunContext
 
+from flowa.clinvar import format_clinvar_for_prompt, query_clinvar
 from flowa.docling import load_bbox_mapping
 from flowa.models import create_model, get_thinking_settings
 from flowa.prompts import load_prompt
@@ -142,6 +143,11 @@ def aggregate_evidence(
     query_data = read_json(assessment_url(variant_id, 'query.json'))
     dois = query_data['dois']
 
+    # Fetch ClinVar evidence
+    ncbi_api_key = os.environ.get('NCBI_API_KEY')
+    clinvar_data = query_clinvar(query_data['hgvs_c'], ncbi_api_key)
+    clinvar_text = format_clinvar_for_prompt(clinvar_data)
+
     # Load extractions, bbox mappings, and metadata for each paper
     evidence_extractions: list[dict[str, Any]] = []
     bbox_mappings: dict[str, dict[int, Any]] = {}
@@ -164,15 +170,16 @@ def aggregate_evidence(
         metadata = read_json(paper_url(doi, 'metadata.json'))
         metadata_cache[doi] = metadata
 
-        evidence_extractions.append(
-            {
-                'doi': doi,
-                'title': metadata['title'],
-                'authors': metadata['authors'],
-                'date': metadata['date'],
-                'evidence': extraction_data['evidence'],
-            }
-        )
+        entry = {
+            'doi': doi,
+            'title': metadata['title'],
+            'authors': metadata['authors'],
+            'date': metadata['date'],
+            'evidence': extraction_data['evidence'],
+        }
+        if metadata.get('pmid'):
+            entry['pmid'] = metadata['pmid']
+        evidence_extractions.append(entry)
 
     if not evidence_extractions:
         log.warning('No papers discussed this variant - writing empty aggregate')
@@ -195,12 +202,15 @@ def aggregate_evidence(
 
     prompt = prompt_template.format(
         variant_details=variant_details,
+        clinvar_data=clinvar_text,
         evidence_extractions=json.dumps(evidence_extractions, indent=2),
     )
 
     if dry_run:
         print('=== PROMPT ===')
         print(prompt)
+        print('\n=== CLINVAR ===')
+        print(clinvar_text)
         print('\n=== BBOX MAPPINGS (DOIs with box counts) ===')
         for doi, boxes in bbox_mappings.items():
             print(f'  {doi}: {len(boxes)} boxes (ids: {min(boxes)}..{max(boxes)})')
