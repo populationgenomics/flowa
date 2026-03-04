@@ -145,7 +145,7 @@ def aggregate_evidence(
 
     # Fetch ClinVar evidence
     ncbi_api_key = os.environ.get('NCBI_API_KEY')
-    clinvar_data = query_clinvar(query_data['hgvs_c'], ncbi_api_key)
+    clinvar_data = query_clinvar(query_data['hgvs_c'], query_data['gene'], ncbi_api_key)
     clinvar_text = format_clinvar_for_prompt(clinvar_data)
 
     # Load extractions, bbox mappings, and metadata for each paper

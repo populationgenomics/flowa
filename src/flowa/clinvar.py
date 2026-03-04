@@ -47,14 +47,31 @@ def _api_params(ncbi_api_key: str | None) -> dict[str, str]:
     retry=retry_if_exception_type(httpx.HTTPStatusError),
     reraise=True,
 )
-def query_clinvar(hgvs_c: str, ncbi_api_key: str | None = None) -> dict[str, Any]:
-    """Query ClinVar by HGVS c. notation and return parsed submission data.
+def _extract_variant_change(hgvs_c: str) -> str:
+    """Extract the variant change from HGVS c. notation.
+
+    'NM_006767.4:c.1943-256C>T' -> '1943-256C>T'
+    """
+    # Split on ':c.' and take the change part
+    if ':c.' in hgvs_c:
+        return hgvs_c.split(':c.', 1)[1]
+    raise ValueError(f'Cannot extract variant change from HGVS: {hgvs_c}')
+
+
+def query_clinvar(hgvs_c: str, gene: str, ncbi_api_key: str | None = None) -> dict[str, Any]:
+    """Query ClinVar by gene + variant change and return parsed submission data.
+
+    Uses the search format ``GENE AND (change OR Not found)`` which reliably
+    returns the correct VariationID, unlike bare HGVS searches that get
+    tokenized incorrectly by NCBI's ESearch.
 
     Returns a dict with 'found': False if the variant is not in ClinVar,
     or a structured dict with aggregate classification and per-submission
     details when found.
     """
-    log.info('Querying ClinVar for %s', hgvs_c)
+    variant_change = _extract_variant_change(hgvs_c)
+    search_term = f'{gene} AND ({variant_change} OR Not found)'
+    log.info('Querying ClinVar for %s (search: %s)', hgvs_c, search_term)
 
     with httpx.Client(timeout=30.0) as client:
         # Step 1: ESearch to find VariationID
@@ -62,7 +79,7 @@ def query_clinvar(hgvs_c: str, ncbi_api_key: str | None = None) -> dict[str, Any
             ESEARCH_URL,
             params={
                 'db': 'clinvar',
-                'term': hgvs_c,
+                'term': search_term,
                 'retmode': 'json',
                 **_api_params(ncbi_api_key),
             },
@@ -75,7 +92,14 @@ def query_clinvar(hgvs_c: str, ncbi_api_key: str | None = None) -> dict[str, Any
             log.info('No ClinVar results for %s', hgvs_c)
             return {'found': False}
 
-        # Use first result (most relevant match)
+        if len(id_list) > 1:
+            log.warning(
+                'ClinVar search for %s returned %d results (IDs: %s), expected 1; using first',
+                hgvs_c,
+                len(id_list),
+                ', '.join(id_list),
+            )
+
         variation_id = id_list[0]
         log.info('Found ClinVar VariationID %s for %s', variation_id, hgvs_c)
 
