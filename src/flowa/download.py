@@ -9,7 +9,7 @@ from pathlib import Path
 import httpx
 import typer
 from defusedxml import ElementTree
-from pypdf import PdfWriter
+from pypdf import PdfReader, PdfWriter
 from tenacity import retry, stop_after_attempt, wait_exponential
 
 from flowa.storage import exists, paper_url, read_json, write_bytes
@@ -60,6 +60,43 @@ def concatenate_pdfs(pdf_paths: list[Path], output_path: Path) -> None:
         writer.write(output_file)
 
 
+def _filter_supplements_by_page_count(
+    supplement_pdfs: list[Path],
+    *,
+    max_pages_per_supplement: int = 20,
+    max_total_supplement_pages: int = 50,
+) -> list[Path]:
+    """Filter supplement PDFs by page count to avoid docling timeouts on huge table dumps."""
+    accepted: list[Path] = []
+    total_pages = 0
+
+    for pdf_path in supplement_pdfs:
+        try:
+            pages = len(PdfReader(pdf_path).pages)
+        except Exception as e:
+            log.warning('Cannot read page count for %s, skipping: %s', pdf_path.name, e)
+            continue
+
+        if pages > max_pages_per_supplement:
+            log.info('Skipping supplement %s: %d pages (limit %d)', pdf_path.name, pages, max_pages_per_supplement)
+            continue
+
+        if total_pages + pages > max_total_supplement_pages:
+            log.info(
+                'Skipping supplement %s: %d pages would exceed total budget (%d/%d)',
+                pdf_path.name,
+                pages,
+                total_pages,
+                max_total_supplement_pages,
+            )
+            continue
+
+        accepted.append(pdf_path)
+        total_pages += pages
+
+    return accepted
+
+
 def process_tgz_archive(tgz_content: bytes, output_path: Path) -> tuple[bool, str]:
     """Extract TGZ archive, find main PDF, concatenate with supplements."""
     with tempfile.TemporaryDirectory() as tmpdir:
@@ -87,6 +124,7 @@ def process_tgz_archive(tgz_content: bytes, output_path: Path) -> tuple[bool, st
             return False, f'Main PDF not found (expected {main_pdf.name})'
 
         supplement_pdfs = extract_supplements_from_nxml(nxml_file, tmpdir_path)
+        supplement_pdfs = _filter_supplements_by_page_count(supplement_pdfs)
         all_pdfs = [main_pdf, *supplement_pdfs]
 
         try:
