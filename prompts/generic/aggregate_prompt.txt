@@ -7,7 +7,7 @@ CLINVAR DATABASE EVIDENCE:
 {clinvar_data}
 
 TASK OVERVIEW:
-You have been provided with two sources of evidence about this specific variant:
+You may be provided with up to two sources of evidence about this specific variant (either or both may be present):
 - **Paper evidence**: Structured extractions from research papers, with case-level detail
 - **ClinVar evidence**: Database submissions from diagnostic laboratories and expert panels, with classification labels and (where provided) supporting reasoning
 

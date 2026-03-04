@@ -181,29 +181,37 @@ def aggregate_evidence(
             entry['pmid'] = metadata['pmid']
         evidence_extractions.append(entry)
 
-    if not evidence_extractions:
-        log.warning('No papers discussed this variant - writing empty aggregate')
+    if not evidence_extractions and not clinvar_data.get('found'):
+        log.warning('No papers or ClinVar data for this variant - writing empty aggregate')
         write_json(aggregate_url, with_schema_version({'results': {}}, AGGREGATE_SCHEMA_VERSION))
         return
 
     # Generate paper_ids and replace DOIs with human-readable IDs for the LLM
-    paper_id_to_doi, doi_to_paper_id = generate_paper_ids(evidence_extractions)
+    paper_id_to_doi: dict[str, str] = {}
+    if evidence_extractions:
+        paper_id_to_doi, doi_to_paper_id = generate_paper_ids(evidence_extractions)
+        for entry in evidence_extractions:
+            entry['paper_id'] = doi_to_paper_id[entry.pop('doi')]
+        evidence_extractions.sort(key=lambda x: x['date'], reverse=True)
 
-    for entry in evidence_extractions:
-        entry['paper_id'] = doi_to_paper_id[entry.pop('doi')]
-
-    # Sort by date descending (most recent first)
-    evidence_extractions.sort(key=lambda x: x['date'], reverse=True)
-
-    log.info('Aggregating evidence from %d papers (model: %s)', len(evidence_extractions), model)
+    log.info(
+        'Aggregating evidence from %d papers + ClinVar (model: %s)',
+        len(evidence_extractions),
+        model,
+    )
 
     # Load prompt and schema from prompt set
     prompt_template, output_type = load_prompt('aggregate')
 
+    evidence_text = (
+        json.dumps(evidence_extractions, indent=2)
+        if evidence_extractions
+        else 'No papers discussing this variant were found.'
+    )
     prompt = prompt_template.format(
         variant_details=variant_details,
         clinvar_data=clinvar_text,
-        evidence_extractions=json.dumps(evidence_extractions, indent=2),
+        evidence_extractions=evidence_text,
     )
 
     if dry_run:
