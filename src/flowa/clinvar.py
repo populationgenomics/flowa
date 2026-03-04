@@ -61,7 +61,7 @@ def _extract_variant_change(hgvs_c: str) -> str:
 def query_clinvar(hgvs_c: str, gene: str, ncbi_api_key: str | None = None) -> dict[str, Any]:
     """Query ClinVar by gene + variant change and return parsed submission data.
 
-    Uses the search format ``GENE AND (change OR Not found)`` which reliably
+    Uses the search format ``GENE AND change`` which reliably
     returns the correct VariationID, unlike bare HGVS searches that get
     tokenized incorrectly by NCBI's ESearch.
 
@@ -70,7 +70,7 @@ def query_clinvar(hgvs_c: str, gene: str, ncbi_api_key: str | None = None) -> di
     details when found.
     """
     variant_change = _extract_variant_change(hgvs_c)
-    search_term = f'{gene} AND ({variant_change} OR Not found)'
+    search_term = f'{gene} AND {variant_change}'
     log.info('Querying ClinVar for %s (search: %s)', hgvs_c, search_term)
 
     with httpx.Client(timeout=30.0) as client:
