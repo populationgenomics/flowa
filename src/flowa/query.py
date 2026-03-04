@@ -2,6 +2,7 @@
 
 import json
 import logging
+import time
 from dataclasses import asdict, dataclass
 from typing import Any, Literal
 from xml.etree.ElementTree import Element
@@ -14,6 +15,18 @@ from tenacity import retry, retry_if_exception_type, stop_after_attempt, wait_ex
 
 from flowa.schema import METADATA_SCHEMA_VERSION, QUERY_SCHEMA_VERSION, with_schema_version
 from flowa.storage import assessment_url, paper_url, read_json, write_json
+
+
+def _print_for_xcom(value: str) -> None:
+    """Print a value to stdout for Airflow XCom capture.
+
+    Must be the very last output the process produces.
+    """
+    # ECS captures the last CloudWatch log event as XCom. CloudWatch merges
+    # stdout and stderr with no ordering guarantee for same-timestamp events,
+    # so we sleep to ensure this gets a later timestamp than preceding log output.
+    time.sleep(0.01)
+    print(value)
 
 
 @dataclass
@@ -360,7 +373,7 @@ def query_dois(
     try:
         cached = read_json(cache_url)
         log.info('Using cached query results (%d DOIs)', len(cached['dois']))
-        print(json.dumps(cached['dois']))
+        _print_for_xcom(json.dumps(cached['dois']))
         return
     except FileNotFoundError:
         pass
@@ -396,4 +409,4 @@ def query_dois(
     log.info('Cached query results to %s', cache_url)
 
     log.info('Found %d DOIs from %d PMIDs', len(dois), len(pmids))
-    print(json.dumps(dois))
+    _print_for_xcom(json.dumps(dois))
