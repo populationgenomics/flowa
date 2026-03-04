@@ -47,31 +47,19 @@ def _api_params(ncbi_api_key: str | None) -> dict[str, str]:
     retry=retry_if_exception_type(httpx.HTTPStatusError),
     reraise=True,
 )
-def _extract_variant_change(hgvs_c: str) -> str:
-    """Extract the variant change from HGVS c. notation.
+def query_clinvar(hgvs_c: str, ncbi_api_key: str | None = None) -> dict[str, Any]:
+    """Query ClinVar by HGVS c. notation and return parsed submission data.
 
-    'NM_006767.4:c.1943-256C>T' -> '1943-256C>T'
-    """
-    # Split on ':c.' and take the change part
-    if ':c.' in hgvs_c:
-        return hgvs_c.split(':c.', 1)[1]
-    raise ValueError(f'Cannot extract variant change from HGVS: {hgvs_c}')
-
-
-def query_clinvar(hgvs_c: str, gene: str, ncbi_api_key: str | None = None) -> dict[str, Any]:
-    """Query ClinVar by gene + variant change and return parsed submission data.
-
-    Uses the search format ``GENE AND change`` which reliably
-    returns the correct VariationID, unlike bare HGVS searches that get
-    tokenized incorrectly by NCBI's ESearch.
+    Uses a quoted exact-phrase search (``"NM_...:c.change"``) which forces
+    NCBI ESearch to match the full HGVS string rather than tokenizing it
+    into separate fields that can match unrelated variants.
 
     Returns a dict with 'found': False if the variant is not in ClinVar,
     or a structured dict with aggregate classification and per-submission
     details when found.
     """
-    variant_change = _extract_variant_change(hgvs_c)
-    search_term = f'{gene} AND {variant_change}'
-    log.info('Querying ClinVar for %s (search: %s)', hgvs_c, search_term)
+    search_term = f'"{hgvs_c}"'
+    log.info('Querying ClinVar for %s', hgvs_c)
 
     with httpx.Client(timeout=30.0) as client:
         # Step 1: ESearch to find VariationID
