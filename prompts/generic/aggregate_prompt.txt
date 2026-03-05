@@ -125,12 +125,15 @@ DESCRIPTION - FILLING IN DETAILS:
 When filling in {{DETAILS}} placeholders, include:
 - Expert panel classifications if applicable
 - Number and type of cases (compound heterozygous, heterozygous, de novo)
+- **Age of onset spectrum** across cases — this is critical for neonatal/carrier screening:
+  * Specific ages or ranges (e.g. "neonatal onset day 1-3", "childhood onset ages 2-5")
+  * Whether onset differs by zygosity (e.g. biallelic = neonatal, het = adult-onset or asymptomatic)
+  * Earliest reported onset if relevant to screening urgency
 - Phenotypic information with specificity:
   * Major clinical features (not just disease name)
-  * Age of onset or presentation (neonatal, childhood, adult)
   * Severity spectrum when variable
   * Key phenotypic distinctions (e.g., het carriers vs biallelic cases)
-  * Asymptomatic carriers with relevant context (biochemical findings, family history)
+  * Asymptomatic carriers with relevant context (biochemical findings, family history, age at assessment)
 - Key sources (specific papers if particularly informative)
 
 Examples:
@@ -175,6 +178,14 @@ POOR: "cardiac involvement"
 GOOD: "recurrent pheochromocytomas (n=4), medullary thyroid cancer (n=2), ages 18-35"
 POOR: "endocrine tumors"
 
+**Age of Onset Synthesis (Critical for Screening):**
+When evidence includes age-of-onset information, synthesize it prominently:
+- State the overall onset range across all sources (e.g. "onset ranged from neonatal to age 5")
+- Note any pattern by zygosity or variant combination (e.g. "biallelic cases presented neonatally; heterozygous carriers remained asymptomatic into adulthood")
+- Flag earliest reported onset — this drives neonatal screening relevance
+- Distinguish age at symptom onset from age at diagnosis when both are available
+- Note the age at assessment for asymptomatic carriers (to contextualize whether they may be pre-symptomatic)
+
 Include when available:
 - Specific symptoms/findings (not generic organ system labels)
 - Quantitative lab/imaging values
@@ -196,7 +207,7 @@ Format (use Markdown):
 
 Example structure (adapt to your evidence):
 ```
-**Summary:** Pathogenic. ClinVar: P (3 stars, 41 submitters); PAH Expert Panel classified as P applying PS3 (1.85% WT enzyme activity in functional assays), PP4_Moderate (most common PAH mutation in PKU cohorts), PM3_Strong (detected in trans with known pathogenic variants IVS12+1G>A and M1V). Paper evidence corroborates: >10 cHet individuals across 3 studies with severe biallelic disease (neonatal skeletal dysplasia, [perinatal lethal](#cite:Smith2022:203)). [1 het carrier asymptomatic](#cite:Smith2022:105) with only biochemical findings (low serum ALP 22 U/L), suggesting incomplete penetrance in heterozygous state; does not change classification given strong biallelic evidence and expert panel review.
+**Summary:** Pathogenic. ClinVar: P (3 stars, 41 submitters); PAH Expert Panel classified as P applying PS3 (1.85% WT enzyme activity in functional assays), PP4_Moderate (most common PAH mutation in PKU cohorts), PM3_Strong (detected in trans with known pathogenic variants IVS12+1G>A and M1V). Paper evidence corroborates: >10 cHet individuals across 3 studies with severe biallelic disease (neonatal skeletal dysplasia, [perinatal lethal](#cite:Smith2022:203)). Age of onset: biallelic cases presented neonatally (day 1-3 of life) to early childhood (age 3-5); [1 het carrier asymptomatic at age 42](#cite:Smith2022:105) with only biochemical findings (low serum ALP 22 U/L), suggesting incomplete penetrance in heterozygous state; does not change classification given strong biallelic evidence and expert panel review.
 
 **Supporting evidence:**
 - **ClinVar**: PAH Expert Panel classified as P (2018-08-06), citing 1.85% WT activity in functional assays and compound het observations with known pathogenic variants. 36 additional lab submissions classify as P, all with criteria provided.

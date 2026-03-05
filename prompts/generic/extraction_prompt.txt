@@ -12,10 +12,11 @@ Extract ALL evidence from this paper about the specific variant listed above. Fo
 3. Case counts - specifically NUMBER OF UNRELATED FAMILIES/cases
 4. Inheritance pattern (de novo vs inherited, homozygous vs heterozygous vs compound heterozygous)
 5. Phenotypes observed in individuals carrying this variant
-6. Database mentions (ClinVar, ClinGen, other clinical databases)
-7. Population frequency information
-8. Functional evidence specific to this variant
-9. Phasing information (cis/trans relationships with other variants)
+6. Age of onset / age at presentation for the associated disease
+7. Database mentions (ClinVar, ClinGen, other clinical databases)
+8. Population frequency information
+9. Functional evidence specific to this variant
+10. Phasing information (cis/trans relationships with other variants)
 
 CITATION REQUIREMENTS:
 For each piece of evidence extracted, you MUST provide specific citations using the <b id=N> tags found in the full text. For each citation:
@@ -79,7 +80,6 @@ Extract detailed, specific clinical information - curators need this to determin
 - Specific clinical symptoms/findings (not just disease name or organ system)
   * Examples: "seizures onset age 3", "LVEF 28%", "elevated CK 450 U/L"
   * NOT just: "neurological symptoms", "cardiac disease", "muscle abnormalities"
-- Age of onset (specific ages/ranges when provided)
 - Severity descriptors and clinical course
 - Quantitative findings (lab values, imaging measurements, functional assessments)
 - Phenotypic variability across carriers (describe specific differences)
@@ -88,27 +88,37 @@ Extract detailed, specific clinical information - curators need this to determin
 - Disease-specific clinical findings with detail
 - Relevant negative findings (e.g., "no cardiac involvement")
 
-**6. DATABASE AND PRIOR REPORTS**
+**6. AGE OF ONSET (CRITICAL for neonatal/carrier screening)**
+Age of onset is essential for determining clinical urgency and screening relevance. Extract with maximum specificity:
+- Specific age of onset or first presentation (e.g. "day 2 of life", "age 3 years", "prenatal ultrasound at 20 weeks")
+- Onset category when specific age is not given: prenatal, neonatal (0-28 days), infantile (1-12 months), childhood (1-10 years), juvenile (10-18 years), or adult (>18 years)
+- Age at diagnosis vs age at symptom onset, if both are provided
+- Age range across multiple patients carrying this variant (e.g. "onset ranged from neonatal to 5 years")
+- Whether the paper describes the presentation as early-onset or late-onset relative to the typical disease course
+- Any correlation between onset age and zygosity or variant combination (e.g. biallelic cases presenting earlier than heterozygous carriers)
+- Age at assessment for asymptomatic carriers (important to establish whether they are truly unaffected or simply pre-symptomatic)
+
+**7. DATABASE AND PRIOR REPORTS**
 - ClinVar entries (count of submissions, star rating, submitter names if provided, assertion)
 - ClinGen or other expert panel classifications
 - Other clinical database mentions
 - References to prior literature reports of this variant
 - Whether this is described as a novel variant or previously reported
 
-**7. POPULATION FREQUENCY**
+**8. POPULATION FREQUENCY**
 - gnomAD, ExAC, or other population database frequencies (overall and by population)
 - Allele counts and allele numbers
 - Presence/absence in controls
 - Homozygous/hemizygous counts in population databases
 
-**8. FUNCTIONAL EVIDENCE**
+**9. FUNCTIONAL EVIDENCE**
 - Experimental studies performed on this specific variant
 - Protein functional assays
 - Model organism studies (cell lines, animal models)
 - In silico predictions (CADD, REVEL, PolyPhen, SIFT, etc.)
 - Structural modeling
 
-**9. PHASING AND CIS/TRANS RELATIONSHIPS**
+**10. PHASING AND CIS/TRANS RELATIONSHIPS**
 - Variants found in cis (same chromosome) with this variant
 - Variants found in trans (opposite chromosome)
 - Cases with alternative explanations for phenotype despite carrying this variant
