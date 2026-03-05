@@ -11,7 +11,7 @@ dependencies = [
     "fsspec",
     "gcsfs",  # GCS support for fsspec
     "httpx",
-    "pydantic-ai",
+    "pydantic-ai-slim[anthropic,bedrock,google,openai]",
     "pydantic-settings",
     "pypdf",
     "s3fs",   # S3/MinIO support for fsspec

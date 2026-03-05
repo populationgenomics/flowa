@@ -11,11 +11,6 @@ from pydantic_ai.settings import ModelSettings
 
 AgentType = Literal['extraction', 'aggregation']
 
-_THINKING_BUDGETS: dict[AgentType, int] = {
-    'extraction': 10_000,
-    'aggregation': 20_000,
-}
-
 _MAX_TOKENS: dict[AgentType, int] = {
     'extraction': 30_000,
     'aggregation': 60_000,
@@ -48,18 +43,21 @@ def create_model(model_str: str) -> Model | str:
 
 def get_thinking_settings(model_str: str, agent_type: AgentType) -> ModelSettings:
     """Get thinking settings for the specified model provider."""
-    budget = _THINKING_BUDGETS[agent_type]
     max_tokens = _MAX_TOKENS[agent_type]
 
     if model_str.startswith('anthropic:'):
         return AnthropicModelSettings(
             max_tokens=max_tokens,
-            anthropic_thinking={'type': 'enabled', 'budget_tokens': budget},
+            anthropic_thinking={'type': 'adaptive'},
+            anthropic_effort='high',
         )
     if model_str.startswith('bedrock:'):
         return BedrockModelSettings(
             max_tokens=max_tokens,
-            bedrock_additional_model_requests_fields={'thinking': {'type': 'enabled', 'budget_tokens': budget}},
+            bedrock_additional_model_requests_fields={
+                'thinking': {'type': 'adaptive'},
+                'output_config': {'effort': 'high'},
+            },
         )
     if model_str.startswith('google-gla:') or model_str.startswith('google-vertex:'):
         return GoogleModelSettings(
