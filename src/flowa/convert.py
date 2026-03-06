@@ -9,7 +9,8 @@ from docling.datamodel.pipeline_options import PdfPipelineOptions
 from docling.document_converter import DocumentConverter, PdfFormatOption
 from docling_core.types.io import DocumentStream
 
-from flowa.storage import exists, paper_url, read_bytes, write_json
+from flowa.docling import serialize_with_bbox_ids
+from flowa.storage import exists, paper_url, read_bytes, write_json, write_text
 
 log = logging.getLogger(__name__)
 
@@ -45,6 +46,12 @@ def convert_paper(
     source = DocumentStream(name=f'{doi}.pdf', stream=BytesIO(pdf_bytes))
     result = converter.convert(source, raises_on_error=True)
 
-    write_json(json_url, result.document.export_to_dict())
+    docling_dict = result.document.export_to_dict()
+    write_json(json_url, docling_dict)
+
+    # Precompute LLM-friendly markdown and bbox mapping
+    markdown, bbox_mapping = serialize_with_bbox_ids(docling_dict)
+    write_text(paper_url(doi, 'docling.md'), markdown)
+    write_json(paper_url(doi, 'docling_bbox.json'), {str(k): v for k, v in bbox_mapping.items()})
 
     log.info('Converted DOI %s successfully', doi)
