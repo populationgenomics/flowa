@@ -18,6 +18,8 @@ Storage layout (DOIs are percent-encoded via encode_doi()):
         source.pdf
         source_hash.txt
         docling.json
+        docling.md
+        docling_bbox.json
         metadata.json
 
     assessments/{variant_id}/
@@ -108,6 +110,12 @@ def write_json(url: str, data: Any) -> None:
     """Write data as JSON to a storage URL."""
     with fsspec.open(url, 'w') as f:
         json.dump(data, f, indent=2)
+
+
+def read_text(url: str) -> str:
+    """Read text from a storage URL."""
+    with fsspec.open(url, 'r') as f:
+        return f.read()
 
 
 def read_bytes(url: str) -> bytes:

@@ -14,7 +14,7 @@ from docling_core.transforms.serializer.markdown import (
 from docling_core.types.doc import DoclingDocument, PictureItem, TableItem, TextItem
 from pydantic import Field
 
-from flowa.storage import paper_url, read_json
+from flowa.storage import paper_url, read_json, read_text
 
 
 class BboxMarkdownTextSerializer(MarkdownTextSerializer):
@@ -137,7 +137,11 @@ def serialize_with_bbox_ids(docling_json: dict) -> tuple[str, dict[int, dict[str
 
 
 def load_bbox_mapping(doi: str) -> dict[int, dict[str, Any]]:
-    """Load and compute bbox mapping from papers/{encoded_doi}/docling.json."""
-    docling_json = read_json(paper_url(doi, 'docling.json'))
-    _, bbox_mapping = serialize_with_bbox_ids(docling_json)
-    return bbox_mapping
+    """Load precomputed bbox mapping from papers/{encoded_doi}/docling_bbox.json."""
+    raw = read_json(paper_url(doi, 'docling_bbox.json'))
+    return {int(k): v for k, v in raw.items()}
+
+
+def load_markdown(doi: str) -> str:
+    """Load precomputed markdown from papers/{encoded_doi}/docling.md."""
+    return read_text(paper_url(doi, 'docling.md'))

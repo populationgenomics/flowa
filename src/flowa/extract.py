@@ -9,10 +9,10 @@ import typer
 from pydantic import BaseModel
 from pydantic_ai import Agent, ModelRetry, RunContext
 
-from flowa.docling import serialize_with_bbox_ids
+from flowa.docling import load_bbox_mapping, load_markdown
 from flowa.models import create_model, get_thinking_settings
 from flowa.prompts import load_prompt
-from flowa.storage import assessment_url, encode_doi, exists, paper_url, read_json, write_bytes, write_json
+from flowa.storage import assessment_url, encode_doi, exists, read_json, write_bytes, write_json
 
 log = logging.getLogger(__name__)
 
@@ -93,11 +93,11 @@ def extract_paper(
         log.info('Already extracted: %s', extraction_url)
         return
 
-    # Load docling JSON - skip if not available
+    # Load precomputed markdown - skip if not available
     try:
-        docling_json = read_json(paper_url(doi, 'docling.json'))
+        full_text = load_markdown(doi)
     except FileNotFoundError:
-        log.info('Skipping %s: docling.json not available', doi)
+        log.info('Skipping %s: docling.md not available', doi)
         return
 
     # Load variant details (stored by query command)
@@ -105,8 +105,7 @@ def extract_paper(
 
     log.info('Extracting evidence from %s (model: %s)', doi, model)
 
-    # Serialize to markdown with bbox IDs
-    full_text, bbox_mapping = serialize_with_bbox_ids(docling_json)
+    bbox_mapping = load_bbox_mapping(doi)
     full_text = truncate_paper_text(full_text, doi)
 
     # Load prompt and schema from prompt set
