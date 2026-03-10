@@ -106,6 +106,118 @@ Then set the `FLOWA_PROMPT_SET` Airflow Variable:
 docker compose exec airflow-scheduler airflow variables set FLOWA_PROMPT_SET mysite
 ```
 
+## Rendering Pipeline Output in a Frontend
+
+The pipeline produces LLM-generated Markdown containing inline citation links
+(`[link text](#cite:AuthorYear:boxId)`) and a `docling_bbox.json` file that maps
+each box ID to a page number and bounding-box coordinates in the source PDF. This
+section describes the recommended patterns for safely rendering this output and
+linking citations to an interactive PDF viewer.
+
+### Citation Format
+
+The aggregate prompt instructs the LLM to emit Markdown links with the href
+format `#cite:paper_id:box_id`, e.g.:
+
+```markdown
+[Chang2021](#cite:Chang2021:42) reported 2 compound-heterozygous cases with
+[severe neonatal-onset skeletal dysplasia](#cite:Chang2021:43).
+```
+
+The `convert` step produces two files per paper:
+
+- `papers/{doi}/docling.md` — full text with `<b id=N>…</b>` tags marking
+  structural elements (sections, tables, figures)
+- `papers/{doi}/docling_bbox.json` — mapping from box ID to PDF coordinates:
+
+  ```json
+  {
+    "42": { "page": 3, "bbox": { "l": 72.0, "t": 450.2, "r": 510.5, "b": 502.1 } },
+    "43": { "page": 3, "bbox": { "l": 72.0, "t": 510.5, "r": 510.5, "b": 558.3 } }
+  }
+  ```
+
+The LLM sees the `<b id=N>` tags in the paper text and uses them as citation
+targets. The box IDs in `docling_bbox.json` map those targets back to precise
+locations in the original PDF.
+
+### Sanitizing LLM Markdown
+
+LLM output is untrusted. Citations may reference non-existent papers or box IDs
+(hallucinations), and the model may emit arbitrary links or HTML. A three-stage
+sanitization pipeline handles this:
+
+```
+Markdown → HTML (markdown parser) → safe HTML (DOMPurify) → validated links
+```
+
+1. **Parse Markdown to HTML** — use any Markdown parser (e.g. `marked`). Disable
+   GFM if your content uses tildes that shouldn't become strikethrough.
+
+2. **Sanitize HTML** — pass through DOMPurify (or equivalent) to strip script
+   tags, event handlers, and dangerous attributes.
+
+3. **Validate citation links** — walk all `<a>` elements in the sanitized HTML.
+   For each link:
+   - Parse the href. If it doesn't match `#cite:{paperId}:{boxId}`, unwrap the
+     `<a>` tag (keep the text content, remove the link).
+   - If it does match, verify that `paperId` resolves to a known paper and that
+     `boxId` exists in that paper's citations. If either check fails, unwrap.
+
+This ensures that only citations referencing real evidence survive. Invalid or
+hallucinated links degrade to plain text rather than becoming broken links or
+security holes. Example implementation of the validation step:
+
+```typescript
+const CITE_HREF_RE = /^#cite:(\w+):(\d+)$/;
+
+function stripInvalidLinks(
+  html: string,
+  knownPapers: Map<string, string>,   // paperId → DOI
+  citations: { doi: string; boxId: number }[],
+): string {
+  const doc = new DOMParser().parseFromString(html, "text/html");
+  doc.querySelectorAll("a").forEach((a) => {
+    const m = CITE_HREF_RE.exec(a.getAttribute("href") ?? "");
+    if (!m) {
+      a.replaceWith(a.textContent ?? "");
+      return;
+    }
+    const [, paperId, boxIdStr] = m;
+    const doi = knownPapers.get(paperId);
+    if (!doi || !citations.some((c) => c.doi === doi && c.boxId === Number(boxIdStr))) {
+      a.replaceWith(a.textContent ?? "");
+    }
+  });
+  return doc.body.innerHTML;
+}
+```
+
+### Linking Citations to a PDF Viewer
+
+When a user clicks a validated citation link, the frontend should:
+
+1. Resolve `paperId` to a DOI using the paper ID mapping from the aggregate result
+2. Fetch the paper's `docling_bbox.json` (cache by DOI — one S3/storage read per paper)
+3. Open the PDF at the correct page and highlight the bounding box
+
+With a client-side PDF viewer (e.g. `react-pdf-highlighter`, `pdfjs`), you can
+render highlights directly from the bbox coordinates without any server-side PDF
+annotation. This means the pipeline doesn't need to produce pre-annotated PDFs —
+the raw PDFs and the bbox mapping are sufficient.
+
+```typescript
+// On citation click:
+const doi = knownPapers.get(paperId);
+const bboxMapping = await fetchBboxMapping(doi); // cached
+const location = bboxMapping[boxId]; // { page, bbox: { l, t, r, b } }
+
+// Open PDF viewer at location.page, highlight location.bbox
+```
+
+This approach keeps the pipeline lean (no annotation step) and lets the viewer
+show only the highlight relevant to the citation the user clicked.
+
 ## Local Development
 
 Docker Compose setup for running Flowa with Apache Airflow 2.10.3.
