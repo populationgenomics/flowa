@@ -151,8 +151,10 @@ sanitization pipeline handles this:
 Markdown → HTML (markdown parser) → safe HTML (DOMPurify) → validated links
 ```
 
-1. **Parse Markdown to HTML** — use any Markdown parser (e.g. `marked`). Disable
-   GFM if your content uses tildes that shouldn't become strikethrough.
+1. **Parse Markdown to HTML** — use any Markdown parser (e.g. `marked`) with GFM
+   enabled for table support. If your content uses tildes that shouldn't become
+   strikethrough (e.g. `~10 het`), disable only the `del` tokenizer rather than
+   all of GFM.
 
 2. **Sanitize HTML** — pass through DOMPurify (or equivalent) to strip script
    tags, event handlers, and dangerous attributes.
