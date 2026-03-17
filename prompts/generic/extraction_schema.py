@@ -4,16 +4,16 @@ This module defines the output structure for individual paper extraction.
 The ExtractionResult class is loaded dynamically by Flowa.
 
 Interface requirements (accessed by Flowa's validation logic):
-    - evidence[].citations[].box_id must exist for bbox validation
+    - evidence[].citations[].quote must exist for fuzzy-match validation
 """
 
 from pydantic import BaseModel, Field
 
 
 class Citation(BaseModel):
-    """A citation to a specific bbox in the source document."""
+    """A citation quoting a specific passage from the source document."""
 
-    box_id: int = Field(description='The bounding box ID from the source text')
+    quote: str = Field(description='A short, distinctive verbatim quote from the paper text that identifies the evidence')
     commentary: str = Field(
         description='What this specific text states/demonstrates (appears as annotation in highlighted PDF)'
     )

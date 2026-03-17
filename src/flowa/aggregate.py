@@ -1,21 +1,22 @@
 """Aggregate evidence across all papers for a variant."""
 
+import asyncio
 import json
 import logging
-import os
 import re
 from typing import Any
 
 import typer
+from anchorite import resolve
 from pydantic import BaseModel
 from pydantic_ai import Agent, ModelRetry, RunContext
 
 from flowa.clinvar import format_clinvar_for_prompt, query_clinvar
-from flowa.docling import load_bbox_mapping
 from flowa.models import create_model, get_thinking_settings
 from flowa.prompts import load_prompt
 from flowa.schema import AGGREGATE_SCHEMA_VERSION, with_schema_version
-from flowa.storage import assessment_url, encode_doi, exists, paper_url, read_json, write_bytes, write_json
+from flowa.settings import Settings
+from flowa.storage import assessment_url, encode_doi, exists, paper_url, read_json, read_text, write_bytes, write_json
 
 log = logging.getLogger(__name__)
 
@@ -82,7 +83,7 @@ def generate_paper_ids(
 def create_aggregate_agent(
     model: str,
     paper_id_to_doi: dict[str, str],
-    bbox_mappings: dict[str, dict[int, Any]],
+    annotated_mds: dict[str, str],
     output_type: type[BaseModel],
 ) -> Agent[None, BaseModel]:
     """Create a Pydantic AI agent with citation validation across all papers."""
@@ -90,71 +91,99 @@ def create_aggregate_agent(
         create_model(model),
         output_type=output_type,
         retries=3,
+        instructions='Always return your response by calling the final_result tool.',
         model_settings=get_thinking_settings(model, 'aggregation'),
     )
 
     @agent.output_validator
     def validate_citations(ctx: RunContext[None], result: BaseModel) -> BaseModel:
-        """Validate that all citation (paper_id, box_id) pairs exist.
+        """Validate that all citation (paper_id, quote) pairs can be resolved.
 
-        Requires: result.results[category].citations[].paper_id and .box_id
+        Requires: result.results[category].citations[].paper_id and .quote
         """
         invalid = []
 
-        for category, cat_result in result.results.items():  # type: ignore[attr-defined]
+        for cat_result in result.results.values():  # type: ignore[attr-defined]
             for citation in cat_result.citations:
                 doi = paper_id_to_doi.get(citation.paper_id)
-                if doi is None or doi not in bbox_mappings:
+                if doi is None or doi not in annotated_mds:
                     invalid.append(f'paper_id={citation.paper_id} (paper not found)')
-                elif citation.box_id not in bbox_mappings[doi]:
-                    invalid.append(f'paper_id={citation.paper_id}, box_id={citation.box_id}, category={category}')
+                    continue
+                resolved = resolve(annotated_mds[doi], [citation.quote])
+                if not resolved.get(citation.quote):
+                    invalid.append(f'paper_id={citation.paper_id}, quote not resolved: {citation.quote[:80]}...')
 
         if invalid:
-            raise ModelRetry(f'Invalid citations not found in documents: {", ".join(invalid)}')
+            raise ModelRetry(f'Invalid citations: {"; ".join(invalid)}')
 
         return result
 
     return agent
 
 
-def aggregate_evidence(
-    variant_id: str = typer.Option(..., '--variant-id', help='Variant identifier'),
-    dry_run: bool = typer.Option(False, '--dry-run', help='Dump prompt and exit without calling LLM'),
+def resolve_aggregate_citations(
+    aggregate_dict: dict[str, Any],
+    paper_id_to_doi: dict[str, str],
+    annotated_mds: dict[str, str],
+    metadata_cache: dict[str, dict[str, Any]],
 ) -> None:
-    """Aggregate evidence across all papers for a variant.
+    """Post-process aggregate output: resolve quotes to bboxes, enrich with DOI."""
+    for cat_result in aggregate_dict['results'].values():
+        for citation in cat_result['citations']:
+            doi = paper_id_to_doi[citation.pop('paper_id')]
+            citation['doi'] = doi
+            quote = citation['quote']
+            resolved = resolve(annotated_mds[doi], [quote])
+            bboxes = []
+            for page, bbox in resolved.get(quote, []):
+                bboxes.append(
+                    {
+                        'page': page,
+                        'top': bbox.top,
+                        'left': bbox.left,
+                        'bottom': bbox.bottom,
+                        'right': bbox.right,
+                    }
+                )
+            citation['bboxes'] = bboxes
 
-    Reads extraction results from assessments/{variant_id}/extractions/,
-    variant details from variant_details.json, and paper metadata from
-    papers/{encoded_doi}/metadata.json. Calls LLM for aggregate assessment and
-    stores result to assessments/{variant_id}/aggregate.json.
+    # Add paper_id_mapping so the UI can cross-reference prose with papers
+    aggregate_dict['paper_id_mapping'] = {
+        'byAuthorYear': {
+            pid: {'doi': doi, 'pmid': metadata_cache[doi].get('pmid')} for pid, doi in paper_id_to_doi.items()
+        },
+        'byDoi': {doi: pid for pid, doi in paper_id_to_doi.items()},
+    }
 
-    Model is configured via FLOWA_MODEL environment variable.
-    """
-    model = os.environ.get('FLOWA_MODEL')
-    if not model:
-        log.error('FLOWA_MODEL environment variable not set')
-        raise typer.Exit(1)
 
-    aggregate_url = assessment_url(variant_id, 'aggregate.json')
-    aggregate_raw_url = assessment_url(variant_id, 'aggregate_raw.json')
+async def aggregate_evidence_async(
+    base: str,
+    variant_id: str,
+    model: str,
+    ncbi_api_key: str | None = None,
+    prompt_set: str = 'generic',
+    dry_run: bool = False,
+) -> None:
+    """Aggregate evidence across all papers for a variant."""
+    aggregate_url = assessment_url(base, variant_id, 'aggregate.json')
+    aggregate_raw_url = assessment_url(base, variant_id, 'aggregate_raw.json')
 
     # Load variant details and query data (stored by query command)
-    variant_details = json.dumps(read_json(assessment_url(variant_id, 'variant_details.json')))
-    query_data = read_json(assessment_url(variant_id, 'query.json'))
+    variant_details = json.dumps(read_json(assessment_url(base, variant_id, 'variant_details.json')))
+    query_data = read_json(assessment_url(base, variant_id, 'query.json'))
     dois = query_data['dois']
 
     # Fetch ClinVar evidence
-    ncbi_api_key = os.environ.get('NCBI_API_KEY')
     clinvar_data = query_clinvar(query_data['hgvs_c'], ncbi_api_key)
     clinvar_text = format_clinvar_for_prompt(clinvar_data)
 
-    # Load extractions, bbox mappings, and metadata for each paper
+    # Load extractions, annotated markdowns, and metadata for each paper
     evidence_extractions: list[dict[str, Any]] = []
-    bbox_mappings: dict[str, dict[int, Any]] = {}
+    annotated_mds: dict[str, str] = {}
     metadata_cache: dict[str, dict[str, Any]] = {}
 
     for doi in dois:
-        extraction_url = assessment_url(variant_id, 'extractions', f'{encode_doi(doi)}.json')
+        extraction_url = assessment_url(base, variant_id, 'extractions', f'{encode_doi(doi)}.json')
 
         if not exists(extraction_url):
             log.info('Skipping %s: no extraction', doi)
@@ -166,11 +195,11 @@ def aggregate_evidence(
             log.info('Skipping %s: variant not discussed', doi)
             continue
 
-        bbox_mappings[doi] = load_bbox_mapping(doi)
-        metadata = read_json(paper_url(doi, 'metadata.json'))
+        annotated_mds[doi] = read_text(paper_url(base, doi, 'annotated.md'))
+        metadata = read_json(paper_url(base, doi, 'metadata.json'))
         metadata_cache[doi] = metadata
 
-        entry = {
+        entry: dict[str, Any] = {
             'doi': doi,
             'title': metadata['title'],
             'authors': metadata['authors'],
@@ -201,7 +230,7 @@ def aggregate_evidence(
     )
 
     # Load prompt and schema from prompt set
-    prompt_template, output_type = load_prompt('aggregate')
+    prompt_template, output_type = load_prompt('aggregate', prompt_set)
 
     evidence_text = (
         json.dumps(evidence_extractions, indent=2)
@@ -219,37 +248,20 @@ def aggregate_evidence(
         print(prompt)
         print('\n=== CLINVAR ===')
         print(clinvar_text)
-        print('\n=== BBOX MAPPINGS (DOIs with box counts) ===')
-        for doi, boxes in bbox_mappings.items():
-            print(f'  {doi}: {len(boxes)} boxes (ids: {min(boxes)}..{max(boxes)})')
         print('\n=== PAPER ID MAPPING ===')
         for pid, doi in paper_id_to_doi.items():
             print(f'  {pid} -> {doi}')
         return
 
-    # Create agent with citation validation (resolves paper_id -> DOI -> bbox)
-    agent = create_aggregate_agent(model, paper_id_to_doi, bbox_mappings, output_type)
+    # Create agent with citation validation
+    agent = create_aggregate_agent(model, paper_id_to_doi, annotated_mds, output_type)
 
     log.info('Calling LLM for aggregate assessment')
-    result = agent.run_sync(prompt)
+    result = await agent.run(prompt)
 
-    # Post-LLM: replace paper_id with DOI in citations, enrich with bbox info
+    # Post-LLM: resolve quotes to bboxes, replace paper_id with DOI
     aggregate_dict = result.output.model_dump()
-    for cat_result in aggregate_dict['results'].values():
-        for citation in cat_result['citations']:
-            doi = paper_id_to_doi[citation.pop('paper_id')]
-            citation['doi'] = doi
-            box_id = citation['box_id']
-            bbox_info = bbox_mappings[doi][box_id]
-            citation['page'] = bbox_info['page']
-            citation['bbox'] = bbox_info['bbox']
-            if 'coord_origin' in bbox_info:
-                citation['coord_origin'] = bbox_info['coord_origin']
-
-    # Add paper_id_mapping so the UI can cross-reference prose with papers
-    aggregate_dict['paper_id_mapping'] = {
-        pid: {'doi': doi, 'pmid': metadata_cache[doi].get('pmid')} for pid, doi in paper_id_to_doi.items()
-    }
+    resolve_aggregate_citations(aggregate_dict, paper_id_to_doi, annotated_mds, metadata_cache)
 
     # Store structured aggregate result
     write_json(aggregate_url, with_schema_version(aggregate_dict, AGGREGATE_SCHEMA_VERSION))
@@ -264,4 +276,23 @@ def aggregate_evidence(
         variant_id,
         len(results_map),
         total_citations,
+    )
+
+
+def aggregate_evidence(
+    variant_id: str = typer.Option(..., '--variant-id', help='Variant identifier'),
+    dry_run: bool = typer.Option(False, '--dry-run', help='Dump prompt and exit without calling LLM'),
+) -> None:
+    """Aggregate evidence across all papers for a variant.
+
+    Reads extraction results from assessments/{variant_id}/extractions/,
+    variant details from variant_details.json, and paper metadata from
+    papers/{encoded_doi}/metadata.json. Calls LLM for aggregate assessment and
+    stores result to assessments/{variant_id}/aggregate.json.
+    """
+    s = Settings()  # type: ignore[call-arg]
+    asyncio.run(
+        aggregate_evidence_async(
+            s.flowa_storage_base, variant_id, s.flowa_extraction_model, s.ncbi_api_key, s.flowa_prompt_set, dry_run
+        )
     )

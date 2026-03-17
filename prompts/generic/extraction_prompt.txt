@@ -19,14 +19,16 @@ Extract ALL evidence from this paper about the specific variant listed above. Fo
 10. Phasing information (cis/trans relationships with other variants)
 
 CITATION REQUIREMENTS:
-For each piece of evidence extracted, you MUST provide specific citations using the <b id=N> tags found in the full text. For each citation:
-- Provide the box ID number (N from the <b id=N> tag)
-- Include brief commentary explaining what this specific text section demonstrates
+For each piece of evidence extracted, you MUST provide a verbatim quote from the paper text that captures the supporting evidence. For each citation:
+- Quote the relevant passage verbatim — enough context to validate the claim (typically a sentence or key clause). The quote will be highlighted in the PDF for curators to review.
+- The quote MUST appear verbatim in the paper text. Do not paraphrase or summarize.
+- Avoid quoting isolated values or single words that could match multiple locations — include surrounding context.
+- Include brief commentary explaining what this specific text demonstrates
 
 Example citation format:
 "citations": [
-  {{"box_id": 42, "commentary": "Variant found in 5 unrelated families, classified as pathogenic"}},
-  {{"box_id": 67, "commentary": "Two compound heterozygous patients with childhood-onset phenotype"}}
+  {{"quote": "The p.Arg123Trp variant was classified as pathogenic based on segregation in five unrelated families with consistent phenotype", "commentary": "Variant found in 5 unrelated families, classified as pathogenic"}},
+  {{"quote": "Two compound heterozygous patients presented with childhood-onset dilated cardiomyopathy (LVEF 20-25%) and metabolic acidosis", "commentary": "Two compound heterozygous patients with childhood-onset phenotype"}}
 ]
 
 NOTE: The commentary should state what the cited text demonstrates, not just describe the section. This helps curators quickly validate that the highlighted text actually supports the claim.
@@ -166,48 +168,14 @@ IMPORTANT EXTRACTION PRINCIPLES:
 
 RESPONSE FORMAT:
 
-Extract evidence as a list of factual findings. Each finding MUST include bbox citations linking to the specific text that supports it.
+Extract evidence as a list of factual findings. Each finding MUST include citations with verbatim quotes from the paper text.
 
 Guidelines:
 - Be precise and factual - extract what the paper states, don't infer
 - Each finding should be atomic (one specific claim)
 - Focus on quantitative data (counts, frequencies, classifications)
 - Include ALL relevant findings, even if they seem contradictory
-- Every finding MUST have at least one bbox citation
-
-Respond in JSON format using this structure:
-
-{{
-  "variant_discussed": true|false,
-  "evidence": [
-    {{
-      "finding": "Variant classified as pathogenic/likely pathogenic in ClinVar with 8 clinical testing submissions",
-      "citations": [
-        {{"box_id": 42, "commentary": "8 submissions in ClinVar, all pathogenic or likely pathogenic"}}
-      ]
-    }},
-    {{
-      "finding": "2 compound heterozygous individuals with severe neonatal-onset dilated cardiomyopathy (LVEF 20-25%), metabolic acidosis, died at ages 3 and 5 months",
-      "citations": [
-        {{"box_id": 123, "commentary": "Patient 1 and 2 compound heterozygous, presented day 2-3 of life with cardiac failure"}},
-        {{"box_id": 125, "commentary": "Both died in infancy; LVEF 20% and 25% on echo; severe lactic acidosis"}}
-      ]
-    }},
-    {{
-      "finding": "1 heterozygous adult (age 42) asymptomatic, normal cardiac echo and exercise testing, mildly elevated lactate (2.8 mmol/L, ref <2.2)",
-      "citations": [
-        {{"box_id": 87, "commentary": "Case 3 heterozygous carrier, clinically well, normal cardiac function"}},
-        {{"box_id": 88, "commentary": "Biochemistry showed lactate 2.8 mmol/L (upper limit normal)"}}
-      ]
-    }},
-    {{
-      "finding": "Variant absent in gnomAD v2.1.1",
-      "citations": [
-        {{"box_id": 156, "commentary": "Variant not found in gnomAD v2.1.1 (0/282,000 alleles)"}}
-      ]
-    }}
-  ]
-}}
+- Every finding MUST have at least one citation with a verbatim quote
 
 PAPER TO EVALUATE:
 

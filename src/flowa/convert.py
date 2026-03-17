@@ -1,57 +1,59 @@
-"""Convert PDF to Docling JSON."""
+"""Convert PDF to annotated Markdown via groundmark."""
 
+import asyncio
 import logging
-from io import BytesIO
 
 import typer
-from docling.datamodel.base_models import InputFormat
-from docling.datamodel.pipeline_options import PdfPipelineOptions
-from docling.document_converter import DocumentConverter, PdfFormatOption
-from docling_core.types.io import DocumentStream
+from groundmark import Config, process
 
-from flowa.docling import serialize_with_bbox_ids
-from flowa.storage import exists, paper_url, read_bytes, write_json, write_text
+from flowa.settings import Settings
+from flowa.storage import exists, paper_url, read_bytes, write_text
 
 log = logging.getLogger(__name__)
 
+PAGES_PER_CHUNK = 10
 
-def convert_paper(
-    doi: str = typer.Option(..., '--doi', help='DOI of the paper'),
-) -> None:
-    """Convert PDF to Docling JSON.
+
+async def convert_paper_async(base: str, doi: str, model: str) -> None:
+    """Convert a single paper's PDF to annotated Markdown.
 
     Reads PDF from papers/{encoded_doi}/source.pdf in object storage.
-    Stores result to papers/{encoded_doi}/docling.json.
-    Exits with error if conversion fails.
+    Stores result to papers/{encoded_doi}/annotated.md.
     """
-    pdf_url = paper_url(doi, 'source.pdf')
-    json_url = paper_url(doi, 'docling.json')
+    md_url = paper_url(base, doi, 'annotated.md')
 
-    # Check if already converted
-    if exists(json_url):
-        log.info('Already converted: %s', json_url)
+    if exists(md_url):
+        log.info('Already converted: %s', md_url)
         return
 
-    # Check PDF exists
+    pdf_url = paper_url(base, doi, 'source.pdf')
     try:
         pdf_bytes = read_bytes(pdf_url)
     except FileNotFoundError:
         log.info('Skipping DOI %s: PDF not available', doi)
         return
 
-    log.info('Converting DOI %s (%d bytes)', doi, len(pdf_bytes))
+    log.info('Converting DOI %s (%d bytes, model: %s, chunk: %d pages)', doi, len(pdf_bytes), model, PAGES_PER_CHUNK)
 
-    pipeline_options = PdfPipelineOptions(do_ocr=False)
-    converter = DocumentConverter(format_options={InputFormat.PDF: PdfFormatOption(pipeline_options=pipeline_options)})
-    source = DocumentStream(name=f'{doi}.pdf', stream=BytesIO(pdf_bytes))
-    result = converter.convert(source, raises_on_error=True)
+    config = Config(model=model, page_count=PAGES_PER_CHUNK)
+    result = await process(pdf_bytes, config)
 
-    docling_dict = result.document.export_to_dict()
-    write_json(json_url, docling_dict)
+    write_text(md_url, result.annotated_markdown)
+    log.info(
+        'Converted DOI %s: %.0f%% coverage, %d chars',
+        doi,
+        result.coverage_percent * 100,
+        len(result.annotated_markdown),
+    )
 
-    # Precompute LLM-friendly markdown and bbox mapping
-    markdown, bbox_mapping = serialize_with_bbox_ids(docling_dict)
-    write_text(paper_url(doi, 'docling.md'), markdown)
-    write_json(paper_url(doi, 'docling_bbox.json'), {str(k): v for k, v in bbox_mapping.items()})
 
-    log.info('Converted DOI %s successfully', doi)
+def convert_paper(
+    doi: str = typer.Option(..., '--doi', help='DOI of the paper'),
+) -> None:
+    """Convert PDF to annotated Markdown.
+
+    Reads PDF from papers/{encoded_doi}/source.pdf in object storage.
+    Stores result to papers/{encoded_doi}/annotated.md.
+    """
+    s = Settings()  # type: ignore[call-arg]
+    asyncio.run(convert_paper_async(s.flowa_storage_base, doi, s.flowa_convert_model))

@@ -13,13 +13,12 @@ Each prompt set must contain:
     - aggregate_schema.py    (must define AggregateResult model)
 
 Schema interface requirements (accessed by Flowa's validation logic):
-    - ExtractionResult.evidence[].citations[].box_id
-    - AggregateResult.citations[].pmid and .box_id
+    - ExtractionResult.evidence[].citations[].quote
+    - AggregateResult.results[category].citations[].paper_id and .quote
 """
 
 import importlib.util
 import logging
-import os
 from pathlib import Path
 from typing import TYPE_CHECKING
 
@@ -29,15 +28,12 @@ if TYPE_CHECKING:
 log = logging.getLogger(__name__)
 
 
-def load_prompt(step: str) -> tuple[str, 'type[BaseModel]']:
+def load_prompt(step: str, prompt_set: str = 'generic') -> tuple[str, 'type[BaseModel]']:
     """Load prompt template and schema model for a pipeline step.
-
-    Resolves the prompt set directory from FLOWA_PROMPT_SET (default: 'generic'),
-    then loads ``{step}_prompt.txt`` and the ``{Step}Result`` class from
-    ``{step}_schema.py``.
 
     Args:
         step: Pipeline step name (e.g. 'extraction', 'aggregate').
+        prompt_set: Name of the prompt set directory under prompts/.
 
     Returns:
         Tuple of (prompt_template, result_model_class).
@@ -45,7 +41,6 @@ def load_prompt(step: str) -> tuple[str, 'type[BaseModel]']:
     Raises:
         ValueError: If the prompt set directory does not exist.
     """
-    prompt_set = os.environ.get('FLOWA_PROMPT_SET') or 'generic'
     prompts_dir = Path('prompts') / prompt_set
 
     if not prompts_dir.exists():

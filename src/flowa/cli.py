@@ -1,11 +1,12 @@
 """Main CLI entry point for Flowa."""
 
 import logging
+import os
 import sys
 
 import typer
 
-from flowa import __version__, aggregate, annotate, convert, download, extract, query
+from flowa import __version__, aggregate, convert, download, extract, query, run
 
 app = typer.Typer(
     name='flowa',
@@ -27,7 +28,7 @@ logging.basicConfig(
 @app.callback()
 def main(
     log_level: str = typer.Option(
-        'INFO',
+        os.environ.get('FLOWA_LOG_LEVEL', 'INFO'),
         '--log-level',
         '-l',
         help='Logging level (DEBUG, INFO, WARNING, ERROR)',
@@ -36,15 +37,18 @@ def main(
     """Flowa - Variant literature assessment pipeline."""
     level = getattr(logging, log_level.upper(), logging.INFO)
     logging.getLogger().setLevel(level)
+    # Suppress noisy third-party loggers even at DEBUG
+    for name in ('pdfminer', 'pdfplumber', 'pypdfium2'):
+        logging.getLogger(name).setLevel(logging.WARNING)
 
 
 # Register commands
+app.command(name='run')(run.run)
 app.command(name='query')(query.query_dois)
 app.command(name='download')(download.download_paper)
 app.command(name='convert')(convert.convert_paper)
 app.command(name='extract')(extract.extract_paper)
 app.command(name='aggregate')(aggregate.aggregate_evidence)
-app.command(name='annotate')(annotate.annotate_pdfs)
 
 
 @app.command()

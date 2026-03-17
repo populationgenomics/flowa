@@ -1,5 +1,6 @@
 """Download PDF from PMC for a single paper."""
 
+import asyncio
 import logging
 import re
 import tarfile
@@ -10,8 +11,9 @@ import httpx
 import typer
 from defusedxml import ElementTree
 from pypdf import PdfReader, PdfWriter
-from tenacity import retry, stop_after_attempt, wait_exponential
+from tenacity import retry, retry_if_exception_type, stop_after_attempt, wait_exponential
 
+from flowa.settings import Settings
 from flowa.storage import exists, paper_url, read_json, write_bytes
 
 log = logging.getLogger(__name__)
@@ -66,7 +68,7 @@ def _filter_supplements_by_page_count(
     max_pages_per_supplement: int = 20,
     max_total_supplement_pages: int = 50,
 ) -> list[Path]:
-    """Filter supplement PDFs by page count to avoid docling timeouts on huge table dumps."""
+    """Filter supplement PDFs by page count to avoid timeouts on huge table dumps."""
     accepted: list[Path] = []
     total_pages = 0
 
@@ -134,62 +136,109 @@ def process_tgz_archive(tgz_content: bytes, output_path: Path) -> tuple[bool, st
             return False, f'Failed to concatenate PDFs: {e}'
 
 
-@retry(stop=stop_after_attempt(3), wait=wait_exponential(), reraise=True)
-def fetch_pmc_pdf(pmid: int, client: httpx.Client, email: str, tool: str) -> tuple[bytes | None, str]:
+async def fetch_pmc_pdf(pmid: int, client: httpx.AsyncClient, email: str, tool: str) -> tuple[bytes | None, str]:
     """Attempt to fetch PDF from PMC for a given PMID.
 
     Returns:
         Tuple of (pdf_bytes or None, message)
     """
+    # Step 1: Get PMCID from idconv API
+    idconv_url = f'https://pmc.ncbi.nlm.nih.gov/tools/idconv/api/v1/articles/?ids={pmid}&idtype=pmid&format=json&tool={tool}&email={email}'
+    response = await client.get(idconv_url)
+    response.raise_for_status()
+    idconv_data = response.json()
+
+    records = idconv_data.get('records', [])
+    if not records or not records[0].get('pmcid'):
+        return None, 'No PMCID found (not in PMC)'
+
+    pmcid = records[0]['pmcid']
+    log.debug('Found PMCID: %s', pmcid)
+
+    # Step 2: Get PDF link from OA API
+    oa_url = f'https://www.ncbi.nlm.nih.gov/pmc/utils/oa/oa.fcgi?id={pmcid}'
+    response = await client.get(oa_url)
+    response.raise_for_status()
+    oa_data = response.text
+
+    # Step 3: Look for TGZ link (includes main article + supplements)
+    tgz_match = re.search(r'<link[^>]*format="tgz"[^>]*href="([^"]+)"[^>]*/>', oa_data)
+
+    if not tgz_match:
+        return None, f'No TGZ link in OA for {pmcid}'
+
+    tgz_url = tgz_match.group(1)
+    if tgz_url.startswith('ftp://'):
+        tgz_url = tgz_url.replace('ftp://', 'https://')
+
+    # Download TGZ with retries (PMC FTP can be flaky)
+    tgz_bytes = await _download_tgz_with_retry(client, tgz_url)
+
+    # Process TGZ to local temp file
+    with tempfile.NamedTemporaryFile(suffix='.pdf', delete=False) as tmp:
+        tmp_path = Path(tmp.name)
+
     try:
-        # Step 1: Get PMCID from idconv API
-        idconv_url = f'https://pmc.ncbi.nlm.nih.gov/tools/idconv/api/v1/articles/?ids={pmid}&idtype=pmid&format=json&tool={tool}&email={email}'
-        response = client.get(idconv_url)
-        response.raise_for_status()
-        idconv_data = response.json()
+        success, message = process_tgz_archive(tgz_bytes, tmp_path)
+        if success:
+            result_bytes = tmp_path.read_bytes()
+            return result_bytes, f'Downloaded from PMC ({pmcid}) - {message}'
+        return None, f'TGZ processing failed for {pmcid}: {message}'
+    finally:
+        tmp_path.unlink(missing_ok=True)
 
-        records = idconv_data.get('records', [])
-        if not records or not records[0].get('pmcid'):
-            return None, 'No PMCID found (not in PMC)'
 
-        pmcid = records[0]['pmcid']
-        log.debug('Found PMCID: %s', pmcid)
+@retry(
+    stop=stop_after_attempt(5),
+    wait=wait_exponential(),
+    retry=retry_if_exception_type(httpx.HTTPStatusError),
+    reraise=True,
+    before_sleep=lambda rs: log.warning(
+        'TGZ download failed (%s), retrying (attempt %d/5)',
+        rs.outcome.exception() if rs.outcome else 'unknown',
+        rs.attempt_number,
+    ),
+)
+async def _download_tgz_with_retry(client: httpx.AsyncClient, tgz_url: str) -> bytes:
+    """Download TGZ archive, retrying on transient HTTP errors."""
+    log.debug('Downloading TGZ from %s', tgz_url)
+    response = await client.get(tgz_url)
+    response.raise_for_status()
+    return response.content
 
-        # Step 2: Get PDF link from OA API
-        oa_url = f'https://www.ncbi.nlm.nih.gov/pmc/utils/oa/oa.fcgi?id={pmcid}'
-        response = client.get(oa_url)
-        response.raise_for_status()
-        oa_data = response.text
 
-        # Step 3: Look for TGZ link (includes main article + supplements)
-        tgz_match = re.search(r'<link[^>]*format="tgz"[^>]*href="([^"]+)"[^>]*/>', oa_data)
+async def download_paper_async(
+    base: str,
+    doi: str,
+    email: str = 'flowa@populationgenomics.org.au',
+    tool: str = 'flowa',
+    timeout: float = 60.0,
+) -> None:
+    """Download PDF from PMC for a single paper."""
+    pdf_url = paper_url(base, doi, 'source.pdf')
 
-        if not tgz_match:
-            return None, f'No TGZ link in OA for {pmcid}'
+    if exists(pdf_url):
+        log.info('PDF already exists: %s', doi)
+        return
 
-        tgz_url = tgz_match.group(1)
-        if tgz_url.startswith('ftp://'):
-            tgz_url = tgz_url.replace('ftp://', 'https://')
+    metadata = read_json(paper_url(base, doi, 'metadata.json'))
+    pmid = metadata.get('pmid')
 
-        log.debug('Downloading TGZ from %s', tgz_url)
-        tgz_response = client.get(tgz_url)
-        tgz_response.raise_for_status()
+    if not pmid:
+        log.info('%s: no PMID in metadata, skipping PMC download', doi)
+        return
 
-        # Process TGZ to local temp file first
-        with tempfile.NamedTemporaryFile(suffix='.pdf', delete=False) as tmp:
-            tmp_path = Path(tmp.name)
+    log.info('Downloading %s (PMID %s)', doi, pmid)
 
-        try:
-            success, message = process_tgz_archive(tgz_response.content, tmp_path)
-            if success:
-                pdf_bytes = tmp_path.read_bytes()
-                return pdf_bytes, f'Downloaded from PMC ({pmcid}) - {message}'
-            return None, f'TGZ processing failed for {pmcid}: {message}'
-        finally:
-            tmp_path.unlink(missing_ok=True)
+    async with httpx.AsyncClient(timeout=timeout) as client:
+        pdf_bytes, message = await fetch_pmc_pdf(pmid, client, email, tool)
 
-    except httpx.HTTPError as e:
-        return None, f'HTTP error: {e}'
+    if pdf_bytes is None:
+        log.info('%s not available in PMC: %s', doi, message)
+        return
+
+    write_bytes(pdf_url, pdf_bytes)
+    log.info('Downloaded %s: %s (%d bytes)', doi, message, len(pdf_bytes))
 
 
 def download_paper(
@@ -204,31 +253,9 @@ def download_paper(
     for PMC lookup. Stores PDF to papers/{encoded_doi}/source.pdf.
 
     Skip logic:
-    - PDF exists → already have it (downloaded or manually added)
-    - No metadata.json → paper not resolved by query step
-    - No PMID in metadata → not a PubMed-indexed paper (future: download preprints via DOI)
+    - PDF exists -> already have it (downloaded or manually added)
+    - No metadata.json -> paper not resolved by query step
+    - No PMID in metadata -> not a PubMed-indexed paper
     """
-    pdf_url = paper_url(doi, 'source.pdf')
-
-    if exists(pdf_url):
-        log.info('PDF already exists: %s', doi)
-        return
-
-    metadata = read_json(paper_url(doi, 'metadata.json'))
-    pmid = metadata.get('pmid')
-
-    if not pmid:
-        log.info('%s: no PMID in metadata, skipping PMC download', doi)
-        return
-
-    log.info('Downloading %s (PMID %s)', doi, pmid)
-
-    with httpx.Client(timeout=timeout) as client:
-        pdf_bytes, message = fetch_pmc_pdf(pmid, client, email, tool)
-
-    if pdf_bytes is None:
-        log.info('%s not available in PMC: %s', doi, message)
-        return
-
-    write_bytes(pdf_url, pdf_bytes)
-    log.info('Downloaded %s: %s (%d bytes)', doi, message, len(pdf_bytes))
+    s = Settings()  # type: ignore[call-arg]
+    asyncio.run(download_paper_async(s.flowa_storage_base, doi, email, tool, timeout))

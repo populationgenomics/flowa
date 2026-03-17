@@ -4,17 +4,17 @@ This module defines the output structure for aggregate assessment across papers.
 The AggregateResult class is loaded dynamically by Flowa.
 
 Interface requirements (accessed by Flowa's validation logic):
-    - results[category].citations[].paper_id and .box_id must exist for bbox validation
+    - results[category].citations[].paper_id and .quote must exist for validation
 """
 
 from pydantic import BaseModel, Field
 
 
 class AggregateCitation(BaseModel):
-    """A citation to a specific bbox in a source paper."""
+    """A citation quoting a specific passage from a source paper."""
 
     paper_id: str = Field(description='Paper ID (e.g. "Smith2024")')
-    box_id: int = Field(description='The bounding box ID from the source text in the paper')
+    quote: str = Field(description='A short, distinctive verbatim quote from the paper text')
     commentary: str = Field(description='What this specific evidence states (appears as annotation in highlighted PDF)')
 
 
@@ -28,14 +28,14 @@ class CategoryResult(BaseModel):
     description: str = Field(description='Summary filled in with specific details from the evidence')
     notes: str = Field(
         description='Detailed curator-style synthesis in Markdown format. '
-        'Use inline citation links [text](#cite:paper_id:box_id) to reference specific paper evidence locations. '
+        'Use inline citation links [text](#cite:paper_id "verbatim quote") to reference specific paper evidence locations. '
         'Reference ClinVar evidence in prose without #cite: links. '
         'Structure: summary (classification rationale with ClinVar status, key evidence and why it is convincing, refuting evidence callout) '
         '-> supporting evidence (per-source) -> refuting evidence if any (per-source).'
     )
     citations: list[AggregateCitation] = Field(
         description='All citations supporting factual claims in the notes. '
-        'Each #cite:paper_id:box_id link in the notes must have a corresponding entry here.'
+        'Each #cite:paper_id link in the notes must have a corresponding entry here with the same paper_id and quote.'
     )
 
 

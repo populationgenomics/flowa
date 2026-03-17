@@ -196,61 +196,37 @@ Include when available:
 
 Format (use Markdown):
 - One concise entry per paper or ClinVar source, with the paper_id (or "ClinVar") in bold as the leading identifier
-- For paper evidence: use inline Markdown citation links to reference specific evidence locations: `[link text](#cite:paper_id:box_id)`
+- For paper evidence: use inline Markdown citation links: `[link text](#cite:paper_id "verbatim quote from that paper")`
 - The link text is free-form — use the paper_id label, a descriptive phrase, or a specific claim, whatever reads most naturally
+- The title attribute (in quotes after the href) MUST be copied verbatim from the extraction input — use the exact quote strings provided, do not rephrase or shorten them
 - Be generous with links: whenever a factual claim can be traced to a specific evidence location, link it
-- The href format `#cite:paper_id:box_id` is required exactly — the application uses it to link to the evidence viewer
-- Each citation link must reference a valid entry in the citations array (same paper_id and box_id)
+- The href format `#cite:paper_id` is required exactly — the application uses it to identify the paper
+- Each citation link must reference a valid entry in the citations array (same paper_id and matching quote)
 - ClinVar evidence has no source document — reference it in prose without `#cite:` links
 - Lead with the summary so the reader gets the aggregate picture first, then provide per-source details for traceability
 - Use inline citation links in both sections whenever a claim can be traced to a specific paper evidence location
 
 Example structure (adapt to your evidence):
 ```
-**Summary:** Pathogenic. ClinVar: P (3 stars, 41 submitters); PAH Expert Panel classified as P applying PS3 (1.85% WT enzyme activity in functional assays), PP4_Moderate (most common PAH mutation in PKU cohorts), PM3_Strong (detected in trans with known pathogenic variants IVS12+1G>A and M1V). Paper evidence corroborates: >10 cHet individuals across 3 studies with severe biallelic disease (neonatal skeletal dysplasia, [perinatal lethal](#cite:Smith2022:203)). Age of onset: biallelic cases presented neonatally (day 1-3 of life) to early childhood (age 3-5); [1 het carrier asymptomatic at age 42](#cite:Smith2022:105) with only biochemical findings (low serum ALP 22 U/L), suggesting incomplete penetrance in heterozygous state; does not change classification given strong biallelic evidence and expert panel review.
+**Summary:** Pathogenic. ClinVar: P (3 stars, 41 submitters); PAH Expert Panel classified as P applying PS3 (1.85% WT enzyme activity in functional assays), PP4_Moderate (most common PAH mutation in PKU cohorts), PM3_Strong (detected in trans with known pathogenic variants IVS12+1G>A and M1V). Paper evidence corroborates: >10 cHet individuals across 3 studies with severe biallelic disease (neonatal skeletal dysplasia, [perinatal lethal](#cite:Smith2022 "Two cases were perinatal lethal with severe skeletal dysplasia and respiratory insufficiency")). Age of onset: biallelic cases presented neonatally (day 1-3 of life) to early childhood (age 3-5); [1 het carrier asymptomatic at age 42](#cite:Smith2022 "A 42-year-old heterozygous female was clinically asymptomatic with low serum ALP of 22 U/L") with only biochemical findings (low serum ALP 22 U/L), suggesting incomplete penetrance in heterozygous state; does not change classification given strong biallelic evidence and expert panel review.
 
 **Supporting evidence:**
 - **ClinVar**: PAH Expert Panel classified as P (2018-08-06), citing 1.85% WT activity in functional assays and compound het observations with known pathogenic variants. 36 additional lab submissions classify as P, all with criteria provided.
-- [**Chang2021**](#cite:Chang2021:42): 2x cHet with [severe neonatal-onset skeletal dysplasia](#cite:Chang2021:43), respiratory insufficiency; both died <6 months.
-- **Smith2022**: [4x cHet individuals](#cite:Smith2022:203): 2 perinatal lethal, 2 childhood-onset with fractures and dental anomalies.
-- **Tanaka2020**: [1x het child](#cite:Tanaka2020:78), mild bone pain onset age 8, premature tooth loss; only variant identified.
+- **Chang2021**: 2x cHet with [severe neonatal-onset skeletal dysplasia](#cite:Chang2021 "Both compound heterozygous patients presented with severe neonatal-onset skeletal dysplasia and respiratory insufficiency, dying before 6 months of age"); both died <6 months.
+- **Smith2022**: [4x cHet individuals](#cite:Smith2022 "Four compound heterozygous individuals were identified: two with perinatal lethal disease and two with childhood-onset fractures and dental anomalies"): 2 perinatal lethal, 2 childhood-onset with fractures and dental anomalies.
+- **Tanaka2020**: [1x het child](#cite:Tanaka2020 "A heterozygous child presented with mild bone pain at age 8 and premature loss of deciduous teeth"), mild bone pain onset age 8, premature tooth loss; only variant identified.
 
 **Refuting evidence:**
-- **Smith2022**: [1x het adult female](#cite:Smith2022:105), asymptomatic, low serum ALP (22 U/L) — suggests incomplete penetrance in heterozygous state.
+- **Smith2022**: [1x het adult female](#cite:Smith2022 "A 42-year-old heterozygous female was clinically asymptomatic with low serum ALP of 22 U/L"), asymptomatic, low serum ALP (22 U/L) — suggests incomplete penetrance in heterozygous state.
 ```
 
 Note: Papers are provided sorted by date (descending, most recent first), with metadata including title, authors list, date (ISO format), and PMID where available. ClinVar submissions may cite these same papers by PMID.
 
 CITATIONS:
 
-Each citation link in the notes (identified by `#cite:paper_id:box_id` href) must correspond to an entry in the citations array with the same paper_id and box_id. All factual claims from paper evidence in your detailed notes should be traceable to the input evidence. Collect all relevant citations (paper_id + box_id + commentary) and include them in the citations array. These will be used to annotate the source PDFs. ClinVar evidence cannot be cited this way — reference it in prose only.
+Each citation link in the notes (identified by `#cite:paper_id` href with a title-attribute quote) must correspond to an entry in the citations array with the same paper_id and quote. The quote in the title attribute and in the citations array MUST be identical to a quote from the extraction input — copy it verbatim. All factual claims from paper evidence in your detailed notes should be traceable to the input evidence. Collect all relevant citations (paper_id + quote + commentary) and include them in the citations array. These will be used to highlight the source PDFs. ClinVar evidence cannot be cited this way — reference it in prose only.
 
 RESPONSE FORMAT:
-
-Respond in JSON using this structure:
-
-{{
-  "classification": "Pathogenic|Likely Pathogenic|VUS|Likely Benign|Benign",
-
-  "classification_rationale": "Brief explanation of why this classification was selected based on case counts and evidence quality",
-
-  "description": "The mandatory template filled in with specific details from the evidence",
-
-  "notes": "Detailed curator-style synthesis in Markdown. Structure: summary (classification rationale, ClinVar status, aggregate counts, refuting evidence callout) → supporting evidence (per-source findings) → refuting evidence if any (per-source findings)",
-
-  "citations": [
-    {{
-      "paper_id": "Chang2021",
-      "box_id": 123,
-      "commentary": "What this evidence states"
-    }},
-    {{
-      "paper_id": "Smith2022",
-      "box_id": 456,
-      "commentary": "What this evidence states"
-    }}
-  ]
-}}
 
 EVIDENCE EXTRACTIONS TO AGGREGATE:
 
