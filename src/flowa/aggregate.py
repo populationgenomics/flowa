@@ -147,12 +147,10 @@ def resolve_aggregate_citations(
                 )
             citation['bboxes'] = bboxes
 
-    # Add paper_id_mapping so the UI can cross-reference prose with papers
+    # Add paper_id_mapping: {AuthorYear → {doi, pmid}} for cross-referencing
+    # prose citations with papers. Consumers build the reverse index on read.
     aggregate_dict['paper_id_mapping'] = {
-        'byAuthorYear': {
-            pid: {'doi': doi, 'pmid': metadata_cache[doi].get('pmid')} for pid, doi in paper_id_to_doi.items()
-        },
-        'byDoi': {doi: pid for pid, doi in paper_id_to_doi.items()},
+        pid: {'doi': doi, 'pmid': metadata_cache[doi].get('pmid')} for pid, doi in paper_id_to_doi.items()
     }
 
 
