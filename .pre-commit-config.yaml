@@ -23,25 +23,23 @@ repos:
     hooks:
       - id: cpg-id-checker
 
-  - repo: https://github.com/astral-sh/ruff-pre-commit
-    # Ruff version.
-    rev: v0.6.2
+  - repo: local
     hooks:
-      - id: ruff
-        args: ["--fix"]
       - id: ruff-format
-
-  - repo: https://github.com/pre-commit/mirrors-mypy
-    rev: v1.8.0
-    hooks:
+        name: ruff format
+        entry: uv run ruff format --check src/
+        language: system
+        pass_filenames: false
+        always_run: true
+      - id: ruff-check
+        name: ruff check
+        entry: uv run ruff check src/
+        language: system
+        pass_filenames: false
+        always_run: true
       - id: mypy
-        args:
-          [
-            --pretty,
-            --show-error-codes,
-            --no-strict-optional,
-            --ignore-missing-imports,
-            --install-types,
-            --non-interactive,
-          ]
-        additional_dependencies: [types-PyYAML==6.0.4, types-toml]
+        name: mypy
+        entry: uv run mypy src/
+        language: system
+        pass_filenames: false
+        always_run: true

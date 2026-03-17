@@ -20,7 +20,13 @@ dependencies = [
 ]
 
 [dependency-groups]
-dev = ["ruff", "mypy", "pytest", "types-defusedxml"]
+dev = [
+    "ruff",
+    "mypy",
+    "pytest",
+    "types-defusedxml",
+    "pre-commit>=4.5.1",
+]
 
 [project.scripts]
 flowa = "flowa.cli:app"
