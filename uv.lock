@@ -400,7 +400,7 @@ requires-dist = [
     { name = "defusedxml" },
     { name = "fsspec" },
     { name = "gcsfs" },
-    { name = "groundmark", specifier = "==0.2.0" },
+    { name = "groundmark", specifier = "==0.2.1" },
     { name = "httpx" },
     { name = "pydantic-ai-slim", extras = ["anthropic", "bedrock", "google", "openai"], specifier = ">=1.69.0" },
     { name = "pydantic-settings" },
@@ -675,7 +675,7 @@ wheels = [
 
 [[package]]
 name = "groundmark"
-version = "0.2.0"
+version = "0.2.1"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "anchorite" },
@@ -683,9 +683,9 @@ dependencies = [
     { name = "pydantic-ai-slim", extra = ["anthropic", "bedrock", "google", "openai"] },
     { name = "pypdf" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/4b/ed/cdc8dd644a724907d8e39cbac962c716ab6719197e5f89420f4938d4c415/groundmark-0.2.0.tar.gz", hash = "sha256:fd8cd21abc9c94d9d510988d04239f860fbe981b77fbdc9ee8ea45d796007bbc", size = 567985, upload-time = "2026-03-16T06:02:37.018Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/a4/86/4b307cd097cc5b916b1d1faf698da9d47b59812f1e14ce281a3a23befc01/groundmark-0.2.1.tar.gz", hash = "sha256:44bbecadbf31295248f36ec46a973f78ff67d911c0d32d1f878b003a2383fe64", size = 567874, upload-time = "2026-03-18T00:13:59.356Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/32/2c/073a53592f5e537d5fe2064105ba31f86a84f5ce5d5a2158625df9ab81d6/groundmark-0.2.0-py3-none-any.whl", hash = "sha256:cce050d945428036e64d538ffd6c8878fd02aaa7c2228cd47c45a5b30505aca0", size = 11450, upload-time = "2026-03-16T06:02:35.611Z" },
+    { url = "https://files.pythonhosted.org/packages/f8/06/86dc2b57d91b0689da66c3f1e7c53a32f4ee5895ccc6d229fe1b05a391bf/groundmark-0.2.1-py3-none-any.whl", hash = "sha256:d3b5d2962f038c5f140d3f20ed48a49ce54f36916fc736251724d97cebb37e40", size = 11324, upload-time = "2026-03-18T00:13:57.688Z" },
 ]
 
 [[package]]

@@ -9,7 +9,7 @@ dependencies = [
     "defusedxml",
     "fsspec",
     "gcsfs",  # GCS support for fsspec
-    "groundmark==0.2.0",
+    "groundmark==0.2.1",
     "httpx",
     "pydantic-ai-slim[anthropic,bedrock,google,openai]>=1.69.0",
     "pydantic-settings",
