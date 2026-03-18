@@ -7,7 +7,7 @@ import logging
 import typer
 from anchorite import resolve, strip
 from pydantic import BaseModel
-from pydantic_ai import Agent, ModelRetry, RunContext
+from pydantic_ai import Agent, RunContext
 
 from flowa.models import create_model, get_thinking_settings
 from flowa.prompts import load_prompt
@@ -65,10 +65,8 @@ def create_extraction_agent(
 
         unresolved = [q for q in all_quotes if not resolved.get(q)]
         if unresolved:
-            raise ModelRetry(
-                f'These quotes could not be resolved against the paper text '
-                f'(not found verbatim, or too short/generic to align unambiguously): '
-                f'{unresolved}'
+            log.warning(
+                f'{len(unresolved)}/{len(all_quotes)} quotes could not be resolved against the paper text: {unresolved}'
             )
 
         return result
