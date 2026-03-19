@@ -2,6 +2,7 @@
 
 import asyncio
 import logging
+import time
 
 import typer
 from groundmark.convert import Config, convert
@@ -36,10 +37,12 @@ async def convert_paper_async(base: str, doi: str, model: str) -> None:
     log.info('Converting DOI %s (%d bytes, model: %s, chunk: %d pages)', doi, len(pdf_bytes), model, PAGES_PER_CHUNK)
 
     config = Config(model=model, page_count=PAGES_PER_CHUNK)
+    t0 = time.monotonic()
     result = await convert(pdf_bytes, config)
+    elapsed = time.monotonic() - t0
 
     write_text(md_url, result.markdown)
-    log.info('Converted DOI %s: %d chars', doi, len(result.markdown))
+    log.info('Converted DOI %s: %d chars in %.1fs', doi, len(result.markdown), elapsed)
 
 
 def convert_paper(

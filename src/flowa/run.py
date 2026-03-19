@@ -15,7 +15,8 @@ from flowa.settings import Settings
 
 log = logging.getLogger(__name__)
 
-DEFAULT_LLM_CONCURRENCY = 10
+DEFAULT_CONVERT_CONCURRENCY = 20
+DEFAULT_EXTRACT_CONCURRENCY = 20
 DEFAULT_DOWNLOAD_CONCURRENCY = 5
 
 
@@ -27,16 +28,17 @@ async def process_paper(
     extraction_model: str,
     prompt_set: str,
     download_semaphore: asyncio.Semaphore,
-    llm_semaphore: asyncio.Semaphore,
+    convert_semaphore: asyncio.Semaphore,
+    extract_semaphore: asyncio.Semaphore,
 ) -> None:
     """Download, convert, and extract a single paper."""
     async with download_semaphore:
         await download_paper_async(base, doi)
 
-    async with llm_semaphore:
+    async with convert_semaphore:
         await convert_paper_async(base, doi, convert_model)
 
-    async with llm_semaphore:
+    async with extract_semaphore:
         await extract_paper_async(base, variant_id, doi, extraction_model, prompt_set)
 
 
@@ -46,13 +48,15 @@ async def run_pipeline(
     gene: str,
     hgvs_c: str,
     source: Literal['mastermind', 'litvar'] = 'mastermind',
-    llm_concurrency: int = DEFAULT_LLM_CONCURRENCY,
+    convert_concurrency: int = DEFAULT_CONVERT_CONCURRENCY,
+    extract_concurrency: int = DEFAULT_EXTRACT_CONCURRENCY,
     download_concurrency: int = DEFAULT_DOWNLOAD_CONCURRENCY,
 ) -> None:
     """Run the full assessment pipeline for a variant."""
     base = settings.flowa_storage_base
     download_semaphore = asyncio.Semaphore(download_concurrency)
-    llm_semaphore = asyncio.Semaphore(llm_concurrency)
+    convert_semaphore = asyncio.Semaphore(convert_concurrency)
+    extract_semaphore = asyncio.Semaphore(extract_concurrency)
 
     # 1. Query literature sources
     log.info('=== Query (%s) ===', source)
@@ -63,7 +67,13 @@ async def run_pipeline(
         log.warning('No papers found — running aggregation with ClinVar only')
 
     # 2. Process papers in parallel (download -> convert -> extract)
-    log.info('=== Processing %d papers (download=%d, llm=%d) ===', len(dois), download_concurrency, llm_concurrency)
+    log.info(
+        '=== Processing %d papers (max concurrent: %d downloads, %d converts, %d extracts) ===',
+        len(dois),
+        download_concurrency,
+        convert_concurrency,
+        extract_concurrency,
+    )
     completed = 0
     failed = 0
 
@@ -78,7 +88,8 @@ async def run_pipeline(
                 settings.flowa_extraction_model,
                 settings.flowa_prompt_set,
                 download_semaphore,
-                llm_semaphore,
+                convert_semaphore,
+                extract_semaphore,
             )
             completed += 1
         except Exception:
@@ -106,8 +117,13 @@ def run(
     gene: str = typer.Option(..., '--gene', '-g', help='Gene symbol (e.g., GAA)'),
     hgvs_c: str = typer.Option(..., '--hgvs-c', '-v', help='HGVS c. notation (e.g., c.2238G>C)'),
     source: Literal['mastermind', 'litvar'] = typer.Option('mastermind', '--source', '-s', help='Literature source'),
-    llm_concurrency: int = typer.Option(DEFAULT_LLM_CONCURRENCY, '--llm-concurrency', help='Max concurrent LLM calls'),
+    convert_concurrency: int = typer.Option(
+        DEFAULT_CONVERT_CONCURRENCY, '--convert-concurrency', help='Max concurrent PDF-to-Markdown conversions'
+    ),
+    extract_concurrency: int = typer.Option(
+        DEFAULT_EXTRACT_CONCURRENCY, '--extract-concurrency', help='Max concurrent LLM extractions'
+    ),
 ) -> None:
     """Run the full assessment pipeline: query -> download -> convert -> extract -> aggregate."""
     s = Settings()  # type: ignore[call-arg]
-    asyncio.run(run_pipeline(s, variant_id, gene, hgvs_c, source, llm_concurrency))
+    asyncio.run(run_pipeline(s, variant_id, gene, hgvs_c, source, convert_concurrency, extract_concurrency))

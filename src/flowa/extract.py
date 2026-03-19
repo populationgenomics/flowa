@@ -3,6 +3,7 @@
 import asyncio
 import json
 import logging
+import time
 
 import typer
 from pydantic import BaseModel
@@ -72,8 +73,6 @@ async def extract_paper_async(
     # Load variant details (stored by query command)
     variant_details = json.dumps(read_json(assessment_url(base, variant_id, 'variant_details.json')))
 
-    log.info('Extracting evidence from %s (%d chars, model: %s)', doi, len(markdown), model)
-
     full_text = truncate_paper_text(markdown, doi)
 
     # Load prompt and schema from prompt set
@@ -86,8 +85,10 @@ async def extract_paper_async(
 
     agent = create_extraction_agent(model, output_type)
 
-    log.info('Calling LLM for extraction of %s', doi)
+    log.info('Extracting %s (%d chars, model: %s)', doi, len(full_text), model)
+    t0 = time.monotonic()
     result = await agent.run(prompt)
+    elapsed = time.monotonic() - t0
 
     # Store structured extraction result
     write_json(extraction_url, result.output.model_dump())
@@ -96,10 +97,11 @@ async def extract_paper_async(
     write_bytes(extraction_raw_url, result.all_messages_json())
 
     log.info(
-        'Extracted %s: variant_discussed=%s, %d findings',
+        'Extracted %s: variant_discussed=%s, %d findings in %.1fs',
         doi,
         result.output.variant_discussed,  # type: ignore[attr-defined]
         len(result.output.evidence),  # type: ignore[attr-defined]
+        elapsed,
     )
 
 
