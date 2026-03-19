@@ -22,7 +22,7 @@ CITATION REQUIREMENTS:
 For each piece of evidence extracted, you MUST provide a verbatim quote from the paper text that captures the supporting evidence. For each citation:
 - Quote the relevant passage verbatim — enough context to validate the claim (typically a sentence or key clause). The quote will be highlighted in the PDF for curators to review.
 - The quote MUST appear verbatim in the paper text. Do not paraphrase or summarize.
-- Avoid quoting isolated values or single words that could match multiple locations — include surrounding context.
+- Quotes must be at least 30 characters long. Avoid quoting isolated values, single cells, or short fragments — include surrounding context (e.g. a full sentence or full table row).
 - Include brief commentary explaining what this specific text demonstrates
 
 Example citation format:
