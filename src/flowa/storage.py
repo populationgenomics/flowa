@@ -6,7 +6,7 @@ Storage layout (DOIs are percent-encoded via encode_doi()):
     papers/{encoded_doi}/
         source.pdf
         source_hash.txt
-        annotated.md
+        markdown.md
         metadata.json
 
     assessments/{variant_id}/

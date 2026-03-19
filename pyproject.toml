@@ -9,15 +9,19 @@ dependencies = [
     "defusedxml",
     "fsspec",
     "gcsfs",  # GCS support for fsspec
-    "groundmark==0.2.1",
     "httpx",
-    "pydantic-ai-slim[anthropic,bedrock,google,openai]>=1.69.0",
     "pydantic-settings",
     "pypdf",
     "s3fs",   # S3/MinIO support for fsspec
     "tenacity",
     "typer",
 ]
+
+[project.optional-dependencies]
+anthropic = ["groundmark[anthropic]"]
+bedrock = ["groundmark[bedrock]"]
+google = ["groundmark[google]"]
+openai = ["groundmark[openai]"]
 
 [dependency-groups]
 dev = [

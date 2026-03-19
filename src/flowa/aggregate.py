@@ -4,10 +4,11 @@ import asyncio
 import json
 import logging
 import re
+import time
 from typing import Any
 
 import typer
-from anchorite import resolve
+from groundmark import DocumentIndex
 from pydantic import BaseModel
 from pydantic_ai import Agent, ModelRetry, RunContext
 
@@ -16,7 +17,7 @@ from flowa.models import create_model, get_thinking_settings
 from flowa.prompts import load_prompt
 from flowa.schema import AGGREGATE_SCHEMA_VERSION, with_schema_version
 from flowa.settings import Settings
-from flowa.storage import assessment_url, encode_doi, exists, paper_url, read_json, read_text, write_bytes, write_json
+from flowa.storage import assessment_url, encode_doi, exists, paper_url, read_bytes, read_json, write_bytes, write_json
 
 log = logging.getLogger(__name__)
 
@@ -83,10 +84,9 @@ def generate_paper_ids(
 def create_aggregate_agent(
     model: str,
     paper_id_to_doi: dict[str, str],
-    annotated_mds: dict[str, str],
     output_type: type[BaseModel],
 ) -> Agent[None, BaseModel]:
-    """Create a Pydantic AI agent with citation validation across all papers."""
+    """Create a Pydantic AI agent with paper_id validation."""
     agent: Agent[None, BaseModel] = Agent(
         create_model(model),
         output_type=output_type,
@@ -97,21 +97,13 @@ def create_aggregate_agent(
 
     @agent.output_validator
     def validate_citations(ctx: RunContext[None], result: BaseModel) -> BaseModel:
-        """Validate that all citation (paper_id, quote) pairs can be resolved.
-
-        Requires: result.results[category].citations[].paper_id and .quote
-        """
+        """Validate that all cited paper_ids exist in the input papers."""
         invalid = []
 
         for cat_result in result.results.values():  # type: ignore[attr-defined]
             for citation in cat_result.citations:
-                doi = paper_id_to_doi.get(citation.paper_id)
-                if doi is None or doi not in annotated_mds:
-                    invalid.append(f'paper_id={citation.paper_id} (paper not found)')
-                    continue
-                resolved = resolve(annotated_mds[doi], [citation.quote])
-                if not resolved.get(citation.quote):
-                    invalid.append(f'paper_id={citation.paper_id}, quote not resolved: {citation.quote[:80]}...')
+                if citation.paper_id not in paper_id_to_doi:
+                    invalid.append(f'paper_id={citation.paper_id} (not in input papers)')
 
         if invalid:
             raise ModelRetry(f'Invalid citations: {"; ".join(invalid)}')
@@ -124,18 +116,65 @@ def create_aggregate_agent(
 def resolve_aggregate_citations(
     aggregate_dict: dict[str, Any],
     paper_id_to_doi: dict[str, str],
-    annotated_mds: dict[str, str],
+    pdf_bytes_cache: dict[str, bytes],
     metadata_cache: dict[str, dict[str, Any]],
 ) -> None:
-    """Post-process aggregate output: resolve quotes to bboxes, enrich with DOI."""
+    """Post-process aggregate output: resolve quotes to bboxes, enrich with DOI.
+
+    Citations whose quotes cannot be resolved get an empty bboxes list —
+    the frontend should handle this gracefully (e.g. link to the paper
+    without a highlight).
+    """
+    # Collect all (doi, quote) pairs to resolve, grouped by DOI.
+    doi_quotes: dict[str, list[str]] = {}
+    for cat_result in aggregate_dict['results'].values():
+        for citation in cat_result['citations']:
+            doi = paper_id_to_doi[citation['paper_id']]
+            doi_quotes.setdefault(doi, []).append(citation['quote'])
+
+    # Build DocumentIndex per cited paper and batch-resolve all quotes.
+    doi_resolved: dict[str, dict[str, list[tuple[int, Any]]]] = {}
+    total_resolve_start = time.monotonic()
+
+    for doi, quotes in doi_quotes.items():
+        t0 = time.monotonic()
+        doc_index = DocumentIndex(pdf_bytes_cache[doi])
+        index_elapsed = time.monotonic() - t0
+
+        t1 = time.monotonic()
+        resolved = doc_index.resolve(quotes)
+        align_elapsed = time.monotonic() - t1
+
+        resolved_count = sum(1 for q in quotes if resolved.get(q))
+        log.info(
+            'Resolved %s: %d/%d quotes, index=%.1fs, align=%.1fs',
+            doi,
+            resolved_count,
+            len(quotes),
+            index_elapsed,
+            align_elapsed,
+        )
+        doi_resolved[doi] = resolved
+
+    total_resolve_elapsed = time.monotonic() - total_resolve_start
+    total_quotes = sum(len(qs) for qs in doi_quotes.values())
+    total_resolved = sum(sum(1 for q in qs if doi_resolved[doi].get(q)) for doi, qs in doi_quotes.items())
+    log.info(
+        'Citation resolution complete: %d/%d quotes across %d papers in %.1fs',
+        total_resolved,
+        total_quotes,
+        len(doi_quotes),
+        total_resolve_elapsed,
+    )
+
+    # Enrich citations with DOI and resolved bboxes.
     for cat_result in aggregate_dict['results'].values():
         for citation in cat_result['citations']:
             doi = paper_id_to_doi[citation.pop('paper_id')]
             citation['doi'] = doi
             quote = citation['quote']
-            resolved = resolve(annotated_mds[doi], [quote])
             bboxes = []
-            for page, bbox in resolved.get(quote, []):
+            for page, bbox in doi_resolved.get(doi, {}).get(quote, []):
                 bboxes.append(
                     {
                         'page': page,
@@ -146,8 +185,10 @@ def resolve_aggregate_citations(
                     }
                 )
             citation['bboxes'] = bboxes
+            if not bboxes:
+                log.warning('No bboxes resolved for %s quote: %.80s...', doi, quote)
 
-    # Add paper_id_mapping: {AuthorYear → {doi, pmid}} for cross-referencing
+    # Add paper_id_mapping: {AuthorYear -> {doi, pmid}} for cross-referencing
     # prose citations with papers. Consumers build the reverse index on read.
     aggregate_dict['paper_id_mapping'] = {
         pid: {'doi': doi, 'pmid': metadata_cache[doi].get('pmid')} for pid, doi in paper_id_to_doi.items()
@@ -175,9 +216,10 @@ async def aggregate_evidence_async(
     clinvar_data = query_clinvar(query_data['hgvs_c'], ncbi_api_key)
     clinvar_text = format_clinvar_for_prompt(clinvar_data)
 
-    # Load extractions, annotated markdowns, and metadata for each paper
+    # Load extractions and metadata for each paper. PDF bytes are cached for
+    # post-LLM citation resolution (DocumentIndex construction).
     evidence_extractions: list[dict[str, Any]] = []
-    annotated_mds: dict[str, str] = {}
+    pdf_bytes_cache: dict[str, bytes] = {}
     metadata_cache: dict[str, dict[str, Any]] = {}
 
     for doi in dois:
@@ -193,7 +235,7 @@ async def aggregate_evidence_async(
             log.info('Skipping %s: variant not discussed', doi)
             continue
 
-        annotated_mds[doi] = read_text(paper_url(base, doi, 'annotated.md'))
+        pdf_bytes_cache[doi] = read_bytes(paper_url(base, doi, 'source.pdf'))
         metadata = read_json(paper_url(base, doi, 'metadata.json'))
         metadata_cache[doi] = metadata
 
@@ -251,15 +293,14 @@ async def aggregate_evidence_async(
             print(f'  {pid} -> {doi}')
         return
 
-    # Create agent with citation validation
-    agent = create_aggregate_agent(model, paper_id_to_doi, annotated_mds, output_type)
+    agent = create_aggregate_agent(model, paper_id_to_doi, output_type)
 
     log.info('Calling LLM for aggregate assessment')
     result = await agent.run(prompt)
 
     # Post-LLM: resolve quotes to bboxes, replace paper_id with DOI
     aggregate_dict = result.output.model_dump()
-    resolve_aggregate_citations(aggregate_dict, paper_id_to_doi, annotated_mds, metadata_cache)
+    resolve_aggregate_citations(aggregate_dict, paper_id_to_doi, pdf_bytes_cache, metadata_cache)
 
     # Store structured aggregate result
     write_json(aggregate_url, with_schema_version(aggregate_dict, AGGREGATE_SCHEMA_VERSION))

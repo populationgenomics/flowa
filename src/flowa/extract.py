@@ -5,9 +5,8 @@ import json
 import logging
 
 import typer
-from anchorite import resolve, strip
 from pydantic import BaseModel
-from pydantic_ai import Agent, RunContext
+from pydantic_ai import Agent
 
 from flowa.models import create_model, get_thinking_settings
 from flowa.prompts import load_prompt
@@ -35,43 +34,16 @@ def truncate_paper_text(full_text: str, doi: str) -> str:
 
 def create_extraction_agent(
     model: str,
-    annotated_md: str,
     output_type: type[BaseModel],
 ) -> Agent[None, BaseModel]:
-    """Create a Pydantic AI agent with citation validation."""
-    agent: Agent[None, BaseModel] = Agent(
+    """Create a Pydantic AI agent for evidence extraction."""
+    return Agent(
         create_model(model),
         output_type=output_type,
         retries=3,
         instructions='Always return your response by calling the final_result tool.',
         model_settings=get_thinking_settings(model, 'extraction'),
     )
-
-    @agent.output_validator
-    def validate_citations(ctx: RunContext[None], result: BaseModel) -> BaseModel:
-        """Validate that all citation quotes can be resolved in annotated_md.
-
-        Requires: result.evidence[].citations[].quote
-        """
-        all_quotes = [
-            citation.quote
-            for finding in result.evidence  # type: ignore[attr-defined]
-            for citation in finding.citations
-        ]
-        if not all_quotes:
-            return result
-
-        resolved = resolve(annotated_md, all_quotes)
-
-        unresolved = [q for q in all_quotes if not resolved.get(q)]
-        if unresolved:
-            log.warning(
-                f'{len(unresolved)}/{len(all_quotes)} quotes could not be resolved against the paper text: {unresolved}'
-            )
-
-        return result
-
-    return agent
 
 
 async def extract_paper_async(
@@ -90,21 +62,19 @@ async def extract_paper_async(
         log.info('Already extracted: %s', extraction_url)
         return
 
-    # Load annotated markdown - skip if not available
+    # Load markdown - skip if not available
     try:
-        annotated_md = read_text(paper_url(base, doi, 'annotated.md'))
+        markdown = read_text(paper_url(base, doi, 'markdown.md'))
     except FileNotFoundError:
-        log.info('Skipping %s: annotated.md not available', doi)
+        log.info('Skipping %s: markdown.md not available', doi)
         return
 
     # Load variant details (stored by query command)
     variant_details = json.dumps(read_json(assessment_url(base, variant_id, 'variant_details.json')))
 
-    log.info('Extracting evidence from %s (model: %s)', doi, model)
+    log.info('Extracting evidence from %s (%d chars, model: %s)', doi, len(markdown), model)
 
-    # Strip annotation spans to get clean markdown for LLM prompt
-    stripped = strip(annotated_md)
-    full_text = truncate_paper_text(stripped.plain_text, doi)
+    full_text = truncate_paper_text(markdown, doi)
 
     # Load prompt and schema from prompt set
     prompt_template, output_type = load_prompt('extraction', prompt_set)
@@ -114,10 +84,9 @@ async def extract_paper_async(
         full_text=full_text,
     )
 
-    # Create agent with citation validation
-    agent = create_extraction_agent(model, annotated_md, output_type)
+    agent = create_extraction_agent(model, output_type)
 
-    log.info('Calling LLM for extraction')
+    log.info('Calling LLM for extraction of %s', doi)
     result = await agent.run(prompt)
 
     # Store structured extraction result
@@ -140,7 +109,7 @@ def extract_paper(
 ) -> None:
     """Extract evidence from a single paper via LLM.
 
-    Reads annotated.md from papers/{encoded_doi}/ and variant_details.json from
+    Reads markdown.md from papers/{encoded_doi}/ and variant_details.json from
     assessments/{variant_id}/, calls LLM for extraction, stores result to
     assessments/{variant_id}/extractions/{encoded_doi}.json.
     """
