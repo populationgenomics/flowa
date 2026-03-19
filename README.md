@@ -6,15 +6,15 @@ Variant literature assessment pipeline with AI extraction.
 
 Flowa is a single async pipeline that processes genetic variant literature:
 
-```
+```text
 query → download → convert → extract → aggregate
 ```
 
 - **Query**: Search Mastermind/LitVar for papers, resolve PMIDs to DOIs via PubMed
 - **Download**: Fetch PDFs from PMC (main article + supplements)
-- **Convert**: PDF → annotated Markdown via [groundmark](https://github.com/populationgenomics/groundmark) (LLM-based conversion with bounding box alignment)
-- **Extract**: Per-paper evidence extraction via LLM (with citation validation against source text)
-- **Aggregate**: Cross-paper synthesis via LLM, resolving citation quotes to PDF coordinates
+- **Convert**: PDF → Markdown via [groundmark](https://github.com/populationgenomics/groundmark) (LLM-based conversion)
+- **Extract**: Per-paper evidence extraction via LLM
+- **Aggregate**: Cross-paper synthesis via LLM, resolving citation quotes to PDF bounding boxes via groundmark
 
 Papers are processed in parallel. LLM concurrency is controlled via `--llm-concurrency`.
 
@@ -77,7 +77,7 @@ Flowa supports site-specific prompt sets. Each prompt set is a directory under `
 
 ### Prompt Set Structure
 
-```
+```text
 prompts/{prompt_set}/
 ├── extraction_prompt.txt      # Prompt template for individual paper extraction
 ├── extraction_schema.py       # Pydantic model defining ExtractionResult
@@ -91,7 +91,7 @@ Schema modules must define Pydantic models with specific fields that Flowa's val
 
 **extraction_schema.py** must define `ExtractionResult` with:
 
-- `evidence[].citations[].quote` (str) — verbatim quote validated against the paper's `annotated.md`
+- `evidence[].citations[].quote` (str) — verbatim quote from the paper
 
 **aggregate_schema.py** must define `AggregateResult` with:
 
@@ -112,14 +112,14 @@ The pipeline uses a unified citation format:
 - The **title attribute** carries a verbatim quote that scopes the PDF highlight
 - Display text is free-form
 
-During aggregation, quotes are resolved against each paper's `annotated.md` (via `anchorite.resolve()`) to produce bounding box coordinates. The aggregate output contains pre-resolved `bboxes` arrays for each citation.
+During aggregation, quotes are resolved against each paper's source PDF (via `groundmark.DocumentIndex`) to produce bounding box coordinates. The aggregate output contains pre-resolved `bboxes` arrays for each citation. Quotes that cannot be resolved get empty `bboxes`.
 
 ## Storage Layout
 
-```
+```text
 papers/{encoded_doi}/
   source.pdf              # Downloaded PDF
-  annotated.md            # Annotated Markdown with <span data-bbox> tags
+  markdown.md             # LLM-generated Markdown
   metadata.json           # PubMed metadata (title, authors, date, etc.)
 
 assessments/{variant_id}/
@@ -147,7 +147,7 @@ uv run flowa run --variant-id test --gene GAA --hgvs-c "NM_000152.5:c.2238G>C" -
 ### Docker
 
 ```bash
-docker build -t flowa .
+docker build --build-arg LLM_EXTRA=bedrock -t flowa .
 docker run \
   -e FLOWA_STORAGE_BASE=s3://bucket \
   -e FLOWA_CONVERT_MODEL=bedrock:au.anthropic.claude-sonnet-4-6 \

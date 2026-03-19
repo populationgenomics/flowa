@@ -4,6 +4,8 @@ FROM ghcr.io/astral-sh/uv:python3.13-trixie-slim
 COPY README* *build.d /build.d/
 RUN bash -c 'for i in $(ls /build.d/*.sh 2>/dev/null | sort) ; do source $i ; done'
 
+ARG LLM_EXTRA
+
 WORKDIR /app
 
 # Copy all project files
@@ -12,8 +14,8 @@ COPY src/ ./src/
 COPY prompts/ ./prompts/
 
 # Export dependencies and install system-wide to use system certs
-RUN uv export --frozen --no-hashes --no-dev -o requirements.txt && \
+RUN uv export --frozen --no-hashes --no-dev --extra "${LLM_EXTRA}" -o requirements.txt && \
     uv pip install --system -r requirements.txt && \
-    uv pip install --system -e .
+    uv pip install --system -e ".[$LLM_EXTRA]"
 
 ENTRYPOINT ["flowa"]
