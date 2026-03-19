@@ -1,12 +1,12 @@
-"""Model and settings helpers for thinking-enabled LLM providers."""
+"""Model and settings helpers for thinking-enabled LLM providers.
+
+Provider-specific settings types are imported inline because only one
+provider is installed at a time (via optional extras).
+"""
 
 from typing import Literal
 
 from pydantic_ai.models import Model
-from pydantic_ai.models.anthropic import AnthropicModelSettings
-from pydantic_ai.models.bedrock import BedrockModelSettings
-from pydantic_ai.models.google import GoogleModelSettings
-from pydantic_ai.models.openai import OpenAIResponsesModelSettings
 from pydantic_ai.settings import ModelSettings
 
 AgentType = Literal['extraction', 'aggregation']
@@ -46,12 +46,16 @@ def get_thinking_settings(model_str: str, agent_type: AgentType) -> ModelSetting
     max_tokens = _MAX_TOKENS[agent_type]
 
     if model_str.startswith('anthropic:'):
+        from pydantic_ai.models.anthropic import AnthropicModelSettings
+
         return AnthropicModelSettings(
             max_tokens=max_tokens,
             anthropic_thinking={'type': 'adaptive'},
             anthropic_effort='high',
         )
     if model_str.startswith('bedrock:'):
+        from pydantic_ai.models.bedrock import BedrockModelSettings
+
         return BedrockModelSettings(
             max_tokens=max_tokens,
             bedrock_additional_model_requests_fields={
@@ -60,11 +64,15 @@ def get_thinking_settings(model_str: str, agent_type: AgentType) -> ModelSetting
             },
         )
     if model_str.startswith('google-gla:') or model_str.startswith('google-vertex:'):
+        from pydantic_ai.models.google import GoogleModelSettings
+
         return GoogleModelSettings(
             max_tokens=max_tokens,
             google_thinking_config={'include_thoughts': True},
         )
     if model_str.startswith('openai:'):
+        from pydantic_ai.models.openai import OpenAIResponsesModelSettings
+
         return OpenAIResponsesModelSettings(
             max_tokens=max_tokens,
             openai_reasoning_effort='high',
