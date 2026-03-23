@@ -671,16 +671,16 @@ wheels = [
 
 [[package]]
 name = "groundmark"
-version = "0.3.4"
+version = "0.3.5"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "pypdf" },
     { name = "pypdfium2" },
     { name = "seq-smith" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/f0/4f/0f0129d98ab0cde7353de0abb64d08b6ce55549573a5ae1497c135236455/groundmark-0.3.4.tar.gz", hash = "sha256:bf3ad67f3d996a137525997fbc031427c66f15163b88df2f463e29c24989ff94", size = 189286, upload-time = "2026-03-19T06:14:42.571Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/90/9f/7a66f085880cdad5b7e29a90792f4bf76376ab1fed899535bddd5fbc9278/groundmark-0.3.5.tar.gz", hash = "sha256:5d3e76942cb7433298de6fe1ec2efd9e428edb1a45a35befb2c91e360b5c1826", size = 189550, upload-time = "2026-03-23T01:31:08.789Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/ed/0e/3a3d8033b7fbbfc659adab5938d75034e5ca7c69e70002eb0b3bf7ce1efd/groundmark-0.3.4-py3-none-any.whl", hash = "sha256:5ec6a45ba5037da9ef39429fc7443c9a23bca6cb5a06945580ba5054e2e7902b", size = 13078, upload-time = "2026-03-19T06:14:41.057Z" },
+    { url = "https://files.pythonhosted.org/packages/1c/bf/e837be2194e7e4d40193bc4d4e034a870318532cf66cd5bf62e58e54c62c/groundmark-0.3.5-py3-none-any.whl", hash = "sha256:193a3edf875844165caf22ef2bbb374692b8ad2f1f69fc84a76d4f614e2b4845", size = 13269, upload-time = "2026-03-23T01:31:07.479Z" },
 ]
 
 [package.optional-dependencies]
