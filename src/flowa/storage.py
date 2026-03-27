@@ -30,7 +30,7 @@ import json
 from typing import Any
 from urllib.parse import quote
 
-import fsspec
+import fsspec  # type: ignore[import-untyped]
 
 
 def encode_doi(doi: str) -> str:

@@ -665,22 +665,23 @@ grpc = [
 name = "griffelib"
 version = "2.0.0"
 source = { registry = "https://pypi.org/simple" }
+sdist = { url = "https://files.pythonhosted.org/packages/ad/06/eccbd311c9e2b3ca45dbc063b93134c57a1ccc7607c5e545264ad092c4a9/griffelib-2.0.0.tar.gz", hash = "sha256:e504d637a089f5cab9b5daf18f7645970509bf4f53eda8d79ed71cce8bd97934", size = 166312, upload-time = "2026-03-23T21:06:55.954Z" }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/4d/51/c936033e16d12b627ea334aaaaf42229c37620d0f15593456ab69ab48161/griffelib-2.0.0-py3-none-any.whl", hash = "sha256:01284878c966508b6d6f1dbff9b6fa607bc062d8261c5c7253cb285b06422a7f", size = 142004, upload-time = "2026-02-09T19:09:40.561Z" },
 ]
 
 [[package]]
 name = "groundmark"
-version = "0.3.5"
+version = "0.3.6"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "pypdf" },
     { name = "pypdfium2" },
     { name = "seq-smith" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/90/9f/7a66f085880cdad5b7e29a90792f4bf76376ab1fed899535bddd5fbc9278/groundmark-0.3.5.tar.gz", hash = "sha256:5d3e76942cb7433298de6fe1ec2efd9e428edb1a45a35befb2c91e360b5c1826", size = 189550, upload-time = "2026-03-23T01:31:08.789Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/90/65/20fdf9782ca71409348b0d43133bde524ef0852bb90964b5b2a4303925fd/groundmark-0.3.6.tar.gz", hash = "sha256:ce5a30e03e0c30b962e89bb3ac5f1d6d05392c02d14667b1e47387e549d8d3b9", size = 189749, upload-time = "2026-03-27T01:09:42.104Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/1c/bf/e837be2194e7e4d40193bc4d4e034a870318532cf66cd5bf62e58e54c62c/groundmark-0.3.5-py3-none-any.whl", hash = "sha256:193a3edf875844165caf22ef2bbb374692b8ad2f1f69fc84a76d4f614e2b4845", size = 13269, upload-time = "2026-03-23T01:31:07.479Z" },
+    { url = "https://files.pythonhosted.org/packages/d2/91/b8c25adb30e65954473743ce947780e4130c4b56ba54d12af0de6c952c00/groundmark-0.3.6-py3-none-any.whl", hash = "sha256:258462c4ba4caa2b4851f4f2a675ba017dcbea79b267980341215c58209c592d", size = 13429, upload-time = "2026-03-27T01:09:40.72Z" },
 ]
 
 [package.optional-dependencies]
