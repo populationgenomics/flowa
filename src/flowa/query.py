@@ -278,7 +278,7 @@ def _extract_date(date_elem: Element | None) -> str | None:
     retry=retry_if_exception_type(httpx.HTTPStatusError),
     reraise=True,
 )
-async def _fetch_pubmed_metadata_batch(pmids: list[int]) -> dict[int, dict[str, Any]]:
+async def fetch_pubmed_metadata_batch(pmids: list[int]) -> dict[int, dict[str, Any]]:
     """Fetch metadata for multiple papers from PubMed in a single EFetch request."""
     async with httpx.AsyncClient(timeout=30.0) as client:
         response = await client.get(
@@ -310,7 +310,7 @@ async def resolve_pmids_to_dois(base: str, pmids: list[int]) -> list[str]:
     if not pmids:
         return []
 
-    metadata_by_pmid = await _fetch_pubmed_metadata_batch(pmids)
+    metadata_by_pmid = await fetch_pubmed_metadata_batch(pmids)
     dois: list[str] = []
 
     for pmid in pmids:
