@@ -1,6 +1,7 @@
 """Convert PDF to Markdown via groundmark."""
 
 import asyncio
+import json
 import logging
 import time
 
@@ -8,7 +9,7 @@ import typer
 from groundmark.convert import Config, convert
 
 from flowa.settings import Settings
-from flowa.storage import exists, paper_url, read_bytes, write_text
+from flowa.storage import exists, paper_url, read_bytes, write_bytes, write_text
 
 log = logging.getLogger(__name__)
 
@@ -42,6 +43,10 @@ async def convert_paper_async(base: str, doi: str, model: str) -> None:
     elapsed = time.monotonic() - t0
 
     write_text(md_url, result.markdown)
+
+    raw_url = paper_url(base, doi, 'convert_raw.json')
+    write_bytes(raw_url, json.dumps(result.all_messages).encode())
+
     log.info('Converted DOI %s: %d chars in %.1fs', doi, len(result.markdown), elapsed)
 
 

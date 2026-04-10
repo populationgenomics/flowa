@@ -3,8 +3,7 @@ revision = 3
 requires-python = "==3.13.*"
 
 [options]
-exclude-newer = "2026-04-02T02:52:09.835957Z"
-exclude-newer-span = "P7D"
+exclude-newer = "2026-04-12T14:00:00Z"
 
 [[package]]
 name = "aiobotocore"
@@ -676,16 +675,16 @@ wheels = [
 
 [[package]]
 name = "groundmark"
-version = "0.3.6"
+version = "0.4.0"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "pypdf" },
     { name = "pypdfium2" },
     { name = "seq-smith" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/90/65/20fdf9782ca71409348b0d43133bde524ef0852bb90964b5b2a4303925fd/groundmark-0.3.6.tar.gz", hash = "sha256:ce5a30e03e0c30b962e89bb3ac5f1d6d05392c02d14667b1e47387e549d8d3b9", size = 189749, upload-time = "2026-03-27T01:09:42.104Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/3f/c8/702254fc475b2b5ccdbefa72096828831904dbb0c5590ffc1d40a5739706/groundmark-0.4.0.tar.gz", hash = "sha256:fd7c4a2862d658221463db8f95148905342dc3bcba563945170f681c607f45e3", size = 200221, upload-time = "2026-04-10T14:14:17.46Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/d2/91/b8c25adb30e65954473743ce947780e4130c4b56ba54d12af0de6c952c00/groundmark-0.3.6-py3-none-any.whl", hash = "sha256:258462c4ba4caa2b4851f4f2a675ba017dcbea79b267980341215c58209c592d", size = 13429, upload-time = "2026-03-27T01:09:40.72Z" },
+    { url = "https://files.pythonhosted.org/packages/8a/4d/f3998a7821fceba524ec346b17fa2751b45ab74e7b1c9a1370165268ec50/groundmark-0.4.0-py3-none-any.whl", hash = "sha256:34b6a527d7c31595eaa7b677f27f0f967c5f74b81fc0fb83d7b42e8033ce5f51", size = 13587, upload-time = "2026-04-10T14:14:15.962Z" },
 ]
 
 [package.optional-dependencies]
