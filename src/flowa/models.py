@@ -10,10 +10,16 @@ from pydantic_ai.models import Model
 from pydantic_ai.settings import ModelSettings
 
 AgentType = Literal['extraction', 'aggregation']
+EffortLevel = Literal['low', 'medium', 'high']
 
 _MAX_TOKENS: dict[AgentType, int] = {
-    'extraction': 30_000,
-    'aggregation': 60_000,
+    'extraction': 80_000,
+    'aggregation': 80_000,
+}
+
+_THINKING_EFFORT: dict[AgentType, EffortLevel] = {
+    'extraction': 'medium',
+    'aggregation': 'high',
 }
 
 
@@ -44,6 +50,7 @@ def create_model(model_str: str) -> Model | str:
 def get_thinking_settings(model_str: str, agent_type: AgentType) -> ModelSettings:
     """Get thinking settings for the specified model provider."""
     max_tokens = _MAX_TOKENS[agent_type]
+    effort = _THINKING_EFFORT[agent_type]
 
     if model_str.startswith('anthropic:'):
         from pydantic_ai.models.anthropic import AnthropicModelSettings
@@ -51,7 +58,7 @@ def get_thinking_settings(model_str: str, agent_type: AgentType) -> ModelSetting
         return AnthropicModelSettings(
             max_tokens=max_tokens,
             anthropic_thinking={'type': 'adaptive'},
-            anthropic_effort='high',
+            anthropic_effort=effort,
         )
     if model_str.startswith('bedrock:'):
         from pydantic_ai.models.bedrock import BedrockModelSettings
@@ -60,7 +67,7 @@ def get_thinking_settings(model_str: str, agent_type: AgentType) -> ModelSetting
             max_tokens=max_tokens,
             bedrock_additional_model_requests_fields={
                 'thinking': {'type': 'adaptive'},
-                'output_config': {'effort': 'high'},
+                'output_config': {'effort': effort},
             },
         )
     if model_str.startswith('google-gla:') or model_str.startswith('google-vertex:'):
@@ -75,7 +82,7 @@ def get_thinking_settings(model_str: str, agent_type: AgentType) -> ModelSetting
 
         return OpenAIResponsesModelSettings(
             max_tokens=max_tokens,
-            openai_reasoning_effort='high',
+            openai_reasoning_effort=effort,
             openai_reasoning_summary='detailed',
         )
     # Fallback for unknown providers
