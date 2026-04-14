@@ -170,6 +170,8 @@ async def fetch_pmc_pdf(pmid: int, client: httpx.AsyncClient, email: str, tool: 
     tgz_url = tgz_match.group(1)
     if tgz_url.startswith('ftp://'):
         tgz_url = tgz_url.replace('ftp://', 'https://')
+    # OA API still returns old FTP paths, but NCBI moved them under /deprecated/
+    tgz_url = tgz_url.replace('/pub/pmc/oa_', '/pub/pmc/deprecated/oa_')
 
     # Download TGZ with retries (PMC FTP can be flaky)
     tgz_bytes = await _download_tgz_with_retry(client, tgz_url)
