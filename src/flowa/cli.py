@@ -4,7 +4,10 @@ import logging
 import os
 import sys
 
+import logfire
 import typer
+from pydantic_ai import Agent
+from pydantic_ai.models.instrumented import InstrumentationSettings
 
 from flowa import __version__, aggregate, convert, download, extract, query, run
 
@@ -22,6 +25,22 @@ logging.basicConfig(
     datefmt='%Y-%m-%d %H:%M:%S',
     stream=sys.stderr,
     force=True,  # Override any existing configuration
+)
+
+# Set up OpenTelemetry via logfire. send_to_logfire=False means we only export
+# via OTLP (to OTEL_EXPORTER_OTLP_ENDPOINT). Gracefully degrades to no-op when
+# the env var is unset (local dev, tests).
+logfire.configure(
+    send_to_logfire=False,
+    service_name='flowa-worker',
+)
+# Patches Agent class globally — captures all agent runs (including groundmark's
+# PDF conversion agents) with zero changes in those modules.
+Agent.instrument_all(
+    InstrumentationSettings(
+        include_content=False,
+        version=3,
+    )
 )
 
 

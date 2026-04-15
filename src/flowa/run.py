@@ -4,6 +4,7 @@ import asyncio
 import logging
 from typing import Literal
 
+import logfire
 import typer
 
 from flowa.aggregate import aggregate_evidence_async
@@ -32,14 +33,15 @@ async def process_paper(
     extract_semaphore: asyncio.Semaphore,
 ) -> None:
     """Download, convert, and extract a single paper."""
-    async with download_semaphore:
-        await download_paper_async(base, doi)
+    with logfire.span('flowa.process_paper', doi=doi):
+        async with download_semaphore:
+            await download_paper_async(base, doi)
 
-    async with convert_semaphore:
-        await convert_paper_async(base, doi, convert_model)
+        async with convert_semaphore:
+            await convert_paper_async(base, doi, convert_model)
 
-    async with extract_semaphore:
-        await extract_paper_async(base, variant_id, doi, extraction_model, prompt_set)
+        async with extract_semaphore:
+            await extract_paper_async(base, variant_id, doi, extraction_model, prompt_set)
 
 
 async def run_pipeline(
@@ -53,63 +55,64 @@ async def run_pipeline(
     download_concurrency: int = DEFAULT_DOWNLOAD_CONCURRENCY,
 ) -> None:
     """Run the full assessment pipeline for a variant."""
-    base = settings.flowa_storage_base
-    download_semaphore = asyncio.Semaphore(download_concurrency)
-    convert_semaphore = asyncio.Semaphore(convert_concurrency)
-    extract_semaphore = asyncio.Semaphore(extract_concurrency)
+    with logfire.span('flowa.pipeline', variant_id=variant_id, gene=gene, source=source):
+        base = settings.flowa_storage_base
+        download_semaphore = asyncio.Semaphore(download_concurrency)
+        convert_semaphore = asyncio.Semaphore(convert_concurrency)
+        extract_semaphore = asyncio.Semaphore(extract_concurrency)
 
-    # 1. Query literature sources
-    log.info('=== Query (%s) ===', source)
-    dois = await query_dois_async(base, variant_id, gene, hgvs_c, source, settings.mastermind_api_token)
-    log.info('Query complete: %d papers found', len(dois))
+        # 1. Query literature sources
+        log.info('=== Query (%s) ===', source)
+        dois = await query_dois_async(base, variant_id, gene, hgvs_c, source, settings.mastermind_api_token)
+        log.info('Query complete: %d papers found', len(dois))
 
-    if not dois:
-        log.warning('No papers found — running aggregation with ClinVar only')
+        if not dois:
+            log.warning('No papers found — running aggregation with ClinVar only')
 
-    # 2. Process papers in parallel (download -> convert -> extract)
-    log.info(
-        '=== Processing %d papers (max concurrent: %d downloads, %d converts, %d extracts) ===',
-        len(dois),
-        download_concurrency,
-        convert_concurrency,
-        extract_concurrency,
-    )
-    completed = 0
-    failed = 0
+        # 2. Process papers in parallel (download -> convert -> extract)
+        log.info(
+            '=== Processing %d papers (max concurrent: %d downloads, %d converts, %d extracts) ===',
+            len(dois),
+            download_concurrency,
+            convert_concurrency,
+            extract_concurrency,
+        )
+        completed = 0
+        failed = 0
 
-    async def process_and_track(doi: str) -> None:
-        nonlocal completed, failed
-        try:
-            await process_paper(
-                base,
-                variant_id,
-                doi,
-                settings.flowa_convert_model,
-                settings.flowa_extraction_model,
-                settings.flowa_prompt_set,
-                download_semaphore,
-                convert_semaphore,
-                extract_semaphore,
-            )
-            completed += 1
-        except Exception:
-            log.exception('Failed to process paper %s — skipping', doi)
-            failed += 1
-        log.info('Progress: %d/%d done (%d failed)', completed + failed, len(dois), failed)
+        async def process_and_track(doi: str) -> None:
+            nonlocal completed, failed
+            try:
+                await process_paper(
+                    base,
+                    variant_id,
+                    doi,
+                    settings.flowa_convert_model,
+                    settings.flowa_extraction_model,
+                    settings.flowa_prompt_set,
+                    download_semaphore,
+                    convert_semaphore,
+                    extract_semaphore,
+                )
+                completed += 1
+            except Exception:
+                log.exception('Failed to process paper %s — skipping', doi)
+                failed += 1
+            log.info('Progress: %d/%d done (%d failed)', completed + failed, len(dois), failed)
 
-    async with asyncio.TaskGroup() as tg:
-        for doi in dois:
-            tg.create_task(process_and_track(doi))
+        async with asyncio.TaskGroup() as tg:
+            for doi in dois:
+                tg.create_task(process_and_track(doi))
 
-    log.info('Processing complete: %d succeeded, %d failed out of %d', completed, failed, len(dois))
+        log.info('Processing complete: %d succeeded, %d failed out of %d', completed, failed, len(dois))
 
-    # 3. Aggregate
-    log.info('=== Aggregating ===')
-    await aggregate_evidence_async(
-        base, variant_id, settings.flowa_extraction_model, settings.ncbi_api_key, settings.flowa_prompt_set
-    )
+        # 3. Aggregate
+        log.info('=== Aggregating ===')
+        await aggregate_evidence_async(
+            base, variant_id, settings.flowa_extraction_model, settings.ncbi_api_key, settings.flowa_prompt_set
+        )
 
-    log.info('=== Pipeline complete for %s ===', variant_id)
+        log.info('=== Pipeline complete for %s ===', variant_id)
 
 
 def run(

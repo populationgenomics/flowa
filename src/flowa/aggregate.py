@@ -7,6 +7,7 @@ import re
 import time
 from typing import Any
 
+import logfire
 import typer
 from groundmark import DocumentIndex
 from pydantic import BaseModel
@@ -300,7 +301,8 @@ async def aggregate_evidence_async(
 
     # Post-LLM: resolve quotes to bboxes, replace paper_id with DOI
     aggregate_dict = result.output.model_dump()
-    resolve_aggregate_citations(aggregate_dict, paper_id_to_doi, pdf_bytes_cache, metadata_cache)
+    with logfire.span('flowa.resolve_citations', paper_count=len(paper_id_to_doi)):
+        resolve_aggregate_citations(aggregate_dict, paper_id_to_doi, pdf_bytes_cache, metadata_cache)
 
     # Store structured aggregate result
     write_json(aggregate_url, with_schema_version(aggregate_dict, AGGREGATE_SCHEMA_VERSION))
