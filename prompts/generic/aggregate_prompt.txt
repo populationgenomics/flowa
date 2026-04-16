@@ -33,6 +33,7 @@ CRITICAL AGGREGATION PRINCIPLES:
 - Distinguish between family-level and individual-level counts
 - Be explicit about de novo cases vs inherited cases
 - Note asymptomatic carriers separately (evidence for benign assertion)
+- Actively deduplicate across all sources: look for overlapping cohorts, shared research groups, "previously reported" references, matching patient/family identifiers, and ClinVar submissions citing the same papers. When the same family appears in multiple sources, count it once. Clearly state the deduplicated total and explain any overlap detected.
 
 **Evaluating Evidence Quality:**
 
@@ -149,7 +150,7 @@ DETAILED NOTES GENERATION:
 
 Generate concise curator-style notes synthesizing evidence across papers and ClinVar using **Markdown formatting**. Structure:
 
-1. **Summary**: Classification rationale focusing on the *why* — what evidence was presented and why it is (or isn't) convincing. Include: ClinVar aggregate classification and expert panel conclusion (if any), what ACMG criteria were applied and how, key evidence (functional assays, segregation, case counts with de-duplication), phenotypic spectrum. Explicitly call out any refuting evidence and why it does not change the classification. If no refuting evidence exists, note that.
+1. **Summary**: Very concise (1-3 sentences). State the selected classification, the primary metric driving that selection (deduplicated unrelated family count, expert panel classification, or nature of conflict/inconclusiveness), and any critical caveat (e.g. significant refuting evidence, high population frequency, phenotype mismatch). All detail — phenotype, age of onset, per-source breakdowns, ACMG criteria — belongs in the sections below.
 2. **Supporting evidence**: Per-source findings that support the selected classification
 3. **Refuting evidence**: Per-source findings that argue against it (omit this section entirely if none)
 
@@ -208,16 +209,16 @@ Format (use Markdown):
 
 Example structure (adapt to your evidence):
 ```
-**Summary:** Pathogenic. ClinVar: P (3 stars, 41 submitters); PAH Expert Panel classified as P applying PS3 (1.85% WT enzyme activity in functional assays), PP4_Moderate (most common PAH mutation in PKU cohorts), PM3_Strong (detected in trans with known pathogenic variants IVS12+1G>A and M1V). Paper evidence corroborates: >10 cHet individuals across 3 studies with severe biallelic disease (neonatal skeletal dysplasia, [perinatal lethal](#cite:Smith2022 "Two cases were perinatal lethal with severe skeletal dysplasia and respiratory insufficiency")). Age of onset: biallelic cases presented neonatally (day 1-3 of life) to early childhood (age 3-5); [1 het carrier asymptomatic at age 42](#cite:Smith2022 "A 42-year-old heterozygous female was clinically asymptomatic with low serum ALP of 22 U/L") with only biochemical findings (low serum ALP 22 U/L), suggesting incomplete penetrance in heterozygous state; does not change classification given strong biallelic evidence and expert panel review.
+**Summary:** Pathogenic. ClinVar 3-star expert panel P classification; >10 unrelated cHet cases across 3 studies with consistent severe phenotype. 1 het carrier asymptomatic, suggesting incomplete penetrance in het state — does not change classification given strong biallelic evidence and expert panel review.
 
 **Supporting evidence:**
-- **ClinVar**: PAH Expert Panel classified as P (2018-08-06), citing 1.85% WT activity in functional assays and compound het observations with known pathogenic variants. 36 additional lab submissions classify as P, all with criteria provided.
-- **Chang2021**: 2x cHet with [severe neonatal-onset skeletal dysplasia](#cite:Chang2021 "Both compound heterozygous patients presented with severe neonatal-onset skeletal dysplasia and respiratory insufficiency, dying before 6 months of age"); both died <6 months.
-- **Smith2022**: [4x cHet individuals](#cite:Smith2022 "Four compound heterozygous individuals were identified: two with perinatal lethal disease and two with childhood-onset fractures and dental anomalies"): 2 perinatal lethal, 2 childhood-onset with fractures and dental anomalies.
+- **ClinVar**: PAH Expert Panel classified as P (2018-08-06), applying PS3 (1.85% WT enzyme activity), PP4_Moderate (most common PAH mutation in PKU cohorts), PM3_Strong (in trans with known pathogenic variants IVS12+1G>A and M1V). 36 additional lab submissions classify as P, all with criteria provided.
+- **Chang2021**: [2x cHet, severe neonatal-onset skeletal dysplasia](#cite:Chang2021 "Both compound heterozygous patients presented with severe neonatal-onset skeletal dysplasia and respiratory insufficiency, dying before 6 months of age"); both died <6 months. Onset: neonatal (day 1-3).
+- **Smith2022**: [4x cHet individuals](#cite:Smith2022 "Four compound heterozygous individuals were identified: two with perinatal lethal disease and two with childhood-onset fractures and dental anomalies"): 2 perinatal lethal, 2 childhood-onset with fractures and dental anomalies. Onset range: neonatal to age 3-5. [1x het adult female](#cite:Smith2022 "A 42-year-old heterozygous female was clinically asymptomatic with low serum ALP of 22 U/L"), asymptomatic at 42, low serum ALP (22 U/L).
 - **Tanaka2020**: [1x het child](#cite:Tanaka2020 "A heterozygous child presented with mild bone pain at age 8 and premature loss of deciduous teeth"), mild bone pain onset age 8, premature tooth loss; only variant identified.
 
 **Refuting evidence:**
-- **Smith2022**: [1x het adult female](#cite:Smith2022 "A 42-year-old heterozygous female was clinically asymptomatic with low serum ALP of 22 U/L"), asymptomatic, low serum ALP (22 U/L) — suggests incomplete penetrance in heterozygous state.
+- **Smith2022**: [1x het adult female](#cite:Smith2022 "A 42-year-old heterozygous female was clinically asymptomatic with low serum ALP of 22 U/L"), asymptomatic at age 42, low serum ALP (22 U/L) — suggests incomplete penetrance in heterozygous state.
 ```
 
 Note: Papers are provided sorted by date (descending, most recent first), with metadata including title, authors list, date (ISO format), and PMID where available. ClinVar submissions may cite these same papers by PMID.

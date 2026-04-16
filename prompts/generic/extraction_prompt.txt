@@ -163,6 +163,7 @@ IMPORTANT EXTRACTION PRINCIPLES:
 - Distinguish between P/LP classifications vs VUS classifications
 - Extract exact case counts when provided; use "NR" when not stated
 - Be conservative: if relatedness is unclear, note the uncertainty
+- Note family identifiers, pedigree positions, or cohort labels when provided — these support cross-source deduplication of cases
 - Prioritize direct evidence from this paper over citations to other papers (but note prior reports)
 - For compound heterozygous cases, identify them clearly and note the second variant if provided
 
