@@ -6,6 +6,7 @@ readme = "README.md"
 requires-python = "==3.13.*"
 license = { file = "LICENSE" }
 dependencies = [
+    "boto3",
     "defusedxml",
     "fsspec",
     "gcsfs",  # GCS support for fsspec
@@ -26,6 +27,7 @@ openai = ["groundmark[openai]"]
 
 [dependency-groups]
 dev = [
+    "boto3-stubs[s3]",
     "ruff",
     "mypy",
     "pytest",

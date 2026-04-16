@@ -1,15 +1,17 @@
 """Download PDF from PMC for a single paper."""
 
 import asyncio
+import json
 import logging
-import re
-import tarfile
 import tempfile
 from pathlib import Path
 
+import boto3
 import httpx
 import typer
-from defusedxml import ElementTree
+from botocore import UNSIGNED
+from botocore.config import Config
+from botocore.exceptions import ClientError
 from pypdf import PdfReader, PdfWriter
 from tenacity import retry, retry_if_exception_type, stop_after_attempt, wait_exponential
 
@@ -18,37 +20,13 @@ from flowa.storage import exists, paper_url, read_json, write_bytes
 
 log = logging.getLogger(__name__)
 
+PMC_OA_BUCKET = 'pmc-oa-opendata'
+_S3_CONFIG = Config(signature_version=UNSIGNED, region_name='us-east-1')
 
-def extract_supplements_from_nxml(nxml_path: Path, archive_dir: Path) -> list[Path]:
-    """Parse NXML file and extract ordered list of PDF supplement paths."""
-    supplements = []
 
-    try:
-        tree = ElementTree.parse(nxml_path)
-        root = tree.getroot()
-        if root is None:
-            return []
-
-        for supp in root.iter():
-            if supp.tag.endswith('supplementary-material'):
-                for media in supp.iter():
-                    if media.tag.endswith('media'):
-                        href = None
-                        for attr_name, attr_value in media.attrib.items():
-                            if 'href' in attr_name:
-                                href = attr_value
-                                break
-
-                        if href and href.lower().endswith('.pdf'):
-                            matching_files = list(archive_dir.rglob(href))
-                            if matching_files:
-                                supplements.append(matching_files[0])
-                                log.debug('Found supplement PDF: %s', href)
-
-    except (ElementTree.ParseError, OSError) as e:
-        log.warning('Failed to parse NXML for supplements: %s', e)
-
-    return supplements
+def _make_s3_client():  # type: ignore[no-untyped-def]
+    """Create an anonymous S3 client for the PMC OA bucket."""
+    return boto3.client('s3', config=_S3_CONFIG)
 
 
 def concatenate_pdfs(pdf_paths: list[Path], output_path: Path) -> None:
@@ -99,41 +77,56 @@ def _filter_supplements_by_page_count(
     return accepted
 
 
-def process_tgz_archive(tgz_content: bytes, output_path: Path) -> tuple[bool, str]:
-    """Extract TGZ archive, find main PDF, concatenate with supplements."""
-    with tempfile.TemporaryDirectory() as tmpdir:
-        tmpdir_path = Path(tmpdir)
-        tgz_path = tmpdir_path / 'archive.tar.gz'
-        tgz_path.write_bytes(tgz_content)
+def _resolve_latest_version(s3, pmcid: str) -> int | None:  # type: ignore[no-untyped-def]
+    """Find the latest version number for a PMCID in the OA bucket.
 
+    Returns the version number (e.g. 2) or None if the article is not in the bucket.
+    """
+    response = s3.list_objects_v2(Bucket=PMC_OA_BUCKET, Prefix=f'{pmcid}.', Delimiter='/')
+    prefixes = response.get('CommonPrefixes', [])
+    if not prefixes:
+        return None
+
+    # Prefixes look like "PMC12345.1/", "PMC12345.2/" — extract version numbers
+    versions: list[int] = []
+    for p in prefixes:
+        prefix_str = p['Prefix'].rstrip('/')
+        version_str = prefix_str.rsplit('.', 1)[-1]
         try:
-            with tarfile.open(tgz_path, 'r:gz') as tar:
-                tar.extractall(tmpdir_path, filter='data')
-        except (tarfile.TarError, OSError) as e:
-            return False, f'Failed to extract TGZ: {e}'
+            versions.append(int(version_str))
+        except ValueError:
+            continue
 
-        nxml_files = list(tmpdir_path.rglob('*.nxml'))
+    return max(versions) if versions else None
 
-        if len(nxml_files) == 0:
-            return False, 'No NXML file found in archive'
-        if len(nxml_files) > 1:
-            return False, f'Multiple NXML files found: {[f.name for f in nxml_files]}'
 
-        nxml_file = nxml_files[0]
-        main_pdf = nxml_file.with_suffix('.pdf')
+@retry(
+    stop=stop_after_attempt(5),
+    wait=wait_exponential(),
+    retry=retry_if_exception_type(ClientError),
+    reraise=True,
+    before_sleep=lambda rs: log.warning(
+        'S3 download failed (%s), retrying (attempt %d/5)',
+        rs.outcome.exception() if rs.outcome else 'unknown',
+        rs.attempt_number,
+    ),
+)
+def _download_s3_object(s3, key: str) -> bytes:  # type: ignore[no-untyped-def]
+    """Download a single object from the PMC OA bucket with retries."""
+    response = s3.get_object(Bucket=PMC_OA_BUCKET, Key=key)
+    return response['Body'].read()
 
-        if not main_pdf.exists():
-            return False, f'Main PDF not found (expected {main_pdf.name})'
 
-        supplement_pdfs = extract_supplements_from_nxml(nxml_file, tmpdir_path)
-        supplement_pdfs = _filter_supplements_by_page_count(supplement_pdfs)
-        all_pdfs = [main_pdf, *supplement_pdfs]
+def _s3_url_to_key(s3_url: str) -> str:
+    """Convert an S3 URL from metadata JSON to a plain key.
 
-        try:
-            concatenate_pdfs(all_pdfs, output_path)
-            return True, f'Concatenated {len(all_pdfs)} PDFs ({len(supplement_pdfs)} supplements)'
-        except OSError as e:
-            return False, f'Failed to concatenate PDFs: {e}'
+    Strips the 's3://bucket/' prefix and any '?md5=...' query parameter.
+    Example: 's3://pmc-oa-opendata/PMC123.1/file.pdf?md5=abc' -> 'PMC123.1/file.pdf'
+    """
+    # Strip s3://bucket/ prefix
+    path = s3_url.split(f's3://{PMC_OA_BUCKET}/')[-1]
+    # Strip query params
+    return path.split('?')[0]
 
 
 async def fetch_pmc_pdf(pmid: int, client: httpx.AsyncClient, email: str, tool: str) -> tuple[bytes | None, str]:
@@ -155,58 +148,59 @@ async def fetch_pmc_pdf(pmid: int, client: httpx.AsyncClient, email: str, tool: 
     pmcid = records[0]['pmcid']
     log.debug('Found PMCID: %s', pmcid)
 
-    # Step 2: Get PDF link from OA API
-    oa_url = f'https://www.ncbi.nlm.nih.gov/pmc/utils/oa/oa.fcgi?id={pmcid}'
-    response = await client.get(oa_url)
-    response.raise_for_status()
-    oa_data = response.text
+    # Step 2: Find latest version in S3 bucket
+    s3 = _make_s3_client()
+    version = await asyncio.to_thread(_resolve_latest_version, s3, pmcid)
+    if version is None:
+        return None, f'{pmcid} not in PMC OA bucket'
 
-    # Step 3: Look for TGZ link (includes main article + supplements)
-    tgz_match = re.search(r'<link[^>]*format="tgz"[^>]*href="([^"]+)"[^>]*/>', oa_data)
+    # Step 3: Fetch per-article metadata JSON
+    metadata_key = f'metadata/{pmcid}.{version}.json'
+    log.debug('Fetching metadata: %s', metadata_key)
+    metadata_bytes = await asyncio.to_thread(_download_s3_object, s3, metadata_key)
+    metadata = json.loads(metadata_bytes)
 
-    if not tgz_match:
-        return None, f'No TGZ link in OA for {pmcid}'
+    # Step 4: Identify main PDF and supplement PDFs
+    pdf_url = metadata.get('pdf_url')
+    if not pdf_url:
+        return None, f'No pdf_url in metadata for {pmcid}.{version}'
 
-    tgz_url = tgz_match.group(1)
-    if tgz_url.startswith('ftp://'):
-        tgz_url = tgz_url.replace('ftp://', 'https://')
-    # OA API still returns old FTP paths, but NCBI moved them under /deprecated/
-    tgz_url = tgz_url.replace('/pub/pmc/oa_', '/pub/pmc/deprecated/oa_')
+    main_pdf_key = _s3_url_to_key(pdf_url)
+    supplement_keys = [
+        _s3_url_to_key(url) for url in metadata.get('media_urls', []) if url.lower().split('?')[0].endswith('.pdf')
+    ]
 
-    # Download TGZ with retries (PMC FTP can be flaky)
-    tgz_bytes = await _download_tgz_with_retry(client, tgz_url)
+    log.debug('Main PDF: %s, %d supplement PDFs', main_pdf_key, len(supplement_keys))
 
-    # Process TGZ to local temp file
-    with tempfile.NamedTemporaryFile(suffix='.pdf', delete=False) as tmp:
-        tmp_path = Path(tmp.name)
+    # Step 5: Download all PDFs
+    async def download(key: str) -> bytes:
+        return await asyncio.to_thread(_download_s3_object, s3, key)
 
-    try:
-        success, message = process_tgz_archive(tgz_bytes, tmp_path)
-        if success:
-            result_bytes = tmp_path.read_bytes()
-            return result_bytes, f'Downloaded from PMC ({pmcid}) - {message}'
-        return None, f'TGZ processing failed for {pmcid}: {message}'
-    finally:
-        tmp_path.unlink(missing_ok=True)
+    all_keys = [main_pdf_key, *supplement_keys]
+    all_contents = await asyncio.gather(*[download(key) for key in all_keys])
 
+    # Step 6: Write to temp files, filter supplements, concatenate
+    with tempfile.TemporaryDirectory() as tmpdir:
+        tmpdir_path = Path(tmpdir)
 
-@retry(
-    stop=stop_after_attempt(5),
-    wait=wait_exponential(),
-    retry=retry_if_exception_type(httpx.HTTPStatusError),
-    reraise=True,
-    before_sleep=lambda rs: log.warning(
-        'TGZ download failed (%s), retrying (attempt %d/5)',
-        rs.outcome.exception() if rs.outcome else 'unknown',
-        rs.attempt_number,
-    ),
-)
-async def _download_tgz_with_retry(client: httpx.AsyncClient, tgz_url: str) -> bytes:
-    """Download TGZ archive, retrying on transient HTTP errors."""
-    log.debug('Downloading TGZ from %s', tgz_url)
-    response = await client.get(tgz_url)
-    response.raise_for_status()
-    return response.content
+        main_path = tmpdir_path / 'main.pdf'
+        main_path.write_bytes(all_contents[0])
+
+        supplement_paths: list[Path] = []
+        for i, content in enumerate(all_contents[1:]):
+            path = tmpdir_path / f'supplement_{i:03d}.pdf'
+            path.write_bytes(content)
+            supplement_paths.append(path)
+
+        supplement_paths = _filter_supplements_by_page_count(supplement_paths)
+        all_pdfs = [main_path, *supplement_paths]
+
+        output_path = tmpdir_path / 'output.pdf'
+        concatenate_pdfs(all_pdfs, output_path)
+        result_bytes = output_path.read_bytes()
+
+    message = f'Downloaded from PMC ({pmcid}.{version}) - {len(all_pdfs)} PDFs ({len(supplement_paths)} supplements)'
+    return result_bytes, message
 
 
 async def download_paper_async(
