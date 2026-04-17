@@ -7,8 +7,9 @@ import time
 
 import typer
 from groundmark.convert import Config, convert
+from groundmark.convert import ModelConfig as GroundmarkModelConfig
 
-from flowa.settings import Settings
+from flowa.settings import ModelConfig, Settings
 from flowa.storage import exists, paper_url, read_bytes, write_bytes, write_text
 
 log = logging.getLogger(__name__)
@@ -16,7 +17,7 @@ log = logging.getLogger(__name__)
 PAGES_PER_CHUNK = 10
 
 
-async def convert_paper_async(base: str, doi: str, model: str) -> None:
+async def convert_paper_async(base: str, doi: str, model: ModelConfig) -> None:
     """Convert a single paper's PDF to Markdown.
 
     Reads PDF from papers/{encoded_doi}/source.pdf in object storage.
@@ -35,9 +36,14 @@ async def convert_paper_async(base: str, doi: str, model: str) -> None:
         log.info('Skipping DOI %s: PDF not available', doi)
         return
 
-    log.info('Converting DOI %s (%d bytes, model: %s, chunk: %d pages)', doi, len(pdf_bytes), model, PAGES_PER_CHUNK)
+    log.info(
+        'Converting DOI %s (%d bytes, model: %s, chunk: %d pages)', doi, len(pdf_bytes), model.name, PAGES_PER_CHUNK
+    )
 
-    config = Config(model=model, page_count=PAGES_PER_CHUNK)
+    config = Config(
+        model=GroundmarkModelConfig(name=model.name, bedrock_inference_profile=model.bedrock_inference_profile),
+        page_count=PAGES_PER_CHUNK,
+    )
     t0 = time.monotonic()
     result = await convert(pdf_bytes, config)
     elapsed = time.monotonic() - t0

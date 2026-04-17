@@ -7,11 +7,11 @@ import time
 
 import typer
 from pydantic import BaseModel
-from pydantic_ai import Agent
+from pydantic_ai import Agent, NativeOutput
 
 from flowa.models import create_model, get_thinking_settings
 from flowa.prompts import load_prompt
-from flowa.settings import Settings
+from flowa.settings import ModelConfig, Settings
 from flowa.storage import assessment_url, encode_doi, exists, paper_url, read_json, read_text, write_bytes, write_json
 
 log = logging.getLogger(__name__)
@@ -34,15 +34,14 @@ def truncate_paper_text(full_text: str, doi: str) -> str:
 
 
 def create_extraction_agent(
-    model: str,
+    model: ModelConfig,
     output_type: type[BaseModel],
 ) -> Agent[None, BaseModel]:
     """Create a Pydantic AI agent for evidence extraction."""
     return Agent(
         create_model(model),
-        output_type=output_type,
+        output_type=NativeOutput(output_type),
         retries=3,
-        instructions='Always return your response by calling the final_result tool.',
         model_settings=get_thinking_settings(model, 'extraction'),
     )
 
@@ -51,7 +50,7 @@ async def extract_paper_async(
     base: str,
     variant_id: str,
     doi: str,
-    model: str,
+    model: ModelConfig,
     prompt_set: str = 'generic',
 ) -> None:
     """Extract evidence from a single paper via LLM."""
@@ -85,7 +84,7 @@ async def extract_paper_async(
 
     agent = create_extraction_agent(model, output_type)
 
-    log.info('Extracting %s (%d chars, model: %s)', doi, len(full_text), model)
+    log.info('Extracting %s (%d chars, model: %s)', doi, len(full_text), model.name)
     t0 = time.monotonic()
     result = await agent.run(prompt)
     elapsed = time.monotonic() - t0

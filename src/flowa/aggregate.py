@@ -11,13 +11,13 @@ import logfire
 import typer
 from groundmark import DocumentIndex
 from pydantic import BaseModel
-from pydantic_ai import Agent, ModelRetry, RunContext
+from pydantic_ai import Agent, ModelRetry, NativeOutput, RunContext
 
 from flowa.clinvar import format_clinvar_for_prompt, query_clinvar
 from flowa.models import create_model, get_thinking_settings
 from flowa.prompts import load_prompt
 from flowa.schema import AGGREGATE_SCHEMA_VERSION, with_schema_version
-from flowa.settings import Settings
+from flowa.settings import ModelConfig, Settings
 from flowa.storage import assessment_url, encode_doi, exists, paper_url, read_bytes, read_json, write_bytes, write_json
 
 log = logging.getLogger(__name__)
@@ -83,16 +83,15 @@ def generate_paper_ids(
 
 
 def create_aggregate_agent(
-    model: str,
+    model: ModelConfig,
     paper_id_to_doi: dict[str, str],
     output_type: type[BaseModel],
 ) -> Agent[None, BaseModel]:
     """Create a Pydantic AI agent with paper_id validation."""
     agent: Agent[None, BaseModel] = Agent(
         create_model(model),
-        output_type=output_type,
+        output_type=NativeOutput(output_type),
         retries=3,
-        instructions='Always return your response by calling the final_result tool.',
         model_settings=get_thinking_settings(model, 'aggregation'),
     )
 
@@ -199,7 +198,7 @@ def resolve_aggregate_citations(
 async def aggregate_evidence_async(
     base: str,
     variant_id: str,
-    model: str,
+    model: ModelConfig,
     ncbi_api_key: str | None = None,
     prompt_set: str = 'generic',
     dry_run: bool = False,
@@ -267,7 +266,7 @@ async def aggregate_evidence_async(
     log.info(
         'Aggregating evidence from %d papers + ClinVar (model: %s)',
         len(evidence_extractions),
-        model,
+        model.name,
     )
 
     # Load prompt and schema from prompt set

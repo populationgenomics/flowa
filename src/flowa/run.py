@@ -12,7 +12,7 @@ from flowa.convert import convert_paper_async
 from flowa.download import download_paper_async
 from flowa.extract import extract_paper_async
 from flowa.query import query_dois_async
-from flowa.settings import Settings
+from flowa.settings import ModelConfig, Settings
 
 log = logging.getLogger(__name__)
 
@@ -25,8 +25,8 @@ async def process_paper(
     base: str,
     variant_id: str,
     doi: str,
-    convert_model: str,
-    extraction_model: str,
+    convert_model: ModelConfig,
+    extraction_model: ModelConfig,
     prompt_set: str,
     download_semaphore: asyncio.Semaphore,
     convert_semaphore: asyncio.Semaphore,

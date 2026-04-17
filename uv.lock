@@ -3,11 +3,11 @@ revision = 3
 requires-python = "==3.13.*"
 
 [options]
-exclude-newer = "2026-04-09T01:35:10.798412Z"
+exclude-newer = "2026-04-10T01:35:07.980531Z"
 exclude-newer-span = "P7D"
 
 [options.exclude-newer-package]
-groundmark = "3000-01-01T13:00:00Z"
+groundmark = { timestamp = "2026-04-17T01:35:07.980455Z", span = "PT0S" }
 
 [[package]]
 name = "aiobotocore"
@@ -444,10 +444,10 @@ requires-dist = [
     { name = "defusedxml" },
     { name = "fsspec" },
     { name = "gcsfs" },
-    { name = "groundmark", extras = ["anthropic"], marker = "extra == 'anthropic'" },
-    { name = "groundmark", extras = ["bedrock"], marker = "extra == 'bedrock'" },
-    { name = "groundmark", extras = ["google"], marker = "extra == 'google'" },
-    { name = "groundmark", extras = ["openai"], marker = "extra == 'openai'" },
+    { name = "groundmark", extras = ["anthropic"], marker = "extra == 'anthropic'", specifier = ">=0.5.0" },
+    { name = "groundmark", extras = ["bedrock"], marker = "extra == 'bedrock'", specifier = ">=0.5.0" },
+    { name = "groundmark", extras = ["google"], marker = "extra == 'google'", specifier = ">=0.5.0" },
+    { name = "groundmark", extras = ["openai"], marker = "extra == 'openai'", specifier = ">=0.5.0" },
     { name = "httpx" },
     { name = "logfire" },
     { name = "pydantic-settings" },
@@ -724,16 +724,16 @@ wheels = [
 
 [[package]]
 name = "groundmark"
-version = "0.4.0"
+version = "0.5.1"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "pypdf" },
     { name = "pypdfium2" },
     { name = "seq-smith" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/3f/c8/702254fc475b2b5ccdbefa72096828831904dbb0c5590ffc1d40a5739706/groundmark-0.4.0.tar.gz", hash = "sha256:fd7c4a2862d658221463db8f95148905342dc3bcba563945170f681c607f45e3", size = 200221, upload-time = "2026-04-10T14:14:17.46Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/97/32/5d09cf14d677ce54329e033096dabefe07be18dc447346c0413fe12f3068/groundmark-0.5.1.tar.gz", hash = "sha256:338ed11e8dc39a17e0bf2db6f864c73130449c44e1b465a950d1ca1d45787366", size = 212031, upload-time = "2026-04-17T01:31:35.002Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/8a/4d/f3998a7821fceba524ec346b17fa2751b45ab74e7b1c9a1370165268ec50/groundmark-0.4.0-py3-none-any.whl", hash = "sha256:34b6a527d7c31595eaa7b677f27f0f967c5f74b81fc0fb83d7b42e8033ce5f51", size = 13587, upload-time = "2026-04-10T14:14:15.962Z" },
+    { url = "https://files.pythonhosted.org/packages/ad/eb/312810cfed4f16b1b054e58c65b517a2de45c0d17e72384e55aceec9ea56/groundmark-0.5.1-py3-none-any.whl", hash = "sha256:7ddb8ee769ccd6940b17ba5ea61697d48bd55628f6f2689ea0330714817b2194", size = 14005, upload-time = "2026-04-17T01:31:33.846Z" },
 ]
 
 [package.optional-dependencies]

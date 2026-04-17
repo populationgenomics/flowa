@@ -20,10 +20,29 @@ dependencies = [
 ]
 
 [project.optional-dependencies]
-anthropic = ["groundmark[anthropic]"]
-bedrock = ["groundmark[bedrock]"]
-google = ["groundmark[google]"]
-openai = ["groundmark[openai]"]
+# Require >=0.5.0 for `groundmark.convert.ModelConfig` (used by `flowa/convert.py`
+# to plumb Bedrock cost-attribution ARNs separately from the model name).
+anthropic = ["groundmark[anthropic]>=0.5.0"]
+bedrock = ["groundmark[bedrock]>=0.5.0"]
+google = ["groundmark[google]>=0.5.0"]
+openai = ["groundmark[openai]>=0.5.0"]
+
+# Bypass the global 7-day release-age gate for groundmark — we own the package
+# and need to consume newly-cut versions immediately. Drop this entry once the
+# pinned version is older than 7 days on PyPI.
+[tool.uv]
+exclude-newer-package = { groundmark = "0 days" }
+
+# Pin pydantic-ai-slim to a fork of v1.83.0 with PR #4237 cherry-picked on top.
+# PR #4237 adds Bedrock native structured output (`NativeOutput`) and strict tool
+# calls, which enable constrained JSON sampling and eliminate retry loops on
+# malformed `final_result` tool args. Fork branch: `v1.83.0+bedrock-strict` on
+# https://github.com/lgruen-vcgs/pydantic-ai (rebased from
+# https://github.com/shailendher/pydantic-ai/tree/feat/bedrock-native-output-support).
+# Switch back to the upstream release once #4237 lands and is published to PyPI.
+# Mirrors the same pin in ~/groundmark/pyproject.toml.
+[tool.uv.sources]
+pydantic-ai-slim = { git = "https://github.com/lgruen-vcgs/pydantic-ai", rev = "c908946f71cfafd1be18ade8d9cd1296fb6a5558", subdirectory = "pydantic_ai_slim" }
 
 [dependency-groups]
 dev = [
