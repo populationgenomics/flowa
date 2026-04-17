@@ -95,8 +95,8 @@ Schema modules must define Pydantic models with specific fields that Flowa's val
 
 **aggregate_schema.py** must define `AggregateResult` with:
 
-- `results[category].citations[].paper_id` (str) — paper identifier
-- `results[category].citations[].quote` (str) — verbatim quote resolved to PDF bounding boxes
+- `results[].citations[].paper_id` (str) — paper identifier
+- `results[].citations[].quote` (str) — verbatim quote resolved to PDF bounding boxes
 
 All other fields can be customized freely. See `prompts/generic/` for the default implementation.
 

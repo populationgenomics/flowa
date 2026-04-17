@@ -4,7 +4,7 @@ This module defines the output structure for aggregate assessment across papers.
 The AggregateResult class is loaded dynamically by Flowa.
 
 Interface requirements (accessed by Flowa's validation logic):
-    - results[category].citations[].paper_id and .quote must exist for validation
+    - results[].citations[].paper_id and .quote must exist for validation
 """
 
 from pydantic import BaseModel, Field
@@ -21,6 +21,7 @@ class AggregateCitation(BaseModel):
 class CategoryResult(BaseModel):
     """Result for a single assessment category."""
 
+    category: str = Field(description='Assessment category identifier (e.g., "acmg_classification")')
     classification: str = Field(
         description='ACMG classification: Pathogenic, Likely Pathogenic, VUS, Likely Benign, or Benign'
     )
@@ -40,11 +41,9 @@ class CategoryResult(BaseModel):
 
 
 class AggregateResult(BaseModel):
-    """Multi-category aggregate result for ACMG-style variant assessment.
+    """Multi-category aggregate result for ACMG-style variant assessment."""
 
-    Keys are assessment category identifiers (e.g., 'acmg_classification').
-    """
-
-    results: dict[str, CategoryResult] = Field(
-        description='Map from category identifier to the assessment result for that category'
+    results: list[CategoryResult] = Field(
+        description='List of assessment results, one per selected category. '
+        'Each entry carries its own `category` identifier.'
     )

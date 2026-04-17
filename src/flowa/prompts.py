@@ -14,7 +14,7 @@ Each prompt set must contain:
 
 Schema interface requirements (accessed by Flowa's validation logic):
     - ExtractionResult.evidence[].citations[].quote
-    - AggregateResult.results[category].citations[].paper_id and .quote
+    - AggregateResult.results[].citations[].paper_id and .quote
 """
 
 import importlib.util

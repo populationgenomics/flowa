@@ -100,7 +100,7 @@ def create_aggregate_agent(
         """Validate that all cited paper_ids exist in the input papers."""
         invalid = []
 
-        for cat_result in result.results.values():  # type: ignore[attr-defined]
+        for cat_result in result.results:  # type: ignore[attr-defined]
             for citation in cat_result.citations:
                 if citation.paper_id not in paper_id_to_doi:
                     invalid.append(f'paper_id={citation.paper_id} (not in input papers)')
@@ -127,7 +127,7 @@ def resolve_aggregate_citations(
     """
     # Collect all (doi, quote) pairs to resolve, grouped by DOI.
     doi_quotes: dict[str, list[str]] = {}
-    for cat_result in aggregate_dict['results'].values():
+    for cat_result in aggregate_dict['results']:
         for citation in cat_result['citations']:
             doi = paper_id_to_doi[citation['paper_id']]
             doi_quotes.setdefault(doi, []).append(citation['quote'])
@@ -168,7 +168,7 @@ def resolve_aggregate_citations(
     )
 
     # Enrich citations with DOI and resolved bboxes.
-    for cat_result in aggregate_dict['results'].values():
+    for cat_result in aggregate_dict['results']:
         for citation in cat_result['citations']:
             doi = paper_id_to_doi[citation.pop('paper_id')]
             citation['doi'] = doi
@@ -252,7 +252,7 @@ async def aggregate_evidence_async(
 
     if not evidence_extractions and not clinvar_data.get('found'):
         log.warning('No papers or ClinVar data for this variant - writing empty aggregate')
-        write_json(aggregate_url, with_schema_version({'results': {}}, AGGREGATE_SCHEMA_VERSION))
+        write_json(aggregate_url, with_schema_version({'results': []}, AGGREGATE_SCHEMA_VERSION))
         return
 
     # Generate paper_ids and replace DOIs with human-readable IDs for the LLM
@@ -309,12 +309,12 @@ async def aggregate_evidence_async(
     # Store raw LLM conversation for debugging
     write_bytes(aggregate_raw_url, result.all_messages_json())
 
-    results_map = result.output.results  # type: ignore[attr-defined]
-    total_citations = sum(len(cat_result.citations) for cat_result in results_map.values())
+    results_list = result.output.results  # type: ignore[attr-defined]
+    total_citations = sum(len(cat_result.citations) for cat_result in results_list)
     log.info(
         'Aggregated variant %s: %d categories, %d citations',
         variant_id,
-        len(results_map),
+        len(results_list),
         total_citations,
     )
 
