@@ -1,5 +1,9 @@
 FROM ghcr.io/astral-sh/uv:python3.13-trixie-slim
 
+# Required for git-sourced deps in pyproject.toml/uv.lock (currently the
+# pydantic-ai-slim fork pin). Drop once all deps come from a registry.
+RUN apt-get update && apt-get install -y --no-install-recommends git && rm -rf /var/lib/apt/lists/*
+
 # Support for custom build steps
 COPY README* *build.d /build.d/
 RUN bash -c 'for i in $(ls /build.d/*.sh 2>/dev/null | sort) ; do source $i ; done'
