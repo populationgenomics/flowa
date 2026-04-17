@@ -22,10 +22,13 @@ dependencies = [
 [project.optional-dependencies]
 # Require >=0.5.0 for `groundmark.convert.ModelConfig` (used by `flowa/convert.py`
 # to plumb Bedrock cost-attribution ARNs separately from the model name).
-anthropic = ["groundmark[anthropic]>=0.5.0"]
-bedrock = ["groundmark[bedrock]>=0.5.0"]
-google = ["groundmark[google]>=0.5.0"]
-openai = ["groundmark[openai]>=0.5.0"]
+# pydantic-ai-slim is also listed as a direct dep so the [tool.uv.sources] git
+# pin below actually applies — without that, it'd be transitive-only via
+# groundmark and uv would silently fall back to the PyPI version.
+anthropic = ["groundmark[anthropic]>=0.5.0", "pydantic-ai-slim[anthropic]"]
+bedrock = ["groundmark[bedrock]>=0.5.0", "pydantic-ai-slim[bedrock]"]
+google = ["groundmark[google]>=0.5.0", "pydantic-ai-slim[google]"]
+openai = ["groundmark[openai]>=0.5.0", "pydantic-ai-slim[openai]"]
 
 # Bypass the global 7-day release-age gate for groundmark — we own the package
 # and need to consume newly-cut versions immediately. Drop this entry once the
