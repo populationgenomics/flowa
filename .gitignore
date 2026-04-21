@@ -11,6 +11,10 @@ __pycache__/
 CLAUDE.md
 specs/
 
+# Only the public generic prompt set is tracked.
+prompts/*/
+!prompts/generic/
+
 # C extensions
 *.so
 

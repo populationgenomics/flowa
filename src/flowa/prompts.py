@@ -13,8 +13,9 @@ Each prompt set must contain:
     - aggregate_schema.py    (must define AggregateResult model)
 
 Schema interface requirements (accessed by Flowa's validation logic):
-    - ExtractionResult.evidence[].citations[].quote
-    - AggregateResult.results[].citations[].paper_id and .quote
+    - ExtractionResult.claims[].citations[].quote
+    - AggregateResult.results[].papers[].paper_id
+    - AggregateResult.results[].claims[].paper_id and .citations[].quote
 """
 
 import importlib.util

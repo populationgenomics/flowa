@@ -1,5 +1,7 @@
 You are a clinical genetics expert evaluating a research paper for evidence about a SPECIFIC VARIANT to support ACMG-based variant classification for rare disease diagnosis.
 
+This task involves multi-step reasoning. Think carefully before responding.
+
 CRITICAL: This task is VARIANT-SPECIFIC. You are ONLY looking for evidence about the EXACT variant provided below. If this paper does not discuss this specific variant, return a result indicating no relevant evidence was found. This is a perfectly valid and expected outcome for most papers.
 
 VARIANT QUERY (from Mutalyzer/VariantValidator):
@@ -18,20 +20,53 @@ Extract ALL evidence from this paper about the specific variant listed above. Fo
 9. Functional evidence specific to this variant
 10. Phasing information (cis/trans relationships with other variants)
 
-CITATION REQUIREMENTS:
-For each piece of evidence extracted, you MUST provide a verbatim quote from the paper text that captures the supporting evidence. For each citation:
+CLAIM AND CITATION REQUIREMENTS:
+Output each factual statement as a CLAIM. Each claim has:
+- `text`: the factual statement, written as the curator will read it during triage (a single sentence is ideal).
+- `citations`: one or more verbatim quotes from the paper that support the claim.
+
+For each citation quote:
 - Quote the relevant passage verbatim — enough context to validate the claim (typically a sentence or key clause). The quote will be highlighted in the PDF for curators to review.
 - The quote MUST appear verbatim in the paper text. Do not paraphrase or summarize.
 - Quotes must be at least 30 characters long. Avoid quoting isolated values, single cells, or short fragments — include surrounding context (e.g. a full sentence or full table row).
-- Include brief commentary explaining what this specific text demonstrates
 
-Example citation format:
-"citations": [
-  {{"quote": "The p.Arg123Trp variant was classified as pathogenic based on segregation in five unrelated families with consistent phenotype", "commentary": "Variant found in 5 unrelated families, classified as pathogenic"}},
-  {{"quote": "Two compound heterozygous patients presented with childhood-onset dilated cardiomyopathy (LVEF 20-25%) and metabolic acidosis", "commentary": "Two compound heterozygous patients with childhood-onset phenotype"}}
+CLAIM GRANULARITY:
+
+A claim is anchored by its supporting passage. The passage — one sentence, one full table row, one figure caption — is what grounds the claim; `text` is a one-line synthesis of what that passage says about the variant.
+
+HARD RULE: No two claims may cite the same quote. If two candidate claims would cite the same passage, they are the same claim — merge them into one whose `text` synthesises both facts.
+
+When a single passage establishes multiple facts about the variant — e.g. a patient row with sex, onset age, zygosity, and de novo status — emit ONE claim. Synthesise the facts into the claim's `text`; cite the full passage ONCE. Do NOT split a row into a claim per column.
+
+Emit SEPARATE claims only when the facts come from DIFFERENT passages (e.g. patient row in Table 1 + cohort-level statistics in the text + segregation figure — three claims, three distinct quotes).
+
+Use multiple citations on a single claim ONLY when several quotes jointly establish one synthesis fact (e.g. pedigree figure + patient identification + measurement value together establishing segregation).
+
+Counter-example — patient-row "31 | M | 28 | 10 | Syncope | 14174a>g | Y4725C | CT | Trio | de novo | none | none":
+
+  WRONG (row split across claims with the same quote):
+    {{"text": "Patient 31 is male", "citations": [{{"quote": "31 | M | 28 | 10 | ..."}}]}}
+    {{"text": "Patient 31 had onset age 10", "citations": [{{"quote": "31 | M | 28 | 10 | ..."}}]}}
+    {{"text": "Patient 31 was confirmed de novo", "citations": [{{"quote": "31 | M | 28 | 10 | ..."}}]}}
+
+  RIGHT (one claim per passage, row cited once):
+    {{"text": "Patient 31 (male, onset age 10, syncope, age 28 at analysis) carries the variant in the C-terminal domain, confirmed de novo by trio testing with both parents phenotypically unaffected.", "citations": [{{"quote": "31 | M | 28 | 10 | Syncope | 14174a>g | Y4725C | CT | Trio | de novo | none | none"}}]}}
+
+Example claim format:
+"claims": [
+  {{
+    "text": "The p.Arg123Trp variant was classified as pathogenic based on segregation in five unrelated families with consistent phenotype.",
+    "citations": [
+      {{"quote": "The p.Arg123Trp variant was classified as pathogenic based on segregation in five unrelated families with consistent phenotype"}}
+    ]
+  }},
+  {{
+    "text": "Two compound heterozygous patients presented with childhood-onset dilated cardiomyopathy (LVEF 20-25%) and metabolic acidosis.",
+    "citations": [
+      {{"quote": "Two compound heterozygous patients presented with childhood-onset dilated cardiomyopathy (LVEF 20-25%) and metabolic acidosis"}}
+    ]
+  }}
 ]
-
-NOTE: The commentary should state what the cited text demonstrates, not just describe the section. This helps curators quickly validate that the highlighted text actually supports the claim.
 
 VARIANT MATCHING GUIDELINES:
 You are provided with multiple representations of the SAME variant (genomic, transcript, protein coordinates). Consider it a MATCH if the paper describes the variant using ANY of these notations, allowing for:
@@ -61,7 +96,7 @@ EVIDENCE CATEGORIES TO EXTRACT:
 - Star rating for ClinVar entries if mentioned
 - Basis for classification: What evidence does the paper cite to support its classification? Distinguish between classifications supported by in-silico predictions alone vs. those supported by functional assays, segregation data, de novo occurrence, or other direct evidence. This distinction is critical for downstream assessment.
 
-**3. CASE COUNT EVIDENCE (CRITICAL for code selection)**
+**3. CASE COUNT EVIDENCE (CRITICAL for classification)**
 - TOTAL number of cases/individuals with this variant
 - Number of UNRELATED families/cases (must be explicitly stated or clearly inferable)
 - Number of de novo cases (for dominant conditions)
@@ -126,36 +161,6 @@ Age of onset is essential for determining clinical urgency and screening relevan
 - Cases with alternative explanations for phenotype despite carrying this variant
 - Implications for pathogenicity assessment
 
-UNDERSTANDING THE ACMG CLASSIFICATION CONTEXT:
-You are extracting evidence that will be used to assign ACMG classifications from the "Previous Reports" category. Here are the classification criteria to help you understand what evidence is most relevant:
-
-**PATHOGENIC:**
-- Variant has previously been classified by experts OR has been classified as pathogenic/likely pathogenic in ≥2 *de novo* UNRELATED cases or ≥5 UNRELATED cases in recessive or inherited conditions, or without allelic information
-- Strong evidence if n ≥5 *de novo* UNRELATED cases or ≥10 UNRELATED cases
-- NOTE: Can apply if, for example, an expert panel is known to have considered extensive additional information (i.e. ClinVar 3+ stars variant)
-- CAUTION with variants that are high frequency in the population and where therefore, individual observations could be observed by chance or appear *de novo* due to factors such as non-paternity
-- CAUTION if variant disease association is not related to patient's phenotype as this could be an incidental finding
-
-**LIKELY PATHOGENIC:**
-- Variant has previously been described as pathogenic in 1 *de novo* UNRELATED case or ≥3 and <5 UNRELATED cases in recessive or inherited conditions, or without allelic information
-- OR variant has previously been described as pathogenic in ≤2 UNRELATED cases in recessive or inherited conditions, or without allelic information
-- CAUTION with variants that are high frequency in the population
-- CAUTION if variant disease association is not related to patient's phenotype
-
-**VUS (VARIANT OF UNCERTAIN SIGNIFICANCE):**
-- Variant has not previously been described in clinical databases or literature
-- OR variant has previously been described with conflicting classifications in clinical databases or literature
-- OR variant has previously been described with inconclusive classifications (e.g. VUS that is present in the population)
-- OR variant must be absent in gnomAD but described in ≥3 additional UNRELATED cases with consistent phenotype (only for rare disorders, only count if individual has signs or symptoms consistent with disease caused by this gene)
-
-**LIKELY BENIGN:**
-- Variant has previously been described as benign in databases or literature in <3 UNRELATED cases
-- Variant has been seen in cis with an alternative pathogenic variant or in a case with an alternative explanation for a consistent phenotype
-
-**BENIGN:**
-- Variant has previously been classified by experts OR has been classified as benign in ≥3 UNRELATED cases
-- NOTE: Can apply if expert panel is known to have considered extensive additional information
-
 IMPORTANT EXTRACTION PRINCIPLES:
 - Focus on UNRELATED families/cases - this is the primary metric for classification
 - Clearly distinguish between family-level counts and individual-level counts
@@ -167,16 +172,15 @@ IMPORTANT EXTRACTION PRINCIPLES:
 - Prioritize direct evidence from this paper over citations to other papers (but note prior reports)
 - For compound heterozygous cases, identify them clearly and note the second variant if provided
 
-RESPONSE FORMAT:
+EXTRACTION GUIDELINES:
 
-Extract evidence as a list of factual findings. Each finding MUST include citations with verbatim quotes from the paper text.
+Extract evidence as a list of CLAIMS. Each claim MUST include at least one citation with a verbatim quote from the paper text.
 
-Guidelines:
-- Be precise and factual - extract what the paper states, don't infer
-- Each finding should be atomic (one specific claim)
+- Be precise and factual — extract what the paper states, don't infer
 - Focus on quantitative data (counts, frequencies, classifications)
-- Include ALL relevant findings, even if they seem contradictory
-- Every finding MUST have at least one citation with a verbatim quote
+- Include ALL relevant claims, even if they seem contradictory
+- Every claim MUST have at least one citation with a verbatim quote
+- Within a paper, the quotes used across claims MUST be distinguishable (no two claims share the same quote)
 
 PAPER TO EVALUATE:
 

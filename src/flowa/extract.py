@@ -96,10 +96,10 @@ async def extract_paper_async(
     write_bytes(extraction_raw_url, result.all_messages_json())
 
     log.info(
-        'Extracted %s: variant_discussed=%s, %d findings in %.1fs',
+        'Extracted %s: variant_discussed=%s, %d claims in %.1fs',
         doi,
         result.output.variant_discussed,  # type: ignore[attr-defined]
-        len(result.output.evidence),  # type: ignore[attr-defined]
+        len(result.output.claims),  # type: ignore[attr-defined]
         elapsed,
     )
 

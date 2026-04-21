@@ -96,17 +96,34 @@ def create_aggregate_agent(
     )
 
     @agent.output_validator
-    def validate_citations(ctx: RunContext[None], result: BaseModel) -> BaseModel:
-        """Validate that all cited paper_ids exist in the input papers."""
-        invalid = []
+    def validate_shape(ctx: RunContext[None], result: BaseModel) -> BaseModel:
+        """Shape-only validation: paper_id membership + group integrity.
+
+        Semantic cross-field checks (citation fidelity, grouping order) live in
+        chat-service — every artifact mutation flows through it, so the rules
+        stay authored in one place.
+        """
+        errors: list[str] = []
 
         for cat_result in result.results:  # type: ignore[attr-defined]
-            for citation in cat_result.citations:
-                if citation.paper_id not in paper_id_to_doi:
-                    invalid.append(f'paper_id={citation.paper_id} (not in input papers)')
+            code = getattr(cat_result, 'code', '<unknown>')
+            paper_ids_in_papers = [p.paper_id for p in cat_result.papers]
+            paper_ids_set = set(paper_ids_in_papers)
 
-        if invalid:
-            raise ModelRetry(f'Invalid citations: {"; ".join(invalid)}')
+            if len(paper_ids_in_papers) != len(paper_ids_set):
+                duplicates = [pid for pid in paper_ids_set if paper_ids_in_papers.count(pid) > 1]
+                errors.append(f'code={code}: papers[] has duplicate paper_ids: {sorted(duplicates)}')
+
+            for paper in cat_result.papers:
+                if paper.paper_id not in paper_id_to_doi:
+                    errors.append(f'code={code}: papers[] has unknown paper_id={paper.paper_id}')
+
+            for claim in cat_result.claims:
+                if claim.paper_id not in paper_ids_set:
+                    errors.append(f'code={code}: claim cites paper_id={claim.paper_id} not present in papers[]')
+
+        if errors:
+            raise ModelRetry('Invalid aggregate output: ' + '; '.join(errors))
 
         return result
 
@@ -119,18 +136,19 @@ def resolve_aggregate_citations(
     pdf_bytes_cache: dict[str, bytes],
     metadata_cache: dict[str, dict[str, Any]],
 ) -> None:
-    """Post-process aggregate output: resolve quotes to bboxes, enrich with DOI.
+    """Post-process aggregate output: resolve quotes to bboxes on claim citations.
 
-    Citations whose quotes cannot be resolved get an empty bboxes list —
-    the frontend should handle this gracefully (e.g. link to the paper
-    without a highlight).
+    Claims are grouped by paper_id so every (paper_id, quote) pair resolves to
+    exactly one paper. Quotes that cannot be resolved get an empty bboxes list —
+    the frontend handles missing highlights gracefully.
     """
     # Collect all (doi, quote) pairs to resolve, grouped by DOI.
     doi_quotes: dict[str, list[str]] = {}
     for cat_result in aggregate_dict['results']:
-        for citation in cat_result['citations']:
-            doi = paper_id_to_doi[citation['paper_id']]
-            doi_quotes.setdefault(doi, []).append(citation['quote'])
+        for claim in cat_result['claims']:
+            doi = paper_id_to_doi[claim['paper_id']]
+            for citation in claim['citations']:
+                doi_quotes.setdefault(doi, []).append(citation['quote'])
 
     # Build DocumentIndex per cited paper and batch-resolve all quotes.
     doi_resolved: dict[str, dict[str, list[tuple[int, Any]]]] = {}
@@ -167,26 +185,26 @@ def resolve_aggregate_citations(
         total_resolve_elapsed,
     )
 
-    # Enrich citations with DOI and resolved bboxes.
+    # Attach resolved bboxes onto each claim's citations.
     for cat_result in aggregate_dict['results']:
-        for citation in cat_result['citations']:
-            doi = paper_id_to_doi[citation.pop('paper_id')]
-            citation['doi'] = doi
-            quote = citation['quote']
-            bboxes = []
-            for page, bbox in doi_resolved.get(doi, {}).get(quote, []):
-                bboxes.append(
-                    {
-                        'page': page,
-                        'top': bbox.top,
-                        'left': bbox.left,
-                        'bottom': bbox.bottom,
-                        'right': bbox.right,
-                    }
-                )
-            citation['bboxes'] = bboxes
-            if not bboxes:
-                log.warning('No bboxes resolved for %s quote: %.80s...', doi, quote)
+        for claim in cat_result['claims']:
+            doi = paper_id_to_doi[claim['paper_id']]
+            for citation in claim['citations']:
+                quote = citation['quote']
+                bboxes = []
+                for page, bbox in doi_resolved.get(doi, {}).get(quote, []):
+                    bboxes.append(
+                        {
+                            'page': page,
+                            'top': bbox.top,
+                            'left': bbox.left,
+                            'bottom': bbox.bottom,
+                            'right': bbox.right,
+                        }
+                    )
+                citation['bboxes'] = bboxes
+                if not bboxes:
+                    log.warning('No bboxes resolved for %s quote: %.80s...', doi, quote)
 
     # Add paper_id_mapping: {AuthorYear -> {doi, pmid}} for cross-referencing
     # prose citations with papers. Consumers build the reverse index on read.
@@ -239,12 +257,26 @@ async def aggregate_evidence_async(
         metadata = read_json(paper_url(base, doi, 'metadata.json'))
         metadata_cache[doi] = metadata
 
+        # Support both new-shape ('claims') and legacy ('evidence') extractions for
+        # backfill convenience — the schema renamed EvidenceFinding -> Claim and
+        # dropped commentary, but we still want to consume older extraction JSON.
+        claims = extraction_data.get('claims')
+        if claims is None:
+            legacy = extraction_data.get('evidence', [])
+            claims = [
+                {
+                    'text': item.get('finding', ''),
+                    'citations': [{'quote': c['quote']} for c in item.get('citations', [])],
+                }
+                for item in legacy
+            ]
+
         entry: dict[str, Any] = {
             'doi': doi,
             'title': metadata['title'],
             'authors': metadata['authors'],
             'date': metadata['date'],
-            'evidence': extraction_data['evidence'],
+            'claims': claims,
         }
         if metadata.get('pmid'):
             entry['pmid'] = metadata['pmid']
@@ -310,12 +342,14 @@ async def aggregate_evidence_async(
     write_bytes(aggregate_raw_url, result.all_messages_json())
 
     results_list = result.output.results  # type: ignore[attr-defined]
-    total_citations = sum(len(cat_result.citations) for cat_result in results_list)
+    total_claims = sum(len(cat_result.claims) for cat_result in results_list)
+    total_papers = sum(len(cat_result.papers) for cat_result in results_list)
     log.info(
-        'Aggregated variant %s: %d categories, %d citations',
+        'Aggregated variant %s: %d categories, %d claims across %d papers',
         variant_id,
         len(results_list),
-        total_citations,
+        total_claims,
+        total_papers,
     )
 
 
