@@ -82,6 +82,15 @@ def generate_paper_ids(
     return paper_id_to_doi, doi_to_paper_id
 
 
+# One counter per rule label — lets us see how often aggregation's LLM
+# produces shape-invalid output and which rule it trips on. Logfire is
+# configured in cli.py; when it isn't (tests), the counter is a no-op.
+_aggregate_retry_counter = logfire.metric_counter(
+    'flowa_aggregate_validation_errors_total',
+    description='Shape-validation rule violations found by the aggregate output_validator',
+)
+
+
 def create_aggregate_agent(
     model: ModelConfig,
     paper_id_to_doi: dict[str, str],
@@ -113,14 +122,17 @@ def create_aggregate_agent(
             if len(paper_ids_in_papers) != len(paper_ids_set):
                 duplicates = [pid for pid in paper_ids_set if paper_ids_in_papers.count(pid) > 1]
                 errors.append(f'code={code}: papers[] has duplicate paper_ids: {sorted(duplicates)}')
+                _aggregate_retry_counter.add(1, {'rule': 'paper_id_duplicate'})
 
             for paper in cat_result.papers:
                 if paper.paper_id not in paper_id_to_doi:
                     errors.append(f'code={code}: papers[] has unknown paper_id={paper.paper_id}')
+                    _aggregate_retry_counter.add(1, {'rule': 'paper_id_unknown'})
 
             for claim in cat_result.claims:
                 if claim.paper_id not in paper_ids_set:
                     errors.append(f'code={code}: claim cites paper_id={claim.paper_id} not present in papers[]')
+                    _aggregate_retry_counter.add(1, {'rule': 'claim_paper_missing'})
 
         if errors:
             raise ModelRetry('Invalid aggregate output: ' + '; '.join(errors))
