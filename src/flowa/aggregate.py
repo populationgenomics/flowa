@@ -340,7 +340,9 @@ async def aggregate_evidence_async(
     agent = create_aggregate_agent(model, paper_id_to_doi, output_type)
 
     log.info('Calling LLM for aggregate assessment')
+    t0 = time.monotonic()
     result = await agent.run(prompt)
+    elapsed = time.monotonic() - t0
 
     # Post-LLM: resolve quotes to bboxes, replace paper_id with DOI
     aggregate_dict = result.output.model_dump()
@@ -357,11 +359,12 @@ async def aggregate_evidence_async(
     total_claims = sum(len(cat_result.claims) for cat_result in results_list)
     total_papers = sum(len(cat_result.papers) for cat_result in results_list)
     log.info(
-        'Aggregated variant %s: %d categories, %d claims across %d papers',
+        'Aggregated variant %s: %d categories, %d claims across %d papers in %.1fs',
         variant_id,
         len(results_list),
         total_claims,
         total_papers,
+        elapsed,
     )
 
 
