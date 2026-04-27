@@ -23,6 +23,26 @@ Your task is to:
 6. **RANK PAPERS**: Order papers by contribution to the synthesis (first = most important), with a one-sentence rank rationale
 7. **EMIT CLAIMS**: Produce the curator-facing triage list — the factual claims supporting your synthesis, grouped by paper and ordered by importance within each paper
 
+EMPTY-EVIDENCE SHORTCUT:
+
+If neither ClinVar evidence nor paper evidence is provided, return exactly this output:
+
+```json
+{
+  "results": [
+    {
+      "category": "acmg_classification",
+      "classification": "VUS",
+      "classification_rationale": "No previous reports of this variant were found in ClinVar or in the literature corpus queried for this run.",
+      "description": "This variant has no previous evidence of pathogenicity.",
+      "notes": "No previous reports of this variant were found in ClinVar or in the literature corpus queried for this run.",
+      "papers": [],
+      "claims": []
+    }
+  ]
+}
+```
+
 CRITICAL AGGREGATION PRINCIPLES:
 
 **Avoiding Double-Counting:**

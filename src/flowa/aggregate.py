@@ -294,11 +294,6 @@ async def aggregate_evidence_async(
             entry['pmid'] = metadata['pmid']
         evidence_extractions.append(entry)
 
-    if not evidence_extractions and not clinvar_data.get('found'):
-        log.warning('No papers or ClinVar data for this variant - writing empty aggregate')
-        write_json(aggregate_url, with_schema_version({'results': []}, AGGREGATE_SCHEMA_VERSION))
-        return
-
     # Generate paper_ids and replace DOIs with human-readable IDs for the LLM
     paper_id_to_doi: dict[str, str] = {}
     if evidence_extractions:
