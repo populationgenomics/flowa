@@ -5,7 +5,7 @@ This task involves multi-step reasoning. Think carefully before responding.
 CRITICAL: This task is VARIANT-SPECIFIC. You are ONLY looking for evidence about the EXACT variant provided below. If this paper does not discuss this specific variant, return a result indicating no relevant evidence was found. This is a perfectly valid and expected outcome for most papers.
 
 VARIANT QUERY (from Mutalyzer/VariantValidator):
-{variant_details}
+{{ variant_details }}
 
 TASK OVERVIEW:
 Extract ALL evidence from this paper about the specific variant listed above. Focus on:
@@ -45,27 +45,27 @@ Use multiple citations on a single claim ONLY when several quotes jointly establ
 Counter-example — patient-row "31 | M | 28 | 10 | Syncope | 14174a>g | Y4725C | CT | Trio | de novo | none | none":
 
   WRONG (row split across claims with the same quote):
-    {{"text": "Patient 31 is male", "citations": [{{"quote": "31 | M | 28 | 10 | ..."}}]}}
-    {{"text": "Patient 31 had onset age 10", "citations": [{{"quote": "31 | M | 28 | 10 | ..."}}]}}
-    {{"text": "Patient 31 was confirmed de novo", "citations": [{{"quote": "31 | M | 28 | 10 | ..."}}]}}
+    {"text": "Patient 31 is male", "citations": [{"quote": "31 | M | 28 | 10 | ..."}]}
+    {"text": "Patient 31 had onset age 10", "citations": [{"quote": "31 | M | 28 | 10 | ..."}]}
+    {"text": "Patient 31 was confirmed de novo", "citations": [{"quote": "31 | M | 28 | 10 | ..."}]}
 
   RIGHT (one claim per passage, row cited once):
-    {{"text": "Patient 31 (male, onset age 10, syncope, age 28 at analysis) carries the variant in the C-terminal domain, confirmed de novo by trio testing with both parents phenotypically unaffected.", "citations": [{{"quote": "31 | M | 28 | 10 | Syncope | 14174a>g | Y4725C | CT | Trio | de novo | none | none"}}]}}
+    {"text": "Patient 31 (male, onset age 10, syncope, age 28 at analysis) carries the variant in the C-terminal domain, confirmed de novo by trio testing with both parents phenotypically unaffected.", "citations": [{"quote": "31 | M | 28 | 10 | Syncope | 14174a>g | Y4725C | CT | Trio | de novo | none | none"}]}
 
 Example claim format:
 "claims": [
-  {{
+  {
     "text": "The p.Arg123Trp variant was classified as pathogenic based on segregation in five unrelated families with consistent phenotype.",
     "citations": [
-      {{"quote": "The p.Arg123Trp variant was classified as pathogenic based on segregation in five unrelated families with consistent phenotype"}}
+      {"quote": "The p.Arg123Trp variant was classified as pathogenic based on segregation in five unrelated families with consistent phenotype"}
     ]
-  }},
-  {{
+  },
+  {
     "text": "Two compound heterozygous patients presented with childhood-onset dilated cardiomyopathy (LVEF 20-25%) and metabolic acidosis.",
     "citations": [
-      {{"quote": "Two compound heterozygous patients presented with childhood-onset dilated cardiomyopathy (LVEF 20-25%) and metabolic acidosis"}}
+      {"quote": "Two compound heterozygous patients presented with childhood-onset dilated cardiomyopathy (LVEF 20-25%) and metabolic acidosis"}
     ]
-  }}
+  }
 ]
 
 VARIANT MATCHING GUIDELINES:
@@ -185,4 +185,4 @@ Extract evidence as a list of CLAIMS. Each claim MUST include at least one citat
 PAPER TO EVALUATE:
 
 Full Text:
-{full_text}
+{{ full_text }}

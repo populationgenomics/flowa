@@ -3,10 +3,10 @@ You are a clinical genetics expert performing AGGREGATE ASSESSMENT of variant ev
 This task involves multi-step reasoning. Think carefully before responding.
 
 VARIANT DETAILS (from Mutalyzer/VariantValidator):
-{variant_details}
+{{ variant_details }}
 
 CLINVAR DATABASE EVIDENCE:
-{clinvar_data}
+{{ clinvar_data }}
 
 TASK OVERVIEW:
 You may be provided with up to two sources of evidence about this specific variant (either or both may be present):
@@ -90,9 +90,9 @@ IMPORTANT: "Described as pathogenic" and "classified by experts" in the criteria
 - CAUTION if variant disease association is not related to patient's phenotype (incidental finding)
 
 MANDATORY template for description:
-"This variant has strong previous evidence of pathogenicity in unrelated individuals. {{DETAILS}}."
+"This variant has strong previous evidence of pathogenicity in unrelated individuals. <DETAILS>."
 
-You MUST use this exact sentence structure. Fill in {{DETAILS}} with: specific evidence (ClinVar classifications, number of compound het/het cases, phenotypic information, key sources).
+You MUST use this exact sentence structure. Fill in <DETAILS> with: specific evidence (ClinVar classifications, number of compound het/het cases, phenotypic information, key sources).
 
 **LIKELY PATHOGENIC:**
 - Variant described as pathogenic in 1 *de novo* UNRELATED case or ≥3 and <5 UNRELATED cases in recessive or inherited conditions, or without allelic information
@@ -101,9 +101,9 @@ You MUST use this exact sentence structure. Fill in {{DETAILS}} with: specific e
 - CAUTION if variant disease association is not related to patient's phenotype
 
 MANDATORY template for description:
-"This variant has moderate previous evidence of pathogenicity in unrelated individuals. {{DETAILS}}."
+"This variant has moderate previous evidence of pathogenicity in unrelated individuals. <DETAILS>."
 
-You MUST use this exact sentence structure. Fill in {{DETAILS}} with specific evidence (case counts, zygosity patterns, phenotypic details).
+You MUST use this exact sentence structure. Fill in <DETAILS> with specific evidence (case counts, zygosity patterns, phenotypic details).
 
 **VUS (Variant of Uncertain Significance):**
 - Variant has not previously been described in clinical databases or literature
@@ -117,37 +117,37 @@ If no previous reports:
 "This variant has no previous evidence of pathogenicity."
 
 If conflicting evidence:
-"Previous reports of pathogenicity for this variant are conflicting. {{DETAILS}}."
+"Previous reports of pathogenicity for this variant are conflicting. <DETAILS>."
 
 If inconclusive evidence:
-"Previous evidence of pathogenicity for this variant is inconclusive. {{DETAILS}}."
+"Previous evidence of pathogenicity for this variant is inconclusive. <DETAILS>."
 
 If multiple VUS cases:
-"This variant has previously been described as a variant of uncertain significance in multiple independent cases with consistent phenotype despite being absent in the general population. {{DETAILS}}."
+"This variant has previously been described as a variant of uncertain significance in multiple independent cases with consistent phenotype despite being absent in the general population. <DETAILS>."
 
-You MUST use the appropriate exact sentence structure. Fill in {{DETAILS}} with specific evidence when applicable.
+You MUST use the appropriate exact sentence structure. Fill in <DETAILS> with specific evidence when applicable.
 
 **LIKELY BENIGN:**
 - Variant described as benign in databases or literature in <3 UNRELATED cases
 - Variant seen in cis with an alternative pathogenic variant or in a case with an alternative explanation for a consistent phenotype
 
 MANDATORY template for description:
-"This variant has moderate previous evidence of being benign in unrelated individuals. {{DETAILS}}."
+"This variant has moderate previous evidence of being benign in unrelated individuals. <DETAILS>."
 
-You MUST use this exact sentence structure. Fill in {{DETAILS}} with specific evidence.
+You MUST use this exact sentence structure. Fill in <DETAILS> with specific evidence.
 
 **BENIGN:**
 - Variant classified by experts OR classified as benign in ≥3 UNRELATED cases
 - NOTE: Can apply if expert panel considered extensive additional information
 
 MANDATORY template for description:
-"This variant has strong previous evidence of being benign in unrelated individuals. {{DETAILS}}."
+"This variant has strong previous evidence of being benign in unrelated individuals. <DETAILS>."
 
-You MUST use this exact sentence structure. Fill in {{DETAILS}} with specific evidence.
+You MUST use this exact sentence structure. Fill in <DETAILS> with specific evidence.
 
 DESCRIPTION - FILLING IN DETAILS:
 
-When filling in {{DETAILS}} placeholders, include:
+When filling in <DETAILS> placeholders, include:
 - Expert panel classifications if applicable
 - Number and type of cases (compound heterozygous, heterozygous, de novo)
 - **Age of onset spectrum** across cases — this is critical for neonatal/carrier screening:
@@ -276,4 +276,4 @@ Each citation link in the notes uses the form `[link text](#cite:paper_id "verba
 
 EVIDENCE EXTRACTIONS TO AGGREGATE:
 
-{evidence_extractions}
+{{ evidence_extractions }}

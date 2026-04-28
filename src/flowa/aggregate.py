@@ -316,7 +316,7 @@ async def aggregate_evidence_async(
         if evidence_extractions
         else 'No papers discussing this variant were found.'
     )
-    prompt = prompt_template.format(
+    prompt = prompt_template.render(
         variant_details=variant_details,
         clinvar_data=clinvar_text,
         evidence_extractions=evidence_text,

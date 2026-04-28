@@ -77,7 +77,7 @@ async def extract_paper_async(
     # Load prompt and schema from prompt set
     prompt_template, output_type = load_prompt('extraction', prompt_set)
 
-    prompt = prompt_template.format(
+    prompt = prompt_template.render(
         variant_details=variant_details,
         full_text=full_text,
     )

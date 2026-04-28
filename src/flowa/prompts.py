@@ -23,13 +23,22 @@ import logging
 from pathlib import Path
 from typing import TYPE_CHECKING
 
+import jinja2
+
 if TYPE_CHECKING:
     from pydantic import BaseModel
 
 log = logging.getLogger(__name__)
 
+# Plain-text prompts; missing context vars should raise loudly rather than render empty.
+_jinja_env = jinja2.Environment(
+    undefined=jinja2.StrictUndefined,
+    autoescape=False,
+    keep_trailing_newline=True,
+)
 
-def load_prompt(step: str, prompt_set: str = 'generic') -> tuple[str, 'type[BaseModel]']:
+
+def load_prompt(step: str, prompt_set: str = 'generic') -> tuple[jinja2.Template, 'type[BaseModel]']:
     """Load prompt template and schema model for a pipeline step.
 
     Args:
@@ -37,7 +46,8 @@ def load_prompt(step: str, prompt_set: str = 'generic') -> tuple[str, 'type[Base
         prompt_set: Name of the prompt set directory under prompts/.
 
     Returns:
-        Tuple of (prompt_template, result_model_class).
+        Tuple of (compiled Jinja2 template, result_model_class). Render the template
+        with `template.render(**kwargs)`.
 
     Raises:
         ValueError: If the prompt set directory does not exist.
@@ -50,8 +60,9 @@ def load_prompt(step: str, prompt_set: str = 'generic') -> tuple[str, 'type[Base
 
     log.info('Using prompt set: %s', prompt_set)
 
-    # Load prompt template
+    # Load and compile prompt template
     prompt_text = (prompts_dir / f'{step}_prompt.txt').read_text()
+    template = _jinja_env.from_string(prompt_text)
 
     # Load schema model
     module_path = prompts_dir / f'{step}_schema.py'
@@ -67,4 +78,4 @@ def load_prompt(step: str, prompt_set: str = 'generic') -> tuple[str, 'type[Base
     if not hasattr(module, class_name):
         raise AttributeError(f"Module {module_path} does not define '{class_name}'")
 
-    return prompt_text, getattr(module, class_name)
+    return template, getattr(module, class_name)
