@@ -376,12 +376,16 @@ def _format_submission(s: dict[str, Any]) -> list[str]:
     lines.append(second_line)
 
     if method_name := s.get('method_name'):
-        method_line = f'  Method: {method_name}'
+        method_line = f'  Assertion method: {method_name}'
         if inheritance := s.get('inheritance'):
             method_line += f' ({inheritance})'
         lines.append(method_line)
     elif inheritance := s.get('inheritance'):
         lines.append(f'  Inheritance: {inheritance}')
+
+    collection_methods = sorted({m for obs in s.get('observations') or [] if (m := obs.get('method'))})
+    if collection_methods:
+        lines.append(f'  Collection method: {", ".join(collection_methods)}')
 
     if conditions := s.get('conditions'):
         lines.append(f'  Condition: {"; ".join(conditions)}')
@@ -403,8 +407,6 @@ def _format_submission(s: dict[str, Any]) -> list[str]:
             bits.append(origin)
         if affected := obs.get('affected'):
             bits.append(f'affected {affected}')
-        if method := obs.get('method'):
-            bits.append(method)
         if zygosity := obs.get('zygosity'):
             bits.append(zygosity)
         if (n := obs.get('n_alleles')) is not None:
