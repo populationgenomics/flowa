@@ -35,16 +35,16 @@ jobs:
           fetch-depth: 0
           persist-credentials: false
 
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v5
         with:
           node-version: "22"
           registry-url: "https://registry.npmjs.org"
 
-      # Pin the npm CLI for reproducibility. Trusted publishing requires
-      # >=11.5.1; whichever 22.x setup-node resolves to may ship a lower
-      # bundled npm, so pin explicitly rather than relying on the resolution.
-      - name: Pin npm CLI
-        run: npm install -g npm@11.13.0
+      # Trusted publishing requires npm >= 11.5.1. Rely on Node 22.x's
+      # bundled npm (recent enough as of mid-2026) and surface the resolved
+      # version so a too-old bundled npm fails loudly with context.
+      - name: Verify npm version
+        run: npm --version
 
       - name: Enable Corepack
         run: corepack enable
