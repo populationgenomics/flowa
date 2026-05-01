@@ -1,4 +1,4 @@
-# @flowa/react-viewer
+# @flowajs/react-viewer
 
 React components for rendering [flowa](https://github.com/populationgenomics/flowa)
 pipeline outputs.
@@ -6,7 +6,7 @@ pipeline outputs.
 ## Install
 
 ```bash
-pnpm add @flowa/react-viewer
+pnpm add @flowajs/react-viewer
 # Plus the peer dependencies, if not already installed:
 pnpm add react react-dom @mantine/core @mantine/hooks @tabler/icons-react
 ```
@@ -51,7 +51,7 @@ Consumers using Tailwind should add the package's `dist` directory to the
 {
   content: [
     "./src/**/*.{ts,tsx}",
-    "./node_modules/@flowa/react-viewer/dist/**/*.{js,mjs}",
+    "./node_modules/@flowajs/react-viewer/dist/**/*.{js,mjs}",
   ],
 }
 ```
@@ -92,7 +92,7 @@ Every published version carries a sigstore provenance attestation. To verify:
 ```bash
 npm audit signatures
 # Or, for one package:
-npm view @flowa/react-viewer
+npm view @flowajs/react-viewer
 ```
 
 ## License

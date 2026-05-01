@@ -1,4 +1,4 @@
-# Tag-driven release of @flowa/react-viewer to npm via OIDC trusted publishing.
+# Tag-driven release of @flowajs/react-viewer to npm via OIDC trusted publishing.
 #
 # Trigger: `git tag react-viewer-v$VERSION && git push origin react-viewer-v$VERSION`.
 # Gating: the `npm-publish` GitHub environment requires manual approval before
@@ -12,7 +12,7 @@
 # Action versions are pinned to major-version tags here, matching lint.yaml.
 # Switch to SHA pins via Dependabot before going to production.
 
-name: Release @flowa/react-viewer
+name: Release @flowajs/react-viewer
 
 on:
   push:
@@ -53,13 +53,13 @@ jobs:
         run: pnpm install --frozen-lockfile --ignore-scripts
 
       - name: Build
-        run: pnpm --filter @flowa/react-viewer build
+        run: pnpm --filter @flowajs/react-viewer build
 
       - name: Test
-        run: pnpm --filter @flowa/react-viewer test
+        run: pnpm --filter @flowajs/react-viewer test
 
       - name: Typecheck
-        run: pnpm --filter @flowa/react-viewer typecheck
+        run: pnpm --filter @flowajs/react-viewer typecheck
 
       - name: Verify tarball contents
         working-directory: packages/react-viewer
