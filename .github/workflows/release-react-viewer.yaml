@@ -35,19 +35,19 @@ jobs:
           fetch-depth: 0
           persist-credentials: false
 
-      - uses: actions/setup-node@v4
+      - uses: pnpm/action-setup@v4
+
+      - uses: actions/setup-node@v5
         with:
           node-version: "22"
           registry-url: "https://registry.npmjs.org"
+          cache: "pnpm"
 
       # Trusted publishing requires npm >= 11.5.1. Rely on Node 22.x's
-      # bundled npm (recent enough as of mid-2026) and surface the resolved
-      # version so a too-old bundled npm fails loudly with context.
+      # bundled npm and surface the resolved version so a too-old bundled
+      # npm fails loudly with context.
       - name: Verify npm version
         run: npm --version
-
-      - name: Enable Corepack
-        run: corepack enable
 
       - name: Install dependencies
         run: pnpm install --frozen-lockfile --ignore-scripts
