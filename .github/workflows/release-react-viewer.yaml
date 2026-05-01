@@ -1,0 +1,72 @@
+# Tag-driven release of @flowa/react-viewer to npm via OIDC trusted publishing.
+#
+# Trigger: `git tag react-viewer-v$VERSION && git push origin react-viewer-v$VERSION`.
+# Gating: the `npm-publish` GitHub environment requires manual approval before
+# the publish step runs.
+#
+# Setup is documented in specs/flowa_demo.md (§6.1, §16.3) and the publishing
+# guide it references — scope reservation, trusted-publisher binding, branch
+# and tag protection, environment reviewers all need to be configured on
+# npmjs.com / GitHub before this workflow can publish successfully.
+#
+# Action versions are pinned to major-version tags here, matching lint.yaml.
+# Switch to SHA pins via Dependabot before going to production.
+
+name: Release @flowa/react-viewer
+
+on:
+  push:
+    tags:
+      - "react-viewer-v*"
+
+permissions:
+  contents: read
+  id-token: write # Required for OIDC trusted publishing.
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    environment: npm-publish # Must match the trusted-publisher config on npmjs.com.
+    timeout-minutes: 15
+
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          registry-url: "https://registry.npmjs.org"
+
+      # Pin the npm CLI for reproducibility. Trusted publishing requires
+      # >=11.5.1; whichever 22.x setup-node resolves to may ship a lower
+      # bundled npm, so pin explicitly rather than relying on the resolution.
+      - name: Pin npm CLI
+        run: npm install -g npm@11.13.0
+
+      - name: Enable Corepack
+        run: corepack enable
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile --ignore-scripts
+
+      - name: Build
+        run: pnpm --filter @flowa/react-viewer build
+
+      - name: Test
+        run: pnpm --filter @flowa/react-viewer test
+
+      - name: Typecheck
+        run: pnpm --filter @flowa/react-viewer typecheck
+
+      - name: Verify tarball contents
+        working-directory: packages/react-viewer
+        run: pnpm pack --dry-run
+
+      - name: Publish
+        working-directory: packages/react-viewer
+        run: npm publish --provenance --access=public
+        env:
+          NPM_CONFIG_PROVENANCE: true

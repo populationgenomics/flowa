@@ -1,0 +1,72 @@
+{
+  "name": "@flowa/react-viewer",
+  "version": "0.0.1",
+  "description": "React components for rendering flowa pipeline outputs: citation-grounded Markdown, PDF viewer with bbox highlights, triage workspace.",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/populationgenomics/flowa.git",
+    "directory": "packages/react-viewer"
+  },
+  "homepage": "https://github.com/populationgenomics/flowa#readme",
+  "bugs": {
+    "url": "https://github.com/populationgenomics/flowa/issues"
+  },
+  "publishConfig": {
+    "access": "public",
+    "provenance": true,
+    "registry": "https://registry.npmjs.org"
+  },
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE"
+  ],
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.mjs",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.mjs",
+      "require": "./dist/index.cjs"
+    }
+  },
+  "sideEffects": false,
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "build": "tsup",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "dompurify": "3.3.1",
+    "html-react-parser": "5.2.2",
+    "marked": "16.4.2",
+    "react-pdf": "9.2.1"
+  },
+  "peerDependencies": {
+    "@mantine/core": "^8.0.0",
+    "@mantine/hooks": "^8.0.0",
+    "@tabler/icons-react": "^3.0.0",
+    "react": "^18.0.0",
+    "react-dom": "^18.0.0"
+  },
+  "devDependencies": {
+    "@mantine/core": "8.3.18",
+    "@mantine/hooks": "8.3.18",
+    "@tabler/icons-react": "3.41.1",
+    "@testing-library/react": "16.1.0",
+    "@types/react": "18.3.18",
+    "@types/react-dom": "18.3.5",
+    "happy-dom": "20.7.0",
+    "react": "18.2.0",
+    "react-dom": "18.2.0",
+    "tsup": "8.3.5",
+    "typescript": "5.7.3",
+    "vitest": "2.1.9"
+  }
+}
