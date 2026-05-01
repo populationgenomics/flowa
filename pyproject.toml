@@ -31,11 +31,11 @@ bedrock = ["groundmark[bedrock]>=0.5.0", "pydantic-ai-slim[bedrock]"]
 google = ["groundmark[google]>=0.5.0", "pydantic-ai-slim[google]"]
 openai = ["groundmark[openai]>=0.5.0", "pydantic-ai-slim[openai]"]
 
-# Bypass the global 7-day release-age gate for groundmark — we own the package
-# and need to consume newly-cut versions immediately. Drop this entry once the
-# pinned version is older than 7 days on PyPI.
 [tool.uv]
-exclude-newer-package = { groundmark = "0 days" }
+# Supply-chain hygiene: only install package versions ≥ 7 days old. Pairs with
+# the npm/pnpm `min-release-age` gates configured globally; this is the
+# in-repo equivalent for the Python side so contributors and CI inherit it.
+exclude-newer = "7 days"
 
 # Pin pydantic-ai-slim to a fork of v1.83.0 with PR #4237 cherry-picked on top.
 # PR #4237 adds Bedrock native structured output (`NativeOutput`) and strict tool

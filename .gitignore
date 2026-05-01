@@ -149,3 +149,11 @@ docker/.env
 docker/config/
 docker/plugins/
 docker/logs/
+
+# Node / TypeScript workspace
+node_modules/
+.next/
+.turbo/
+demo-data/
+*.tsbuildinfo
+pnpm-debug.log*

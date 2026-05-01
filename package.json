@@ -1,0 +1,18 @@
+{
+  "name": "flowa",
+  "private": true,
+  "version": "0.0.0",
+  "description": "flowa polyglot monorepo: Python pipeline, TypeScript packages, demo app.",
+  "license": "MIT",
+  "engines": {
+    "node": ">=20.0.0",
+    "pnpm": ">=10.16.0"
+  },
+  "packageManager": "pnpm@10.33.2",
+  "scripts": {
+    "lint": "prettier --check ."
+  },
+  "devDependencies": {
+    "prettier": "3.8.3"
+  }
+}

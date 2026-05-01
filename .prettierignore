@@ -1,0 +1,24 @@
+# Lockfiles, build outputs, caches.
+pnpm-lock.yaml
+uv.lock
+node_modules/
+.next/
+.turbo/
+dist/
+coverage/
+*.tsbuildinfo
+
+# Python project surface — owned by ruff/mypy.
+.venv/
+.mypy_cache/
+.pytest_cache/
+.ruff_cache/
+__pycache__/
+
+# Local data + generated artifacts.
+data/
+reports/
+demo-data/
+
+# Markdown is owned by markdownlint, not prettier.
+*.md

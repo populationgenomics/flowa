@@ -1,3 +1,6 @@
+# Single source of truth for pre-commit + CI lint. .github/workflows/lint.yaml
+# invokes `uv run pre-commit run --all-files`, so adding a check here
+# automatically runs it locally and in CI.
 repos:
   - repo: https://github.com/pre-commit/pre-commit-hooks
     rev: v4.5.0
@@ -23,6 +26,8 @@ repos:
     hooks:
       - id: cpg-id-checker
 
+  # Use the project's pinned tools via uv / pnpm so pre-commit and CI checks
+  # match what runs locally — no separate version pinning here.
   - repo: local
     hooks:
       - id: ruff-format
@@ -43,3 +48,10 @@ repos:
         language: system
         pass_filenames: false
         always_run: true
+      # markdownlint owns markdown above, so prettier stays out of .md.
+      - id: prettier
+        name: prettier --check
+        entry: pnpm exec prettier --check
+        language: system
+        files: \.(ts|tsx|js|jsx|mjs|cjs|json|yaml|yml)$
+        exclude: ^pnpm-lock\.yaml$
