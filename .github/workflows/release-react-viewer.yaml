@@ -43,9 +43,15 @@ jobs:
           registry-url: "https://registry.npmjs.org"
           cache: "pnpm"
 
-      # Trusted publishing requires npm >= 11.5.1. Rely on Node 22.x's
-      # bundled npm and surface the resolved version so a too-old bundled
-      # npm fails loudly with context.
+      # Trusted publishing requires npm >= 11.5.1; Node 22.x ships npm 10.9.x.
+      # Install to a fresh prefix to sidestep `npm install -g npm@X` clobbering
+      # its own node_modules mid-upgrade.
+      - name: Pin npm
+        run: |
+          mkdir -p "$RUNNER_TEMP/npm-pin"
+          npm install -g --prefix="$RUNNER_TEMP/npm-pin" npm@11.13.0
+          echo "$RUNNER_TEMP/npm-pin/bin" >> "$GITHUB_PATH"
+
       - name: Verify npm version
         run: npm --version
 
