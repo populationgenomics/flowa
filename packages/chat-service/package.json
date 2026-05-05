@@ -1,0 +1,112 @@
+{
+  "name": "@flowajs/chat-service",
+  "version": "0.0.0",
+  "description": "Stateless service that orchestrates LLM conversations over flowa artifacts.",
+  "license": "MIT",
+  "type": "module",
+  "engines": {
+    "node": ">=20"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/populationgenomics/flowa.git",
+    "directory": "packages/chat-service"
+  },
+  "homepage": "https://github.com/populationgenomics/flowa#readme",
+  "bugs": {
+    "url": "https://github.com/populationgenomics/flowa/issues"
+  },
+  "publishConfig": {
+    "access": "public",
+    "provenance": true,
+    "registry": "https://registry.npmjs.org"
+  },
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE"
+  ],
+  "main": "./dist/index.js",
+  "exports": {
+    ".": "./dist/index.js",
+    "./server": "./dist/server.js",
+    "./auth/oidc": "./dist/auth/oidc.js",
+    "./storage": "./dist/storage/factory.js",
+    "./storage/fs": "./dist/storage/fs.js",
+    "./storage/s3": "./dist/storage/s3.js",
+    "./storage/interface": "./dist/storage/interface.js",
+    "./llm": "./dist/llm/factory.js",
+    "./llm/interface": "./dist/llm/interface.js",
+    "./llm/anthropic": "./dist/llm/anthropic.js",
+    "./llm/bedrock": "./dist/llm/bedrock.js",
+    "./llm/google-gla": "./dist/llm/google-gla.js",
+    "./llm/google-vertex": "./dist/llm/google-vertex.js",
+    "./llm/openai": "./dist/llm/openai.js"
+  },
+  "scripts": {
+    "build": "tsc -p tsconfig.build.json",
+    "start": "node --import ./dist/instrumentation.js dist/index.js",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@hono/node-server": "1.19.14",
+    "@opentelemetry/api": "1.9.1",
+    "@opentelemetry/core": "2.7.0",
+    "@opentelemetry/instrumentation-aws-sdk": "0.69.0",
+    "@opentelemetry/instrumentation-http": "0.214.0",
+    "@opentelemetry/otlp-transformer": "0.214.0",
+    "@opentelemetry/resources": "2.7.0",
+    "@opentelemetry/sdk-metrics": "2.7.0",
+    "@opentelemetry/sdk-node": "0.214.0",
+    "@opentelemetry/sdk-trace-base": "2.7.0",
+    "ai": "6.0.168",
+    "aws4fetch": "1.0.20",
+    "hono": "4.12.15",
+    "jose": "6.2.3",
+    "nunjucks": "3.2.4",
+    "yaml": "2.8.3",
+    "zod": "4.3.6"
+  },
+  "peerDependencies": {
+    "@ai-sdk/amazon-bedrock": "^4.0.0",
+    "@ai-sdk/anthropic": "^3.0.0",
+    "@ai-sdk/google": "^3.0.0",
+    "@ai-sdk/google-vertex": "^4.0.0",
+    "@ai-sdk/openai": "^3.0.0",
+    "@aws-sdk/client-s3": "^3.0.0"
+  },
+  "peerDependenciesMeta": {
+    "@ai-sdk/amazon-bedrock": {
+      "optional": true
+    },
+    "@ai-sdk/anthropic": {
+      "optional": true
+    },
+    "@ai-sdk/google": {
+      "optional": true
+    },
+    "@ai-sdk/google-vertex": {
+      "optional": true
+    },
+    "@ai-sdk/openai": {
+      "optional": true
+    },
+    "@aws-sdk/client-s3": {
+      "optional": true
+    }
+  },
+  "devDependencies": {
+    "@ai-sdk/amazon-bedrock": "4.0.96",
+    "@ai-sdk/anthropic": "3.0.71",
+    "@ai-sdk/google": "3.0.64",
+    "@ai-sdk/google-vertex": "4.0.112",
+    "@ai-sdk/openai": "3.0.53",
+    "@aws-sdk/client-s3": "3.1038.0",
+    "@types/node": "22.19.17",
+    "@types/nunjucks": "3.2.6",
+    "typescript": "5.7.3",
+    "vitest": "2.1.9"
+  }
+}

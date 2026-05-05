@@ -1,0 +1,16 @@
+You are a test stub for the aggregate-edit prompt. The real generic
+prompt is M4's deliverable; this fixture exists only to exercise the
+loader, the Nunjucks render path, and the three required context
+variables.
+
+## Schema
+
+{{ artifact_schema }}
+
+## Paper index
+
+{{ paper_index }}
+
+## Initial artifact
+
+{{ initial_artifact }}

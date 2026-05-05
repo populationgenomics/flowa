@@ -1,6 +1,7 @@
 """Prompt set loading utilities.
 
-Flowa supports configurable prompt sets for different integrations (e.g., Curio, generic ACMG).
+Flowa supports configurable prompt sets for different integrations (e.g., the
+in-tree `generic` set, or a private deployment-specific overlay).
 Prompt sets are directories under `prompts/` containing prompt templates and Pydantic schema modules.
 
 Configuration:

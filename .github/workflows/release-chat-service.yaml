@@ -1,0 +1,81 @@
+# Tag-driven release of @flowajs/chat-service to npm via OIDC trusted publishing.
+#
+# Trigger: `git tag chat-service-v$VERSION && git push origin chat-service-v$VERSION`.
+# Gating: the `npm-publish` GitHub environment requires manual approval before
+# the publish step runs.
+#
+# Setup mirrors @flowajs/react-viewer's release workflow — same `npm-publish`
+# environment, same approver list, same tag-protection ruleset (extended with
+# `chat-service-v*`). Per-package work needed before the first OIDC publish:
+# bootstrap publish 0.0.1 with a granular token, deprecate it, configure the
+# trusted publisher on npmjs.com (workflow filename: release-chat-service.yaml,
+# environment: npm-publish), then enable "Require 2FA and disallow tokens".
+#
+# Action versions are pinned to major-version tags here, matching lint.yaml /
+# release-react-viewer.yaml. Switch to SHA pins via Dependabot before going
+# to production.
+
+name: Release @flowajs/chat-service
+
+on:
+  push:
+    tags:
+      - "chat-service-v*"
+
+permissions:
+  contents: read
+  id-token: write # Required for OIDC trusted publishing.
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    environment: npm-publish # Must match the trusted-publisher config on npmjs.com.
+    timeout-minutes: 15
+
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+
+      - uses: pnpm/action-setup@v4
+
+      - uses: actions/setup-node@v5
+        with:
+          node-version: "22"
+          registry-url: "https://registry.npmjs.org"
+          cache: "pnpm"
+
+      # Trusted publishing requires npm >= 11.5.1; Node 22.x ships npm 10.9.x.
+      # Install to a fresh prefix to sidestep `npm install -g npm@X` clobbering
+      # its own node_modules mid-upgrade.
+      - name: Pin npm
+        run: |
+          mkdir -p "$RUNNER_TEMP/npm-pin"
+          npm install -g --prefix="$RUNNER_TEMP/npm-pin" npm@11.13.0
+          echo "$RUNNER_TEMP/npm-pin/bin" >> "$GITHUB_PATH"
+
+      - name: Verify npm version
+        run: npm --version
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile --ignore-scripts
+
+      - name: Build
+        run: pnpm --filter @flowajs/chat-service build
+
+      - name: Test
+        run: pnpm --filter @flowajs/chat-service test
+
+      - name: Typecheck
+        run: pnpm --filter @flowajs/chat-service typecheck
+
+      - name: Verify tarball contents
+        working-directory: packages/chat-service
+        run: pnpm pack --dry-run
+
+      - name: Publish
+        working-directory: packages/chat-service
+        run: npm publish --provenance --access=public
+        env:
+          NPM_CONFIG_PROVENANCE: true
