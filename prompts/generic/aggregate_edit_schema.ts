@@ -3,25 +3,31 @@
  *
  * Mirrors `prompts/generic/aggregate_schema.py:CategoryResult`: the
  * citation-grounded core fields exposed by `@flowajs/chat-service`'s
- * `artifactFields`, plus `classification` and `classification_rationale`
+ * `ArtifactSchema`, plus `classification` and `classification_rationale`
  * for ACMG-style variant assessment.
  *
  * Deployments wanting different fields should write their own schema
- * following the same pattern: spread `artifactFields`, add deployment
- * fields. Keep core field names with these names; chat-service reads them
- * directly. Refining types (e.g. constraining `classification` to a Zod
- * enum) is fine; renaming is not.
+ * following the same pattern: take `ArtifactSchema` (the citation-grounded
+ * core) and `.extend(...)` with deployment fields. Keep core field names
+ * with these names; chat-service reads them directly. Refining types (e.g.
+ * constraining `classification` to a Zod enum) is fine; renaming is not.
  *
- * Loaded at compile time by deployment entries (e.g. `examples/demo/`)
- * that pass it to `createApp({ schema })`. Not consumed at runtime by
- * `@flowajs/chat-service` itself.
+ * `.extend(...)` is used instead of spreading `artifactFields` because
+ * spreading widens the shape's TypeScript type to a generic record, which
+ * makes the resulting schema unassignable to `z.ZodType<Artifact>` at the
+ * `createApp({ schema })` call site. `.extend(...)` preserves the shape,
+ * so the deployment's broader schema is assignable to the narrower
+ * core-only parameter type.
+ *
+ * Loaded at compile time by deployment entries that pass it to
+ * `createApp({ schema })`. Not consumed at runtime by `@flowajs/chat-service`
+ * itself.
  */
 
-import { artifactFields } from "@flowajs/chat-service";
+import { ArtifactSchema as CoreSchema } from "@flowajs/chat-service";
 import { z } from "zod";
 
-export const ArtifactSchema = z.object({
-  ...artifactFields,
+export const ArtifactSchema = CoreSchema.extend({
   classification: z
     .string()
     .describe(

@@ -1,5 +1,5 @@
 /**
- * M4 render smoke test: load the real `prompts/generic/aggregate_edit_prompt.txt`
+ * Render smoke test: load the real `prompts/generic/aggregate_edit_prompt.txt`
  * and render it with a schema that mirrors `prompts/generic/aggregate_edit_schema.ts`
  * (citation-grounded core via `artifactFields` + `classification` +
  * `classification_rationale`). Verifies the deployment-extension pattern
@@ -135,6 +135,17 @@ describe("prompts/generic/aggregate_edit_prompt.txt", () => {
     ]) {
       expect(json).toContain(`"${field}"`);
     }
+  });
+
+  test("fails loudly when a required context variable is omitted", () => {
+    const template = loadEditPromptTemplate(GENERIC_PROMPT_DIR);
+    expect(() =>
+      promptEnv.renderString(template, {
+        artifact_schema: schemaForPrompt(GenericArtifactSchema),
+        // paper_index intentionally omitted
+        initial_artifact: FIXTURE_INITIAL_ARTIFACT,
+      }),
+    ).toThrow(/null or undefined/);
   });
 });
 

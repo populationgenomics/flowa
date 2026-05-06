@@ -1,54 +1,24 @@
-/** Default env-driven entry. Production deployments needing custom
- *  cred-mint flows or per-deployment auth wiring should write their own
- *  thin entry that calls `createApp` from `./server` directly. See
- *  README.md "Production deployment". */
+/**
+ * Public API surface for `@flowajs/chat-service`.
+ *
+ * Deployments compose their full artifact schema by calling
+ * `ArtifactSchema.extend({ ... })` with their additional fields, then
+ * pass the result to `createApp({ schema })` (from
+ * `@flowajs/chat-service/server`). `.extend(...)` preserves the shape's
+ * TypeScript type so the resulting schema stays assignable to
+ * `z.ZodType<Artifact>`; spreading `...artifactFields` into a fresh
+ * `z.object({...})` also works at runtime but widens the inferred shape
+ * to `Record<string, any>`, which fails the static type at the
+ * `createApp` call site. `artifactFields` is exported for reference /
+ * runtime inspection.
+ *
+ * The CLI / env-driven entry that boots the service from environment
+ * variables lives at `dist/cli.js` (run via `node dist/cli.js`).
+ */
 
-import { serve } from "@hono/node-server";
-import { Hono } from "hono";
-import { loadConfig } from "./config.js";
-import { createApp } from "./server.js";
-import { createStorage } from "./storage/factory.js";
-import { createProvider } from "./llm/factory.js";
-import { createOidcMiddleware } from "./auth/oidc.js";
-
-async function main(): Promise<void> {
-  const config = loadConfig();
-  const storage = await createStorage(config.storage);
-  const provider = await createProvider(config.llmModel);
-
-  const chatApp = createApp({
-    storage,
-    provider,
-    jwtSecret: config.jwtSecret,
-    promptDir: config.promptDir,
-    jwtTtlSeconds: config.jwtTtlSeconds,
-    corsOrigins: config.corsOrigins,
-  });
-
-  // Apply the OIDC middleware on POST /sessions when configured. The
-  // route is unauthenticated otherwise (suitable for the demo / local
-  // development; production deployments should always set OIDC_*).
-  let app: Hono;
-  if (config.oidc) {
-    app = new Hono();
-    app.use(
-      "/sessions",
-      createOidcMiddleware({
-        ...config.oidc,
-        devMode: process.env.NODE_ENV === "development",
-      }),
-    );
-    app.route("/", chatApp);
-  } else {
-    app = chatApp;
-  }
-
-  serve({ fetch: app.fetch, port: config.port }, (info) => {
-    console.log(`chat-service listening on port ${info.port}`);
-  });
-}
-
-main().catch((error) => {
-  console.error(error);
-  process.exit(1);
-});
+export {
+  artifactFields,
+  ArtifactSchema,
+  schemaForPrompt,
+  type Artifact,
+} from "./artifact.js";

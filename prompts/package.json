@@ -1,0 +1,15 @@
+{
+  "name": "@flowajs/prompts",
+  "private": true,
+  "version": "0.0.0",
+  "description": "Workspace anchor for prompt sets consumed by @flowajs/chat-service. Each subdirectory is a self-contained set with its own aggregate_edit_schema.ts and aggregate_edit_prompt.txt.",
+  "license": "MIT",
+  "type": "module",
+  "exports": {
+    "./*": "./*/aggregate_edit_schema.ts"
+  },
+  "dependencies": {
+    "@flowajs/chat-service": "workspace:*",
+    "zod": "4.3.6"
+  }
+}

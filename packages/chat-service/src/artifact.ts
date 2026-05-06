@@ -2,9 +2,9 @@
 // set of fields (`category`, `description`, `notes`, `papers`, `claims`)
 // because those are what the chat-tool design — `view`, `search`,
 // `str_replace`, `insert`, `write` over a citation-grounded synthesis —
-// actually depends on. Deployments extend by spreading `artifactFields`
-// into a Zod object and adding their own fields; they do not rename the
-// core fields.
+// actually depends on. Deployments extend by calling
+// `ArtifactSchema.extend({...})` with their additional fields; they do
+// not rename the core fields.
 //
 // Field names mirror flowa's `prompts/generic/aggregate_schema.py`.
 
@@ -62,17 +62,24 @@ const RankedPaper = z.object({
 
 /**
  * Citation-grounded fields shared by every chat-service artifact. Deployments
- * spread this into their own Zod schema and add deployment-specific fields:
+ * extend the schema by calling `ArtifactSchema.extend({...})` with their
+ * additional fields:
  *
  * ```ts
- * import { artifactFields } from "@flowajs/chat-service";
+ * import { ArtifactSchema } from "@flowajs/chat-service";
  *
- * export const MyArtifactSchema = z.object({
- *   ...artifactFields,
+ * export const MyArtifactSchema = ArtifactSchema.extend({
  *   classification: z.string(),
  *   classification_rationale: z.string(),
  * });
  * ```
+ *
+ * `.extend(...)` preserves the shape's TypeScript type, so the resulting
+ * schema stays assignable to `z.ZodType<Artifact>` at the
+ * `createApp({ schema })` call site. Spreading `...artifactFields` into a
+ * fresh `z.object({...})` works at runtime but widens the inferred shape
+ * to `Record<string, any>`, which fails the static type. `artifactFields`
+ * is exported anyway for runtime inspection / reflection.
  *
  * Deployments must keep these fields with these names; chat-service reads
  * them directly. Refining their types (e.g. constraining `category` to a

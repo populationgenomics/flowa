@@ -1,6 +1,8 @@
 import { afterEach, beforeEach, describe, expect, test, vi } from "vitest";
 import type { ModelMessage } from "ai";
+import type { createAmazonBedrock } from "@ai-sdk/amazon-bedrock";
 import { createProvider } from "../src/llm/factory.js";
+import { createBedrockProvider } from "../src/llm/bedrock.js";
 
 // Provider construction is lazy in every @ai-sdk/* package — none of them
 // touches creds at construction time. We still stub env vars so the SDKs'
@@ -147,6 +149,54 @@ describe("bedrock provider", () => {
     ).providerOptions;
     expect(merged.someOther).toEqual({ keep: true });
     expect(merged.bedrock).toEqual({ cachePoint: { type: "default" } });
+  });
+
+  test("without inferenceProfile, modelId is the API target", async () => {
+    const calls: string[] = [];
+    const fakeClient = ((id: string) => {
+      calls.push(id);
+      return { id };
+    }) as unknown as ReturnType<typeof createAmazonBedrock>;
+
+    await createBedrockProvider({
+      modelId: "au.anthropic.claude-sonnet-4-6",
+      client: fakeClient,
+    });
+
+    expect(calls).toEqual(["au.anthropic.claude-sonnet-4-6"]);
+  });
+
+  test("when inferenceProfile is set, ARN is the API target — modelId stays informative", async () => {
+    const calls: string[] = [];
+    const fakeClient = ((id: string) => {
+      calls.push(id);
+      return { id };
+    }) as unknown as ReturnType<typeof createAmazonBedrock>;
+
+    const arn =
+      "arn:aws:bedrock:ap-southeast-2:111111111111:application-inference-profile/abc";
+    await createBedrockProvider({
+      modelId: "au.anthropic.claude-sonnet-4-6",
+      inferenceProfile: arn,
+      client: fakeClient,
+    });
+
+    expect(calls).toEqual([arn]);
+  });
+
+  test("createProvider forwards BEDROCK_INFERENCE_PROFILE env var to the bedrock provider", async () => {
+    vi.stubEnv(
+      "BEDROCK_INFERENCE_PROFILE",
+      "arn:aws:bedrock:us-east-1:111111111111:application-inference-profile/abc",
+    );
+    const provider = await createProvider(
+      "bedrock:au.anthropic.claude-sonnet-4-6",
+    );
+    // Construction succeeds and the provider name is unchanged. The unit
+    // tests above on `createBedrockProvider` cover the API-target swap;
+    // here we just verify the env-var read path wires through without
+    // surfacing as a runtime error.
+    expect(provider.name).toBe("aws.bedrock");
   });
 });
 

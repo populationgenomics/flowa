@@ -41,7 +41,11 @@ export async function createProvider(model: string): Promise<LlmProvider> {
     }
     case "bedrock": {
       const { createBedrockProvider } = await import("./bedrock.js");
-      return createBedrockProvider({ modelId });
+      const inferenceProfile = process.env.BEDROCK_INFERENCE_PROFILE;
+      return createBedrockProvider({
+        modelId,
+        ...(inferenceProfile ? { inferenceProfile } : {}),
+      });
     }
     case "google-gla": {
       const { createGoogleGlaProvider } = await import("./google-gla.js");

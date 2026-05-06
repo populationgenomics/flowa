@@ -41,4 +41,4 @@ COPY packages/chat-service/prompts ./prompts
 ENV NODE_ENV=production
 EXPOSE 8000
 
-CMD ["node", "--import", "./dist/instrumentation.js", "dist/index.js"]
+CMD ["node", "--import", "./dist/instrumentation.js", "dist/cli.js"]

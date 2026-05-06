@@ -4,6 +4,19 @@ import type { LlmProvider } from "./interface.js";
 
 export interface BedrockProviderOptions {
   modelId: string;
+  /**
+   * Optional Bedrock application inference profile ARN. When set, the
+   * profile ARN is used as the actual API target — Bedrock routes
+   * through the profile for cost attribution. `modelId` remains the
+   * informative foundation-model identifier carried into telemetry and
+   * logs.
+   *
+   * The Vercel AI SDK's `bedrock(modelId)` factory accepts only one
+   * identifier, so when a profile is present we hand the ARN where the
+   * foundation modelId would have gone; chat-service keeps `modelId`
+   * separately for the human-readable role.
+   */
+  inferenceProfile?: string;
   /** Optional pre-built provider client. */
   client?: ReturnType<typeof createAmazonBedrock>;
 }
@@ -20,13 +33,28 @@ export interface BedrockProviderOptions {
  * implemented in `./anthropic.ts` with the equivalent `cacheControl`
  * marker.
  */
-export function createBedrockProvider(
+export async function createBedrockProvider(
   options: BedrockProviderOptions,
-): LlmProvider {
-  const client = options.client ?? createAmazonBedrock({});
+): Promise<LlmProvider> {
+  let client = options.client;
+  if (!client) {
+    // The Vercel AI SDK's `@ai-sdk/amazon-bedrock` doesn't use the AWS
+    // SDK's standard credential chain by default — it expects explicit
+    // keys or a `credentialProvider` function. Wire `fromNodeProviderChain`
+    // here so AWS_PROFILE / SSO / IRSA / env-var auth all "just work" via
+    // the env-driven entry. Deployments needing custom cred-mint flows
+    // (OIDC → STS, etc.) construct their own client with whatever
+    // provider matches their setup and pass it in via `options.client`.
+    const { fromNodeProviderChain } =
+      await import("@aws-sdk/credential-providers");
+    client = createAmazonBedrock({
+      credentialProvider: fromNodeProviderChain(),
+    });
+  }
+  const apiTarget = options.inferenceProfile ?? options.modelId;
   return {
     name: "aws.bedrock",
-    model: client(options.modelId),
+    model: client(apiTarget),
     providerOptions: {
       bedrock: {
         additionalModelRequestFields: {
