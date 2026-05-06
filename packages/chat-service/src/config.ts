@@ -5,7 +5,7 @@ import type { StorageConfig } from "./storage/factory.js";
 
 const RequiredEnv = z.object({
   LLM_MODEL: z.string().min(1),
-  STORAGE_BACKEND: z.enum(["fs", "s3"]),
+  STORAGE_BACKEND: z.enum(["fs", "s3", "gcs"]),
   CHAT_JWT_SECRET: z.string().min(1),
 });
 
@@ -56,8 +56,21 @@ function buildStorageConfig(): StorageConfig {
       ...(prefix !== undefined ? { prefix } : {}),
     };
   }
+  if (backend === "gcs") {
+    const bucket = process.env.STORAGE_GCS_BUCKET;
+    if (!bucket) {
+      throw new Error(
+        "STORAGE_BACKEND=gcs requires STORAGE_GCS_BUCKET to be set.",
+      );
+    }
+    return {
+      backend: "gcs",
+      bucket,
+      ...(prefix !== undefined ? { prefix } : {}),
+    };
+  }
   throw new Error(
-    `STORAGE_BACKEND must be one of "fs", "s3"; got: ${JSON.stringify(backend)}`,
+    `STORAGE_BACKEND must be one of "fs", "s3", "gcs"; got: ${JSON.stringify(backend)}`,
   );
 }
 

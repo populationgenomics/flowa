@@ -25,9 +25,9 @@ Two consumption modes:
              │
    ┌─────────┴─────────┐
    ▼                   ▼
-Storage           LlmProvider
-  fs | s3       anthropic | bedrock | google-gla
-                google-vertex | openai
+Storage              LlmProvider
+  fs | s3 | gcs   anthropic | bedrock | google-gla
+                  google-vertex | openai
 ```
 
 The HTTP surface is provider-agnostic. Backends and the LLM provider are
@@ -37,7 +37,7 @@ in a custom entry).
 ### Storage
 
 `Storage` is a thin interface (5 ops: `read` / `write` / `writeIfAbsent` /
-`exists` / `list`). Two backends ship in v1:
+`exists` / `list`). Three backends are available:
 
 - **`fs`** — POSIX local filesystem. Atomic create-only via
   `O_CREAT|O_EXCL`.
@@ -48,9 +48,15 @@ in a custom entry).
   Spaces, Wasabi, Hetzner, etc.) set those env vars to point at the provider.
   For knobs the SDK doesn't surface as env vars (e.g. `forcePathStyle`,
   custom retry policy), use the `{ client }` programmatic form.
+- **`gcs`** — `@google-cloud/storage`. Atomic create-only via the
+  `ifGenerationMatch: 0` precondition. Credentials come from Google Cloud's
+  Application Default Credentials chain (`GOOGLE_APPLICATION_CREDENTIALS`,
+  gcloud user creds, GCE metadata server, etc.). For deployments needing
+  Workload Identity Federation or other custom cred-mint flows, use the
+  `{ client }` programmatic form with a pre-built `Storage` client.
 
-GCS-native and Azure-Blob backends are next adapters; either follows the same
-shape (`{ url } | { client, ... }` factory) and contributes ~80 LOC.
+An Azure Blob backend is the next adapter when a consumer surfaces it; same
+factory shape (`{ bucket, prefix? } | { client, bucket, prefix? }`).
 
 ### LLM providers
 
@@ -59,9 +65,9 @@ two optional knobs: `providerOptions` (per-provider thinking/reasoning
 config) and `prepareStep(messages)` (per-step messages transformation, used
 by Bedrock for prompt-cache point injection).
 
-Five providers in v1: `anthropic`, `bedrock`, `google-gla`, `google-vertex`,
-`openai`. Each ai-sdk package is an optional peer — install only what you
-use. Selection at runtime via `LLM_MODEL=<provider>:<model>`.
+Five providers are supported: `anthropic`, `bedrock`, `google-gla`,
+`google-vertex`, `openai`. Each ai-sdk package is an optional peer — install
+only what you use. Selection at runtime via `LLM_MODEL=<provider>:<model>`.
 
 ### Authentication
 
@@ -92,9 +98,10 @@ etc.). The default env-driven `index.ts` applies it on `/sessions` when
 | Var | Required? | Purpose |
 |-----|-----------|---------|
 | `LLM_MODEL` | yes | `<provider>:<model>` — e.g. `bedrock:au.anthropic.claude-sonnet-4-6`, `anthropic:claude-sonnet-4-6`, `google-gla:gemini-2.5-pro`, `google-vertex:gemini-2.5-pro`, `openai:gpt-5`. |
-| `STORAGE_BACKEND` | yes | One of `fs`, `s3`. |
+| `STORAGE_BACKEND` | yes | One of `fs`, `s3`, `gcs`. |
 | `STORAGE_FS_ROOT` | when `fs` | Absolute path to the storage root directory. |
 | `STORAGE_S3_BUCKET` | when `s3` | Bucket name. Region, endpoint, and credentials come from the AWS SDK's standard env vars (`AWS_REGION`, `AWS_ENDPOINT_URL_S3`, `AWS_ACCESS_KEY_ID`, etc.); set those to point at AWS S3 or any S3-compat provider. |
+| `STORAGE_GCS_BUCKET` | when `gcs` | Bucket name. Credentials come from Google Cloud's Application Default Credentials chain (`GOOGLE_APPLICATION_CREDENTIALS`, gcloud user creds, GCE metadata server, etc.). |
 | `STORAGE_PREFIX` | no | Prefix prepended to every storage key (regardless of backend). |
 | `CHAT_JWT_SECRET` | yes | Session JWT signing key. |
 | `CHAT_PROMPT_DIR` | no, default `./prompts` | Directory containing `aggregate_edit_prompt.txt`. |

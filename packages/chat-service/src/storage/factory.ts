@@ -3,11 +3,13 @@ import type { Storage } from "./interface.js";
 /**
  * Discriminated config for the env-driven default `index.ts`. Each backend
  * lives in its own module so the matching SDK (`@aws-sdk/client-s3` for
- * `s3`) is loaded only when actually selected.
+ * `s3`, `@google-cloud/storage` for `gcs`) is loaded only when actually
+ * selected.
  */
 export type StorageConfig =
   | { backend: "fs"; root: string; prefix?: string }
-  | { backend: "s3"; bucket: string; prefix?: string };
+  | { backend: "s3"; bucket: string; prefix?: string }
+  | { backend: "gcs"; bucket: string; prefix?: string };
 
 /**
  * Construct a `Storage` from a typed config. The matching backend module is
@@ -26,6 +28,13 @@ export async function createStorage(config: StorageConfig): Promise<Storage> {
   if (config.backend === "s3") {
     const { createS3Storage } = await import("./s3.js");
     return createS3Storage({
+      bucket: config.bucket,
+      ...(config.prefix !== undefined ? { prefix: config.prefix } : {}),
+    });
+  }
+  if (config.backend === "gcs") {
+    const { createGcsStorage } = await import("./gcs.js");
+    return createGcsStorage({
       bucket: config.bucket,
       ...(config.prefix !== undefined ? { prefix: config.prefix } : {}),
     });
