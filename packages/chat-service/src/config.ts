@@ -54,15 +54,6 @@ function buildStorageConfig(): StorageConfig {
       backend: "s3",
       bucket,
       ...(prefix !== undefined ? { prefix } : {}),
-      ...(process.env.STORAGE_S3_REGION
-        ? { region: process.env.STORAGE_S3_REGION }
-        : {}),
-      ...(process.env.STORAGE_S3_ENDPOINT
-        ? { endpoint: process.env.STORAGE_S3_ENDPOINT }
-        : {}),
-      ...(process.env.STORAGE_S3_FORCE_PATH_STYLE === "true"
-        ? { forcePathStyle: true }
-        : {}),
     };
   }
   throw new Error(

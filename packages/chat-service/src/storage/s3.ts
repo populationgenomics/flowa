@@ -3,25 +3,23 @@ import {
   ListObjectsV2Command,
   PutObjectCommand,
   S3Client,
-  type S3ClientConfig,
 } from "@aws-sdk/client-s3";
 import { type Storage, StorageConflictError } from "./interface.js";
 
 /**
- * Env-driven form: chat-service constructs the S3 client using the AWS
- * SDK's default credential chain (`fromNodeProviderChain`). For S3-compat
- * providers other than AWS (Cloudflare R2, Backblaze B2, MinIO,
- * DigitalOcean Spaces, Wasabi, Hetzner, etc.), set `endpoint` and any
- * required `forcePathStyle`.
+ * Env-driven form: chat-service constructs the S3 client with no explicit
+ * config; the AWS SDK resolves credentials, region, and endpoint from its
+ * standard env vars (`AWS_REGION`, `AWS_ENDPOINT_URL_S3`, the
+ * `fromNodeProviderChain` chain, etc.). For S3-compat providers
+ * (Cloudflare R2, Backblaze B2, MinIO, DigitalOcean Spaces, Wasabi,
+ * Hetzner, etc.), set `AWS_ENDPOINT_URL_S3` and `AWS_REGION` in the
+ * environment. For knobs the SDK doesn't expose via env vars (e.g.
+ * `forcePathStyle`, custom retry policy), use the `{ client }`
+ * programmatic form below.
  */
 export interface S3StorageConfigOptions {
   bucket: string;
   prefix?: string;
-  region?: string;
-  endpoint?: string;
-  forcePathStyle?: boolean;
-  /** Extra `S3ClientConfig` merged on top of the values above. */
-  clientConfig?: S3ClientConfig;
 }
 
 /**
@@ -45,14 +43,8 @@ export function createS3Storage(
       prefix: options.prefix ?? "",
     });
   }
-  const client = new S3Client({
-    region: options.region ?? "us-east-1",
-    ...(options.endpoint ? { endpoint: options.endpoint } : {}),
-    ...(options.forcePathStyle ? { forcePathStyle: true } : {}),
-    ...options.clientConfig,
-  });
   return makeStorage({
-    client,
+    client: new S3Client(),
     bucket: options.bucket,
     prefix: options.prefix ?? "",
   });

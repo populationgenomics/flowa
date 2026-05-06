@@ -285,13 +285,7 @@ describe("list", () => {
 
 describe("env-driven factory", () => {
   test("returns a Storage with the configured prefix when no `client` is passed", () => {
-    const storage = createS3Storage({
-      bucket: "b",
-      region: "us-west-2",
-      endpoint: "https://s3.example.com",
-      forcePathStyle: true,
-      prefix: "scoped/",
-    });
+    const storage = createS3Storage({ bucket: "b", prefix: "scoped/" });
     expect(storage.prefix).toBe("scoped/");
     expect(typeof storage.read).toBe("function");
     expect(typeof storage.write).toBe("function");

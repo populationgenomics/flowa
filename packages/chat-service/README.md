@@ -42,9 +42,12 @@ in a custom entry).
 - **`fs`** — POSIX local filesystem. Atomic create-only via
   `O_CREAT|O_EXCL`.
 - **`s3`** — `@aws-sdk/client-s3`. Atomic create-only via `IfNoneMatch: '*'`.
-  Supports any S3-compatible provider (AWS S3, Cloudflare R2, Backblaze B2,
-  MinIO, DigitalOcean Spaces, Wasabi, Hetzner, etc.) via the `endpoint`
-  option.
+  Region, endpoint, and credentials are resolved from the AWS SDK's standard
+  env vars (`AWS_REGION`, `AWS_ENDPOINT_URL_S3`, `fromNodeProviderChain`); for
+  S3-compatible providers (Cloudflare R2, Backblaze B2, MinIO, DigitalOcean
+  Spaces, Wasabi, Hetzner, etc.) set those env vars to point at the provider.
+  For knobs the SDK doesn't surface as env vars (e.g. `forcePathStyle`,
+  custom retry policy), use the `{ client }` programmatic form.
 
 GCS-native and Azure-Blob backends are next adapters; either follows the same
 shape (`{ url } | { client, ... }` factory) and contributes ~80 LOC.
@@ -91,10 +94,7 @@ etc.). The default env-driven `index.ts` applies it on `/sessions` when
 | `LLM_MODEL` | yes | `<provider>:<model>` — e.g. `bedrock:au.anthropic.claude-sonnet-4-6`, `anthropic:claude-sonnet-4-6`, `google-gla:gemini-2.5-pro`, `google-vertex:gemini-2.5-pro`, `openai:gpt-5`. |
 | `STORAGE_BACKEND` | yes | One of `fs`, `s3`. |
 | `STORAGE_FS_ROOT` | when `fs` | Absolute path to the storage root directory. |
-| `STORAGE_S3_BUCKET` | when `s3` | Bucket name. |
-| `STORAGE_S3_REGION` | no, default `us-east-1` | AWS region (or equivalent for the S3-compat provider). |
-| `STORAGE_S3_ENDPOINT` | no | Custom endpoint URL for S3-compat providers (Cloudflare R2, Backblaze B2, MinIO, DigitalOcean Spaces, Wasabi, Hetzner, etc.). |
-| `STORAGE_S3_FORCE_PATH_STYLE` | no | Set to `true` for endpoints that require path-style addressing. |
+| `STORAGE_S3_BUCKET` | when `s3` | Bucket name. Region, endpoint, and credentials come from the AWS SDK's standard env vars (`AWS_REGION`, `AWS_ENDPOINT_URL_S3`, `AWS_ACCESS_KEY_ID`, etc.); set those to point at AWS S3 or any S3-compat provider. |
 | `STORAGE_PREFIX` | no | Prefix prepended to every storage key (regardless of backend). |
 | `CHAT_JWT_SECRET` | yes | Session JWT signing key. |
 | `CHAT_PROMPT_DIR` | no, default `./prompts` | Directory containing `aggregate_edit_prompt.txt`. |

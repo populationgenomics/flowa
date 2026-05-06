@@ -7,14 +7,7 @@ import type { Storage } from "./interface.js";
  */
 export type StorageConfig =
   | { backend: "fs"; root: string; prefix?: string }
-  | {
-      backend: "s3";
-      bucket: string;
-      prefix?: string;
-      region?: string;
-      endpoint?: string;
-      forcePathStyle?: boolean;
-    };
+  | { backend: "s3"; bucket: string; prefix?: string };
 
 /**
  * Construct a `Storage` from a typed config. The matching backend module is
@@ -35,11 +28,6 @@ export async function createStorage(config: StorageConfig): Promise<Storage> {
     return createS3Storage({
       bucket: config.bucket,
       ...(config.prefix !== undefined ? { prefix: config.prefix } : {}),
-      ...(config.region !== undefined ? { region: config.region } : {}),
-      ...(config.endpoint !== undefined ? { endpoint: config.endpoint } : {}),
-      ...(config.forcePathStyle !== undefined
-        ? { forcePathStyle: config.forcePathStyle }
-        : {}),
     });
   }
   // Exhaustiveness check — the discriminated union should cover every backend.
