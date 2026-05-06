@@ -6,6 +6,10 @@ Prompt sets are directories under `prompts/` containing prompt templates and Pyd
 
 Configuration:
     FLOWA_PROMPT_SET: Name of the prompt set directory to use (default: 'generic')
+    FLOWA_PROMPT_DIR: Path to the directory holding prompt-set subdirectories.
+        Defaults to `./prompts` (cwd-relative) — fine for `flowa <command>`
+        invoked from the repo root, but external consumers running flowa
+        from a different cwd should set this explicitly.
 
 Each prompt set must contain:
     - extraction_prompt.txt
@@ -21,6 +25,7 @@ Schema interface requirements (accessed by Flowa's validation logic):
 
 import importlib.util
 import logging
+import os
 from pathlib import Path
 from typing import TYPE_CHECKING
 
@@ -53,10 +58,11 @@ def load_prompt(step: str, prompt_set: str = 'generic') -> tuple[jinja2.Template
     Raises:
         ValueError: If the prompt set directory does not exist.
     """
-    prompts_dir = Path('prompts') / prompt_set
+    prompts_root = Path(os.environ.get('FLOWA_PROMPT_DIR', 'prompts'))
+    prompts_dir = prompts_root / prompt_set
 
     if not prompts_dir.exists():
-        available = [p.name for p in Path('prompts').iterdir() if p.is_dir()]
+        available = [p.name for p in prompts_root.iterdir() if p.is_dir()] if prompts_root.exists() else []
         raise ValueError(f"Prompt set '{prompt_set}' not found at {prompts_dir}. Available: {available}")
 
     log.info('Using prompt set: %s', prompt_set)

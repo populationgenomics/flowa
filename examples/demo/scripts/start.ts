@@ -1,14 +1,15 @@
 /**
- * Boot orchestrator: loads .env, probes the two listening ports, seeds
- * fixtures into ./demo-data/ on first boot, then launches Next.js +
- * the chat-service entry concurrently. All four are local concerns —
- * no network, no docker, no cross-process IPC beyond HTTP.
+ * Boot orchestrator: loads .env, probes the three listening ports, seeds
+ * fixtures into ./demo-data/ on first boot, then launches Next.js,
+ * chat-service, and demo-gateway concurrently. All three are local
+ * concerns — no network, no docker, no cross-process IPC beyond HTTP.
  */
 
 import { existsSync, mkdirSync, cpSync } from "node:fs";
 import { resolve, dirname } from "node:path";
 import { fileURLToPath } from "node:url";
 import { createServer, type AddressInfo } from "node:net";
+import { spawnSync } from "node:child_process";
 import concurrently from "concurrently";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
@@ -27,12 +28,28 @@ if (!process.env.LLM_MODEL) {
   process.exit(1);
 }
 
+// demo-gateway is a uv-managed Python project. Probe for uv early so the
+// failure mode is a one-liner pointing at the install docs, not an opaque
+// "command not found" deep inside `concurrently`'s child-process output.
+const uvProbe = spawnSync("uv", ["--version"], { stdio: "ignore" });
+if (uvProbe.status !== 0) {
+  console.error(
+    "uv is not on PATH. Install it via https://docs.astral.sh/uv/getting-started/installation/ (or `brew install uv` / `pip install uv`).",
+  );
+  process.exit(1);
+}
+
 const nextPort = Number.parseInt(process.env.DEMO_NEXT_PORT ?? "7700", 10);
 const chatPort = Number.parseInt(process.env.CHAT_SERVICE_PORT ?? "7701", 10);
+const gatewayPort = Number.parseInt(
+  process.env.DEMO_GATEWAY_PORT ?? "7702",
+  10,
+);
 
 for (const [name, port] of [
   ["DEMO_NEXT_PORT", nextPort],
   ["CHAT_SERVICE_PORT", chatPort],
+  ["DEMO_GATEWAY_PORT", gatewayPort],
 ] as const) {
   if (!Number.isFinite(port) || port <= 0 || port > 65_535) {
     console.error(`${name} must be a port between 1 and 65535, got: ${port}`);
@@ -55,12 +72,37 @@ if (!existsSync(dataRoot) && existsSync(fixturesRoot)) {
   cpSync(fixturesRoot, dataRoot, { recursive: true });
 }
 
+// Translate LLM_MODEL + BEDROCK_INFERENCE_PROFILE into the FLOWA_* shape
+// pydantic-settings expects on the Python side. Provider creds (AWS_*,
+// ANTHROPIC_API_KEY, GOOGLE_*, OPENAI_API_KEY) are read by each SDK
+// directly via standard env-var names — no translation needed.
+const llmModel = process.env.LLM_MODEL;
+const bedrockProfile = process.env.BEDROCK_INFERENCE_PROFILE;
+// flowa's prompt loader resolves `./prompts` relative to cwd by default,
+// which is wrong here because demo-gateway runs from `examples/demo/`.
+// Point it at the in-tree prompt set explicitly via the absolute path.
+const flowaPromptDir = resolve(demoRoot, "..", "..", "prompts");
+const flowaEnv: Record<string, string> = {
+  FLOWA_STORAGE_BASE: dataRoot,
+  FLOWA_EXTRACTION_MODEL__NAME: llmModel,
+  FLOWA_CONVERT_MODEL__NAME: llmModel,
+  FLOWA_PROMPT_DIR: flowaPromptDir,
+};
+if (bedrockProfile) {
+  flowaEnv.FLOWA_EXTRACTION_MODEL__BEDROCK_INFERENCE_PROFILE = bedrockProfile;
+  flowaEnv.FLOWA_CONVERT_MODEL__BEDROCK_INFERENCE_PROFILE = bedrockProfile;
+}
+
 const env = {
   ...process.env,
   CHAT_SERVICE_PORT: String(chatPort),
   DEMO_NEXT_PORT: String(nextPort),
+  DEMO_GATEWAY_PORT: String(gatewayPort),
   DEMO_DATA_DIR: dataRoot,
+  ...flowaEnv,
 };
+
+const gatewayRoot = resolve(demoRoot, "..", "demo-gateway");
 
 const { result } = concurrently(
   [
@@ -70,6 +112,16 @@ const { result } = concurrently(
       cwd: demoRoot,
       env,
       prefixColor: "magenta",
+    },
+    {
+      name: "gateway",
+      // `uv run` starts in the demo-gateway project's environment; the
+      // `--project` flag makes it work even when invoked from a
+      // different cwd, so the demo doesn't have to chdir before spawn.
+      command: `uv run --project ${JSON.stringify(gatewayRoot)} demo-gateway`,
+      cwd: demoRoot,
+      env,
+      prefixColor: "yellow",
     },
     {
       name: "next",

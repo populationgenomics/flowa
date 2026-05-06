@@ -81,6 +81,14 @@ async def query_mastermind(gene: str, hgvs_c: str, api_token: str) -> list[int]:
                     'page': page,
                 },
             )
+            if response.status_code == 404:
+                # Mastermind returns 404 for variants with no articles in its
+                # DB. Treat it as an empty result rather than an error so
+                # callers can still run the rest of the pipeline (ClinVar
+                # only). LitVar handles the same case via its empty-matches
+                # branch already.
+                log.warning('Mastermind has no articles for %s', variant)
+                break
             response.raise_for_status()
 
             data = response.json()
