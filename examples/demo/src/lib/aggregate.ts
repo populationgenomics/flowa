@@ -14,7 +14,7 @@ import type {
   PaperIdMapping,
   RankedPaper,
 } from "@flowajs/react-viewer";
-import { getDemoDataDir } from "./demoConfig.js";
+import { getDemoDataDir } from "./demoConfig";
 
 interface RawCitation {
   quote: string;

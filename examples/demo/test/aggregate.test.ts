@@ -6,7 +6,7 @@ import {
   loadAggregate,
   loadEditDraft,
   listVersions,
-} from "../src/lib/aggregate.js";
+} from "../src/lib/aggregate";
 
 let dataDir: string;
 

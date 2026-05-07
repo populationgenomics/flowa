@@ -11,7 +11,7 @@ import { mkdirSync, mkdtempSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import type { NextApiRequest, NextApiResponse } from "next";
-import handler from "../src/pages/api/runs/[runId]/progress.js";
+import handler from "../src/pages/api/runs/[runId]/progress";
 
 let dataRoot: string;
 let originalDemoDataDir: string | undefined;

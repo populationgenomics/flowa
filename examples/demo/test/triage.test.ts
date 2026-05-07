@@ -15,8 +15,8 @@ import {
   setClaimState,
   setPaperDone,
   type WorkspaceKey,
-} from "../src/lib/triageDb.js";
-import { migrate } from "../src/db/migrate.js";
+} from "../src/lib/triageDb";
+import { migrate } from "../src/db/migrate";
 
 const KEY: WorkspaceKey = {
   variantId: "RYR2-Y4725C",

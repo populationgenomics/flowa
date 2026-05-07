@@ -11,7 +11,7 @@
  */
 
 import { DatabaseSync } from "node:sqlite";
-import { migrate } from "../db/migrate.js";
+import { migrate } from "../db/migrate";
 
 export type TriageStateValue = "UNREVIEWED" | "ACCEPTED" | "REJECTED";
 export type WorkspaceKey = Record<string, string | number>;
