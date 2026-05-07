@@ -121,6 +121,19 @@ const gatewayRoot = resolve(demoRoot, "..", "demo-gateway");
 const { result } = concurrently(
   [
     {
+      // `@flowajs/react-viewer` is consumed via its `exports` map, which
+      // points at `dist/`. Without a watcher, source edits in
+      // `packages/react-viewer/src/` are invisible to Next dev until
+      // the package is rebuilt manually. Run tsup in watch mode so
+      // every src edit re-emits dist/ and Next picks it up via its
+      // own HMR.
+      name: "viewer",
+      command: "pnpm --filter @flowajs/react-viewer build:watch",
+      cwd: demoRoot,
+      env,
+      prefixColor: "blue",
+    },
+    {
       name: "chat",
       command: "tsx scripts/chat-service.ts",
       cwd: demoRoot,
