@@ -90,6 +90,22 @@ describe("loadAggregate", () => {
     expect(loaded!.artifact.claims[0]?.citations[0]?.quote).toBe("quote 1");
   });
 
+  test("artifactText is the per-category snake_case JSON, not the full wrapper", async () => {
+    writeAggregate("v1", SAMPLE_AGGREGATE);
+    const loaded = await loadAggregate("v1", "acmg_classification", {
+      dataDir,
+    });
+    const parsed = JSON.parse(loaded!.artifactText) as Record<string, unknown>;
+    // chat-service iterates `claims` and `papers` directly; the wrapper
+    // shape (`results[]` / `paper_id_mapping`) would crash it with
+    // "artifact.claims is not iterable".
+    expect(parsed.results).toBeUndefined();
+    expect(parsed.paper_id_mapping).toBeUndefined();
+    expect(parsed.category).toBe("acmg_classification");
+    expect(Array.isArray(parsed.claims)).toBe(true);
+    expect(Array.isArray(parsed.papers)).toBe(true);
+  });
+
   test("derives byDoi from the on-disk paper_id_mapping", async () => {
     writeAggregate("v1", SAMPLE_AGGREGATE);
     const loaded = await loadAggregate("v1", "acmg_classification", {

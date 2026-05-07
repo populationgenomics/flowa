@@ -157,11 +157,16 @@ export async function loadAggregate(
   const dataDir = options.dataDir ?? getDemoDataDir();
   const path = join(dataDir, "assessments", variantId, "aggregate.json");
   if (!existsSync(path)) return null;
-  const artifactText = await readFile(path, "utf8");
-  const raw = JSON.parse(artifactText) as RawAggregate;
+  const fileText = await readFile(path, "utf8");
+  const raw = JSON.parse(fileText) as RawAggregate;
   const rawCategory = raw.results.find((r) => r.category === category);
   if (!rawCategory) return null;
   const paperIdMapping = await buildPaperIdMapping(dataDir, raw);
+  // chat-service stores artifacts per-category (one CategoryResult) and
+  // expects `initial_artifact` to match that shape, not the multi-category
+  // wrapper. Stringify the matching entry so the consumer can pass it
+  // straight through to the chat session factory + the download button.
+  const artifactText = JSON.stringify(rawCategory, null, 2);
   return {
     artifact: toCategorySuggestion(rawCategory),
     paperIdMapping,

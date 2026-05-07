@@ -147,7 +147,7 @@ const { result } = concurrently(
   ],
   {
     prefix: "{name}",
-    killOthers: ["failure", "success"],
+    killOthersOn: ["failure", "success"],
     restartTries: 0,
   },
 );
