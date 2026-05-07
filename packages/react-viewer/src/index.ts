@@ -40,3 +40,13 @@ export {
   encodeDoi,
   type FlatCitation,
 } from "./triage/citation-utils";
+export {
+  useTriageStore,
+  claimKey,
+  type TriageStore,
+  type TriageStoreData,
+  type TriageStoreActions,
+  type ClaimKey,
+} from "./triage/store";
+export { useTriageKeyboard, jumpToNextUnreviewed } from "./triage/keyboard";
+export type { TriageBackend, TriageSnapshotPayload } from "./triage/backend";
