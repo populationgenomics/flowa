@@ -1,8 +1,8 @@
 # demo-gateway
 
 A small FastAPI service that wraps the `flowa` library so the in-tree
-demo's Next.js app can trigger pipeline runs and look up active runs
-over plain HTTP.
+demo's Next.js app can trigger pipeline runs, look up active runs, and
+resolve citation quotes to PDF bboxes over plain HTTP.
 
 Deliberately scaled down: one Python process, ~300 LOC, no auth
 (localhost only), in-memory active-run tracking, local-fs progress
@@ -23,10 +23,10 @@ This service's own machinery is throwaway demo wiring:
   deployment uses a job queue / workers and persistent run records.
 - `ProgressSink` rewrites a local file on every event. A real
   deployment publishes to a stream (or PUTs to object storage).
-- The browser fetches `/runs` and `/runs/active` directly from this
-  service with `CORSMiddleware: allow_origins=*`. A real deployment
-  puts a gateway like this behind authenticated server middleware
-  and never exposes it to the browser cross-origin.
+- The browser fetches `/runs`, `/runs/active`, and `/resolve-citations`
+  directly from this service with `CORSMiddleware: allow_origins=*`.
+  A real deployment puts a gateway like this behind authenticated server
+  middleware and never exposes it to the browser cross-origin.
 
 If this code is useful as a starting point, treat the `flowa.run`
 imports as load-bearing and the rest as something to replace.
@@ -37,6 +37,7 @@ imports as load-bearing and the rest as something to replace.
 |---|---|---|
 | `POST` | `/runs` | Body `{ variant_id, gene, hgvs_c }`. Spawns the pipeline as an `asyncio` task and returns `{ run_id, started_at, status }` immediately. 409 if a run is already in flight for the variant; 429 at the concurrency cap. |
 | `GET`  | `/runs/active?variant_id=X` | Most recent run for `variant_id` as `{ run_id, started_at, status }`. 404 if none. `status` is `running` while in flight; `success` / `error` once terminal. |
+| `POST` | `/resolve-citations` | Body `{ citations: [{ doi, quotes[] }] }`. Builds a fsspec-based PDF loader rooted at `DEMO_DATA_DIR/papers/{encoded_doi}/source.pdf` and calls `flowa.resolve.resolve_citations(...)` synchronously. Returns `{ resolved: { doi: { quote: HighlightBbox[] } }, errors: { doi: string } }`. DOIs whose source PDF can't be loaded land in `errors`; quotes that groundmark searches for but can't align land as empty arrays in `resolved`. |
 | `GET`  | `/health` | `{ "status": "ok" }`. |
 
 `progress.jsonl` is written to the shared `DEMO_DATA_DIR` and read

@@ -9,13 +9,13 @@ from typing import Any
 
 import logfire
 import typer
-from groundmark import DocumentIndex
 from pydantic import BaseModel
 from pydantic_ai import Agent, ModelRetry, NativeOutput, RunContext
 
 from flowa.clinvar import format_clinvar_for_prompt, query_clinvar
 from flowa.models import create_model, get_thinking_settings
 from flowa.prompts import load_prompt
+from flowa.resolve import CitationQuery, resolve_citations
 from flowa.schema import AGGREGATE_SCHEMA_VERSION, with_schema_version
 from flowa.settings import ModelConfig, Settings
 from flowa.storage import assessment_url, encode_doi, exists, paper_url, read_bytes, read_json, write_bytes, write_json
@@ -150,11 +150,12 @@ def resolve_aggregate_citations(
 ) -> None:
     """Post-process aggregate output: resolve quotes to bboxes on claim citations.
 
-    Claims are grouped by paper_id so every (paper_id, quote) pair resolves to
-    exactly one paper. Quotes that cannot be resolved get an empty bboxes list —
-    the frontend handles missing highlights gracefully.
+    Delegates the actual groundmark alignment to `flowa.resolve.resolve_citations`
+    with a cache-backed loader, then attaches the resulting bboxes onto each
+    claim's citations in place. Claims are grouped by paper_id so every
+    (paper_id, quote) pair resolves to exactly one paper.
     """
-    # Collect all (doi, quote) pairs to resolve, grouped by DOI.
+    # Collect all (doi, quote) pairs, grouped by DOI.
     doi_quotes: dict[str, list[str]] = {}
     for cat_result in aggregate_dict['results']:
         for claim in cat_result['claims']:
@@ -162,40 +163,8 @@ def resolve_aggregate_citations(
             for citation in claim['citations']:
                 doi_quotes.setdefault(doi, []).append(citation['quote'])
 
-    # Build DocumentIndex per cited paper and batch-resolve all quotes.
-    doi_resolved: dict[str, dict[str, list[tuple[int, Any]]]] = {}
-    total_resolve_start = time.monotonic()
-
-    for doi, quotes in doi_quotes.items():
-        t0 = time.monotonic()
-        doc_index = DocumentIndex(pdf_bytes_cache[doi])
-        index_elapsed = time.monotonic() - t0
-
-        t1 = time.monotonic()
-        resolved = doc_index.resolve(quotes)
-        align_elapsed = time.monotonic() - t1
-
-        resolved_count = sum(1 for q in quotes if resolved.get(q))
-        log.info(
-            'Resolved %s: %d/%d quotes, index=%.1fs, align=%.1fs',
-            doi,
-            resolved_count,
-            len(quotes),
-            index_elapsed,
-            align_elapsed,
-        )
-        doi_resolved[doi] = resolved
-
-    total_resolve_elapsed = time.monotonic() - total_resolve_start
-    total_quotes = sum(len(qs) for qs in doi_quotes.values())
-    total_resolved = sum(sum(1 for q in qs if doi_resolved[doi].get(q)) for doi, qs in doi_quotes.items())
-    log.info(
-        'Citation resolution complete: %d/%d quotes across %d papers in %.1fs',
-        total_resolved,
-        total_quotes,
-        len(doi_quotes),
-        total_resolve_elapsed,
-    )
+    citations_input = [CitationQuery(doi=doi, quotes=quotes) for doi, quotes in doi_quotes.items()]
+    result = resolve_citations(citations_input, pdf_loader=pdf_bytes_cache.get)
 
     # Attach resolved bboxes onto each claim's citations.
     for cat_result in aggregate_dict['results']:
@@ -203,18 +172,8 @@ def resolve_aggregate_citations(
             doi = paper_id_to_doi[claim['paper_id']]
             for citation in claim['citations']:
                 quote = citation['quote']
-                bboxes = []
-                for page, bbox in doi_resolved.get(doi, {}).get(quote, []):
-                    bboxes.append(
-                        {
-                            'page': page,
-                            'top': bbox.top,
-                            'left': bbox.left,
-                            'bottom': bbox.bottom,
-                            'right': bbox.right,
-                        }
-                    )
-                citation['bboxes'] = bboxes
+                bboxes = result.resolved.get(doi, {}).get(quote, [])
+                citation['bboxes'] = [b.model_dump() for b in bboxes]
                 if not bboxes:
                     log.warning('No bboxes resolved for %s quote: %.80s...', doi, quote)
 

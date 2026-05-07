@@ -1,13 +1,14 @@
 """FastAPI app exposing the pipeline as HTTP endpoints.
 
 Endpoints:
-  POST /runs           — kick off a pipeline run for a variant
-  GET  /runs/active    — most recent run record for a variant (status == running while in flight)
-  GET  /health         — liveness probe
+  POST /runs                — kick off a pipeline run for a variant
+  GET  /runs/active         — most recent run record for a variant (status == running while in flight)
+  POST /resolve-citations   — align verbatim quotes to PDF bboxes
+  GET  /health              — liveness probe
 
-The Next.js demo proxies the first two; it reads `progress.jsonl` directly
-from the shared local filesystem rather than going through this gateway,
-since both processes have access to the same files.
+The Next.js demo connects to all of these directly from the browser. It only
+reads `progress.jsonl` server-side because that needs the shared local
+filesystem; everything else is direct-talk.
 """
 
 import logging
@@ -17,6 +18,8 @@ from typing import Annotated
 import uvicorn
 from fastapi import APIRouter, Depends, FastAPI, HTTPException, Query, Request, status
 from fastapi.middleware.cors import CORSMiddleware
+from flowa.resolve import ResolvedCitations, ResolveRequest, resolve_citations
+from flowa.storage import paper_url, read_bytes
 from pydantic import BaseModel, Field
 
 from .config import Settings
@@ -65,6 +68,10 @@ def _runs(request: Request) -> RunManager:
     return request.app.state.runs
 
 
+def _settings(request: Request) -> Settings:
+    return request.app.state.settings
+
+
 router = APIRouter()
 
 
@@ -95,6 +102,27 @@ async def get_active_run(
     if record is None:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f'no run for variant {variant_id}')
     return RunResponse.from_record(record)
+
+
+@router.post('/resolve-citations', response_model=ResolvedCitations)
+def resolve_citations_route(
+    body: ResolveRequest,
+    settings: Annotated[Settings, Depends(_settings)],
+) -> ResolvedCitations:
+    """Align verbatim quotes to PDF bboxes.
+
+    Sync `def` so FastAPI auto-runs it in the threadpool — groundmark's PDF
+    parsing is CPU-bound and would block the asyncio loop otherwise.
+    """
+    base = str(settings.demo_data_dir)
+
+    def loader(doi: str) -> bytes | None:
+        try:
+            return read_bytes(paper_url(base, doi, 'source.pdf'))
+        except FileNotFoundError:
+            return None
+
+    return resolve_citations(body.citations, pdf_loader=loader)
 
 
 @asynccontextmanager

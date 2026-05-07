@@ -1,0 +1,163 @@
+"""Tests for the citation-bbox resolver.
+
+groundmark's `DocumentIndex` is mocked at the resolve-module level so the
+tests exercise the resolver's plumbing (quote ordering, bbox normalisation,
+loader failure path, aggregate logging counts) without depending on real
+PDF parsing. The CLI smoke uses a subprocess against an empty `--base` so
+the loader returns None for every DOI — exercises stdin/stdout/argparse
+without needing a fixture PDF in the repo.
+"""
+
+import json
+import subprocess
+import sys
+from pathlib import Path
+
+import pytest
+
+from flowa import resolve as resolve_module
+from flowa.resolve import (
+    CitationQuery,
+    HighlightBbox,
+    resolve_citation_in_pdf,
+    resolve_citations,
+)
+
+
+class _FakeBbox:
+    def __init__(self, top: int, left: int, bottom: int, right: int):
+        self.top = top
+        self.left = left
+        self.bottom = bottom
+        self.right = right
+
+
+class _FakeDocumentIndex:
+    """Test stand-in for groundmark.DocumentIndex.
+
+    `resolutions` is a class attribute the test sets per-case: maps quote → list
+    of (page, bbox) pairs. Quotes absent from the map resolve to no locations.
+    """
+
+    resolutions: dict[str, list[tuple[int, _FakeBbox]]] = {}
+    constructed_with: list[bytes] = []
+
+    def __init__(self, pdf_bytes: bytes):
+        type(self).constructed_with.append(pdf_bytes)
+
+    def resolve(self, quotes: list[str]) -> dict[str, list[tuple[int, _FakeBbox]]]:
+        return {q: type(self).resolutions.get(q, []) for q in quotes}
+
+
+@pytest.fixture
+def fake_document_index(monkeypatch):
+    _FakeDocumentIndex.resolutions = {}
+    _FakeDocumentIndex.constructed_with = []
+    monkeypatch.setattr(resolve_module, 'DocumentIndex', _FakeDocumentIndex)
+    return _FakeDocumentIndex
+
+
+def test_resolve_citation_in_pdf_short_circuits_on_empty_quotes(fake_document_index):
+    result = resolve_citation_in_pdf(b'pdf-bytes', [])
+    assert result == {}
+    # No DocumentIndex constructed — avoids paying the parse cost when there's nothing to align.
+    assert fake_document_index.constructed_with == []
+
+
+def test_resolve_citation_in_pdf_returns_entry_per_input_quote(fake_document_index):
+    fake_document_index.resolutions = {
+        'first quote': [(1, _FakeBbox(top=10, left=20, bottom=30, right=40))],
+        'third quote': [
+            (2, _FakeBbox(top=100, left=200, bottom=300, right=400)),
+            (5, _FakeBbox(top=110, left=210, bottom=310, right=410)),
+        ],
+    }
+    quotes = ['first quote', 'second quote', 'third quote']
+    result = resolve_citation_in_pdf(b'pdf-bytes', quotes)
+
+    # Every input quote appears, in input order.
+    assert list(result.keys()) == quotes
+    # Located quotes get their normalised HighlightBbox shape.
+    assert result['first quote'] == [HighlightBbox(page=1, top=10, left=20, bottom=30, right=40)]
+    assert result['third quote'] == [
+        HighlightBbox(page=2, top=100, left=200, bottom=300, right=400),
+        HighlightBbox(page=5, top=110, left=210, bottom=310, right=410),
+    ]
+    # Unlocated quote gets empty list (distinct from "DOI absent" at the resolve_citations layer).
+    assert result['second quote'] == []
+
+
+def test_resolve_citations_groups_results_per_doi(fake_document_index):
+    fake_document_index.resolutions = {
+        'quote A': [(1, _FakeBbox(top=1, left=2, bottom=3, right=4))],
+        'quote B': [(7, _FakeBbox(top=5, left=6, bottom=7, right=8))],
+    }
+    pdfs = {'10.1/a': b'pdf-A', '10.2/b': b'pdf-B'}
+    citations = [
+        CitationQuery(doi='10.1/a', quotes=['quote A']),
+        CitationQuery(doi='10.2/b', quotes=['quote B']),
+    ]
+
+    result = resolve_citations(citations, pdf_loader=pdfs.get)
+
+    assert set(result.resolved.keys()) == {'10.1/a', '10.2/b'}
+    assert result.resolved['10.1/a']['quote A'] == [HighlightBbox(page=1, top=1, left=2, bottom=3, right=4)]
+    assert result.resolved['10.2/b']['quote B'] == [HighlightBbox(page=7, top=5, left=6, bottom=7, right=8)]
+    assert result.errors == {}
+    # Each DOI's PDF was loaded once (no double-fetch).
+    assert sorted(fake_document_index.constructed_with) == [b'pdf-A', b'pdf-B']
+
+
+def test_resolve_citations_records_errors_when_loader_returns_none(fake_document_index):
+    def loader(doi: str) -> bytes | None:
+        return b'pdf-A' if doi == '10.1/a' else None
+
+    fake_document_index.resolutions = {'quote A': [(1, _FakeBbox(top=1, left=2, bottom=3, right=4))]}
+
+    citations = [
+        CitationQuery(doi='10.1/a', quotes=['quote A']),
+        CitationQuery(doi='10.missing/x', quotes=['anything']),
+    ]
+    result = resolve_citations(citations, pdf_loader=loader)
+
+    # Successful DOI is in `resolved`; missing DOI is in `errors` (never in `resolved`).
+    assert '10.1/a' in result.resolved
+    assert '10.missing/x' not in result.resolved
+    assert result.errors == {'10.missing/x': 'source.pdf not found'}
+
+
+def test_resolve_citations_loader_exceptions_propagate(fake_document_index):
+    def loader(doi: str) -> bytes | None:
+        raise RuntimeError('storage backend failed')
+
+    citations = [CitationQuery(doi='10.1/a', quotes=['anything'])]
+
+    with pytest.raises(RuntimeError, match='storage backend failed'):
+        resolve_citations(citations, pdf_loader=loader)
+
+
+def test_resolve_citations_handles_empty_input(fake_document_index):
+    # Edge case: empty citations list. No loader calls, no resolutions.
+    result = resolve_citations([], pdf_loader=lambda _doi: pytest.fail('loader should not be called'))
+    assert result.resolved == {}
+    assert result.errors == {}
+
+
+def test_cli_smoke_returns_errors_for_missing_pdf(tmp_path: Path):
+    """Subprocess call to `flowa resolve` against an empty --base.
+
+    The loader's FileNotFoundError → None path should populate `errors` for every
+    requested DOI without crashing. Exercises the full stdin → JSON out plumbing
+    without needing a real PDF in the repo.
+    """
+    payload = json.dumps({'citations': [{'doi': '10.1/missing', 'quotes': ['any quote']}]})
+    proc = subprocess.run(
+        [sys.executable, '-m', 'flowa.cli', 'resolve', '--base', str(tmp_path)],
+        input=payload,
+        capture_output=True,
+        text=True,
+        check=True,
+    )
+    output = json.loads(proc.stdout)
+    assert output['resolved'] == {}
+    assert output['errors'] == {'10.1/missing': 'source.pdf not found'}
