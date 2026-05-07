@@ -49,7 +49,8 @@ export default function ViewerPage() {
     typeof router.query.category === "string" ? router.query.category : null;
 
   const [versions, setVersions] = useState<ListedVersion[] | null>(null);
-  const [selectedVersion, setSelectedVersion] = useState<number>(0);
+  // null until the versions list lands; then defaults to the newest version.
+  const [selectedVersion, setSelectedVersion] = useState<number | null>(null);
   const [loadedByVersion, setLoadedByVersion] = useState<
     Record<number, LoadedVersion>
   >({});
@@ -90,14 +91,24 @@ export default function ViewerPage() {
     [variantId, category],
   );
 
-  // Bootstrap: list versions, then fetch v0.
+  // Bootstrap: list versions, then fetch the selected version.
   useEffect(() => {
     if (!variantId || !category) return;
     void fetchVersions();
   }, [variantId, category, fetchVersions]);
 
+  // On first load, after the versions list lands, default to the newest
+  // version. After that the user owns selectedVersion (dropdown picks /
+  // chat-write transitions both set it explicitly).
+  useEffect(() => {
+    if (selectedVersion !== null) return;
+    if (!versions || versions.length === 0) return;
+    setSelectedVersion(versions[versions.length - 1]!.version);
+  }, [versions, selectedVersion]);
+
   useEffect(() => {
     if (!variantId || !category) return;
+    if (selectedVersion === null) return;
     if (loadedByVersion[selectedVersion]) return;
     void fetchVersion(selectedVersion);
   }, [variantId, category, selectedVersion, loadedByVersion, fetchVersion]);
@@ -135,7 +146,10 @@ export default function ViewerPage() {
     [variantId, category, fetchVersions],
   );
 
-  const loaded = loadedByVersion[selectedVersion] ?? null;
+  const loaded =
+    selectedVersion !== null
+      ? (loadedByVersion[selectedVersion] ?? null)
+      : null;
 
   // Hold artifactText in a ref so chatSessionFactory always reads the
   // latest value without rebinding when the cache map changes.
@@ -186,7 +200,10 @@ export default function ViewerPage() {
     () => ({
       variantId: variantId ?? "",
       category: category ?? "",
-      version: selectedVersion,
+      // The render guard below ensures we never render the shell while
+      // selectedVersion is null; this fallback only exists to satisfy
+      // the WorkspaceKey type before the guard runs.
+      version: selectedVersion ?? 0,
     }),
     [variantId, category, selectedVersion],
   );
@@ -260,7 +277,8 @@ export default function ViewerPage() {
         artifact={loaded.artifact}
         paperIdMapping={loaded.paperIdMapping}
         versions={versionEntries}
-        selectedVersion={selectedVersion}
+        // Narrowed by the `selectedVersion === null` render guard above.
+        selectedVersion={selectedVersion!}
         onVersionChange={setSelectedVersion}
         backend={backend}
         workspaceKey={workspaceKey}

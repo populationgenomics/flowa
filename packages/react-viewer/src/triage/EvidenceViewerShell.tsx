@@ -332,31 +332,46 @@ export function EvidenceViewerShell({
   ]);
 
   // ── Triage actions ────────────────────────────────────────────────
-  function checkAutoMarkPaperDone(paperId: string) {
+  /**
+   * Reconcile the paper-done flag with the current claim states.
+   *
+   * - All claims decided AND not done → auto-mark done; jump to the next
+   *   unreviewed claim across papers.
+   * - Any claim back to UNREVIEWED AND currently done → auto-unmark.
+   *   This is the load-bearing half: without it, un-accepting a claim
+   *   leaves a stale "done" flag, and chat-service treats the paper as
+   *   triaged-empty (curator finished, accepted nothing) and drops it.
+   */
+  function reconcilePaperDone(paperId: string) {
     const state = useTriageStore.getState();
     const group = claimsByPaper.get(paperId) ?? [];
     if (group.length === 0) return;
-    if (state.papersDone[paperId] != null) return;
     const allDecided = group.every((_, i) => {
       const s = state.claimStates[claimKey(paperId, i + 1)];
       return s != null && s !== "UNREVIEWED";
     });
-    if (!allDecided) return;
+    const isDone = state.papersDone[paperId] != null;
 
-    applyPaperDone(paperId, true, user);
-    backend.setPaperDone(workspaceKey, paperId, true, user).catch(() => {
+    if (allDecided && !isDone) {
+      applyPaperDone(paperId, true, user);
+      backend.setPaperDone(workspaceKey, paperId, true, user).catch(() => {
+        applyPaperDone(paperId, false, user);
+      });
+      jumpToNextUnreviewed(
+        paperIds,
+        claimsByPaper,
+        useTriageStore.getState().claimStates,
+        paperId,
+        group.length,
+        1,
+        focusClaim,
+      );
+    } else if (!allDecided && isDone) {
       applyPaperDone(paperId, false, user);
-    });
-
-    jumpToNextUnreviewed(
-      paperIds,
-      claimsByPaper,
-      useTriageStore.getState().claimStates,
-      paperId,
-      group.length,
-      1,
-      focusClaim,
-    );
+      backend.setPaperDone(workspaceKey, paperId, false, user).catch(() => {
+        applyPaperDone(paperId, true, user);
+      });
+    }
   }
 
   function advanceToNextUnreviewedInPaper(curPaper: string, curIndex: number) {
@@ -397,8 +412,8 @@ export function EvidenceViewerShell({
         .catch(() => applyClaimState(paperId, claimIndex, reverted));
       if (newState !== "UNREVIEWED") {
         advanceToNextUnreviewedInPaper(paperId, claimIndex);
-        checkAutoMarkPaperDone(paperId);
       }
+      reconcilePaperDone(paperId);
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [triageReady, claimsByPaper, workspaceKeyJson],
@@ -421,8 +436,8 @@ export function EvidenceViewerShell({
         .catch(() => applyClaimState(paperId, claimIndex, reverted));
       if (newState !== "UNREVIEWED") {
         advanceToNextUnreviewedInPaper(paperId, claimIndex);
-        checkAutoMarkPaperDone(paperId);
       }
+      reconcilePaperDone(paperId);
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [triageReady, claimsByPaper, workspaceKeyJson],

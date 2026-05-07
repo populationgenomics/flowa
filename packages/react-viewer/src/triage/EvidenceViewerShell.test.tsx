@@ -273,6 +273,91 @@ describe("EvidenceViewerShell", () => {
     });
   });
 
+  it("auto-marks a paper done when its last claim is decided", async () => {
+    const backend = makeBackend({ claims: [], papers: [], comments: [] });
+    render(
+      wrap(
+        <EvidenceViewerShell
+          {...baseProps}
+          artifact={ARTIFACT}
+          backend={backend}
+          chatSessionFactory={NEVER_SESSION}
+          onVersionChange={vi.fn()}
+        />,
+      ),
+    );
+    await waitFor(() => expect(screen.getByTestId("focus-card")).toBeDefined());
+
+    // Accept claim 1 — focus auto-advances to claim 2 of the same paper.
+    fireEvent.click(screen.getByTestId("accept-button"));
+    await waitFor(() => {
+      expect(
+        screen.getByTestId("focus-card").getAttribute("data-claim-index"),
+      ).toBe("2");
+    });
+
+    // Accept claim 2 — both Smith2024 claims now decided → auto-mark done.
+    fireEvent.click(screen.getByTestId("accept-button"));
+    await waitFor(() => {
+      const calls = backend.setPaperDoneCalls.filter(
+        ([, paperId]) => paperId === "Smith2024",
+      );
+      expect(calls).toHaveLength(1);
+      expect(calls[0]![2]).toBe(true);
+    });
+    expect(useTriageStore.getState().papersDone["Smith2024"]).toBeDefined();
+  });
+
+  it("auto-unmarks a paper-done flag when a claim toggles back to UNREVIEWED", async () => {
+    const backend = makeBackend({ claims: [], papers: [], comments: [] });
+    render(
+      wrap(
+        <EvidenceViewerShell
+          {...baseProps}
+          artifact={ARTIFACT}
+          backend={backend}
+          chatSessionFactory={NEVER_SESSION}
+          onVersionChange={vi.fn()}
+        />,
+      ),
+    );
+    await waitFor(() => expect(screen.getByTestId("focus-card")).toBeDefined());
+
+    // Decide both Smith2024 claims so the paper auto-marks done.
+    fireEvent.click(screen.getByTestId("accept-button"));
+    await waitFor(() =>
+      expect(
+        screen.getByTestId("focus-card").getAttribute("data-claim-index"),
+      ).toBe("2"),
+    );
+    fireEvent.click(screen.getByTestId("accept-button"));
+    await waitFor(() => {
+      expect(useTriageStore.getState().papersDone["Smith2024"]).toBeDefined();
+    });
+
+    // Re-focus Smith2024 claim 1 (the rail row).
+    fireEvent.click(screen.getByTestId("paper-row-Smith2024"));
+    await waitFor(() => {
+      const fc = screen.getByTestId("focus-card");
+      expect(fc.getAttribute("data-paper-id")).toBe("Smith2024");
+      expect(fc.getAttribute("data-claim-index")).toBe("1");
+    });
+
+    // Toggle accept off → state goes back to UNREVIEWED. The paper-done
+    // flag should auto-revert (so chat-service doesn't see a "triaged
+    // but no claims accepted" paper and silently drop it on rewrite).
+    fireEvent.click(screen.getByTestId("accept-button"));
+    await waitFor(() => {
+      const calls = backend.setPaperDoneCalls.filter(
+        ([, paperId]) => paperId === "Smith2024",
+      );
+      expect(calls).toHaveLength(2);
+      expect(calls[0]![2]).toBe(true);
+      expect(calls[1]![2]).toBe(false);
+    });
+    expect(useTriageStore.getState().papersDone["Smith2024"]).toBeUndefined();
+  });
+
   it("renders the commitSlot in the footer", async () => {
     const backend = makeBackend({ claims: [], papers: [], comments: [] });
     render(
