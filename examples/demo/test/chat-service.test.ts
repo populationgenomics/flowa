@@ -99,7 +99,7 @@ describe("chat-service entry wiring", () => {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
-        variant_id: "F508del",
+        variant_id: "RYR2-Y4725C",
         user_id: "leo@example.com",
         category: "acmg_classification",
         initial_artifact: "{}",
@@ -113,7 +113,7 @@ describe("chat-service entry wiring", () => {
     // Seed the minimum chat-service expects: query.json (DOI list) +
     // aggregate.json (with one matching category). Per-paper extracts
     // are read on-demand by tools, not at session creation.
-    const variantId = "F508del";
+    const variantId = "RYR2-Y4725C";
     writeFileSync(
       join(makeDir(dataRoot, "assessments", variantId), "query.json"),
       JSON.stringify({ dois: [] }),

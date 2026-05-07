@@ -72,6 +72,20 @@ if (!existsSync(dataRoot) && existsSync(fixturesRoot)) {
   cpSync(fixturesRoot, dataRoot, { recursive: true });
 }
 
+// pdfjs worker + cmaps must live under public/ for the viewer page to
+// reach them. The pnpm workspace's `ignore-scripts=true` policy
+// suppresses pdfjs-dist's postinstall, and our own postinstall could
+// also be skipped, so re-run the copy idempotently on every boot.
+const pdfjsCopy = spawnSync(
+  "pnpm",
+  ["exec", "tsx", "scripts/copy-pdfjs-assets.ts"],
+  { cwd: demoRoot, stdio: "inherit" },
+);
+if (pdfjsCopy.status !== 0) {
+  console.error("failed to copy pdfjs assets into public/pdfjs/");
+  process.exit(1);
+}
+
 // Translate LLM_MODEL + BEDROCK_INFERENCE_PROFILE into the FLOWA_* shape
 // pydantic-settings expects on the Python side. Provider creds (AWS_*,
 // ANTHROPIC_API_KEY, GOOGLE_*, OPENAI_API_KEY) are read by each SDK

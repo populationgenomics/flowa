@@ -20,5 +20,11 @@ data/
 reports/
 demo-data/
 
+# Demo runtime + fixture artifacts.
+# - public/pdfjs/ is a vendored pdfjs-dist build output, copied at install/boot.
+# - fixtures/ ships JSON produced by the flowa pipeline (no formatter ownership).
+examples/demo/public/pdfjs/
+examples/demo/fixtures/
+
 # Markdown is owned by markdownlint, not prettier.
 *.md
