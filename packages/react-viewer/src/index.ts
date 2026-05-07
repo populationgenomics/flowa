@@ -71,3 +71,16 @@ export {
   type ChatSectionProps,
   type SessionInfo,
 } from "./triage/ChatSection";
+
+// Citation resolver (callback contract for chat-introduced citations)
+export type {
+  CitationQuery,
+  CitationResolver,
+  ResolvedCitations,
+} from "./triage/citation-resolver";
+
+// Evidence viewer shell — composes the triage workspace
+export {
+  EvidenceViewerShell,
+  type EvidenceViewerShellProps,
+} from "./triage/EvidenceViewerShell";

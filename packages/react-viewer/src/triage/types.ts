@@ -3,8 +3,8 @@
  * and the curator triages) plus the per-claim triage state values.
  *
  * `WorkspaceKey` is opaque to the shell: backends use it as the primary key
- * for persisting triage state. The demo encodes `{ variantId, category,
- * version }`; downstream deployments may add additional fields. The shell
+ * for persisting triage state. Consumers encode whatever fields uniquely
+ * identify the triage workspace for a given artifact version. The shell
  * never reads its fields — it only forwards the key to the backend.
  */
 
@@ -52,7 +52,7 @@ export type TriageStateValue = "UNREVIEWED" | "ACCEPTED" | "REJECTED";
 /**
  * Workspace key passed to a `TriageBackend`. Opaque to the shell; consumers
  * encode whatever uniquely identifies "the triage state for this artifact
- * version". The demo uses `{ variantId, category, version }`.
+ * version".
  */
 export type WorkspaceKey = Record<string, string | number>;
 

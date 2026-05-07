@@ -2,10 +2,10 @@
  * Citation-level utilities: flatten a CategorySuggestion's per-claim citations
  * into a flat list keyed by DOI, and format paper labels for display.
  *
- * `encodeDoi` is the percent-encoding the demo (and any consumer that names
- * paper directories by DOI) needs to keep paths stable: encodes `!'()*` in
- * addition to what `encodeURIComponent` covers, matching Python's
- * `urllib.parse.quote(doi, safe='')`.
+ * `encodeDoi` is the percent-encoding any consumer that names paper
+ * directories or URL paths by DOI needs to keep keys stable: encodes
+ * `!'()*` in addition to what `encodeURIComponent` covers, matching
+ * Python's `urllib.parse.quote(doi, safe='')`.
  */
 
 import type { PaperIdMapping } from "../citations/types";

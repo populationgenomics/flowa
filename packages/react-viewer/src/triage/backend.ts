@@ -1,13 +1,11 @@
 /**
  * Triage persistence interface. The shell calls these methods through
- * whatever implementation the consumer wires up; the demo's impl is a thin
- * fetch wrapper over its `/api/triage/*` Next.js routes (which write to a
- * local SQLite DB), and a deployment-style impl typically wraps an
- * authenticated tRPC router writing to the deployment's primary database.
+ * whatever implementation the consumer wires up.
  *
  * Optimistic updates with revert-on-error are owned by the Zustand store
- * inside `@flowajs/react-viewer`, not by the backend. The backend is purely
- * persistence + load.
+ * inside the package, not by the backend. The backend is purely
+ * persistence + load: each setter applies the change durably; `load`
+ * returns the full per-workspace snapshot.
  */
 
 import type { TriageStateValue, WorkspaceKey } from "./types";

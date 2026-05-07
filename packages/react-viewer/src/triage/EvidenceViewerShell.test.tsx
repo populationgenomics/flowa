@@ -1,0 +1,294 @@
+// @vitest-environment happy-dom
+
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import { fireEvent, render, screen, waitFor } from "@testing-library/react";
+import { MantineProvider } from "@mantine/core";
+import { EvidenceViewerShell } from "./EvidenceViewerShell";
+import { useTriageStore } from "./store";
+import type { PaperIdMapping } from "../citations/types";
+import type {
+  CategorySuggestion,
+  TriageStateValue,
+  VersionEntry,
+  WorkspaceKey,
+} from "./types";
+import type { TriageBackend, TriageSnapshotPayload } from "./backend";
+import type { CitationResolver } from "./citation-resolver";
+import type { SessionInfo } from "./ChatSection";
+
+// happy-dom does not implement ResizeObserver; stub it so PdfHighlightViewer mounts.
+class ResizeObserverStub {
+  observe() {}
+  unobserve() {}
+  disconnect() {}
+}
+
+beforeEach(() => {
+  globalThis.ResizeObserver =
+    ResizeObserverStub as unknown as typeof ResizeObserver;
+  vi.doMock("react-pdf", () => ({
+    pdfjs: { GlobalWorkerOptions: {} },
+    Document: () => null,
+    Page: () => null,
+  }));
+});
+
+afterEach(() => {
+  useTriageStore.getState().reset();
+  vi.clearAllMocks();
+});
+
+const MAPPING: PaperIdMapping = {
+  byAuthorYear: {
+    Smith2024: { doi: "10.1234/smith.2024" },
+    Jones2023: { doi: "10.1234/jones.2023" },
+  },
+  byDoi: {
+    "10.1234/smith.2024": "Smith2024",
+    "10.1234/jones.2023": "Jones2023",
+  },
+};
+
+const ARTIFACT: CategorySuggestion = {
+  code: "Pathogenic",
+  codeRationale: "Strong functional + clinical evidence.",
+  descriptionShort: "Description.",
+  notes: "Notes.",
+  papers: [
+    { paperId: "Smith2024", rankRationale: "Functional." },
+    { paperId: "Jones2023", rankRationale: "Clinical." },
+  ],
+  claims: [
+    {
+      paperId: "Smith2024",
+      text: "Functional claim 1",
+      citations: [
+        {
+          quote: "func quote",
+          bboxes: [{ page: 1, top: 100, left: 100, bottom: 200, right: 200 }],
+        },
+      ],
+    },
+    {
+      paperId: "Smith2024",
+      text: "Functional claim 2",
+      citations: [{ quote: "second func quote" }],
+    },
+    {
+      paperId: "Jones2023",
+      text: "Clinical claim",
+      citations: [{ quote: "clin quote" }],
+    },
+  ],
+};
+
+const VERSIONS: VersionEntry[] = [
+  {
+    version: 0,
+    parentVersion: null,
+    createdAt: new Date("2026-05-07T00:00:00Z"),
+    createdBy: "pipeline",
+  },
+];
+
+interface MockBackend extends TriageBackend {
+  loadCalls: WorkspaceKey[];
+  setClaimStateCalls: Array<[WorkspaceKey, string, number, TriageStateValue]>;
+  setPaperDoneCalls: Array<[WorkspaceKey, string, boolean, string]>;
+}
+
+function makeBackend(snapshot: TriageSnapshotPayload): MockBackend {
+  const backend: MockBackend = {
+    loadCalls: [],
+    setClaimStateCalls: [],
+    setPaperDoneCalls: [],
+    async load(key) {
+      backend.loadCalls.push(key);
+      return snapshot;
+    },
+    async setClaimState(key, paperId, claimIndex, state) {
+      backend.setClaimStateCalls.push([key, paperId, claimIndex, state]);
+    },
+    async setClaimComment() {
+      // not exercised in these tests
+    },
+    async setPaperDone(key, paperId, done, user) {
+      backend.setPaperDoneCalls.push([key, paperId, done, user]);
+    },
+  };
+  return backend;
+}
+
+const NOOP_RESOLVER: CitationResolver = async () => ({
+  resolved: {},
+  errors: {},
+});
+
+const NEVER_SESSION: () => Promise<SessionInfo> = () => new Promise(() => {});
+
+const baseProps = {
+  paperIdMapping: MAPPING,
+  versions: VERSIONS,
+  selectedVersion: 0,
+  workspaceKey: { variantId: "RYR2", category: "acmg", version: 0 },
+  user: "alice",
+  resolveCitations: NOOP_RESOLVER,
+  pdfUrlForDoi: (doi: string) =>
+    `https://example.test/${encodeURIComponent(doi)}.pdf`,
+  pdfWorkerSrc: "/pdfjs/pdf.worker.min.mjs",
+  pdfCMapUrl: "/pdfjs/cmaps/",
+};
+
+const wrap = (node: React.ReactNode) => (
+  <MantineProvider>{node}</MantineProvider>
+);
+
+describe("EvidenceViewerShell", () => {
+  it("renders the loading placeholder when artifact is null", () => {
+    render(
+      wrap(
+        <EvidenceViewerShell
+          {...baseProps}
+          artifact={null}
+          backend={makeBackend({ claims: [], papers: [], comments: [] })}
+          chatSessionFactory={NEVER_SESSION}
+          onVersionChange={vi.fn()}
+        />,
+      ),
+    );
+    expect(screen.getByText(/Loading artifact/)).toBeDefined();
+  });
+
+  it("loads triage snapshot on mount, focuses the first unreviewed claim, and exposes version dropdown", async () => {
+    const backend = makeBackend({ claims: [], papers: [], comments: [] });
+    render(
+      wrap(
+        <EvidenceViewerShell
+          {...baseProps}
+          artifact={ARTIFACT}
+          backend={backend}
+          chatSessionFactory={NEVER_SESSION}
+          onVersionChange={vi.fn()}
+        />,
+      ),
+    );
+
+    // Backend.load is called with the workspace key.
+    await waitFor(() => expect(backend.loadCalls.length).toBeGreaterThan(0));
+    expect(backend.loadCalls[0]).toEqual(baseProps.workspaceKey);
+
+    // After load, focus lands on (Smith2024, 1).
+    await waitFor(() => {
+      expect(
+        screen.getByTestId("focus-card").getAttribute("data-paper-id"),
+      ).toBe("Smith2024");
+    });
+    expect(
+      screen.getByTestId("focus-card").getAttribute("data-claim-index"),
+    ).toBe("1");
+
+    // Footer renders the version dropdown.
+    expect(screen.getByTestId("viewer-footer")).toBeDefined();
+    expect(screen.getByTestId("version-select")).toBeDefined();
+  });
+
+  it("accepting a claim updates the store optimistically and fires backend.setClaimState", async () => {
+    const backend = makeBackend({ claims: [], papers: [], comments: [] });
+    render(
+      wrap(
+        <EvidenceViewerShell
+          {...baseProps}
+          artifact={ARTIFACT}
+          backend={backend}
+          chatSessionFactory={NEVER_SESSION}
+          onVersionChange={vi.fn()}
+        />,
+      ),
+    );
+    await waitFor(() => expect(screen.getByTestId("focus-card")).toBeDefined());
+
+    fireEvent.click(screen.getByTestId("accept-button"));
+
+    await waitFor(() => {
+      expect(backend.setClaimStateCalls.length).toBe(1);
+    });
+    const [key, paperId, claimIndex, state] = backend.setClaimStateCalls[0]!;
+    expect(key).toEqual(baseProps.workspaceKey);
+    expect(paperId).toBe("Smith2024");
+    expect(claimIndex).toBe(1);
+    expect(state).toBe("ACCEPTED");
+  });
+
+  it("reverts the optimistic update when backend.setClaimState rejects", async () => {
+    const backend = makeBackend({ claims: [], papers: [], comments: [] });
+    backend.setClaimState = async () => {
+      throw new Error("network");
+    };
+    render(
+      wrap(
+        <EvidenceViewerShell
+          {...baseProps}
+          artifact={ARTIFACT}
+          backend={backend}
+          chatSessionFactory={NEVER_SESSION}
+          onVersionChange={vi.fn()}
+        />,
+      ),
+    );
+    await waitFor(() => expect(screen.getByTestId("focus-card")).toBeDefined());
+
+    fireEvent.click(screen.getByTestId("accept-button"));
+
+    // After the failed setter resolves, the store reverts back to UNREVIEWED
+    // for (Smith2024, 1).
+    await waitFor(() => {
+      const states = useTriageStore.getState().claimStates;
+      expect(states["Smith2024\n1"] ?? "UNREVIEWED").toBe("UNREVIEWED");
+    });
+  });
+
+  it("rewrite button is disabled until at least one claim is triaged", async () => {
+    const backend = makeBackend({ claims: [], papers: [], comments: [] });
+    render(
+      wrap(
+        <EvidenceViewerShell
+          {...baseProps}
+          artifact={ARTIFACT}
+          backend={backend}
+          chatSessionFactory={NEVER_SESSION}
+          onVersionChange={vi.fn()}
+        />,
+      ),
+    );
+    await waitFor(() =>
+      expect(screen.getByTestId("rewrite-button")).toBeDefined(),
+    );
+    const btn = screen.getByTestId("rewrite-button") as HTMLButtonElement;
+    expect(btn.disabled).toBe(true);
+
+    fireEvent.click(screen.getByTestId("accept-button"));
+    await waitFor(() => {
+      const after = screen.getByTestId("rewrite-button") as HTMLButtonElement;
+      expect(after.disabled).toBe(false);
+    });
+  });
+
+  it("renders the commitSlot in the footer", async () => {
+    const backend = makeBackend({ claims: [], papers: [], comments: [] });
+    render(
+      wrap(
+        <EvidenceViewerShell
+          {...baseProps}
+          artifact={ARTIFACT}
+          backend={backend}
+          chatSessionFactory={NEVER_SESSION}
+          onVersionChange={vi.fn()}
+          commitSlot={<button data-testid="commit-slot-btn">Download</button>}
+        />,
+      ),
+    );
+    await waitFor(() =>
+      expect(screen.getByTestId("commit-slot-btn")).toBeDefined(),
+    );
+  });
+});
