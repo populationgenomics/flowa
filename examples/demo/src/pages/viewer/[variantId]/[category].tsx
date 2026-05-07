@@ -102,8 +102,12 @@ export default function ViewerPage() {
     void fetchVersion(selectedVersion);
   }, [variantId, category, selectedVersion, loadedByVersion, fetchVersion]);
 
-  // After a chat-write: refetch the versions list, switch the selected
-  // version, and clear the cached entry for the new version (forces refetch).
+  // After a chat-write: refetch the versions list AND the new version's
+  // artifact text *before* bumping selectedVersion. Atomicity matters —
+  // if selectedVersion advances before loadedByVersion[v] is populated,
+  // the shell briefly sees artifact=null, returns its loader, and
+  // unmounts <ChatSection>. The chat conversation history (held by
+  // useChat) would be reset.
   const handleArtifactWrite = useCallback(
     async ({
       version,
@@ -112,15 +116,23 @@ export default function ViewerPage() {
       version: number;
       parentVersion: number;
     }) => {
+      if (!variantId || !category) return;
       await fetchVersions();
-      setLoadedByVersion((prev) => {
-        const next = { ...prev };
-        delete next[version];
-        return next;
-      });
+      const res = await fetch(
+        `/api/edit-drafts/${encodeURIComponent(variantId)}/${encodeURIComponent(category)}/${version}`,
+      );
+      if (!res.ok) {
+        setError(`Could not load version v${version} (${res.status})`);
+        return;
+      }
+      const data = (await res.json()) as LoadedVersion;
+      // React batches both setStates from the same async callback in
+      // React 18; the next render sees selectedVersion=v AND
+      // loadedByVersion[v]=data atomically.
+      setLoadedByVersion((prev) => ({ ...prev, [version]: data }));
       setSelectedVersion(version);
     },
-    [fetchVersions],
+    [variantId, category, fetchVersions],
   );
 
   const loaded = loadedByVersion[selectedVersion] ?? null;
