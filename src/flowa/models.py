@@ -1,4 +1,4 @@
-"""Model and settings helpers for thinking-enabled LLM providers.
+"""Model and settings helpers for Pydantic AI agents in flowa.
 
 Provider-specific settings types are imported inline because only one
 provider is installed at a time (via optional extras).
@@ -11,18 +11,7 @@ from pydantic_ai.settings import ModelSettings
 
 from flowa.settings import ModelConfig
 
-AgentType = Literal['extraction', 'aggregation']
 EffortLevel = Literal['low', 'medium', 'high']
-
-_MAX_TOKENS: dict[AgentType, int] = {
-    'extraction': 80_000,
-    'aggregation': 80_000,
-}
-
-_THINKING_EFFORT: dict[AgentType, EffortLevel] = {
-    'extraction': 'medium',
-    'aggregation': 'high',
-}
 
 
 def create_model(config: ModelConfig) -> Model | str:
@@ -41,46 +30,71 @@ def create_model(config: ModelConfig) -> Model | str:
     return config.name
 
 
-def get_thinking_settings(config: ModelConfig, agent_type: AgentType) -> ModelSettings:
-    """Get thinking settings for the specified model provider."""
-    max_tokens = _MAX_TOKENS[agent_type]
-    effort = _THINKING_EFFORT[agent_type]
+def get_model_settings(
+    config: ModelConfig,
+    *,
+    effort: EffortLevel | None = None,
+    max_tokens: int | None = None,
+) -> ModelSettings | None:
+    """Build provider-specific ModelSettings.
 
+    ``effort`` enables extended thinking at the given level when set.
+    ``max_tokens`` caps output length when set. Bedrock cost-attribution
+    inference profiles flow through whenever set on the config, independent
+    of ``effort`` and ``max_tokens``.
+
+    Returns ``None`` when no provider-specific settings are needed.
+    """
     if config.name.startswith('anthropic:'):
+        if effort is None and max_tokens is None:
+            return None
         from pydantic_ai.models.anthropic import AnthropicModelSettings
 
-        return AnthropicModelSettings(
-            max_tokens=max_tokens,
-            anthropic_thinking={'type': 'adaptive'},
-            anthropic_effort=effort,
-        )
+        settings: AnthropicModelSettings = {}
+        if max_tokens is not None:
+            settings['max_tokens'] = max_tokens
+        if effort is not None:
+            settings['anthropic_thinking'] = {'type': 'adaptive'}
+            settings['anthropic_effort'] = effort
+        return settings
     if config.name.startswith('bedrock:'):
         from pydantic_ai.models.bedrock import BedrockModelSettings
 
-        settings: BedrockModelSettings = {
-            'max_tokens': max_tokens,
-            'bedrock_additional_model_requests_fields': {
+        bedrock_settings: BedrockModelSettings = {}
+        if max_tokens is not None:
+            bedrock_settings['max_tokens'] = max_tokens
+        if effort is not None:
+            bedrock_settings['bedrock_additional_model_requests_fields'] = {
                 'thinking': {'type': 'adaptive'},
                 'output_config': {'effort': effort},
-            },
-        }
+            }
         if config.bedrock_inference_profile:
-            settings['bedrock_inference_profile'] = config.bedrock_inference_profile
-        return settings
+            bedrock_settings['bedrock_inference_profile'] = config.bedrock_inference_profile
+        return bedrock_settings if bedrock_settings else None
     if config.name.startswith('google-gla:') or config.name.startswith('google-vertex:'):
+        if effort is None and max_tokens is None:
+            return None
         from pydantic_ai.models.google import GoogleModelSettings
 
-        return GoogleModelSettings(
-            max_tokens=max_tokens,
-            google_thinking_config={'include_thoughts': True},
-        )
+        google_settings: GoogleModelSettings = {}
+        if max_tokens is not None:
+            google_settings['max_tokens'] = max_tokens
+        if effort is not None:
+            google_settings['google_thinking_config'] = {'include_thoughts': True}
+        return google_settings
     if config.name.startswith('openai:'):
+        if effort is None and max_tokens is None:
+            return None
         from pydantic_ai.models.openai import OpenAIResponsesModelSettings
 
-        return OpenAIResponsesModelSettings(
-            max_tokens=max_tokens,
-            openai_reasoning_effort=effort,
-            openai_reasoning_summary='detailed',
-        )
-    # Fallback for unknown providers
+        openai_settings: OpenAIResponsesModelSettings = {}
+        if max_tokens is not None:
+            openai_settings['max_tokens'] = max_tokens
+        if effort is not None:
+            openai_settings['openai_reasoning_effort'] = effort
+            openai_settings['openai_reasoning_summary'] = 'detailed'
+        return openai_settings
+    # Unknown provider fallback
+    if max_tokens is None:
+        return None
     return ModelSettings(max_tokens=max_tokens)

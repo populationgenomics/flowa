@@ -3,8 +3,11 @@ revision = 3
 requires-python = "==3.13.*"
 
 [options]
-exclude-newer = "2026-04-29T16:56:54.059545Z"
+exclude-newer = "2026-05-04T04:05:15.473004Z"
 exclude-newer-span = "P7D"
+
+[options.exclude-newer-package]
+anchorite = { timestamp = "2026-05-11T04:05:15.473009Z", span = "PT0S" }
 
 [[package]]
 name = "aiohappyeyeballs"
@@ -59,6 +62,20 @@ dependencies = [
 sdist = { url = "https://files.pythonhosted.org/packages/61/62/06741b579156360248d1ec624842ad0edf697050bbaf7c3e46394e106ad1/aiosignal-1.4.0.tar.gz", hash = "sha256:f47eecd9468083c2029cc99945502cb7708b082c232f9aca65da147157b251c7", size = 25007, upload-time = "2025-07-03T22:54:43.528Z" }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/fb/76/641ae371508676492379f16e2fa48f4e2c11741bd63c48be4b12a6b09cba/aiosignal-1.4.0-py3-none-any.whl", hash = "sha256:053243f8b92b990551949e63930a839ff0cf0b0ebbe0597b0f3fb19e1a0fe82e", size = 7490, upload-time = "2025-07-03T22:54:42.156Z" },
+]
+
+[[package]]
+name = "anchorite"
+version = "0.3.0"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "fsspec" },
+    { name = "pypdfium2" },
+    { name = "seq-smith" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/72/56/c4a2a6122f7f81fc60816ae20d6c50ae7768c1b1aa7dfe51d4b8ff803aed/anchorite-0.3.0.tar.gz", hash = "sha256:c8d1197708da830b1a99cb9d2ec7c6a8a81a658f0f61935db4ba6d2d33121935", size = 4309349, upload-time = "2026-05-11T00:28:26.297Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/1e/ef/1a1b1280f521f9613c424262761af1f5a630f8a70c70a805ebd082c2a1c4/anchorite-0.3.0-py3-none-any.whl", hash = "sha256:3d816a7b07e2857bd4a9aa98fb6a86fa9da9002ca2f11caaabb6d83da019313a", size = 51602, upload-time = "2026-05-11T00:28:24.694Z" },
 ]
 
 [[package]]
@@ -398,6 +415,7 @@ name = "flowa"
 version = "0.1.0"
 source = { editable = "../../" }
 dependencies = [
+    { name = "anchorite" },
     { name = "boto3" },
     { name = "defusedxml" },
     { name = "fsspec" },
@@ -414,32 +432,25 @@ dependencies = [
 
 [package.optional-dependencies]
 anthropic = [
-    { name = "groundmark", extra = ["anthropic"] },
     { name = "pydantic-ai-slim", extra = ["anthropic"] },
 ]
 bedrock = [
-    { name = "groundmark", extra = ["bedrock"] },
     { name = "pydantic-ai-slim", extra = ["bedrock"] },
 ]
 google = [
-    { name = "groundmark", extra = ["google"] },
     { name = "pydantic-ai-slim", extra = ["google"] },
 ]
 openai = [
-    { name = "groundmark", extra = ["openai"] },
     { name = "pydantic-ai-slim", extra = ["openai"] },
 ]
 
 [package.metadata]
 requires-dist = [
+    { name = "anchorite", specifier = ">=0.3.0" },
     { name = "boto3" },
     { name = "defusedxml" },
     { name = "fsspec" },
     { name = "gcsfs" },
-    { name = "groundmark", extras = ["anthropic"], marker = "extra == 'anthropic'", specifier = ">=0.5.0" },
-    { name = "groundmark", extras = ["bedrock"], marker = "extra == 'bedrock'", specifier = ">=0.5.0" },
-    { name = "groundmark", extras = ["google"], marker = "extra == 'google'", specifier = ">=0.5.0" },
-    { name = "groundmark", extras = ["openai"], marker = "extra == 'openai'", specifier = ">=0.5.0" },
     { name = "httpx" },
     { name = "jinja2" },
     { name = "logfire" },
@@ -717,34 +728,6 @@ source = { registry = "https://pypi.org/simple" }
 sdist = { url = "https://files.pythonhosted.org/packages/9d/82/74f4a3310cdabfbb10da554c3a672847f1ed33c6f61dd472681ce7f1fe67/griffelib-2.0.2.tar.gz", hash = "sha256:3cf20b3bc470e83763ffbf236e0076b1211bac1bc67de13daf494640f2de707e", size = 166461, upload-time = "2026-03-27T11:34:51.091Z" }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/11/8c/c9138d881c79aa0ea9ed83cbd58d5ca75624378b38cee225dcf5c42cc91f/griffelib-2.0.2-py3-none-any.whl", hash = "sha256:925c857658fb1ba40c0772c37acbc2ab650bd794d9c1b9726922e36ea4117ea1", size = 142357, upload-time = "2026-03-27T11:34:46.275Z" },
-]
-
-[[package]]
-name = "groundmark"
-version = "0.5.1"
-source = { registry = "https://pypi.org/simple" }
-dependencies = [
-    { name = "pypdf" },
-    { name = "pypdfium2" },
-    { name = "seq-smith" },
-]
-sdist = { url = "https://files.pythonhosted.org/packages/97/32/5d09cf14d677ce54329e033096dabefe07be18dc447346c0413fe12f3068/groundmark-0.5.1.tar.gz", hash = "sha256:338ed11e8dc39a17e0bf2db6f864c73130449c44e1b465a950d1ca1d45787366", size = 212031, upload-time = "2026-04-17T01:31:35.002Z" }
-wheels = [
-    { url = "https://files.pythonhosted.org/packages/ad/eb/312810cfed4f16b1b054e58c65b517a2de45c0d17e72384e55aceec9ea56/groundmark-0.5.1-py3-none-any.whl", hash = "sha256:7ddb8ee769ccd6940b17ba5ea61697d48bd55628f6f2689ea0330714817b2194", size = 14005, upload-time = "2026-04-17T01:31:33.846Z" },
-]
-
-[package.optional-dependencies]
-anthropic = [
-    { name = "pydantic-ai-slim", extra = ["anthropic"] },
-]
-bedrock = [
-    { name = "pydantic-ai-slim", extra = ["bedrock"] },
-]
-google = [
-    { name = "pydantic-ai-slim", extra = ["google"] },
-]
-openai = [
-    { name = "pydantic-ai-slim", extra = ["openai"] },
 ]
 
 [[package]]

@@ -9,8 +9,8 @@ import typer
 from pydantic import BaseModel
 from pydantic_ai import Agent, NativeOutput
 
-from flowa.models import create_model, get_thinking_settings
-from flowa.prompts import load_prompt
+from flowa.models import create_model, get_model_settings
+from flowa.prompts import load_prompt_and_schema
 from flowa.settings import ModelConfig, Settings
 from flowa.storage import assessment_url, encode_doi, exists, paper_url, read_json, read_text, write_bytes, write_json
 
@@ -19,6 +19,9 @@ log = logging.getLogger(__name__)
 # Maximum tokens per paper (heuristic: 1 token ≈ 4 chars)
 MAX_PAPER_TOKENS = 60000
 MAX_PAPER_CHARS = MAX_PAPER_TOKENS * 4
+
+# Cap for thinking + structured-output combined; matches Sonnet 4.6's max output.
+_EXTRACT_MAX_TOKENS = 64_000
 
 
 def truncate_paper_text(full_text: str, doi: str) -> str:
@@ -42,7 +45,7 @@ def create_extraction_agent(
         create_model(model),
         output_type=NativeOutput(output_type),
         retries=3,
-        model_settings=get_thinking_settings(model, 'extraction'),
+        model_settings=get_model_settings(model, effort='medium', max_tokens=_EXTRACT_MAX_TOKENS),
     )
 
 
@@ -75,7 +78,7 @@ async def extract_paper_async(
     full_text = truncate_paper_text(markdown, doi)
 
     # Load prompt and schema from prompt set
-    prompt_template, output_type = load_prompt('extraction', prompt_set)
+    prompt_template, output_type = load_prompt_and_schema('extraction', prompt_set)
 
     prompt = prompt_template.render(
         variant_details=variant_details,

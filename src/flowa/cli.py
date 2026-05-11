@@ -34,8 +34,8 @@ logfire.configure(
     send_to_logfire=False,
     service_name='flowa-worker',
 )
-# Patches Agent class globally — captures all agent runs (including groundmark's
-# PDF conversion agents) with zero changes in those modules.
+# Patches Agent class globally — captures every agent run (extraction,
+# aggregation, transcription) with zero changes in those modules.
 Agent.instrument_all(
     InstrumentationSettings(
         include_content=False,

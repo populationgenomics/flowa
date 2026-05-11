@@ -13,9 +13,10 @@ Configuration:
 
 Each prompt set must contain:
     - extraction_prompt.txt
-    - extraction_schema.py   (must define ExtractionResult model)
+    - extraction_schema.py     (must define ExtractionResult model)
     - aggregate_prompt.txt
-    - aggregate_schema.py    (must define AggregateResult model)
+    - aggregate_schema.py      (must define AggregateResult model)
+    - transcription_prompt.txt (text-only prompt, loaded via load_text_prompt)
 
 Schema interface requirements (accessed by Flowa's validation logic):
     - ExtractionResult.claims[].citations[].quote
@@ -44,8 +45,35 @@ _jinja_env = jinja2.Environment(
 )
 
 
-def load_prompt(step: str, prompt_set: str = 'generic') -> tuple[jinja2.Template, 'type[BaseModel]']:
-    """Load prompt template and schema model for a pipeline step.
+def _prompts_dir(prompt_set: str) -> Path:
+    """Resolve and validate the prompt-set directory."""
+    prompts_root = Path(os.environ.get('FLOWA_PROMPT_DIR', 'prompts'))
+    prompts_dir = prompts_root / prompt_set
+
+    if not prompts_dir.exists():
+        available = [p.name for p in prompts_root.iterdir() if p.is_dir()] if prompts_root.exists() else []
+        raise ValueError(f"Prompt set '{prompt_set}' not found at {prompts_dir}. Available: {available}")
+
+    return prompts_dir
+
+
+def load_text_prompt(step: str, prompt_set: str = 'generic') -> str:
+    """Load a prompt as plain text.
+
+    Use for steps whose output isn't a Pydantic-validated structure — currently
+    just transcription, which emits free-form Markdown. For prompts that pair
+    with a result schema, use ``load_prompt_and_schema`` instead.
+    """
+    prompts_dir = _prompts_dir(prompt_set)
+    log.info('Using prompt set: %s', prompt_set)
+    return (prompts_dir / f'{step}_prompt.txt').read_text()
+
+
+def load_prompt_and_schema(step: str, prompt_set: str = 'generic') -> tuple[jinja2.Template, 'type[BaseModel]']:
+    """Load a Jinja-templated prompt together with its result schema.
+
+    Use for steps whose output is a Pydantic-validated structure (extraction,
+    aggregation). For free-form text prompts, use ``load_text_prompt`` instead.
 
     Args:
         step: Pipeline step name (e.g. 'extraction', 'aggregate').
@@ -58,13 +86,7 @@ def load_prompt(step: str, prompt_set: str = 'generic') -> tuple[jinja2.Template
     Raises:
         ValueError: If the prompt set directory does not exist.
     """
-    prompts_root = Path(os.environ.get('FLOWA_PROMPT_DIR', 'prompts'))
-    prompts_dir = prompts_root / prompt_set
-
-    if not prompts_dir.exists():
-        available = [p.name for p in prompts_root.iterdir() if p.is_dir()] if prompts_root.exists() else []
-        raise ValueError(f"Prompt set '{prompt_set}' not found at {prompts_dir}. Available: {available}")
-
+    prompts_dir = _prompts_dir(prompt_set)
     log.info('Using prompt set: %s', prompt_set)
 
     # Load and compile prompt template

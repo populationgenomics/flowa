@@ -17,6 +17,10 @@ dependencies = [
 # Match the polyglot supply-chain posture of the parent flowa repo: only
 # install package versions ≥ 7 days old.
 exclude-newer = "7 days"
+# Bypass the gate for anchorite — flowa pulls it as a base dep and we need
+# to consume newly-cut versions immediately. Drop once anchorite is older
+# than 7 days on PyPI.
+exclude-newer-package = { anchorite = "0 days" }
 
 [tool.uv.sources]
 # flowa lives one directory up. demo-gateway never installs from PyPI; it

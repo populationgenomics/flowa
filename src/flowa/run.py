@@ -48,7 +48,7 @@ async def process_paper(
             on_paper_done('download', doi)
 
         async with convert_semaphore:
-            await convert_paper_async(base, doi, convert_model)
+            await convert_paper_async(base, doi, convert_model, prompt_set)
         if on_paper_done is not None:
             on_paper_done('convert', doi)
 

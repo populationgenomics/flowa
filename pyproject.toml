@@ -6,6 +6,7 @@ readme = "README.md"
 requires-python = "==3.13.*"
 license = { file = "LICENSE" }
 dependencies = [
+    "anchorite>=0.3.0",
     "boto3",
     "defusedxml",
     "fsspec",
@@ -21,21 +22,26 @@ dependencies = [
 ]
 
 [project.optional-dependencies]
-# Require >=0.5.0 for `groundmark.convert.ModelConfig` (used by `flowa/convert.py`
-# to plumb Bedrock cost-attribution ARNs separately from the model name).
-# pydantic-ai-slim is also listed as a direct dep so the [tool.uv.sources] git
-# pin below actually applies — without that, it'd be transitive-only via
-# groundmark and uv would silently fall back to the PyPI version.
-anthropic = ["groundmark[anthropic]>=0.5.0", "pydantic-ai-slim[anthropic]"]
-bedrock = ["groundmark[bedrock]>=0.5.0", "pydantic-ai-slim[bedrock]"]
-google = ["groundmark[google]>=0.5.0", "pydantic-ai-slim[google]"]
-openai = ["groundmark[openai]>=0.5.0", "pydantic-ai-slim[openai]"]
+# pydantic-ai-slim drives both PDF→Markdown transcription (`flowa.convert`) and
+# evidence extraction/aggregation. It needs to be a declared dep (not just
+# transitive) so the [tool.uv.sources] git pin below applies — otherwise uv
+# would fall back to the PyPI version and lose the cherry-picked Bedrock
+# native-output patch.
+anthropic = ["pydantic-ai-slim[anthropic]"]
+bedrock = ["pydantic-ai-slim[bedrock]"]
+google = ["pydantic-ai-slim[google]"]
+openai = ["pydantic-ai-slim[openai]"]
 
 [tool.uv]
 # Supply-chain hygiene: only install package versions ≥ 7 days old. Pairs with
 # the npm/pnpm `min-release-age` gates configured globally; this is the
 # in-repo equivalent for the Python side so contributors and CI inherit it.
 exclude-newer = "7 days"
+
+# Bypass the gate for anchorite — we own the package and need to consume
+# newly-cut versions immediately. Drop this entry once the pinned version is
+# older than 7 days on PyPI.
+exclude-newer-package = { anchorite = "0 days" }
 
 # Pin pydantic-ai-slim to a fork of v1.83.0 with PR #4237 cherry-picked on top.
 # PR #4237 adds Bedrock native structured output (`NativeOutput`) and strict tool
@@ -44,7 +50,6 @@ exclude-newer = "7 days"
 # https://github.com/lgruen-vcgs/pydantic-ai (rebased from
 # https://github.com/shailendher/pydantic-ai/tree/feat/bedrock-native-output-support).
 # Switch back to the upstream release once #4237 lands and is published to PyPI.
-# Mirrors the same pin in ~/groundmark/pyproject.toml.
 [tool.uv.sources]
 pydantic-ai-slim = { git = "https://github.com/lgruen-vcgs/pydantic-ai", rev = "c908946f71cfafd1be18ade8d9cd1296fb6a5558", subdirectory = "pydantic_ai_slim" }
 

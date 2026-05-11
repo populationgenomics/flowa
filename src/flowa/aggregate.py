@@ -13,14 +13,27 @@ from pydantic import BaseModel
 from pydantic_ai import Agent, ModelRetry, NativeOutput, RunContext
 
 from flowa.clinvar import format_clinvar_for_prompt, query_clinvar
-from flowa.models import create_model, get_thinking_settings
-from flowa.prompts import load_prompt
+from flowa.models import create_model, get_model_settings
+from flowa.prompts import load_prompt_and_schema
 from flowa.resolve import CitationQuery, resolve_citations
 from flowa.schema import AGGREGATE_SCHEMA_VERSION, with_schema_version
 from flowa.settings import ModelConfig, Settings
-from flowa.storage import assessment_url, encode_doi, exists, paper_url, read_bytes, read_json, write_bytes, write_json
+from flowa.storage import (
+    assessment_url,
+    encode_doi,
+    exists,
+    paper_url,
+    read_bytes,
+    read_json,
+    read_text,
+    write_bytes,
+    write_json,
+)
 
 log = logging.getLogger(__name__)
+
+# Cap for thinking + structured-output combined; matches Sonnet 4.6's max output.
+_AGGREGATE_MAX_TOKENS = 64_000
 
 
 # Paper ID generation ({LastName}{Year} format), ported from palit.
@@ -101,7 +114,7 @@ def create_aggregate_agent(
         create_model(model),
         output_type=NativeOutput(output_type),
         retries=3,
-        model_settings=get_thinking_settings(model, 'aggregation'),
+        model_settings=get_model_settings(model, effort='high', max_tokens=_AGGREGATE_MAX_TOKENS),
     )
 
     @agent.output_validator
@@ -146,14 +159,15 @@ def resolve_aggregate_citations(
     aggregate_dict: dict[str, Any],
     paper_id_to_doi: dict[str, str],
     pdf_bytes_cache: dict[str, bytes],
+    markdown_cache: dict[str, str],
     metadata_cache: dict[str, dict[str, Any]],
 ) -> None:
     """Post-process aggregate output: resolve quotes to bboxes on claim citations.
 
-    Delegates the actual groundmark alignment to `flowa.resolve.resolve_citations`
-    with a cache-backed loader, then attaches the resulting bboxes onto each
-    claim's citations in place. Claims are grouped by paper_id so every
-    (paper_id, quote) pair resolves to exactly one paper.
+    Delegates the actual alignment to `flowa.resolve.resolve_citations` with
+    cache-backed loaders, then attaches the resulting bboxes onto each claim's
+    citations in place. Claims are grouped by paper_id so every (paper_id,
+    quote) pair resolves to exactly one paper.
     """
     # Collect all (doi, quote) pairs, grouped by DOI.
     doi_quotes: dict[str, list[str]] = {}
@@ -164,7 +178,11 @@ def resolve_aggregate_citations(
                 doi_quotes.setdefault(doi, []).append(citation['quote'])
 
     citations_input = [CitationQuery(doi=doi, quotes=quotes) for doi, quotes in doi_quotes.items()]
-    result = resolve_citations(citations_input, pdf_loader=pdf_bytes_cache.get)
+    result = resolve_citations(
+        citations_input,
+        pdf_loader=pdf_bytes_cache.get,
+        markdown_loader=markdown_cache.get,
+    )
 
     # Attach resolved bboxes onto each claim's citations.
     for cat_result in aggregate_dict['results']:
@@ -205,10 +223,14 @@ async def aggregate_evidence_async(
     clinvar_data = query_clinvar(query_data['hgvs_c'], ncbi_api_key)
     clinvar_text = format_clinvar_for_prompt(clinvar_data)
 
-    # Load extractions and metadata for each paper. PDF bytes are cached for
-    # post-LLM citation resolution (DocumentIndex construction).
+    # Load extractions and metadata for each paper. PDF bytes and Markdown are
+    # cached for post-LLM citation resolution: PdfIndex takes both (markdown
+    # denoises the indexed PDF chars). Both files are produced together by the
+    # pipeline; a missing markdown.md at this point is a storage corruption and
+    # surfaces as FileNotFoundError below.
     evidence_extractions: list[dict[str, Any]] = []
     pdf_bytes_cache: dict[str, bytes] = {}
+    markdown_cache: dict[str, str] = {}
     metadata_cache: dict[str, dict[str, Any]] = {}
 
     for doi in dois:
@@ -225,6 +247,7 @@ async def aggregate_evidence_async(
             continue
 
         pdf_bytes_cache[doi] = read_bytes(paper_url(base, doi, 'source.pdf'))
+        markdown_cache[doi] = read_text(paper_url(base, doi, 'markdown.md'))
         metadata = read_json(paper_url(base, doi, 'metadata.json'))
         metadata_cache[doi] = metadata
 
@@ -268,7 +291,7 @@ async def aggregate_evidence_async(
     )
 
     # Load prompt and schema from prompt set
-    prompt_template, output_type = load_prompt('aggregate', prompt_set)
+    prompt_template, output_type = load_prompt_and_schema('aggregate', prompt_set)
 
     evidence_text = (
         json.dumps(evidence_extractions, indent=2)
@@ -301,7 +324,7 @@ async def aggregate_evidence_async(
     # Post-LLM: resolve quotes to bboxes, replace paper_id with DOI
     aggregate_dict = result.output.model_dump()
     with logfire.span('flowa.resolve_citations', paper_count=len(paper_id_to_doi)):
-        resolve_aggregate_citations(aggregate_dict, paper_id_to_doi, pdf_bytes_cache, metadata_cache)
+        resolve_aggregate_citations(aggregate_dict, paper_id_to_doi, pdf_bytes_cache, markdown_cache, metadata_cache)
 
     # Store structured aggregate result
     write_json(aggregate_url, with_schema_version(aggregate_dict, AGGREGATE_SCHEMA_VERSION))

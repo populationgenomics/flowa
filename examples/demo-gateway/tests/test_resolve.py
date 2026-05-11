@@ -14,10 +14,11 @@ from flowa.storage import encode_doi
 from demo_gateway.config import Settings
 
 
-def _write_fake_pdf(data_dir: Path, doi: str, content: bytes = b'fake-pdf') -> None:
+def _write_fake_paper(data_dir: Path, doi: str, pdf: bytes = b'fake-pdf', markdown: str = '# fake md') -> None:
     paper_dir = data_dir / 'papers' / encode_doi(doi)
     paper_dir.mkdir(parents=True, exist_ok=True)
-    (paper_dir / 'source.pdf').write_bytes(content)
+    (paper_dir / 'source.pdf').write_bytes(pdf)
+    (paper_dir / 'markdown.md').write_text(markdown)
 
 
 def test_post_resolve_citations_rejects_malformed_body(client: TestClient) -> None:
@@ -51,15 +52,17 @@ def test_post_resolve_citations_returns_resolved_bboxes(
             self.bottom = bottom
             self.right = right
 
-    class _FakeDocumentIndex:
-        def __init__(self, _pdf_bytes: bytes) -> None:
+    class _FakePdfIndex:
+        def __init__(self, _pdf_bytes: bytes, *, markdown: str | None = None) -> None:
             pass
 
         def resolve(self, quotes: list[str]) -> dict[str, list[tuple[int, _FakeBbox]]]:
-            return {q: [(1, _FakeBbox(top=10, left=20, bottom=30, right=40))] for q in quotes}
+            # 0-indexed page from anchorite — the +1 boundary wrap in resolve.py
+            # turns this into page=1 on the wire.
+            return {q: [(0, _FakeBbox(top=10, left=20, bottom=30, right=40))] for q in quotes}
 
-    monkeypatch.setattr(flowa_resolve_module, 'DocumentIndex', _FakeDocumentIndex)
-    _write_fake_pdf(settings.demo_data_dir, '10.1/present')
+    monkeypatch.setattr(flowa_resolve_module, 'PdfIndex', _FakePdfIndex)
+    _write_fake_paper(settings.demo_data_dir, '10.1/present')
 
     response = client.post(
         '/resolve-citations',

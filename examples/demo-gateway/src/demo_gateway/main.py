@@ -19,7 +19,7 @@ import uvicorn
 from fastapi import APIRouter, Depends, FastAPI, HTTPException, Query, Request, status
 from fastapi.middleware.cors import CORSMiddleware
 from flowa.resolve import ResolvedCitations, ResolveRequest, resolve_citations
-from flowa.storage import paper_url, read_bytes
+from flowa.storage import paper_url, read_bytes, read_text
 from pydantic import BaseModel, Field
 
 from .config import Settings
@@ -111,18 +111,24 @@ def resolve_citations_route(
 ) -> ResolvedCitations:
     """Align verbatim quotes to PDF bboxes.
 
-    Sync `def` so FastAPI auto-runs it in the threadpool — groundmark's PDF
+    Sync `def` so FastAPI auto-runs it in the threadpool — anchorite's PDF
     parsing is CPU-bound and would block the asyncio loop otherwise.
     """
     base = str(settings.demo_data_dir)
 
-    def loader(doi: str) -> bytes | None:
+    def pdf_loader(doi: str) -> bytes | None:
         try:
             return read_bytes(paper_url(base, doi, 'source.pdf'))
         except FileNotFoundError:
             return None
 
-    return resolve_citations(body.citations, pdf_loader=loader)
+    def md_loader(doi: str) -> str | None:
+        try:
+            return read_text(paper_url(base, doi, 'markdown.md'))
+        except FileNotFoundError:
+            return None
+
+    return resolve_citations(body.citations, pdf_loader=pdf_loader, markdown_loader=md_loader)
 
 
 @asynccontextmanager

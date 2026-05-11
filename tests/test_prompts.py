@@ -11,9 +11,9 @@ from pathlib import Path
 import jinja2
 import pytest
 
-from flowa.prompts import load_prompt
+from flowa.prompts import load_prompt_and_schema
 
-# Ensure cwd-relative `prompts/` resolution in `load_prompt` lands at the repo root.
+# Ensure cwd-relative `prompts/` resolution in `load_prompt_and_schema` lands at the repo root.
 REPO_ROOT = Path(__file__).resolve().parent.parent
 
 
@@ -23,7 +23,7 @@ def _chdir_repo_root(monkeypatch):
 
 
 def test_load_extraction_prompt_renders():
-    template, output_type = load_prompt('extraction', 'generic')
+    template, output_type = load_prompt_and_schema('extraction', 'generic')
 
     rendered = template.render(
         variant_details='STUB_VARIANT_DETAILS',
@@ -40,7 +40,7 @@ def test_load_extraction_prompt_renders():
 
 
 def test_load_aggregate_prompt_renders():
-    template, output_type = load_prompt('aggregate', 'generic')
+    template, output_type = load_prompt_and_schema('aggregate', 'generic')
 
     rendered = template.render(
         variant_details='STUB_VARIANT_DETAILS',
@@ -59,7 +59,7 @@ def test_load_aggregate_prompt_renders():
 
 def test_aggregate_prompt_strict_undefined():
     """Missing context vars must raise rather than silently render empty."""
-    template, _ = load_prompt('aggregate', 'generic')
+    template, _ = load_prompt_and_schema('aggregate', 'generic')
 
     with pytest.raises(jinja2.UndefinedError):
         template.render(variant_details='only this one provided')
