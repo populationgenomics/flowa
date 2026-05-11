@@ -96,7 +96,8 @@ examples/demo/
 │           ├── paper-done.ts
 │           └── snapshot/[variantId]/[category]/[version].ts
 ├── fixtures/
-│   └── (hand-crafted aggregate + papers, copied to ./demo-data/ on first boot)
+│   └── (aggregate + papers, copied to ./demo-data/ on first boot;
+│       see LICENSES.md for attribution)
 └── test/
     ├── triage.test.ts          SQLite + API route round-trip.
     └── chat-service.test.ts    Smoke test for the entry script.
@@ -117,12 +118,17 @@ migrator runs idempotently on first API call.
 
 ## Fixture data
 
-`fixtures/` ships a small hand-crafted aggregate (one variant,
-~3 papers, ~5 claims) shaped per
+`fixtures/` ships a small aggregate (one variant) shaped per
 `prompts/generic/aggregate_schema.py:CategoryResult` and the generic
-artifact schema. On first boot, `scripts/start.ts` copies the fixture
-tree to `./demo-data/` if it isn't already present, so chat-service has
-artifacts to load when serving a session.
+artifact schema, along with the source PDFs and Markdown transcriptions
+the aggregate cites. On first boot, `scripts/start.ts` copies the
+fixture tree to `./demo-data/` if it isn't already present, so
+chat-service has artifacts to load when serving a session.
+
+The bundled papers are CC-BY 4.0 PLOS ONE; see `fixtures/LICENSES.md`
+for per-paper attribution. Anything added under `fixtures/papers/` must
+ship with a license that permits redistribution and modification — read
+the rule block in `LICENSES.md` before staging a new fixture.
 
 ## Tests
 
