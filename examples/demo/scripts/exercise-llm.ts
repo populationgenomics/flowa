@@ -69,7 +69,7 @@ const app = createApp({
   promptDir,
 });
 
-const VARIANT_ID = "RYR2-Y4725C";
+const VARIANT_ID = "RYR2-NM_001035_3-c_14174A_G";
 const CATEGORY = "acmg_classification";
 
 // Read the seeded aggregate, stringify the first result as the initial

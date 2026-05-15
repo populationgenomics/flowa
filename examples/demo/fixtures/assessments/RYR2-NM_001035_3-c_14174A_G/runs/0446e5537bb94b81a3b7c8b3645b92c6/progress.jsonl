@@ -1,0 +1,20 @@
+{"timestamp":"2026-05-15T04:44:18.382+00:00","stage":"query","kind":"stage_started","paper_id":null,"done":null,"total":null,"detail":"mastermind","error":null}
+{"timestamp":"2026-05-15T04:44:26.051+00:00","stage":"query","kind":"stage_done","paper_id":null,"done":5,"total":5,"detail":"5 papers","error":null}
+{"timestamp":"2026-05-15T04:44:26.073+00:00","stage":"download","kind":"paper","paper_id":"10.1371/journal.pone.0131517","done":1,"total":5,"detail":null,"error":null}
+{"timestamp":"2026-05-15T04:44:26.073+00:00","stage":"convert","kind":"paper","paper_id":"10.1371/journal.pone.0131517","done":1,"total":5,"detail":null,"error":null}
+{"timestamp":"2026-05-15T04:44:26.187+00:00","stage":"download","kind":"paper","paper_id":"10.1371/journal.pone.0243476","done":2,"total":5,"detail":null,"error":null}
+{"timestamp":"2026-05-15T04:44:26.188+00:00","stage":"convert","kind":"paper","paper_id":"10.1371/journal.pone.0243476","done":2,"total":5,"detail":null,"error":null}
+{"timestamp":"2026-05-15T04:44:26.599+00:00","stage":"download","kind":"paper","paper_id":"10.1253/circj.cj-12-1460","done":3,"total":5,"detail":null,"error":null}
+{"timestamp":"2026-05-15T04:44:26.599+00:00","stage":"convert","kind":"paper","paper_id":"10.1253/circj.cj-12-1460","done":3,"total":5,"detail":null,"error":null}
+{"timestamp":"2026-05-15T04:44:26.599+00:00","stage":"extract","kind":"paper","paper_id":"10.1253/circj.cj-12-1460","done":1,"total":5,"detail":null,"error":null}
+{"timestamp":"2026-05-15T04:44:28.504+00:00","stage":"download","kind":"paper","paper_id":"10.1161/CIRCGEN.116.001424","done":4,"total":5,"detail":null,"error":null}
+{"timestamp":"2026-05-15T04:44:28.508+00:00","stage":"convert","kind":"paper","paper_id":"10.1161/CIRCGEN.116.001424","done":4,"total":5,"detail":null,"error":null}
+{"timestamp":"2026-05-15T04:44:28.510+00:00","stage":"extract","kind":"paper","paper_id":"10.1161/CIRCGEN.116.001424","done":2,"total":5,"detail":null,"error":null}
+{"timestamp":"2026-05-15T04:44:29.188+00:00","stage":"download","kind":"paper","paper_id":"10.2169/internalmedicine.9843-17","done":5,"total":5,"detail":null,"error":null}
+{"timestamp":"2026-05-15T04:44:31.812+00:00","stage":"extract","kind":"paper","paper_id":"10.1371/journal.pone.0243476","done":3,"total":5,"detail":null,"error":null}
+{"timestamp":"2026-05-15T04:44:31.822+00:00","stage":"extract","kind":"paper","paper_id":"10.1371/journal.pone.0131517","done":4,"total":5,"detail":null,"error":null}
+{"timestamp":"2026-05-15T04:47:47.115+00:00","stage":"convert","kind":"paper","paper_id":"10.2169/internalmedicine.9843-17","done":5,"total":5,"detail":null,"error":null}
+{"timestamp":"2026-05-15T04:48:03.067+00:00","stage":"extract","kind":"paper","paper_id":"10.2169/internalmedicine.9843-17","done":5,"total":5,"detail":null,"error":null}
+{"timestamp":"2026-05-15T04:48:03.068+00:00","stage":"aggregate","kind":"stage_started","paper_id":null,"done":null,"total":null,"detail":null,"error":null}
+{"timestamp":"2026-05-15T04:51:07.817+00:00","stage":"aggregate","kind":"stage_done","paper_id":null,"done":null,"total":null,"detail":null,"error":null}
+{"timestamp":"2026-05-15T04:51:07.818+00:00","stage":"aggregate","kind":"run_done","paper_id":null,"done":null,"total":null,"detail":"ok","error":null}

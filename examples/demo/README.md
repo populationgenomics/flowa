@@ -125,27 +125,45 @@ the aggregate cites. On first boot, `scripts/start.ts` copies the
 fixture tree to `./demo-data/` if it isn't already present, so
 chat-service has artifacts to load when serving a session.
 
-The bundled papers are CC-BY 4.0 PLOS ONE; see `fixtures/LICENSES.md`
-for per-paper attribution. Anything added under `fixtures/papers/` must
-ship with a license that permits redistribution and modification — read
-the rule block in `LICENSES.md` before staging a new fixture.
+Two CC-BY 4.0 PLOS ONE papers ship under `fixtures/papers/` with full
+content (PDF + extracted Markdown + metadata); three more papers ship
+metadata only (no PDF, no abstract) so the literature page can render
+five rows that match what flowa originally queried, with the curator
+dropping their own PDFs in via the upload UI. See `fixtures/LICENSES.md`
+for per-paper attribution and the rule block to follow before staging
+anything new under `fixtures/papers/`.
 
-## Re-running an assessment
+## Submitting a variant from the demo UI
+
+`pnpm --filter @flowajs/demo demo` boots Next.js, chat-service, and
+demo-gateway together. Open `http://localhost:7700/`, fill in a Gene
+(e.g. `RYR2`) and HGVS c. (e.g. `NM_001035.3:c.14174A>G`), and submit.
+The Next.js handler derives the `variant_id`
+(`${gene}-${slug(transcript)}-${slug(change)}`, so
+`RYR2-NM_001035_3-c_14174A_G` for the bundled fixture) and forwards
+the run to demo-gateway. The page redirects to `/variants/[variantId]`,
+which polls the run's progress JSONL, lists per-paper download/upload
+status, and surfaces an "Open analysis" chip per category once
+`aggregate.json` lands.
+
+## Re-running an assessment from the CLI
 
 Every pipeline stage (query → download → convert → extract → aggregate)
 caches by output-file presence under `demo-data/`. To redo a stage,
 delete its output and re-run; whatever's left is reused.
 
-Resetting the bundled `RYR2-Y4725C` assessment for an end-to-end re-run
-— keeping cached inputs that don't need redoing (query results, paper
-metadata, downloaded PDFs):
+Resetting the bundled assessment for an end-to-end re-run, keeping
+cached inputs that don't need redoing (query results, paper metadata,
+downloaded PDFs):
 
 ```bash
 cd examples/demo/demo-data
-VARIANT=RYR2-Y4725C
+VARIANT=RYR2-NM_001035_3-c_14174A_G
+# Run progress is now nested under the assessment dir; clear it
+# alongside the aggregate so the next run starts clean.
 rm -f assessments/$VARIANT/aggregate.json \
       assessments/$VARIANT/aggregate_raw.json
-rm -rf assessments/$VARIANT/extractions/ runs/
+rm -rf assessments/$VARIANT/extractions/ assessments/$VARIANT/runs/
 # Re-runs flowa.convert (which uses anchorite for PDF chunking).
 # Drop this line to reuse the cached markdown and only redo extract +
 # aggregate.
@@ -172,10 +190,39 @@ Open `http://localhost:7700/viewer/$VARIANT/acmg_classification` (with
 `pnpm --filter @flowajs/demo demo` running) to exercise the on-demand
 citation-bbox alignment that demo-gateway's `/resolve-citations` serves.
 
-For a fully HTTP-driven e2e instead of the `flowa run` CLI, POST the
-same `{ variant_id, gene, hgvs_c }` body to demo-gateway's `/runs`
-endpoint while the demo is running — the orchestrator handles env
-translation for you.
+A pre-`assessments/`-layout `demo-data/runs/` from an older dev run is
+safe to delete — the current layout writes runs under
+`demo-data/assessments/{variant_id}/runs/{run_id}/`.
+
+## Capturing a fixture from a real run
+
+To replace `examples/demo/fixtures/assessments/...` with a freshly
+captured pipeline run, run the variant end-to-end (UI submission or
+`flowa run`), then copy `demo-data/assessments/{variant_id}/` into
+`fixtures/assessments/{variant_id}/`. Skip `aggregate_raw.json` and
+`extractions/*_raw.json` — those are the raw LLM conversations, large,
+and not needed by anything downstream.
+
+For papers whose source license blocks redistribution (CC-BY-NC-ND
+specifically; see `fixtures/LICENSES.md` for the rule), do **not** delete
+the whole `papers/{encodedDoi}/` directory — only delete `source.pdf`,
+`markdown.md`, and `convert_raw.json`. Keep `metadata.json` (the
+bibliographic fields are factual data, not copyrightable) but strip its
+`abstract` field for safety:
+
+```bash
+python3 -c "
+import json
+p = 'papers/<encoded-doi>/metadata.json'
+d = json.load(open(p))
+d.pop('abstract', None)
+json.dump(d, open(p, 'w'), indent=2, ensure_ascii=False)
+"
+```
+
+The metadata.json lets the literature page render the paper's title +
+author list (so the row reads sensibly), while no derivative content
+ships in the open-source repo.
 
 ## Tests
 

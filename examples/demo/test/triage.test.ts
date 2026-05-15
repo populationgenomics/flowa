@@ -19,7 +19,7 @@ import {
 import { migrate } from "../src/db/migrate";
 
 const KEY: WorkspaceKey = {
-  variantId: "RYR2-Y4725C",
+  variantId: "RYR2-NM_001035_3-c_14174A_G",
   category: "acmg_classification",
   version: 0,
 };
@@ -180,14 +180,14 @@ describe("workspace key normalisation", () => {
   test("key field order does not create duplicate workspace rows", () => {
     const db = getDb(dbPath);
     const k1: WorkspaceKey = {
-      variantId: "RYR2-Y4725C",
+      variantId: "RYR2-NM_001035_3-c_14174A_G",
       category: "acmg_classification",
       version: 0,
     };
     const k2: WorkspaceKey = {
       version: 0,
       category: "acmg_classification",
-      variantId: "RYR2-Y4725C",
+      variantId: "RYR2-NM_001035_3-c_14174A_G",
     };
     setClaimState(db, k1, "Smith2024", 0, "ACCEPTED");
     setClaimState(db, k2, "Smith2024", 1, "REJECTED");
