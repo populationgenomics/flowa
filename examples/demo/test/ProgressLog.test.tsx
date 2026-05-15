@@ -28,7 +28,7 @@ describe("<ProgressLog>", () => {
     );
   });
 
-  test("renders events in input order", () => {
+  test("renders events in input order, with the stage in the leading badge", () => {
     const events: ProgressEvent[] = [
       {
         timestamp: "2026-05-15T00:00:01.000+00:00",
@@ -54,12 +54,12 @@ describe("<ProgressLog>", () => {
       .getAllByTestId(/^progress-event-/)
       .map((el) => el.textContent ?? "");
     expect(rendered).toHaveLength(3);
-    expect(rendered[0]).toMatch(/query: started/);
-    expect(rendered[1]).toMatch(/query: done.*5\/5/);
-    expect(rendered[2]).toMatch(/run: done.*ok/);
+    expect(rendered[0]).toMatch(/query.*started/);
+    expect(rendered[1]).toMatch(/query.*done.*5\/5/);
+    expect(rendered[2]).toMatch(/aggregate.*complete.*ok/);
   });
 
-  test("renders run_error with the error message", () => {
+  test("renders run_error with the error message and red badge color", () => {
     const events: ProgressEvent[] = [
       {
         timestamp: "2026-05-15T00:00:01.000+00:00",
@@ -69,12 +69,12 @@ describe("<ProgressLog>", () => {
       },
     ];
     renderWithProvider(<ProgressLog events={events} />);
-    expect(screen.getByTestId("progress-event-run_error")).toHaveTextContent(
-      "run: error — boom",
-    );
+    const row = screen.getByTestId("progress-event-run_error");
+    expect(row).toHaveTextContent("aggregate");
+    expect(row).toHaveTextContent("error — boom");
   });
 
-  test("renders per-paper counter in `paper` events", () => {
+  test("renders per-paper counter with the stage as the badge", () => {
     const events: ProgressEvent[] = [
       {
         timestamp: "2026-05-15T00:00:01.000+00:00",
@@ -87,7 +87,8 @@ describe("<ProgressLog>", () => {
     ];
     renderWithProvider(<ProgressLog events={events} />);
     const row = screen.getByTestId("progress-event-paper");
-    expect(row).toHaveTextContent("extract: 10.1234/foo");
+    expect(row).toHaveTextContent("extract");
+    expect(row).toHaveTextContent("10.1234/foo");
     expect(row).toHaveTextContent("1/5");
   });
 });
