@@ -6,7 +6,7 @@ readme = "README.md"
 requires-python = "==3.13.*"
 license = { file = "LICENSE" }
 dependencies = [
-    "anchorite>=0.3.0",
+    "anchorite>=0.4.0",
     "boto3",
     "defusedxml",
     "fsspec",
@@ -39,9 +39,10 @@ openai = ["pydantic-ai-slim[openai]"]
 exclude-newer = "7 days"
 
 # Bypass the gate for anchorite — we own the package and need to consume
-# newly-cut versions immediately. Drop this entry once the pinned version is
-# older than 7 days on PyPI.
-exclude-newer-package = { anchorite = "0 days" }
+# newly-cut versions immediately. seq-smith comes along because new anchorite
+# releases pin it tightly. Drop entries once the pinned versions are older
+# than 7 days on PyPI.
+exclude-newer-package = { anchorite = "0 days", seq-smith = "0 days" }
 
 # Pin pydantic-ai-slim to a fork of v1.83.0 with PR #4237 cherry-picked on top.
 # PR #4237 adds Bedrock native structured output (`NativeOutput`) and strict tool
