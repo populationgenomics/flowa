@@ -133,6 +133,40 @@ assessments/{variant_id}/
     {encoded_doi}_raw.json # Raw LLM conversation
 ```
 
+## Development
+
+This repo is a polyglot monorepo: a Python pipeline under `src/flowa/`,
+TypeScript packages under `packages/`, and worked examples under
+`examples/`. Each piece has its own dependency closure, and each Python
+project (the library and `examples/demo-gateway/`) is an independent
+`uv` project. Running `pytest` from the repo root would walk into the
+sibling project and fail on its venv-specific imports — always run
+`pytest` from the project that owns the tests, scoping it to the local
+`tests/` directory:
+
+```bash
+# Library tests
+uv run pytest tests/
+
+# Demo-gateway tests
+cd examples/demo-gateway && uv run pytest tests/
+```
+
+The TypeScript packages and examples share one pnpm workspace, so the
+JS/TS test runner is a single recursive invocation:
+
+```bash
+pnpm -r typecheck
+pnpm -r test
+```
+
+Lint and format checks are unified under pre-commit; CI invokes the
+same hook so local and CI behaviour match:
+
+```bash
+uv run pre-commit run --all-files
+```
+
 ## Deployment
 
 ### Local Development
