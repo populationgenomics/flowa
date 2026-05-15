@@ -130,6 +130,53 @@ for per-paper attribution. Anything added under `fixtures/papers/` must
 ship with a license that permits redistribution and modification — read
 the rule block in `LICENSES.md` before staging a new fixture.
 
+## Re-running an assessment
+
+Every pipeline stage (query → download → convert → extract → aggregate)
+caches by output-file presence under `demo-data/`. To redo a stage,
+delete its output and re-run; whatever's left is reused.
+
+Resetting the bundled `RYR2-Y4725C` assessment for an end-to-end re-run
+— keeping cached inputs that don't need redoing (query results, paper
+metadata, downloaded PDFs):
+
+```bash
+cd examples/demo/demo-data
+VARIANT=RYR2-Y4725C
+rm -f assessments/$VARIANT/aggregate.json \
+      assessments/$VARIANT/aggregate_raw.json
+rm -rf assessments/$VARIANT/extractions/ runs/
+# Re-runs flowa.convert (which uses anchorite for PDF chunking).
+# Drop this line to reuse the cached markdown and only redo extract +
+# aggregate.
+rm -f papers/*/markdown.md papers/*/convert_raw.json
+```
+
+Then drive the pipeline. The demo's `scripts/start.ts` translates the
+demo's `.env` into the `FLOWA_*` shape `pydantic-settings` expects;
+replicate that translation when invoking the CLI directly:
+
+```bash
+cd examples/demo && set -a && source .env && set +a && cd ../..
+export FLOWA_STORAGE_BASE="$PWD/examples/demo/demo-data"
+export FLOWA_EXTRACTION_MODEL__NAME="$LLM_MODEL"
+export FLOWA_CONVERT_MODEL__NAME="$LLM_MODEL"
+if [ -n "${BEDROCK_INFERENCE_PROFILE:-}" ]; then
+  export FLOWA_EXTRACTION_MODEL__BEDROCK_INFERENCE_PROFILE="$BEDROCK_INFERENCE_PROFILE"
+  export FLOWA_CONVERT_MODEL__BEDROCK_INFERENCE_PROFILE="$BEDROCK_INFERENCE_PROFILE"
+fi
+uv run flowa run --variant-id $VARIANT --gene RYR2 --hgvs-c "NM_001035.3:c.14174A>G"
+```
+
+Open `http://localhost:7700/viewer/$VARIANT/acmg_classification` (with
+`pnpm --filter @flowajs/demo demo` running) to exercise the on-demand
+citation-bbox alignment that demo-gateway's `/resolve-citations` serves.
+
+For a fully HTTP-driven e2e instead of the `flowa run` CLI, POST the
+same `{ variant_id, gene, hgvs_c }` body to demo-gateway's `/runs`
+endpoint while the demo is running — the orchestrator handles env
+translation for you.
+
 ## Tests
 
 ```bash
