@@ -428,10 +428,15 @@ export const PdfHighlightViewer = ({
                 const pageNum = i + 1;
                 const bboxes = highlightsByPage.get(pageNum);
                 return (
+                  // `safe center` keeps the page reachable when zoomed wider than the
+                  // viewport; plain `justify-content: center` puts the page at a negative
+                  // x offset and the browser's scroll only exposes positive-x overflow,
+                  // so the left edge becomes unreachable by scrollbar or drag-to-pan.
                   <div
                     key={pageNum}
                     ref={pageNum === targetPage ? targetPageRef : undefined}
-                    className="flex justify-center"
+                    className="flex"
+                    style={{ justifyContent: "safe center" }}
                   >
                     <reactPdf.Page
                       pageNumber={pageNum}
