@@ -48,6 +48,28 @@ async def test_start_returns_record_with_running_status(tmp_path: Path) -> None:
     assert record.run_id  # non-empty
 
 
+async def test_start_creates_assessment_run_dir_before_pipeline_emits(tmp_path: Path) -> None:
+    """The literature page polls progress as soon as the variant page mounts.
+    The run dir must exist by the time `start` returns, even if the pipeline
+    hasn't emitted its first event yet."""
+    started_at_least_once = asyncio.Event()
+    never_returns = asyncio.Event()
+
+    async def hangs(*_args: object, **_kwargs: object) -> None:
+        started_at_least_once.set()
+        await never_returns.wait()
+
+    manager = _make_manager(tmp_path, pipeline=hangs)
+    record = manager.start(variant_id='hold', gene='G', hgvs_c='c.1A>T')
+
+    run_dir = tmp_path / 'assessments' / 'hold' / 'runs' / record.run_id
+    assert run_dir.is_dir()
+
+    # Allow the hanging coroutine to terminate so the event-loop closes cleanly.
+    never_returns.set()
+    await manager.wait(record.run_id)
+
+
 async def test_run_transitions_to_success_on_clean_pipeline_completion(tmp_path: Path) -> None:
     manager = _make_manager(tmp_path, pipeline=_no_op)
     record = manager.start(variant_id='V1', gene='G', hgvs_c='c.1A>T')
@@ -55,7 +77,7 @@ async def test_run_transitions_to_success_on_clean_pipeline_completion(tmp_path:
 
     assert manager.get_active('V1').status == 'success'  # type: ignore[union-attr]
 
-    progress_path = tmp_path / 'runs' / record.run_id / 'progress.jsonl'
+    progress_path = tmp_path / 'assessments' / 'V1' / 'runs' / record.run_id / 'progress.jsonl'
     assert progress_path.exists()
     last_line = progress_path.read_text().splitlines()[-1]
     last = json.loads(last_line)
@@ -73,7 +95,7 @@ async def test_run_transitions_to_error_on_pipeline_exception(tmp_path: Path) ->
 
     assert manager.get_active('V2').status == 'error'  # type: ignore[union-attr]
 
-    progress_path = tmp_path / 'runs' / record.run_id / 'progress.jsonl'
+    progress_path = tmp_path / 'assessments' / 'V2' / 'runs' / record.run_id / 'progress.jsonl'
     last = json.loads(progress_path.read_text().splitlines()[-1])
     assert last['kind'] == 'run_error'
     assert last['error'] == 'flowa boom'
@@ -146,7 +168,7 @@ async def test_pipeline_progress_events_land_in_jsonl(tmp_path: Path) -> None:
     record = manager.start(variant_id='V', gene='G', hgvs_c='c.1A>T')
     await manager.wait(record.run_id)
 
-    lines = (tmp_path / 'runs' / record.run_id / 'progress.jsonl').read_text().splitlines()
+    lines = (tmp_path / 'assessments' / 'V' / 'runs' / record.run_id / 'progress.jsonl').read_text().splitlines()
     parsed = [json.loads(line) for line in lines if line]
     kinds = [(p['stage'], p['kind']) for p in parsed]
     assert kinds == [

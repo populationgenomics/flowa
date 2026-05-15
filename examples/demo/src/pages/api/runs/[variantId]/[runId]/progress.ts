@@ -1,5 +1,5 @@
 /**
- * GET /api/runs/[runId]/progress
+ * GET /api/runs/[variantId]/[runId]/progress
  *
  * Reads the run's `progress.jsonl` directly from the shared local fs
  * (the same file demo-gateway is appending to). Same machine, same fs,
@@ -18,9 +18,12 @@ import { join } from "node:path";
 import type { NextApiRequest, NextApiResponse } from "next";
 import { getDemoDataDir } from "@/lib/demoConfig";
 
-// run_id is a uuid4 hex (32 lowercase hex chars). Validating before we
-// build a path keeps a malicious request from escaping ./demo-data/runs/.
+// run_id is a uuid4 hex (32 lowercase hex chars). variant_id comes from
+// `${gene}-${slug(transcript)}-${slug(change)}` where slug() collapses
+// every non-alphanumeric to `_`, plus dashes between parts. Validating
+// both before path construction blocks `..` escaping out of demo-data/.
 const RUN_ID_RE = /^[0-9a-f]{32}$/;
+const VARIANT_ID_RE = /^[A-Za-z0-9_-]+$/;
 
 interface ProgressEvent {
   timestamp: string;
@@ -48,13 +51,24 @@ export default async function handler(
     return;
   }
 
-  const { runId } = req.query;
+  const { variantId, runId } = req.query;
+  if (typeof variantId !== "string" || !VARIANT_ID_RE.test(variantId)) {
+    res.status(400).json({ error: "Invalid variantId" });
+    return;
+  }
   if (typeof runId !== "string" || !RUN_ID_RE.test(runId)) {
     res.status(400).json({ error: "Invalid runId" });
     return;
   }
 
-  const filePath = join(getDemoDataDir(), "runs", runId, "progress.jsonl");
+  const filePath = join(
+    getDemoDataDir(),
+    "assessments",
+    variantId,
+    "runs",
+    runId,
+    "progress.jsonl",
+  );
 
   let raw: string;
   try {

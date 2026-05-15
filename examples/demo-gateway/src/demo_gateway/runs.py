@@ -115,7 +115,13 @@ class RunManager:
         started_at = now_iso()
         record = RunRecord(run_id=run_id, variant_id=variant_id, started_at=started_at, status='running')
 
-        sink_path = self._data_dir / 'runs' / run_id / 'progress.jsonl'
+        # `progress.jsonl` lives under the assessment dir so the run is
+        # discoverable by variant alone via a filesystem scan (no run-id
+        # manifest needed). ProgressSink's `mkdir(parents=True)` creates
+        # the full `assessments/<variant>/runs/<run>/` chain, so the run
+        # dir exists even if the pipeline dies before any other artifact
+        # is written.
+        sink_path = self._data_dir / 'assessments' / variant_id / 'runs' / run_id / 'progress.jsonl'
         sink = ProgressSink(sink_path)
 
         self._records[variant_id] = record

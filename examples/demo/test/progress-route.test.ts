@@ -1,5 +1,5 @@
 /**
- * Tests for `GET /api/runs/[runId]/progress`.
+ * Tests for `GET /api/runs/[variantId]/[runId]/progress`.
  *
  * The route reads the JSONL straight off disk; tests write fixture files
  * to a tmp dir, point DEMO_DATA_DIR at it, and invoke the handler with
@@ -11,7 +11,7 @@ import { mkdirSync, mkdtempSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import type { NextApiRequest, NextApiResponse } from "next";
-import handler from "../src/pages/api/runs/[runId]/progress";
+import handler from "../src/pages/api/runs/[variantId]/[runId]/progress";
 
 let dataRoot: string;
 let originalDemoDataDir: string | undefined;
@@ -43,8 +43,12 @@ interface CapturedResponse {
   headers: Record<string, string>;
 }
 
-function makeReq(method: string, runId: string): NextApiRequest {
-  return { method, query: { runId } } as unknown as NextApiRequest;
+function makeReq(
+  method: string,
+  variantId: string,
+  runId: string,
+): NextApiRequest {
+  return { method, query: { variantId, runId } } as unknown as NextApiRequest;
 }
 
 function makeRes(): { res: NextApiResponse; captured: CapturedResponse } {
@@ -74,8 +78,12 @@ function makeRes(): { res: NextApiResponse; captured: CapturedResponse } {
   return { res, captured };
 }
 
-function writeProgressFile(runId: string, lines: object[]): void {
-  const dir = join(dataRoot, "runs", runId);
+function writeProgressFile(
+  variantId: string,
+  runId: string,
+  lines: object[],
+): void {
+  const dir = join(dataRoot, "assessments", variantId, "runs", runId);
   mkdirSync(dir, { recursive: true });
   writeFileSync(
     join(dir, "progress.jsonl"),
@@ -83,35 +91,53 @@ function writeProgressFile(runId: string, lines: object[]): void {
   );
 }
 
+const VALID_VARIANT_ID = "RYR2-NM_001035_3-c_14174A_G";
 const VALID_RUN_ID = "0123456789abcdef0123456789abcdef";
 
-describe("GET /api/runs/[runId]/progress", () => {
+describe("GET /api/runs/[variantId]/[runId]/progress", () => {
   test("rejects non-GET methods", async () => {
     const { res, captured } = makeRes();
-    await handler(makeReq("POST", VALID_RUN_ID), res);
+    await handler(makeReq("POST", VALID_VARIANT_ID, VALID_RUN_ID), res);
     expect(captured.statusCode).toBe(405);
   });
 
   test("rejects malformed runId", async () => {
     const { res, captured } = makeRes();
-    await handler(makeReq("GET", "not-a-uuid"), res);
+    await handler(makeReq("GET", VALID_VARIANT_ID, "not-a-uuid"), res);
     expect(captured.statusCode).toBe(400);
   });
 
   test("rejects path traversal attempts in runId", async () => {
     const { res, captured } = makeRes();
-    await handler(makeReq("GET", "../escape"), res);
+    await handler(makeReq("GET", VALID_VARIANT_ID, "../escape"), res);
+    expect(captured.statusCode).toBe(400);
+  });
+
+  test("rejects path traversal attempts in variantId", async () => {
+    const { res, captured } = makeRes();
+    await handler(makeReq("GET", "../escape", VALID_RUN_ID), res);
+    expect(captured.statusCode).toBe(400);
+  });
+
+  test("rejects variantId with disallowed characters", async () => {
+    const { res, captured } = makeRes();
+    // `:` is in HGVS-c but the auto-derivation slugs it to `_`; an
+    // un-slugged value should fail the validator.
+    await handler(
+      makeReq("GET", "RYR2-NM_001035.3:c.14174A>G", VALID_RUN_ID),
+      res,
+    );
     expect(captured.statusCode).toBe(400);
   });
 
   test("returns 404 when no progress file exists", async () => {
     const { res, captured } = makeRes();
-    await handler(makeReq("GET", VALID_RUN_ID), res);
+    await handler(makeReq("GET", VALID_VARIANT_ID, VALID_RUN_ID), res);
     expect(captured.statusCode).toBe(404);
   });
 
   test("returns parsed events with terminal=false while running", async () => {
-    writeProgressFile(VALID_RUN_ID, [
+    writeProgressFile(VALID_VARIANT_ID, VALID_RUN_ID, [
       {
         timestamp: "2026-05-07T00:00:01.000+00:00",
         stage: "query",
@@ -126,7 +152,7 @@ describe("GET /api/runs/[runId]/progress", () => {
       },
     ]);
     const { res, captured } = makeRes();
-    await handler(makeReq("GET", VALID_RUN_ID), res);
+    await handler(makeReq("GET", VALID_VARIANT_ID, VALID_RUN_ID), res);
     expect(captured.statusCode).toBe(200);
     const body = captured.body as { events: unknown[]; terminal: boolean };
     expect(body.events).toHaveLength(2);
@@ -134,7 +160,7 @@ describe("GET /api/runs/[runId]/progress", () => {
   });
 
   test("sets terminal=true when last event is run_done", async () => {
-    writeProgressFile(VALID_RUN_ID, [
+    writeProgressFile(VALID_VARIANT_ID, VALID_RUN_ID, [
       {
         timestamp: "2026-05-07T00:00:01.000+00:00",
         stage: "aggregate",
@@ -143,13 +169,13 @@ describe("GET /api/runs/[runId]/progress", () => {
       },
     ]);
     const { res, captured } = makeRes();
-    await handler(makeReq("GET", VALID_RUN_ID), res);
+    await handler(makeReq("GET", VALID_VARIANT_ID, VALID_RUN_ID), res);
     expect(captured.statusCode).toBe(200);
     expect((captured.body as { terminal: boolean }).terminal).toBe(true);
   });
 
   test("sets terminal=true when last event is run_error", async () => {
-    writeProgressFile(VALID_RUN_ID, [
+    writeProgressFile(VALID_VARIANT_ID, VALID_RUN_ID, [
       {
         timestamp: "2026-05-07T00:00:01.000+00:00",
         stage: "aggregate",
@@ -158,7 +184,7 @@ describe("GET /api/runs/[runId]/progress", () => {
       },
     ]);
     const { res, captured } = makeRes();
-    await handler(makeReq("GET", VALID_RUN_ID), res);
+    await handler(makeReq("GET", VALID_VARIANT_ID, VALID_RUN_ID), res);
     expect((captured.body as { terminal: boolean }).terminal).toBe(true);
   });
 });
