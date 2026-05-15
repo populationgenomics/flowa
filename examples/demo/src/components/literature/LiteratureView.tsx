@@ -2,7 +2,6 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import Link from "next/link";
 import {
   Alert,
-  Box,
   Button,
   Group,
   Loader,
@@ -13,6 +12,7 @@ import {
 } from "@mantine/core";
 import {
   IconAlertCircle,
+  IconChevronRight,
   IconExternalLink,
   IconPlayerPlay,
   IconRefresh,
@@ -238,36 +238,30 @@ export function LiteratureView({ variantId }: LiteratureViewProps) {
     <Stack gap="lg" data-testid="literature-view">
       <Group justify="space-between" align="flex-end">
         <div>
-          <Title order={2}>{variantId}</Title>
-          <Text size="sm" c="dimmed">
+          <Text size="xs" c="dimmed" tt="uppercase" fw={600}>
             Literature triage
           </Text>
+          {/* Variant ids are technical identifiers; the monospace
+              treatment reads as "system value" rather than prose. */}
+          <Title order={2} ff="monospace">
+            {variantId}
+          </Title>
         </div>
-        <Group>
-          <Button
-            variant="default"
-            leftSection={<IconExternalLink size={14} />}
-            disabled={!papersResp || papersResp.papers.length === 0}
-            onClick={handleOpenAllUrls}
-          >
-            Open all URLs
-          </Button>
-          <Button
-            leftSection={
-              latest === null ? (
-                <IconPlayerPlay size={14} />
-              ) : (
-                <IconRefresh size={14} />
-              )
-            }
-            loading={isReanalyzing}
-            disabled={isRunActive || !hasReanalyzeContext}
-            title={reanalyzeDisabledReason}
-            onClick={handleReanalyze}
-          >
-            {reanalyzeLabel}
-          </Button>
-        </Group>
+        <Button
+          leftSection={
+            latest === null ? (
+              <IconPlayerPlay size={14} />
+            ) : (
+              <IconRefresh size={14} />
+            )
+          }
+          loading={isReanalyzing}
+          disabled={isRunActive || !hasReanalyzeContext}
+          title={reanalyzeDisabledReason}
+          onClick={handleReanalyze}
+        >
+          {reanalyzeLabel}
+        </Button>
       </Group>
 
       {error && (
@@ -276,25 +270,36 @@ export function LiteratureView({ variantId }: LiteratureViewProps) {
         </Alert>
       )}
 
-      {papersResp && papersResp.aggregateExists && (
-        <Group gap="xs">
-          {papersResp.categories.map((category) => (
-            <Button
-              key={category}
-              component={Link}
-              href={`/viewer/${encodeURIComponent(variantId)}/${encodeURIComponent(category)}`}
-              variant="filled"
-            >
-              Open analysis: {category}
-            </Button>
-          ))}
-        </Group>
-      )}
+      {papersResp &&
+        papersResp.aggregateExists &&
+        papersResp.categories.length > 0 && (
+          <SectionPaper accentColor="teal">
+            <SectionHeader title="Results" />
+            <Group gap="xs">
+              {papersResp.categories.map((category) => (
+                <ResultCard
+                  key={category}
+                  variantId={variantId}
+                  category={category}
+                />
+              ))}
+            </Group>
+          </SectionPaper>
+        )}
 
-      <Box>
-        <Title order={4} mb="xs">
-          Papers
-        </Title>
+      <SectionPaper accentColor="blue">
+        <Group justify="space-between" align="center" mb="md">
+          <SectionHeader title="Papers" noMargin />
+          <Button
+            variant="default"
+            size="xs"
+            leftSection={<IconExternalLink size={14} />}
+            disabled={!papersResp || papersResp.papers.length === 0}
+            onClick={handleOpenAllUrls}
+          >
+            Open all URLs
+          </Button>
+        </Group>
         {!papersResp ? (
           <Loader size="sm" />
         ) : papersResp.papers.length === 0 ? (
@@ -320,22 +325,74 @@ export function LiteratureView({ variantId }: LiteratureViewProps) {
               ))}
           </Stack>
         )}
-      </Box>
+      </SectionPaper>
 
-      <Box>
-        <Title order={4} mb="xs">
-          Progress
-        </Title>
-        <Paper withBorder p="sm">
-          <ProgressLog
-            events={progress?.events ?? []}
-            emptyMessage={
-              latest === null ? "No runs yet." : "Waiting for the first event…"
-            }
-          />
-        </Paper>
-      </Box>
+      <SectionPaper accentColor="indigo">
+        <SectionHeader title="Progress" />
+        <ProgressLog
+          events={progress?.events ?? []}
+          emptyMessage={
+            latest === null ? "No runs yet." : "Waiting for the first event…"
+          }
+        />
+      </SectionPaper>
     </Stack>
+  );
+}
+
+interface SectionPaperProps {
+  accentColor: string;
+  children: React.ReactNode;
+}
+
+function SectionPaper({ accentColor, children }: SectionPaperProps) {
+  return (
+    <Paper
+      withBorder
+      p="lg"
+      style={{
+        borderTop: `3px solid var(--mantine-color-${accentColor}-6)`,
+      }}
+    >
+      {children}
+    </Paper>
+  );
+}
+
+interface SectionHeaderProps {
+  title: string;
+  noMargin?: boolean;
+}
+
+function SectionHeader({ title, noMargin }: SectionHeaderProps) {
+  return (
+    <Title order={3} mb={noMargin ? undefined : "md"}>
+      {title}
+    </Title>
+  );
+}
+
+interface ResultCardProps {
+  variantId: string;
+  category: string;
+}
+
+function ResultCard({ variantId, category }: ResultCardProps) {
+  // Teal-light keeps the same colour identity the aggregate stage has
+  // in the progress log, so a "result available" reads as the same
+  // family as "aggregate completed" without taking a full-width bar
+  // per category — chips flow horizontally and scale to N categories.
+  return (
+    <Button
+      component={Link}
+      href={`/viewer/${encodeURIComponent(variantId)}/${encodeURIComponent(category)}`}
+      variant="light"
+      color="teal"
+      rightSection={<IconChevronRight size={14} />}
+      data-testid={`result-card-${category}`}
+    >
+      {category}
+    </Button>
   );
 }
 
@@ -367,7 +424,10 @@ function BulkDropzone({ onFiles }: BulkDropzoneProps) {
       onDrop={onDrop}
       style={{
         borderStyle: "dashed",
-        background: dragOver ? "var(--mantine-color-blue-light)" : undefined,
+        borderColor: "var(--mantine-color-blue-4)",
+        background: dragOver
+          ? "var(--mantine-color-blue-light)"
+          : "var(--mantine-color-blue-0)",
       }}
     >
       <Group justify="space-between" align="center">

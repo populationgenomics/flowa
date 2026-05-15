@@ -41,11 +41,20 @@ export function PaperStatusGroup({
   onUpload,
 }: PaperStatusGroupProps) {
   if (papers.length === 0) return null;
+  const color = STATUS_COLORS[status];
   return (
-    <Paper withBorder p="sm" data-testid={`paper-status-group-${status}`}>
+    <Paper
+      withBorder
+      p="sm"
+      data-testid={`paper-status-group-${status}`}
+      // Echo the status badge as a thin rule on the left edge so the
+      // colour carries down the group rather than living only on the
+      // numeric badge.
+      style={{ borderLeft: `4px solid var(--mantine-color-${color}-6)` }}
+    >
       <Group justify="space-between" mb="xs">
         <Title order={5}>{STATUS_LABELS[status]}</Title>
-        <Badge color={STATUS_COLORS[status]} variant="light">
+        <Badge color={color} variant="light">
           {papers.length}
         </Badge>
       </Group>

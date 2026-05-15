@@ -103,7 +103,16 @@ export default function IndexPage() {
           </Text>
         </div>
 
-        <Paper withBorder p="md">
+        <Paper
+          withBorder
+          p="lg"
+          // Top accent rule matches the literature triage sections so
+          // both pages share the same horizontal-card-accent vocabulary.
+          style={{ borderTop: "3px solid var(--mantine-color-indigo-6)" }}
+        >
+          <Title order={3} mb="md">
+            New analysis
+          </Title>
           <form onSubmit={onSubmit}>
             <Stack>
               <TextInput
@@ -144,8 +153,12 @@ export default function IndexPage() {
           </Alert>
         )}
 
-        <div>
-          <Title order={4} mb="xs">
+        <Paper
+          withBorder
+          p="lg"
+          style={{ borderTop: "3px solid var(--mantine-color-teal-6)" }}
+        >
+          <Title order={3} mb="md">
             Run history
           </Title>
           {!history ? (
@@ -183,7 +196,7 @@ export default function IndexPage() {
               )}
             </Stack>
           )}
-        </div>
+        </Paper>
       </Stack>
     </Container>
   );
@@ -197,7 +210,9 @@ function RunHistoryRow({ row }: { row: RunRow }) {
           component={Link}
           href={`/variants/${encodeURIComponent(row.variant_id)}`}
         >
-          {row.variant_id}
+          <Text size="sm" ff="monospace" component="span">
+            {row.variant_id}
+          </Text>
         </Anchor>
       </Table.Td>
       <Table.Td>{row.gene ?? "—"}</Table.Td>
@@ -211,7 +226,7 @@ function RunHistoryRow({ row }: { row: RunRow }) {
       </Table.Td>
       <Table.Td>
         <Badge
-          color={row.terminal ? "gray" : "blue"}
+          color={row.terminal ? "green" : "blue"}
           variant={row.terminal ? "light" : "filled"}
         >
           {row.terminal ? "Done" : "Running"}

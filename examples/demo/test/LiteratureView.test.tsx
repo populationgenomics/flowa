@@ -180,22 +180,25 @@ describe("<LiteratureView>", () => {
     });
   });
 
-  test("renders Open analysis buttons when aggregateExists", async () => {
+  test("renders a Results card per category when aggregateExists", async () => {
     arrangeFetch({
       papers: papersResp({
         aggregateExists: true,
-        categories: ["acmg_classification"],
+        categories: ["acmg_classification", "phenotype_summary"],
       }),
     });
     renderView();
     await waitFor(() => {
       expect(
-        screen.getByText("Open analysis: acmg_classification"),
+        screen.getByTestId("result-card-acmg_classification"),
       ).toBeInTheDocument();
     });
+    expect(
+      screen.getByTestId("result-card-phenotype_summary"),
+    ).toBeInTheDocument();
   });
 
-  test("hides Open analysis buttons when aggregateExists is false", async () => {
+  test("hides the Results section when aggregateExists is false", async () => {
     arrangeFetch();
     renderView();
     await waitFor(() => {
@@ -203,7 +206,8 @@ describe("<LiteratureView>", () => {
         screen.getByText(/Gender Differences in RYR2 Mutations/),
       ).toBeInTheDocument();
     });
-    expect(screen.queryByText(/Open analysis/)).not.toBeInTheDocument();
+    expect(screen.queryByText("Results")).not.toBeInTheDocument();
+    expect(screen.queryByTestId(/^result-card-/)).not.toBeInTheDocument();
   });
 
   test("disables Re-analyze while the latest run is active", async () => {
