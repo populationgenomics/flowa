@@ -30,7 +30,9 @@ interface MockParseResult {
   files: Record<string, { filepath: string }[]>;
 }
 
-const mockParseImpl = vi.fn<(...args: unknown[]) => void>();
+type ParseCallback = (err: unknown, fields: unknown, files: unknown) => void;
+
+const mockParseImpl = vi.fn<(req: unknown, callback: ParseCallback) => void>();
 
 vi.mock("formidable", () => {
   const factory = vi.fn(() => ({
@@ -102,25 +104,15 @@ function postReq(doi: string): NextApiRequest {
 }
 
 function arrangeMockParse(result: MockParseResult): void {
-  mockParseImpl.mockImplementation(
-    (
-      _req: unknown,
-      callback: (err: unknown, fields: unknown, files: unknown) => void,
-    ) => {
-      callback(null, {}, result.files);
-    },
-  );
+  mockParseImpl.mockImplementation((_req, callback) => {
+    callback(null, {}, result.files);
+  });
 }
 
 function arrangeMockParseError(message: string): void {
-  mockParseImpl.mockImplementation(
-    (
-      _req: unknown,
-      callback: (err: unknown, fields: unknown, files: unknown) => void,
-    ) => {
-      callback(new Error(message), {}, {});
-    },
-  );
+  mockParseImpl.mockImplementation((_req, callback) => {
+    callback(new Error(message), {}, {});
+  });
 }
 
 describe("POST /api/papers/[doi]/pdf", () => {

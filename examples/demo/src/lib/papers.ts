@@ -45,9 +45,15 @@ export interface PapersForVariant {
   papers: PaperRow[];
   aggregateExists: boolean;
   categories: string[];
+  /** From `query.json`; null if the run died before the query stage. */
+  gene: string | null;
+  /** From `query.json`; null if the run died before the query stage. */
+  hgvs_c: string | null;
 }
 
 interface QueryFile {
+  gene?: string;
+  hgvs_c?: string;
   dois: string[];
 }
 
@@ -71,7 +77,13 @@ export async function listPapersForVariant(
   // Query stage hasn't run → nothing to list yet.
   const queryPath = join(assessmentDir, "query.json");
   if (!existsSync(queryPath)) {
-    return { papers: [], aggregateExists: false, categories: [] };
+    return {
+      papers: [],
+      aggregateExists: false,
+      categories: [],
+      gene: null,
+      hgvs_c: null,
+    };
   }
   const query = JSON.parse(await readFile(queryPath, "utf8")) as QueryFile;
 
@@ -123,5 +135,11 @@ export async function listPapersForVariant(
     });
   }
 
-  return { papers, aggregateExists, categories };
+  return {
+    papers,
+    aggregateExists,
+    categories,
+    gene: query.gene ?? null,
+    hgvs_c: query.hgvs_c ?? null,
+  };
 }

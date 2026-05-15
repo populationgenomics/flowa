@@ -80,7 +80,16 @@ describe("listPapersForVariant", () => {
       papers: [],
       aggregateExists: false,
       categories: [],
+      gene: null,
+      hgvs_c: null,
     });
+  });
+
+  test("returns gene + hgvs_c from query.json when present", async () => {
+    writeQuery("V1", ["10.1234/foo"]);
+    const result = await listPapersForVariant("V1", { dataDir: dataRoot });
+    expect(result.gene).toBe("RYR2");
+    expect(result.hgvs_c).toBe("NM_001035.3:c.14174A>G");
   });
 
   test("status is `needs_manual` when neither PDF nor extract exist", async () => {
