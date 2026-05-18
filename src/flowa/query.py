@@ -411,6 +411,57 @@ def _load_cached_query(cache_url: str) -> QueryResult | None:
         return None
 
 
+async def query_pmids(
+    variant_spec: VariantSpec,
+    source: Literal['mastermind', 'litvar'],
+    mastermind_api_token: str | None = None,
+) -> list[int]:
+    """Normalise the variant and query the chosen literature source for PMIDs.
+
+    Stateless: no caching, no persistence. The full assessment pipeline uses
+    `query_dois_async` (which also writes `variant_details.json` and resolves
+    PMIDs to DOIs); callers that just need PMIDs for a given `variant_spec`
+    (e.g. variant-sync's bundle-import flow) should use this function.
+    """
+    item = variant_spec.variants[0]
+    hgvs = f'{item.transcript}:{item.hgvs_c}'
+    log.info('Variant: %s (source: %s)', hgvs, source)
+    variant_details = await normalize_variant(hgvs, item.transcript)
+    return await _query_pmids_from_details(variant_details, source, mastermind_api_token)
+
+
+async def _query_pmids_from_details(
+    variant_details: dict,
+    source: Literal['mastermind', 'litvar'],
+    mastermind_api_token: str | None,
+) -> list[int]:
+    """Dispatch a literature query against a precomputed normalised-variant dict.
+
+    Shared between `query_pmids` (variant-sync's entry point) and
+    `query_dois_async` (the assessment pipeline, which still needs the
+    normalised dict for `variant_details.json` persistence and so reuses
+    this helper to avoid duplicating the field-picking logic).
+    """
+    if source == 'mastermind':
+        if not mastermind_api_token:
+            raise ValueError('MASTERMIND_API_TOKEN environment variable not set')
+        return await query_mastermind(variant_details['grch38']['hgvs_g'], mastermind_api_token)
+
+    # LitVar fallback args: prefer MANE Select's projection, fall back to
+    # the caller's transcript when MANE has none (e.g. intronic / splice
+    # variants lack a protein form).
+    mane = variant_details.get('mane_select')
+    user_tx = variant_details.get('user_transcript')
+    protein_short = (mane and mane.get('protein_short')) or (user_tx and user_tx.get('protein_short')) or None
+    litvar_hgvs_c = (mane and mane.get('hgvs_c')) or (user_tx and user_tx.get('hgvs_c')) or None
+    return await query_litvar(
+        rsid=variant_details.get('rsid'),
+        gene_symbol=variant_details['gene_symbol'],
+        protein_short=protein_short,
+        hgvs_c=litvar_hgvs_c,
+    )
+
+
 async def query_dois_async(
     base: str,
     variant_id: str,
@@ -437,30 +488,7 @@ async def query_dois_async(
     write_json(variant_details_url, variant_details)
     log.info('Stored normalised variant to %s', variant_details_url)
 
-    # Pull the fields downstream queries need.
-    hgvs_g = variant_details['grch38']['hgvs_g']
-    rsid = variant_details.get('rsid')
-    gene_symbol = variant_details['gene_symbol']
-    # For LitVar's p.short / c. fallbacks: prefer MANE Select's projection,
-    # fall back to the caller's transcript when MANE has none (e.g.
-    # intronic / splice variants lack a protein form).
-    mane = variant_details.get('mane_select')
-    user_tx = variant_details.get('user_transcript')
-    protein_short = (mane and mane.get('protein_short')) or (user_tx and user_tx.get('protein_short')) or None
-    litvar_hgvs_c = (mane and mane.get('hgvs_c')) or (user_tx and user_tx.get('hgvs_c')) or None
-
-    # Query literature source for PMIDs.
-    if source == 'mastermind':
-        if not mastermind_api_token:
-            raise ValueError('MASTERMIND_API_TOKEN environment variable not set')
-        pmids = await query_mastermind(hgvs_g, mastermind_api_token)
-    else:  # litvar
-        pmids = await query_litvar(
-            rsid=rsid,
-            gene_symbol=gene_symbol,
-            protein_short=protein_short,
-            hgvs_c=litvar_hgvs_c,
-        )
+    pmids = await _query_pmids_from_details(variant_details, source, mastermind_api_token)
 
     # Resolve PMIDs to DOIs and store metadata for each paper
     log.info('Resolving %d PMIDs to DOIs', len(pmids))
