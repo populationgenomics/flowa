@@ -17,7 +17,8 @@
   },
   "pnpm": {
     "overrides": {
-      "fast-xml-parser": "^5.7.3"
+      "fast-xml-parser": "^5.7.3",
+      "@opentelemetry/otlp-transformer>protobufjs": "~8.0.2"
     }
   }
 }
