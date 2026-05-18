@@ -64,7 +64,7 @@
     "@opentelemetry/sdk-trace-base": "2.7.1",
     "ai": "6.0.168",
     "aws4fetch": "1.0.20",
-    "hono": "4.12.15",
+    "hono": "4.12.18",
     "jose": "6.2.3",
     "nunjucks": "3.2.4",
     "yaml": "2.8.3",
