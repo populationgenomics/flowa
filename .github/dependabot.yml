@@ -1,0 +1,91 @@
+# Dependabot configuration for flowa.
+#
+# Strategy:
+# - Weekly version-update PRs per ecosystem, grouped so minor/patch bumps land
+#   in a single PR. Majors still get individual PRs so they can be reviewed in
+#   isolation.
+# - Security-update PRs (opened as soon as an advisory drops) use the same
+#   per-ecosystem groups; that switch is toggled separately at
+#   Settings -> Code security -> "Dependabot security updates" and is wired up
+#   alongside this file.
+# - 7-day cooldown matches the local supply-chain hygiene policy
+#   (`min-release-age=7d` in pnpm's global config, `exclude-newer = "7 days"`
+#   in each uv project). Without it Dependabot would happily open PRs that CI
+#   then rejects because the new version is too fresh.
+# - The reviewer assignment notifies @lgruen-vcgs on each PR; the weekly
+#   cadence keeps the inbox manageable.
+
+version: 2
+
+updates:
+  # npm / pnpm — covers the root pnpm-lock.yaml and every workspace package
+  # (packages/*, examples/*). Dependabot follows the workspace graph
+  # automatically; one entry here is enough.
+  - package-ecosystem: "npm"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+    open-pull-requests-limit: 10
+    reviewers:
+      - "lgruen-vcgs"
+    labels:
+      - "dependencies"
+      - "npm"
+    commit-message:
+      prefix: "deps"
+    cooldown:
+      default-days: 7
+    groups:
+      npm-non-major:
+        patterns:
+          - "*"
+        update-types:
+          - "minor"
+          - "patch"
+
+  # uv / Python — the flowa library project at the repo root.
+  - package-ecosystem: "uv"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+    open-pull-requests-limit: 10
+    reviewers:
+      - "lgruen-vcgs"
+    labels:
+      - "dependencies"
+      - "python"
+    commit-message:
+      prefix: "deps"
+    cooldown:
+      default-days: 7
+    groups:
+      python-non-major:
+        patterns:
+          - "*"
+        update-types:
+          - "minor"
+          - "patch"
+
+  # uv / Python — examples/demo-gateway is its own uv project with its own
+  # uv.lock, so it needs its own entry.
+  - package-ecosystem: "uv"
+    directory: "/examples/demo-gateway"
+    schedule:
+      interval: "weekly"
+    open-pull-requests-limit: 10
+    reviewers:
+      - "lgruen-vcgs"
+    labels:
+      - "dependencies"
+      - "python"
+    commit-message:
+      prefix: "deps"
+    cooldown:
+      default-days: 7
+    groups:
+      python-non-major:
+        patterns:
+          - "*"
+        update-types:
+          - "minor"
+          - "patch"
