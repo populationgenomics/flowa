@@ -28,12 +28,23 @@ afterEach(() => {
   rmSync(dataRoot, { recursive: true, force: true });
 });
 
-function writeQuery(variantId: string, gene: string, hgvs_c: string): void {
+function writeQuery(
+  variantId: string,
+  transcript: string,
+  hgvs_c: string,
+): void {
   const dir = join(dataRoot, "assessments", variantId);
   mkdirSync(dir, { recursive: true });
   writeFileSync(
     join(dir, "query.json"),
-    JSON.stringify({ schema_version: 1, gene, hgvs_c, dois: [] }),
+    JSON.stringify({
+      schema_version: 2,
+      variant_spec: {
+        schema_version: 1,
+        variants: [{ kind: "hgvs_c", transcript, hgvs_c }],
+      },
+      dois: [],
+    }),
   );
 }
 
@@ -61,12 +72,12 @@ describe("scanRunsHistory", () => {
   });
 
   test("returns one row per run across all variants", async () => {
-    writeQuery("RYR2-c_14174A_G", "RYR2", "c.14174A>G");
-    writeRun("RYR2-c_14174A_G", "a".repeat(32), [
+    writeQuery("NM_001035_3-c_14174A_G", "NM_001035.3", "c.14174A>G");
+    writeRun("NM_001035_3-c_14174A_G", "a".repeat(32), [
       { timestamp: "2026-05-01T00:00:00.000+00:00", kind: "stage_started" },
       { timestamp: "2026-05-01T00:01:00.000+00:00", kind: "run_done" },
     ]);
-    writeRun("RYR2-c_14174A_G", "b".repeat(32), [
+    writeRun("NM_001035_3-c_14174A_G", "b".repeat(32), [
       { timestamp: "2026-05-02T00:00:00.000+00:00", kind: "stage_started" },
     ]);
 
@@ -76,7 +87,7 @@ describe("scanRunsHistory", () => {
   });
 
   test("sorts descending by started_at", async () => {
-    writeQuery("V1", "G", "c.1A>T");
+    writeQuery("V1", "NM_000001.1", "c.1A>T");
     writeRun("V1", "1".padStart(32, "0"), [
       { timestamp: "2026-05-01T00:00:00.000+00:00", kind: "run_done" },
     ]);
@@ -95,30 +106,29 @@ describe("scanRunsHistory", () => {
     ]);
   });
 
-  test("joins gene + hgvs_c from sibling query.json", async () => {
-    writeQuery("RYR2-c_14174A_G", "RYR2", "NM_001035.3:c.14174A>G");
-    writeRun("RYR2-c_14174A_G", "a".repeat(32), [
+  test("assembles colon-glued hgvs_c from variant_spec in sibling query.json", async () => {
+    writeQuery("NM_001035_3-c_14174A_G", "NM_001035.3", "c.14174A>G");
+    writeRun("NM_001035_3-c_14174A_G", "a".repeat(32), [
       { timestamp: "2026-05-01T00:00:00.000+00:00", kind: "run_done" },
     ]);
 
     const result = await scanRunsHistory({ page: 1, dataDir: dataRoot });
     expect(result.runs[0]).toMatchObject({
-      gene: "RYR2",
       hgvs_c: "NM_001035.3:c.14174A>G",
     });
   });
 
-  test("returns null gene/hgvs_c when the run died before query.json existed", async () => {
+  test("returns null hgvs_c when the run died before query.json existed", async () => {
     writeRun("ghost", "a".repeat(32), [
       { timestamp: "2026-05-01T00:00:00.000+00:00", kind: "run_error" },
     ]);
 
     const result = await scanRunsHistory({ page: 1, dataDir: dataRoot });
-    expect(result.runs[0]).toMatchObject({ gene: null, hgvs_c: null });
+    expect(result.runs[0]).toMatchObject({ hgvs_c: null });
   });
 
   test("marks runs terminal when last event is run_done or run_error", async () => {
-    writeQuery("V1", "G", "c.1A>T");
+    writeQuery("V1", "NM_000001.1", "c.1A>T");
     writeRun("V1", "a".repeat(32), [
       { timestamp: "2026-05-01T00:00:00.000+00:00", kind: "run_done" },
     ]);
@@ -137,7 +147,7 @@ describe("scanRunsHistory", () => {
   });
 
   test("paginates with page and pageSize", async () => {
-    writeQuery("V1", "G", "c.1A>T");
+    writeQuery("V1", "NM_000001.1", "c.1A>T");
     for (let i = 0; i < 25; i++) {
       const day = (i + 1).toString().padStart(2, "0");
       writeRun("V1", i.toString(16).padStart(32, "0"), [
@@ -169,7 +179,7 @@ describe("scanRunsHistory", () => {
   });
 
   test("handles a run dir with no progress.jsonl yet", async () => {
-    writeQuery("V1", "G", "c.1A>T");
+    writeQuery("V1", "NM_000001.1", "c.1A>T");
     mkdirSync(join(dataRoot, "assessments", "V1", "runs", "a".repeat(32)), {
       recursive: true,
     });

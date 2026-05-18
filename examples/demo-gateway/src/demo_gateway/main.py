@@ -19,6 +19,7 @@ import uvicorn
 from fastapi import APIRouter, Depends, FastAPI, HTTPException, Query, Request, status
 from fastapi.middleware.cors import CORSMiddleware
 from flowa.resolve import ResolvedCitations, ResolveRequest, resolve_citations
+from flowa.schema import VariantSpec
 from flowa.storage import paper_url, read_bytes, read_text
 from pydantic import BaseModel, Field
 
@@ -38,8 +39,7 @@ class TriggerRequest(BaseModel):
     """Body for POST /runs."""
 
     variant_id: str = Field(..., description='Variant identifier')
-    gene: str = Field(..., description='Gene symbol (e.g., CFTR)')
-    hgvs_c: str = Field(..., description='HGVS c. notation (e.g., c.1521_1523del)')
+    variant_spec: VariantSpec = Field(..., description='Variant input envelope (see flowa.schema.VariantSpec)')
 
 
 class RunResponse(BaseModel):
@@ -87,7 +87,7 @@ async def trigger_run(
 ) -> RunResponse:
     """Kick off a pipeline run. 409 if a run is already in flight for the
     variant; 429 if the concurrency cap is reached."""
-    record = runs.start(variant_id=body.variant_id, gene=body.gene, hgvs_c=body.hgvs_c)
+    record = runs.start(variant_id=body.variant_id, variant_spec=body.variant_spec)
     return RunResponse.from_record(record)
 
 

@@ -13,12 +13,17 @@ from pathlib import Path
 import pytest
 from fastapi import HTTPException
 from flowa.progress import ProgressCallback, ProgressEvent, now_iso
+from flowa.schema import HgvsCVariant, VariantSpec
 
 from demo_gateway.runs import RunManager
 
 from .conftest import make_flowa_settings
 
 StubPipeline = Callable[..., Awaitable[None]]
+
+
+def _spec(transcript: str = 'NM_000001.1', hgvs_c: str = 'c.1A>T') -> VariantSpec:
+    return VariantSpec(variants=[HgvsCVariant(kind='hgvs_c', transcript=transcript, hgvs_c=hgvs_c)])
 
 
 def _make_manager(
@@ -41,7 +46,7 @@ async def _no_op(*_args: object, **_kwargs: object) -> None:
 
 async def test_start_returns_record_with_running_status(tmp_path: Path) -> None:
     manager = _make_manager(tmp_path, pipeline=_no_op)
-    record = manager.start(variant_id='F508del', gene='CFTR', hgvs_c='c.1521_1523del')
+    record = manager.start(variant_id='F508del', variant_spec=_spec('NM_000492.4', 'c.1521_1523del'))
 
     assert record.variant_id == 'F508del'
     assert record.status == 'running'
@@ -60,7 +65,7 @@ async def test_start_creates_assessment_run_dir_before_pipeline_emits(tmp_path: 
         await never_returns.wait()
 
     manager = _make_manager(tmp_path, pipeline=hangs)
-    record = manager.start(variant_id='hold', gene='G', hgvs_c='c.1A>T')
+    record = manager.start(variant_id='hold', variant_spec=_spec())
 
     run_dir = tmp_path / 'assessments' / 'hold' / 'runs' / record.run_id
     assert run_dir.is_dir()
@@ -72,7 +77,7 @@ async def test_start_creates_assessment_run_dir_before_pipeline_emits(tmp_path: 
 
 async def test_run_transitions_to_success_on_clean_pipeline_completion(tmp_path: Path) -> None:
     manager = _make_manager(tmp_path, pipeline=_no_op)
-    record = manager.start(variant_id='V1', gene='G', hgvs_c='c.1A>T')
+    record = manager.start(variant_id='V1', variant_spec=_spec())
     await manager.wait(record.run_id)
 
     assert manager.get_active('V1').status == 'success'  # type: ignore[union-attr]
@@ -90,7 +95,7 @@ async def test_run_transitions_to_error_on_pipeline_exception(tmp_path: Path) ->
         raise RuntimeError('flowa boom')
 
     manager = _make_manager(tmp_path, pipeline=boom)
-    record = manager.start(variant_id='V2', gene='G', hgvs_c='c.1A>T')
+    record = manager.start(variant_id='V2', variant_spec=_spec())
     await manager.wait(record.run_id)
 
     assert manager.get_active('V2').status == 'error'  # type: ignore[union-attr]
@@ -109,10 +114,10 @@ async def test_in_flight_run_for_same_variant_returns_409(tmp_path: Path) -> Non
         await never_returns.wait()
 
     manager = _make_manager(tmp_path, pipeline=hangs)
-    manager.start(variant_id='V3', gene='G', hgvs_c='c.1A>T')
+    manager.start(variant_id='V3', variant_spec=_spec())
 
     with pytest.raises(HTTPException) as exc_info:
-        manager.start(variant_id='V3', gene='G', hgvs_c='c.1A>T')
+        manager.start(variant_id='V3', variant_spec=_spec())
     assert exc_info.value.status_code == 409
 
     # Allow the hanging coroutine to terminate so the test event-loop
@@ -130,11 +135,11 @@ async def test_concurrency_cap_returns_429(tmp_path: Path) -> None:
         await never_returns.wait()
 
     manager = _make_manager(tmp_path, pipeline=hangs, max_concurrent_runs=2)
-    manager.start(variant_id='A', gene='G', hgvs_c='c.1A>T')
-    manager.start(variant_id='B', gene='G', hgvs_c='c.1A>T')
+    manager.start(variant_id='A', variant_spec=_spec())
+    manager.start(variant_id='B', variant_spec=_spec())
 
     with pytest.raises(HTTPException) as exc_info:
-        manager.start(variant_id='C', gene='G', hgvs_c='c.1A>T')
+        manager.start(variant_id='C', variant_spec=_spec())
     assert exc_info.value.status_code == 429
 
     never_returns.set()
@@ -144,12 +149,12 @@ async def test_concurrency_cap_returns_429(tmp_path: Path) -> None:
 
 async def test_completed_run_does_not_block_a_new_run_for_same_variant(tmp_path: Path) -> None:
     manager = _make_manager(tmp_path, pipeline=_no_op)
-    first = manager.start(variant_id='V', gene='G', hgvs_c='c.1A>T')
+    first = manager.start(variant_id='V', variant_spec=_spec())
     await manager.wait(first.run_id)
     assert manager.get_active('V').status == 'success'  # type: ignore[union-attr]
 
     # A new run for the same variant should succeed and replace the record.
-    second = manager.start(variant_id='V', gene='G', hgvs_c='c.1A>T')
+    second = manager.start(variant_id='V', variant_spec=_spec())
     assert second.run_id != first.run_id
     assert manager.get_active('V').status == 'running'  # type: ignore[union-attr]
     await manager.wait(second.run_id)
@@ -165,7 +170,7 @@ async def test_pipeline_progress_events_land_in_jsonl(tmp_path: Path) -> None:
         on_progress(ProgressEvent(timestamp=now_iso(), stage='query', kind='stage_done', done=0, total=0))
 
     manager = _make_manager(tmp_path, pipeline=emits)
-    record = manager.start(variant_id='V', gene='G', hgvs_c='c.1A>T')
+    record = manager.start(variant_id='V', variant_spec=_spec())
     await manager.wait(record.run_id)
 
     lines = (tmp_path / 'assessments' / 'V' / 'runs' / record.run_id / 'progress.jsonl').read_text().splitlines()

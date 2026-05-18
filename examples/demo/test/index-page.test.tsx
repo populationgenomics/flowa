@@ -1,11 +1,12 @@
 /**
  * Tests for the `/` index page.
  *
- * Verifies the form-driven submission flow: filling in Gene + HGVS-c,
- * clicking Analyze, then asserting the page POSTs to `/api/runs` with
- * the right body and navigates to `/variants/[id]` on success. The
- * history scan logic itself is tested in `runs.test.ts` and
- * `runs-route.test.ts`; this file only covers the wire-up.
+ * Verifies the form-driven submission flow: filling in Transcript +
+ * HGVS-c, clicking Analyze, then asserting the page POSTs to
+ * `/api/runs` with the right body and navigates to `/variants/[id]`
+ * on success. The history scan logic itself is tested in
+ * `runs.test.ts` and `runs-route.test.ts`; this file only covers the
+ * wire-up.
  */
 
 import { afterEach, beforeEach, describe, expect, test, vi } from "vitest";
@@ -64,7 +65,7 @@ function arrangeFetch(plan: {
         status: 200,
         body: {
           run_id: "abc".repeat(11) + "f",
-          variant_id: "RYR2-NM_001035_3-c_14174A_G",
+          variant_id: "NM_001035_3-c_14174A_G",
           started_at: "2026-05-15T00:00:00.000+00:00",
           status: "running",
         },
@@ -98,31 +99,31 @@ describe("/ index page", () => {
   test("renders the submission form with placeholder + description on each field", async () => {
     arrangeFetch({});
     renderPage();
-    expect(await screen.findByPlaceholderText(/e.g. RYR2/)).toBeInTheDocument();
     expect(
-      screen.getByPlaceholderText(/NM_001035.3:c.14174A>G/),
+      await screen.findByPlaceholderText(/NM_001035\.3/),
     ).toBeInTheDocument();
-    expect(screen.getByText("HUGO gene symbol")).toBeInTheDocument();
+    expect(screen.getByPlaceholderText(/c\.14174A>G/)).toBeInTheDocument();
     expect(
-      screen.getByText(/Full coding notation, with transcript prefix/),
+      screen.getByText(/RefSeq transcript identifier/),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByText(/Coding-DNA notation, c\.-form only/),
     ).toBeInTheDocument();
   });
 
-  test("submits {gene, hgvs_c} (snake_case) and navigates on success", async () => {
+  test("submits {transcript, hgvs_c} (snake_case) and navigates on success", async () => {
     arrangeFetch({});
     renderPage();
 
-    const gene = await screen.findByTestId("gene-input");
+    const transcript = await screen.findByTestId("transcript-input");
     const hgvs = screen.getByTestId("hgvs-input");
-    fireEvent.change(gene, { target: { value: "RYR2" } });
-    fireEvent.change(hgvs, { target: { value: "NM_001035.3:c.14174A>G" } });
+    fireEvent.change(transcript, { target: { value: "NM_001035.3" } });
+    fireEvent.change(hgvs, { target: { value: "c.14174A>G" } });
 
     fireEvent.click(screen.getByTestId("submit-button"));
 
     await waitFor(() => {
-      expect(pushMock).toHaveBeenCalledWith(
-        "/variants/RYR2-NM_001035_3-c_14174A_G",
-      );
+      expect(pushMock).toHaveBeenCalledWith("/variants/NM_001035_3-c_14174A_G");
     });
     const postCall = fetchSpy.mock.calls.find(
       ([, init]: [unknown, RequestInit?]) => (init?.method ?? "GET") === "POST",
@@ -130,8 +131,8 @@ describe("/ index page", () => {
     expect(postCall).toBeDefined();
     const body = JSON.parse((postCall![1] as RequestInit).body as string);
     expect(body).toEqual({
-      gene: "RYR2",
-      hgvs_c: "NM_001035.3:c.14174A>G",
+      transcript: "NM_001035.3",
+      hgvs_c: "c.14174A>G",
     });
   });
 
@@ -140,7 +141,7 @@ describe("/ index page", () => {
     renderPage();
     fireEvent.click(screen.getByTestId("submit-button"));
     expect(
-      await screen.findByText(/Gene and HGVS c\. are both required/),
+      await screen.findByText(/Transcript and HGVS c\. are both required/),
     ).toBeInTheDocument();
     // No POST should have fired.
     const postCalls = fetchSpy.mock.calls.filter(
@@ -154,11 +155,11 @@ describe("/ index page", () => {
       submitResponse: { status: 409, body: "run already in flight" },
     });
     renderPage();
-    fireEvent.change(screen.getByTestId("gene-input"), {
-      target: { value: "RYR2" },
+    fireEvent.change(screen.getByTestId("transcript-input"), {
+      target: { value: "NM_001035.3" },
     });
     fireEvent.change(screen.getByTestId("hgvs-input"), {
-      target: { value: "NM_001035.3:c.14174A>G" },
+      target: { value: "c.14174A>G" },
     });
     fireEvent.click(screen.getByTestId("submit-button"));
 
@@ -174,9 +175,8 @@ describe("/ index page", () => {
         runs: [
           {
             run_id: "a".repeat(32),
-            variant_id: "RYR2-c_14174A_G",
-            gene: "RYR2",
-            hgvs_c: "c.14174A>G",
+            variant_id: "NM_001035_3-c_14174A_G",
+            hgvs_c: "NM_001035.3:c.14174A>G",
             started_at: "2026-05-15T00:00:00.000+00:00",
             terminal: true,
           },
@@ -188,8 +188,8 @@ describe("/ index page", () => {
     });
     renderPage();
     expect(await screen.findByTestId("runs-history-table")).toBeInTheDocument();
-    expect(screen.getByText("RYR2-c_14174A_G")).toBeInTheDocument();
-    expect(screen.getByText("c.14174A>G")).toBeInTheDocument();
+    expect(screen.getByText("NM_001035_3-c_14174A_G")).toBeInTheDocument();
+    expect(screen.getByText("NM_001035.3:c.14174A>G")).toBeInTheDocument();
     expect(screen.getByText("Done")).toBeInTheDocument();
   });
 });

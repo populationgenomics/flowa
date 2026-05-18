@@ -20,9 +20,9 @@ import { getDemoDataDir } from "@/lib/demoConfig";
 import type { ProgressEvent, ProgressResponse } from "@/lib/progressEvents";
 
 // run_id is a uuid4 hex (32 lowercase hex chars). variant_id comes from
-// `${gene}-${slug(transcript)}-${slug(change)}` where slug() collapses
-// every non-alphanumeric to `_`, plus dashes between parts. Validating
-// both before path construction blocks `..` escaping out of demo-data/.
+// `${slug(transcript)}-${slug(hgvs_c)}` where slug() collapses every
+// non-alphanumeric to `_`. Validating both before path construction
+// blocks `..` escaping out of demo-data/.
 const RUN_ID_RE = /^[0-9a-f]{32}$/;
 const VARIANT_ID_RE = /^[A-Za-z0-9_-]+$/;
 

@@ -102,22 +102,33 @@ function writeRun(
   );
 }
 
-function writeQuery(variantId: string, gene: string, hgvs_c: string): void {
+function writeQuery(
+  variantId: string,
+  transcript: string,
+  hgvs_c: string,
+): void {
   const dir = join(dataRoot, "assessments", variantId);
   mkdirSync(dir, { recursive: true });
   writeFileSync(
     join(dir, "query.json"),
-    JSON.stringify({ schema_version: 1, gene, hgvs_c, dois: [] }),
+    JSON.stringify({
+      schema_version: 2,
+      variant_spec: {
+        schema_version: 1,
+        variants: [{ kind: "hgvs_c", transcript, hgvs_c }],
+      },
+      dois: [],
+    }),
   );
 }
 
 describe("POST /api/runs", () => {
-  test("derives variant_id server-side and forwards to demo-gateway", async () => {
+  test("derives variant_id server-side and wraps {variant_id, variant_spec}", async () => {
     fetchSpy = vi.spyOn(globalThis, "fetch").mockResolvedValue(
       new Response(
         JSON.stringify({
           run_id: "abc",
-          variant_id: "RYR2-NM_001035_3-c_14174A_G",
+          variant_id: "NM_001035_3-c_14174A_G",
           started_at: "2026-05-15T00:00:00.000+00:00",
           status: "running",
         }),
@@ -127,7 +138,7 @@ describe("POST /api/runs", () => {
 
     const { res, captured } = makeRes();
     await handler(
-      postReq({ gene: "RYR2", hgvs_c: "NM_001035.3:c.14174A>G" }),
+      postReq({ transcript: "NM_001035.3", hgvs_c: "c.14174A>G" }),
       res,
     );
 
@@ -135,14 +146,19 @@ describe("POST /api/runs", () => {
     expect(fetchSpy).toHaveBeenCalledOnce();
     const [url, init] = fetchSpy.mock.calls[0]!;
     expect(url).toBe("http://gateway.test/runs");
-    const sentBody = JSON.parse((init as { body: string }).body) as Record<
-      string,
-      string
-    >;
+    const sentBody = JSON.parse((init as { body: string }).body);
     expect(sentBody).toEqual({
-      variant_id: "RYR2-NM_001035_3-c_14174A_G",
-      gene: "RYR2",
-      hgvs_c: "NM_001035.3:c.14174A>G",
+      variant_id: "NM_001035_3-c_14174A_G",
+      variant_spec: {
+        schema_version: 1,
+        variants: [
+          {
+            kind: "hgvs_c",
+            transcript: "NM_001035.3",
+            hgvs_c: "c.14174A>G",
+          },
+        ],
+      },
     });
   });
 
@@ -155,13 +171,13 @@ describe("POST /api/runs", () => {
 
     const { res, captured } = makeRes();
     await handler(
-      postReq({ gene: "RYR2", hgvs_c: "NM_001035.3:c.14174A>G" }),
+      postReq({ transcript: "NM_001035.3", hgvs_c: "c.14174A>G" }),
       res,
     );
     expect(captured.statusCode).toBe(409);
   });
 
-  test("rejects requests missing gene", async () => {
+  test("rejects requests missing transcript", async () => {
     const { res, captured } = makeRes();
     await handler(postReq({ hgvs_c: "c.1A>T" }), res);
     expect(captured.statusCode).toBe(400);
@@ -169,13 +185,13 @@ describe("POST /api/runs", () => {
 
   test("rejects requests missing hgvs_c", async () => {
     const { res, captured } = makeRes();
-    await handler(postReq({ gene: "RYR2" }), res);
+    await handler(postReq({ transcript: "NM_001035.3" }), res);
     expect(captured.statusCode).toBe(400);
   });
 
   test("rejects empty-string fields", async () => {
     const { res, captured } = makeRes();
-    await handler(postReq({ gene: "", hgvs_c: "" }), res);
+    await handler(postReq({ transcript: "", hgvs_c: "" }), res);
     expect(captured.statusCode).toBe(400);
   });
 });
@@ -188,22 +204,22 @@ describe("GET /api/runs", () => {
     expect(captured.body).toMatchObject({ runs: [], total: 0, page: 1 });
   });
 
-  test("returns runs sorted descending by started_at with metadata join", async () => {
-    writeQuery("RYR2-c_14174A_G", "RYR2", "c.14174A>G");
-    writeRun("RYR2-c_14174A_G", "a".repeat(32), [
+  test("returns runs sorted descending by started_at with hgvs_c join", async () => {
+    writeQuery("NM_001035_3-c_14174A_G", "NM_001035.3", "c.14174A>G");
+    writeRun("NM_001035_3-c_14174A_G", "a".repeat(32), [
       { timestamp: "2026-05-01T00:00:00.000+00:00", kind: "run_done" },
     ]);
-    writeRun("RYR2-c_14174A_G", "b".repeat(32), [
+    writeRun("NM_001035_3-c_14174A_G", "b".repeat(32), [
       { timestamp: "2026-05-02T00:00:00.000+00:00", kind: "run_done" },
     ]);
 
     const { res, captured } = makeRes();
     await handler(getReq({}), res);
     const body = captured.body as {
-      runs: Array<{ run_id: string; started_at: string; gene: string }>;
+      runs: Array<{ run_id: string; started_at: string; hgvs_c: string }>;
     };
     expect(body.runs[0]?.started_at).toBe("2026-05-02T00:00:00.000+00:00");
-    expect(body.runs[0]?.gene).toBe("RYR2");
+    expect(body.runs[0]?.hgvs_c).toBe("NM_001035.3:c.14174A>G");
   });
 
   test("rejects malformed page parameter", async () => {

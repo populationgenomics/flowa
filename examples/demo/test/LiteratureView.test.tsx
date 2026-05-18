@@ -37,7 +37,7 @@ vi.mock("next/link", () => ({
   ),
 }));
 
-const VARIANT = "RYR2-NM_001035_3-c_14174A_G";
+const VARIANT = "NM_001035_3-c_14174A_G";
 
 let fetchSpy: ReturnType<typeof vi.spyOn>;
 
@@ -58,8 +58,8 @@ function papersResp(
     ],
     aggregateExists: false,
     categories: [],
-    gene: "RYR2",
-    hgvs_c: "NM_001035.3:c.14174A>G",
+    transcript: "NM_001035.3",
+    hgvs_c: "c.14174A>G",
     ...overrides,
   };
 }

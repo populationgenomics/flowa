@@ -27,9 +27,17 @@ function writeQuery(variantId: string, dois: string[]): void {
   writeFileSync(
     join(dir, "query.json"),
     JSON.stringify({
-      schema_version: 1,
-      gene: "RYR2",
-      hgvs_c: "NM_001035.3:c.14174A>G",
+      schema_version: 2,
+      variant_spec: {
+        schema_version: 1,
+        variants: [
+          {
+            kind: "hgvs_c",
+            transcript: "NM_001035.3",
+            hgvs_c: "c.14174A>G",
+          },
+        ],
+      },
       dois,
     }),
   );
@@ -80,16 +88,16 @@ describe("listPapersForVariant", () => {
       papers: [],
       aggregateExists: false,
       categories: [],
-      gene: null,
+      transcript: null,
       hgvs_c: null,
     });
   });
 
-  test("returns gene + hgvs_c from query.json when present", async () => {
+  test("returns transcript + hgvs_c from query.json when present", async () => {
     writeQuery("V1", ["10.1234/foo"]);
     const result = await listPapersForVariant("V1", { dataDir: dataRoot });
-    expect(result.gene).toBe("RYR2");
-    expect(result.hgvs_c).toBe("NM_001035.3:c.14174A>G");
+    expect(result.transcript).toBe("NM_001035.3");
+    expect(result.hgvs_c).toBe("c.14174A>G");
   });
 
   test("status is `needs_manual` when neither PDF nor extract exist", async () => {

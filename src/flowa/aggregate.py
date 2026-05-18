@@ -219,8 +219,14 @@ async def aggregate_evidence_async(
     query_data = read_json(assessment_url(base, variant_id, 'query.json'))
     dois = query_data['dois']
 
+    # Reconstruct the colon-glued HGVS c. expression for ClinVar exact-phrase
+    # search. The variant_spec persisted here carries `transcript` and `hgvs_c`
+    # as separate fields; downstream callers join them at the use site.
+    spec_item = query_data['variant_spec']['variants'][0]
+    hgvs_c_full = f'{spec_item["transcript"]}:{spec_item["hgvs_c"]}'
+
     # Fetch ClinVar evidence
-    clinvar_data = query_clinvar(query_data['hgvs_c'], ncbi_api_key)
+    clinvar_data = query_clinvar(hgvs_c_full, ncbi_api_key)
     clinvar_text = format_clinvar_for_prompt(clinvar_data)
 
     # Load extractions and metadata for each paper. PDF bytes and Markdown are

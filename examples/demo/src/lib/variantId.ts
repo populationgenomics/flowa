@@ -1,15 +1,15 @@
 /**
  * Variant identifier derivation + validation.
  *
- * The demo's submission flow takes a free-text gene symbol and HGVS-c
- * notation from the user and derives a filesystem-safe `variant_id` that
- * encodes both. The same shape is used for the storage key
- * (`assessments/{variant_id}/...`) and URL segments
- * (`/variants/[variantId]`, `/api/runs/[variantId]/...`), so the derived
- * id must restrict itself to a path-safe alphabet and must round-trip
- * deterministically (resubmitting the same gene + hgvs_c produces the
- * same id, so a re-analyze idempotently maps back to the same
- * assessment dir).
+ * The demo's submission flow takes a RefSeq transcript and a c.-form
+ * HGVS expression (as two free-text fields) from the user and derives a
+ * filesystem-safe `variant_id` that encodes both. The same shape is
+ * used for the storage key (`assessments/{variant_id}/...`) and URL
+ * segments (`/variants/[variantId]`, `/api/runs/[variantId]/...`), so
+ * the derived id must restrict itself to a path-safe alphabet and must
+ * round-trip deterministically (resubmitting the same transcript +
+ * hgvs_c produces the same id, so a re-analyze idempotently maps back
+ * to the same assessment dir).
  *
  * Mirrors what curation-service does at the assessment layer: the
  * variant identity is fully derived from the inputs by the trusted
@@ -34,27 +34,16 @@ export function slug(s: string): string {
 }
 
 /**
- * Derive `variant_id` from a gene symbol and HGVS c. notation.
+ * Derive `variant_id` from a transcript + c.-form HGVS expression.
  *
- * - When `hgvs_c` carries a transcript prefix (`NM_001035.3:c.14174A>G`),
- *   the colon is split out and the transcript + change are slugged
- *   independently so transcript versions don't collide
- *   (`NM_001035.3` vs `NM_001035.2` produce distinct ids).
- * - Without a transcript prefix (`c.14174A>G`), the whole string is
- *   slugged in one go.
+ * Each part is slugged independently and joined with `-`, so transcript
+ * versions don't collide (`NM_001035.3` vs `NM_001035.2` produce
+ * distinct ids).
  *
- * Examples:
- *   deriveVariantId("RYR2", "NM_001035.3:c.14174A>G")
- *     → "RYR2-NM_001035_3-c_14174A_G"
- *   deriveVariantId("RYR2", "c.14174A>G")
- *     → "RYR2-c_14174A_G"
+ * Example:
+ *   deriveVariantId("NM_001035.3", "c.14174A>G")
+ *     → "NM_001035_3-c_14174A_G"
  */
-export function deriveVariantId(gene: string, hgvs_c: string): string {
-  const colon = hgvs_c.indexOf(":");
-  if (colon === -1) {
-    return `${gene}-${slug(hgvs_c)}`;
-  }
-  const transcript = hgvs_c.slice(0, colon);
-  const change = hgvs_c.slice(colon + 1);
-  return `${gene}-${slug(transcript)}-${slug(change)}`;
+export function deriveVariantId(transcript: string, hgvs_c: string): string {
+  return `${slug(transcript)}-${slug(hgvs_c)}`;
 }

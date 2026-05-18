@@ -14,6 +14,7 @@ from flowa.download import download_paper_async
 from flowa.extract import extract_paper_async
 from flowa.progress import ProgressCallback, ProgressEvent, Stage, emit, now_iso
 from flowa.query import query_dois_async
+from flowa.schema import VariantSpec, parse_variant_spec_cli
 from flowa.settings import ModelConfig, Settings
 
 log = logging.getLogger(__name__)
@@ -61,8 +62,7 @@ async def process_paper(
 async def run_pipeline(
     settings: Settings,
     variant_id: str,
-    gene: str,
-    hgvs_c: str,
+    variant_spec: VariantSpec,
     source: Literal['mastermind', 'litvar'] = 'mastermind',
     convert_concurrency: int = DEFAULT_CONVERT_CONCURRENCY,
     extract_concurrency: int = DEFAULT_EXTRACT_CONCURRENCY,
@@ -82,7 +82,7 @@ async def run_pipeline(
     decides what "the run" means (a demo gateway, a worker process)
     frames those.
     """
-    with logfire.span('flowa.pipeline', variant_id=variant_id, gene=gene, source=source):
+    with logfire.span('flowa.pipeline', variant_id=variant_id, source=source):
         base = settings.flowa_storage_base
         download_semaphore = asyncio.Semaphore(download_concurrency)
         convert_semaphore = asyncio.Semaphore(convert_concurrency)
@@ -91,7 +91,7 @@ async def run_pipeline(
         # 1. Query literature sources
         log.info('=== Query (%s) ===', source)
         emit(on_progress, ProgressEvent(timestamp=now_iso(), stage='query', kind='stage_started', detail=source))
-        dois = await query_dois_async(base, variant_id, gene, hgvs_c, source, settings.mastermind_api_token)
+        dois = await query_dois_async(base, variant_id, variant_spec, source, settings.mastermind_api_token)
         log.info('Query complete: %d papers found', len(dois))
         emit(
             on_progress,
@@ -190,8 +190,11 @@ async def run_pipeline(
 
 def run(
     variant_id: str = typer.Option(..., '--variant-id', help='Variant identifier'),
-    gene: str = typer.Option(..., '--gene', '-g', help='Gene symbol (e.g., GAA)'),
-    hgvs_c: str = typer.Option(..., '--hgvs-c', '-v', help='HGVS c. notation (e.g., c.2238G>C)'),
+    variant_spec_raw: str = typer.Option(
+        ...,
+        '--variant-spec',
+        help='Variant spec as inline JSON or @path/to/spec.json',
+    ),
     source: Literal['mastermind', 'litvar'] = typer.Option('mastermind', '--source', '-s', help='Literature source'),
     convert_concurrency: int = typer.Option(
         DEFAULT_CONVERT_CONCURRENCY, '--convert-concurrency', help='Max concurrent PDF-to-Markdown conversions'
@@ -201,5 +204,6 @@ def run(
     ),
 ) -> None:
     """Run the full assessment pipeline: query -> download -> convert -> extract -> aggregate."""
+    variant_spec = parse_variant_spec_cli(variant_spec_raw)
     s = Settings()  # type: ignore[call-arg]
-    asyncio.run(run_pipeline(s, variant_id, gene, hgvs_c, source, convert_concurrency, extract_concurrency))
+    asyncio.run(run_pipeline(s, variant_id, variant_spec, source, convert_concurrency, extract_concurrency))

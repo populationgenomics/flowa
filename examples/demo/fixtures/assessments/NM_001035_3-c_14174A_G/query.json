@@ -1,0 +1,20 @@
+{
+  "schema_version": 2,
+  "variant_spec": {
+    "schema_version": 1,
+    "variants": [
+      {
+        "kind": "hgvs_c",
+        "transcript": "NM_001035.3",
+        "hgvs_c": "c.14174A>G"
+      }
+    ]
+  },
+  "dois": [
+    "10.1253/circj.cj-12-1460",
+    "10.1371/journal.pone.0131517",
+    "10.2169/internalmedicine.9843-17",
+    "10.1161/CIRCGEN.116.001424",
+    "10.1371/journal.pone.0243476"
+  ]
+}

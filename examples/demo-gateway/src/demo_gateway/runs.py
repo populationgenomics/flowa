@@ -24,6 +24,7 @@ from typing import Literal
 from fastapi import HTTPException, status
 from flowa.progress import ProgressCallback, ProgressEvent, now_iso
 from flowa.run import run_pipeline
+from flowa.schema import VariantSpec
 from flowa.settings import Settings as FlowaSettings
 
 from .progress import ProgressSink
@@ -91,7 +92,7 @@ class RunManager:
         if task is not None:
             await task
 
-    def start(self, *, variant_id: str, gene: str, hgvs_c: str) -> RunRecord:
+    def start(self, *, variant_id: str, variant_spec: VariantSpec) -> RunRecord:
         """Kick off a pipeline run. Returns immediately.
 
         Raises HTTPException(409) if a run is already in flight for this
@@ -128,20 +129,20 @@ class RunManager:
         # Hold the task reference so the asyncio loop doesn't GC the
         # coroutine mid-flight; we drop it once the runner finishes.
         task = asyncio.create_task(
-            self._runner(record=record, gene=gene, hgvs_c=hgvs_c, sink_append=sink.append),
+            self._runner(record=record, variant_spec=variant_spec, sink_append=sink.append),
             name=f'flowa-run-{run_id}',
         )
         self._tasks[run_id] = task
 
-        log.info('Started run %s for variant %s (%s %s)', run_id, variant_id, gene, hgvs_c)
+        item = variant_spec.variants[0]
+        log.info('Started run %s for variant %s (%s:%s)', run_id, variant_id, item.transcript, item.hgvs_c)
         return record
 
     async def _runner(
         self,
         *,
         record: RunRecord,
-        gene: str,
-        hgvs_c: str,
+        variant_spec: VariantSpec,
         sink_append: ProgressCallback,
     ) -> None:
         """Drive the pipeline; emit run_done / run_error around it."""
@@ -153,8 +154,7 @@ class RunManager:
             await self._pipeline(
                 self._flowa_settings,
                 variant_id=record.variant_id,
-                gene=gene,
-                hgvs_c=hgvs_c,
+                variant_spec=variant_spec,
                 source=source,
                 on_progress=sink_append,
             )

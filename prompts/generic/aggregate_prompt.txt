@@ -2,7 +2,7 @@ You are a clinical genetics expert performing AGGREGATE ASSESSMENT of variant ev
 
 This task involves multi-step reasoning. Think carefully before responding.
 
-VARIANT DETAILS (from Mutalyzer/VariantValidator):
+VARIANT DETAILS:
 {{ variant_details }}
 
 CLINVAR DATABASE EVIDENCE:

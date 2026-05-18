@@ -91,7 +91,7 @@ function writeProgressFile(
   );
 }
 
-const VALID_VARIANT_ID = "RYR2-NM_001035_3-c_14174A_G";
+const VALID_VARIANT_ID = "NM_001035_3-c_14174A_G";
 const VALID_RUN_ID = "0123456789abcdef0123456789abcdef";
 
 describe("GET /api/runs/[variantId]/[runId]/progress", () => {

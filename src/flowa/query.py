@@ -2,48 +2,27 @@
 
 import asyncio
 import logging
-from dataclasses import asdict, dataclass
 from typing import Any, Literal
 from xml.etree.ElementTree import Element
 
 import httpx
 import typer
 from defusedxml import ElementTree
+from pydantic import ValidationError
 from tenacity import retry, retry_if_exception_type, stop_after_attempt, wait_exponential
 
-from flowa.schema import METADATA_SCHEMA_VERSION, QUERY_SCHEMA_VERSION, with_schema_version
+from flowa.normalize import normalize_variant
+from flowa.schema import (
+    METADATA_SCHEMA_VERSION,
+    QueryResult,
+    VariantSpec,
+    parse_variant_spec_cli,
+    with_schema_version,
+)
 from flowa.settings import Settings
 from flowa.storage import assessment_url, paper_url, read_json, write_json
 
-
-@dataclass
-class QueryResult:
-    """Standardized query result for downstream tasks."""
-
-    gene: str
-    hgvs_c: str
-    dois: list[str]
-
-
-VARIANT_VALIDATOR_BASE_URL = 'https://rest.variantvalidator.org/VariantValidator/variantvalidator'
-
 log = logging.getLogger(__name__)
-
-
-async def query_variant_validator(hgvs_c: str) -> dict:
-    """Query VariantValidator API for variant details."""
-    url = f'{VARIANT_VALIDATOR_BASE_URL}/GRCh38/{hgvs_c}/mane_select'
-
-    log.info('Querying VariantValidator for %s', hgvs_c)
-
-    async with httpx.AsyncClient(timeout=30.0) as client:
-        response = await client.get(
-            url,
-            params={'content-type': 'application/json'},
-            headers={'accept': 'application/json'},
-        )
-        response.raise_for_status()
-        return response.json()
 
 
 MAX_ARTICLES = 50
@@ -59,11 +38,17 @@ _LITVAR_PAGE_SIZE = 10
 _LITVAR_MAX_PAGES = MAX_ARTICLES // _LITVAR_PAGE_SIZE
 
 
-async def query_mastermind(gene: str, hgvs_c: str, api_token: str) -> list[int]:
-    """Query Mastermind API for PMIDs (relevance-ranked, capped)."""
-    hgvs_c_stripped = hgvs_c.split(':', 1)[-1]
-    variant = f'{gene}:{hgvs_c_stripped}'
-    log.info('Querying Mastermind for %s', variant)
+async def query_mastermind(hgvs_g: str, api_token: str) -> list[int]:
+    """Query Mastermind API for PMIDs (relevance-ranked, capped).
+
+    Uses the genomic HGVS form (`NC_<chr>.<ver>:g.<pos><ref>><alt>`) as the
+    `variant` parameter. Per Spike B, this is one of two formats Mastermind
+    accepts and is preferred over the legacy `GENE:c.` form because it's
+    genomically unambiguous (no transcript-version-isoform conflation) and
+    improves splice-variant recall — Mastermind tokenises c.-form queries
+    against the splice region, returning unrelated papers.
+    """
+    log.info('Querying Mastermind for %s', hgvs_g)
 
     base_url = 'https://mastermind.genomenon.com/api/v2/articles'
     pmids: list[int] = []
@@ -77,7 +62,7 @@ async def query_mastermind(gene: str, hgvs_c: str, api_token: str) -> list[int]:
                 base_url,
                 params={
                     'api_token': api_token,
-                    'variant': variant,
+                    'variant': hgvs_g,
                     'page': page,
                 },
             )
@@ -87,7 +72,7 @@ async def query_mastermind(gene: str, hgvs_c: str, api_token: str) -> list[int]:
                 # callers can still run the rest of the pipeline (ClinVar
                 # only). LitVar handles the same case via its empty-matches
                 # branch already.
-                log.warning('Mastermind has no articles for %s', variant)
+                log.warning('Mastermind has no articles for %s', hgvs_g)
                 break
             response.raise_for_status()
 
@@ -115,84 +100,152 @@ async def query_mastermind(gene: str, hgvs_c: str, api_token: str) -> list[int]:
     return sorted(pmids)
 
 
-async def query_litvar(gene: str, hgvs_c: str) -> list[int]:
-    """Query LitVar API for PMIDs (relevance-ranked, capped)."""
-    hgvs_c_stripped = hgvs_c.split(':', 1)[-1]
-    query = f'{gene} {hgvs_c_stripped}'
-    log.info('Querying LitVar for %s', query)
+_LITVAR_AUTOCOMPLETE_URL = 'https://www.ncbi.nlm.nih.gov/research/litvar2-api/variant/autocomplete/'
+_LITVAR_SEARCH_URL = 'https://www.ncbi.nlm.nih.gov/research/litvar2-api/search/'
 
-    autocomplete_url = 'https://www.ncbi.nlm.nih.gov/research/litvar2-api/variant/autocomplete/'
-    search_url = 'https://www.ncbi.nlm.nih.gov/research/litvar2-api/search/'
+
+async def _litvar_resolve_variant_id(client: httpx.AsyncClient, query: str, *, expected_gene: str | None) -> str | None:
+    """Look up LitVar's internal variant id for an autocomplete query.
+
+    Returns the `_id` of the first match (filtered by `expected_gene` when
+    supplied), or None when no match resolves. The gene filter is only
+    useful for the `gene + p.short` fallback path — rsID queries are
+    already unambiguous.
+    """
+    response = await client.get(_LITVAR_AUTOCOMPLETE_URL, params={'query': query})
+    response.raise_for_status()
+    matches = response.json()
+    if not matches:
+        return None
+
+    if expected_gene:
+        gene_lower = expected_gene.lower()
+        matches = [m for m in matches if any(g.lower() == gene_lower for g in m.get('gene', []))]
+        if not matches:
+            return None
+
+    selected = matches[0]
+    log.info(
+        'LitVar matched %r → %s (rsid=%s, pmids=%d)',
+        query,
+        selected.get('name'),
+        selected.get('rsid', 'N/A'),
+        selected.get('pmids_count', 0),
+    )
+    return selected['_id']
+
+
+async def _litvar_fetch_pmids(client: httpx.AsyncClient, variant_id: str) -> list[int]:
+    """Fetch PMIDs for a LitVar variant id (relevance-ranked, capped)."""
+    pmids: list[int] = []
+    page = 1
+    while True:
+        log.debug('Fetching LitVar search page %d for %s', page, variant_id)
+        response = await client.get(
+            _LITVAR_SEARCH_URL,
+            params={'variant': variant_id, 'sort': 'score desc', 'page': page},
+        )
+        response.raise_for_status()
+        data = response.json()
+        for result in data.get('results', []):
+            if pmid := result.get('pmid'):
+                pmids.append(int(pmid))
+        total_pages = data.get('total_pages', 0)
+        if page >= total_pages:
+            break
+        if page >= _LITVAR_MAX_PAGES:
+            log.warning('Capping LitVar results at %d articles', len(pmids))
+            break
+        page += 1
+    return pmids
+
+
+def _bare_change(hgvs_form: str | None) -> str | None:
+    """Strip transcript / protein prefix from an HGVS form for LitVar queries.
+
+    LitVar's autocomplete matches `GENE Y4725C` / `GENE c.14174A>G` more
+    reliably than the full HGVS form, so we hand it the bare change after
+    the colon (and after `p.` for protein forms, stripping any wrapping
+    parentheses).
+    """
+    if not hgvs_form or ':' not in hgvs_form:
+        return None
+    bare = hgvs_form.split(':', 1)[1].removeprefix('p.').strip('()')
+    return bare or None
+
+
+async def query_litvar(
+    *,
+    rsid: str | None,
+    gene_symbol: str,
+    protein_short: str | None,
+    hgvs_c: str | None,
+) -> list[int]:
+    """Query LitVar2 for PMIDs using the best available variant identifier.
+
+    LitVar's autocomplete is a literature-indexing layer: it knows variants
+    in whatever form papers mentioned them in. Its disambiguation engine
+    maps across notations, but *only for variants where the cross-notation
+    mapping has been seen in literature* — so a single query form can
+    silently return zero matches for a variant that LitVar actually has
+    indexed under a different form.
+
+    Strategy (sequential, early-stop on first non-empty match):
+
+    1. **rsID** when VEP supplied one — most reliable across notations
+       (Spike G: every variant with an rsID resolved via every form, all
+       routed to the same LitVar `_id`).
+    2. **`gene + p.short`** — catches missense/nonsense variants typically
+       cited in 1-letter protein form (Spike C3: RYR2 Y4725C, no rsID,
+       resolves only via this path).
+    3. **`gene + c.`** — last resort. Spike G found a real variant
+       (MYBPC3 c.2864_2865delCT, frameshift, 48 PMIDs in LitVar) where
+       neither (1) nor (2) resolves — frameshift variants often lack a
+       clean p.short form, and rsID coverage isn't always supplied by
+       upstream normalisers even when LitVar has rsID-indexed the entry.
+
+    Stops on the first non-empty result and logs which path matched, so
+    we can collect empirical data on fallback frequency. Returns an empty
+    list (not an error) when no path matches — distinct from an HTTP
+    failure, which propagates, so callers can still run the rest of the
+    pipeline (e.g. ClinVar) without false-failing.
+
+    Why not `gene + p.long` too? Spike G confirmed it's fully redundant:
+    every variant where LitVar matched the 3-letter form was already
+    covered by the 1-letter form on the same internal `_id`.
+    """
+    p_short_bare = _bare_change(protein_short)
+    c_bare = _bare_change(hgvs_c)
+    attempts: list[tuple[str, str, str | None]] = [
+        # (path_label, autocomplete_query, expected_gene_for_filter)
+        ('rsid', rsid or '', None),
+        ('gene+p.short', f'{gene_symbol} {p_short_bare}' if p_short_bare else '', gene_symbol),
+        ('gene+c.', f'{gene_symbol} {c_bare}' if c_bare else '', gene_symbol),
+    ]
 
     async with httpx.AsyncClient(timeout=30.0) as client:
-        log.debug('Finding variant matches')
-        response = await client.get(autocomplete_url, params={'query': query})
-        response.raise_for_status()
+        for path_label, query, expected_gene in attempts:
+            if not query:
+                continue
+            log.info('LitVar: trying %s path (%r)', path_label, query)
+            litvar_id = await _litvar_resolve_variant_id(client, query, expected_gene=expected_gene)
+            if litvar_id is None:
+                continue
+            pmids = await _litvar_fetch_pmids(client, litvar_id)
+            if not pmids:
+                log.info('LitVar: %s resolved but returned no PMIDs', path_label)
+                continue
+            log.info('LitVar: %s path matched (%d PMIDs)', path_label, len(pmids))
+            return sorted(pmids)
 
-        matches = response.json()
-
-        if not matches:
-            log.warning('No matches found in LitVar')
-            return []
-
-        # Filter matches by gene
-        gene_lower = gene.lower()
-        matching_variants = [match for match in matches if any(g.lower() == gene_lower for g in match.get('gene', []))]
-
-        if not matching_variants:
-            log.warning('No matches for gene %s', gene)
-            return []
-
-        # Take first match (could prefer MANE Select in future)
-        selected = matching_variants[0]
-        litvar_variant_id = selected['_id']
-
-        log.info(
-            'Found variant: %s (rsid: %s, pmids: %d)',
-            selected['name'],
-            selected.get('rsid', 'N/A'),
-            selected.get('pmids_count', 0),
-        )
-
-        # Fetch publications via search endpoint (supports relevance sorting + pagination)
-        pmids: list[int] = []
-        page = 1
-
-        while True:
-            log.debug('Fetching page %d', page)
-
-            response = await client.get(
-                search_url,
-                params={
-                    'variant': litvar_variant_id,
-                    'sort': 'score desc',
-                    'page': page,
-                },
-            )
-            response.raise_for_status()
-
-            data = response.json()
-
-            for result in data.get('results', []):
-                if pmid := result.get('pmid'):
-                    pmids.append(int(pmid))
-
-            total_pages = data.get('total_pages', 0)
-            if page >= total_pages:
-                break
-
-            if page >= _LITVAR_MAX_PAGES:
-                total_count = data.get('count', 0)
-                log.warning(
-                    'Capping LitVar results at %d/%d articles',
-                    len(pmids),
-                    total_count,
-                )
-                break
-
-            page += 1
-
-        return sorted(pmids)
+    log.warning(
+        'LitVar: no matches via rsID, gene+p.short, or gene+c. (rsid=%s, gene=%s, p.short=%s, c.=%s)',
+        rsid,
+        gene_symbol,
+        protein_short,
+        hgvs_c,
+    )
+    return []
 
 
 EFETCH_URL = 'https://eutils.ncbi.nlm.nih.gov/entrez/eutils/efetch.fcgi'
@@ -340,11 +393,28 @@ async def resolve_pmids_to_dois(base: str, pmids: list[int]) -> list[str]:
     return dois
 
 
+def _load_cached_query(cache_url: str) -> QueryResult | None:
+    """Read and validate a cached QueryResult, or return None if missing/stale.
+
+    A schema_version mismatch (e.g. an older cache predating the
+    variant_spec refactor) shows up as ValidationError; we treat that as a
+    cache miss and re-run.
+    """
+    try:
+        raw = read_json(cache_url)
+    except FileNotFoundError:
+        return None
+    try:
+        return QueryResult.model_validate(raw)
+    except ValidationError as exc:
+        log.warning('Cached query.json is stale (%s); re-running', exc.errors()[0]['msg'])
+        return None
+
+
 async def query_dois_async(
     base: str,
     variant_id: str,
-    gene: str,
-    hgvs_c: str,
+    variant_spec: VariantSpec,
     source: Literal['mastermind', 'litvar'],
     mastermind_api_token: str | None = None,
 ) -> list[str]:
@@ -353,34 +423,51 @@ async def query_dois_async(
     variant_details_url = assessment_url(base, variant_id, 'variant_details.json')
 
     # Check cache first
-    try:
-        cached = read_json(cache_url)
-        log.info('Using cached query results (%d DOIs)', len(cached['dois']))
-        return cached['dois']
-    except FileNotFoundError:
-        pass
+    cached = _load_cached_query(cache_url)
+    if cached is not None:
+        log.info('Using cached query results (%d DOIs)', len(cached.dois))
+        return cached.dois
 
-    log.info('Variant: %s %s (source: %s)', gene, hgvs_c, source)
+    item = variant_spec.variants[0]
+    hgvs = f'{item.transcript}:{item.hgvs_c}'
+    log.info('Variant: %s (source: %s)', hgvs, source)
 
-    # Query VariantValidator for variant details and store for downstream tasks
-    variant_details = await query_variant_validator(hgvs_c)
+    # Normalise via VEP REST and store for downstream stages (extract, aggregate).
+    variant_details = await normalize_variant(hgvs, item.transcript)
     write_json(variant_details_url, variant_details)
-    log.info('Stored variant details to %s', variant_details_url)
+    log.info('Stored normalised variant to %s', variant_details_url)
 
-    # Query literature source for PMIDs
+    # Pull the fields downstream queries need.
+    hgvs_g = variant_details['grch38']['hgvs_g']
+    rsid = variant_details.get('rsid')
+    gene_symbol = variant_details['gene_symbol']
+    # For LitVar's p.short / c. fallbacks: prefer MANE Select's projection,
+    # fall back to the caller's transcript when MANE has none (e.g.
+    # intronic / splice variants lack a protein form).
+    mane = variant_details.get('mane_select')
+    user_tx = variant_details.get('user_transcript')
+    protein_short = (mane and mane.get('protein_short')) or (user_tx and user_tx.get('protein_short')) or None
+    litvar_hgvs_c = (mane and mane.get('hgvs_c')) or (user_tx and user_tx.get('hgvs_c')) or None
+
+    # Query literature source for PMIDs.
     if source == 'mastermind':
         if not mastermind_api_token:
             raise ValueError('MASTERMIND_API_TOKEN environment variable not set')
-        pmids = await query_mastermind(gene, hgvs_c, mastermind_api_token)
+        pmids = await query_mastermind(hgvs_g, mastermind_api_token)
     else:  # litvar
-        pmids = await query_litvar(gene, hgvs_c)
+        pmids = await query_litvar(
+            rsid=rsid,
+            gene_symbol=gene_symbol,
+            protein_short=protein_short,
+            hgvs_c=litvar_hgvs_c,
+        )
 
     # Resolve PMIDs to DOIs and store metadata for each paper
     log.info('Resolving %d PMIDs to DOIs', len(pmids))
     dois = await resolve_pmids_to_dois(base, pmids)
 
-    result = QueryResult(gene=gene, hgvs_c=hgvs_c, dois=dois)
-    write_json(cache_url, with_schema_version(asdict(result), QUERY_SCHEMA_VERSION))
+    result = QueryResult(variant_spec=variant_spec, dois=dois)
+    write_json(cache_url, result.model_dump())
     log.info('Cached query results to %s', cache_url)
 
     log.info('Found %d DOIs from %d PMIDs', len(dois), len(pmids))
@@ -389,8 +476,11 @@ async def query_dois_async(
 
 def query_dois(
     variant_id: str = typer.Option(..., '--variant-id', help='Unique identifier for this variant'),
-    gene: str = typer.Option(..., '--gene', '-g', help='Gene symbol (e.g., GAA)'),
-    hgvs_c: str = typer.Option(..., '--hgvs-c', '-v', help='HGVS c. notation (e.g., c.2238G>C)'),
+    variant_spec_raw: str = typer.Option(
+        ...,
+        '--variant-spec',
+        help='Variant spec as inline JSON or @path/to/spec.json',
+    ),
     source: Literal['mastermind', 'litvar'] = typer.Option(..., '--source', '-s', help='Literature source to query'),
 ) -> None:
     """Query literature sources for variant DOIs.
@@ -398,9 +488,10 @@ def query_dois(
     Queries Mastermind or LitVar for PMIDs, resolves each to a DOI via PubMed,
     and stores paper metadata. Caches results to object storage.
     """
+    variant_spec = parse_variant_spec_cli(variant_spec_raw)
     s = Settings()  # type: ignore[call-arg]
     try:
-        asyncio.run(query_dois_async(s.flowa_storage_base, variant_id, gene, hgvs_c, source, s.mastermind_api_token))
+        asyncio.run(query_dois_async(s.flowa_storage_base, variant_id, variant_spec, source, s.mastermind_api_token))
     except ValueError as e:
         log.error('%s', e)
         raise typer.Exit(1) from None

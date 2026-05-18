@@ -16,7 +16,13 @@ def test_health_returns_ok(client: TestClient) -> None:
 def test_post_runs_returns_record(client: TestClient) -> None:
     response = client.post(
         '/runs',
-        json={'variant_id': 'F508del', 'gene': 'CFTR', 'hgvs_c': 'c.1521_1523del'},
+        json={
+            'variant_id': 'F508del',
+            'variant_spec': {
+                'schema_version': 1,
+                'variants': [{'kind': 'hgvs_c', 'transcript': 'NM_000492.4', 'hgvs_c': 'c.1521_1523del'}],
+            },
+        },
     )
     assert response.status_code == 200
     body = response.json()
@@ -27,7 +33,8 @@ def test_post_runs_returns_record(client: TestClient) -> None:
 
 
 def test_post_runs_rejects_malformed_body(client: TestClient) -> None:
-    response = client.post('/runs', json={'gene': 'CFTR'})  # missing variant_id + hgvs_c
+    # missing variant_id + variant_spec → 422
+    response = client.post('/runs', json={'variant_id': 'X'})
     assert response.status_code == 422
 
 
@@ -37,7 +44,13 @@ def test_get_runs_active_returns_404_when_no_run(client: TestClient) -> None:
 
 
 def test_get_runs_active_returns_record_after_post(client: TestClient) -> None:
-    client.post('/runs', json={'variant_id': 'X', 'gene': 'G', 'hgvs_c': 'c.1A>T'})
+    client.post('/runs', json={
+            'variant_id': 'X',
+            'variant_spec': {
+                'schema_version': 1,
+                'variants': [{'kind': 'hgvs_c', 'transcript': 'NM_000001.1', 'hgvs_c': 'c.1A>T'}],
+            },
+        })
     response = client.get('/runs/active', params={'variant_id': 'X'})
     assert response.status_code == 200
     assert response.json()['variant_id'] == 'X'
@@ -64,8 +77,20 @@ def test_post_runs_returns_409_when_in_flight(client: TestClient, app) -> None:
         pipeline=hangs,
     )
 
-    first = client.post('/runs', json={'variant_id': 'V', 'gene': 'G', 'hgvs_c': 'c.1A>T'})
+    first = client.post('/runs', json={
+            'variant_id': 'V',
+            'variant_spec': {
+                'schema_version': 1,
+                'variants': [{'kind': 'hgvs_c', 'transcript': 'NM_000001.1', 'hgvs_c': 'c.1A>T'}],
+            },
+        })
     assert first.status_code == 200
 
-    second = client.post('/runs', json={'variant_id': 'V', 'gene': 'G', 'hgvs_c': 'c.1A>T'})
+    second = client.post('/runs', json={
+            'variant_id': 'V',
+            'variant_spec': {
+                'schema_version': 1,
+                'variants': [{'kind': 'hgvs_c', 'transcript': 'NM_000001.1', 'hgvs_c': 'c.1A>T'}],
+            },
+        })
     assert second.status_code == 409

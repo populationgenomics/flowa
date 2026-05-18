@@ -4,7 +4,7 @@ This task involves multi-step reasoning. Think carefully before responding.
 
 CRITICAL: This task is VARIANT-SPECIFIC. You are ONLY looking for evidence about the EXACT variant provided below. If this paper does not discuss this specific variant, return a result indicating no relevant evidence was found. This is a perfectly valid and expected outcome for most papers.
 
-VARIANT QUERY (from Mutalyzer/VariantValidator):
+VARIANT QUERY:
 {{ variant_details }}
 
 TASK OVERVIEW:

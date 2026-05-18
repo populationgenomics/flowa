@@ -137,7 +137,7 @@ export function LiteratureView({ variantId }: LiteratureViewProps) {
   }, [activeRunId, variantId]);
 
   const handleReanalyze = useCallback(async () => {
-    if (!papersResp || !papersResp.gene || !papersResp.hgvs_c) {
+    if (!papersResp || !papersResp.transcript || !papersResp.hgvs_c) {
       // Without query.json there's nothing to re-submit; the button is
       // disabled in this state too, so this guard is belt-and-braces.
       return;
@@ -149,7 +149,7 @@ export function LiteratureView({ variantId }: LiteratureViewProps) {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          gene: papersResp.gene,
+          transcript: papersResp.transcript,
           hgvs_c: papersResp.hgvs_c,
         }),
       });
@@ -217,7 +217,9 @@ export function LiteratureView({ variantId }: LiteratureViewProps) {
 
   const isRunActive = latest !== null && latest.terminal === false;
   const reanalyzeLabel = latest === null ? "Analyze" : "Re-analyze";
-  const hasReanalyzeContext = Boolean(papersResp?.gene && papersResp?.hgvs_c);
+  const hasReanalyzeContext = Boolean(
+    papersResp?.transcript && papersResp?.hgvs_c,
+  );
   const reanalyzeDisabledReason = isRunActive
     ? "A run is currently in flight."
     : !hasReanalyzeContext

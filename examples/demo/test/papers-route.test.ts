@@ -99,7 +99,7 @@ describe("GET /api/papers", () => {
       papers: [],
       aggregateExists: false,
       categories: [],
-      gene: null,
+      transcript: null,
       hgvs_c: null,
     });
   });

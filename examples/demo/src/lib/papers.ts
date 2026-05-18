@@ -45,15 +45,25 @@ export interface PapersForVariant {
   papers: PaperRow[];
   aggregateExists: boolean;
   categories: string[];
-  /** From `query.json`; null if the run died before the query stage. */
-  gene: string | null;
-  /** From `query.json`; null if the run died before the query stage. */
+  /**
+   * RefSeq transcript from `query.json`'s
+   * `variant_spec.variants[0].transcript`. Null when the run died
+   * before the query stage finished.
+   */
+  transcript: string | null;
+  /**
+   * c.-form HGVS expression (without transcript prefix) from
+   * `query.json`'s `variant_spec.variants[0].hgvs_c`. Null when the
+   * run died before the query stage finished. Callers that want the
+   * full transcript-prefixed display form join `${transcript}:${hgvs_c}`.
+   */
   hgvs_c: string | null;
 }
 
 interface QueryFile {
-  gene?: string;
-  hgvs_c?: string;
+  variant_spec?: {
+    variants?: { transcript?: string; hgvs_c?: string }[];
+  };
   dois: string[];
 }
 
@@ -81,11 +91,14 @@ export async function listPapersForVariant(
       papers: [],
       aggregateExists: false,
       categories: [],
-      gene: null,
+      transcript: null,
       hgvs_c: null,
     };
   }
   const query = JSON.parse(await readFile(queryPath, "utf8")) as QueryFile;
+  const specItem = query.variant_spec?.variants?.[0];
+  const transcript = specItem?.transcript ?? null;
+  const hgvs_c = specItem?.hgvs_c ?? null;
 
   const aggregatePath = join(assessmentDir, "aggregate.json");
   let aggregateExists = false;
@@ -139,7 +152,7 @@ export async function listPapersForVariant(
     papers,
     aggregateExists,
     categories,
-    gene: query.gene ?? null,
-    hgvs_c: query.hgvs_c ?? null,
+    transcript,
+    hgvs_c,
   };
 }

@@ -140,7 +140,7 @@ demo-gateway together. Open `http://localhost:7700/`, fill in a Gene
 (e.g. `RYR2`) and HGVS c. (e.g. `NM_001035.3:c.14174A>G`), and submit.
 The Next.js handler derives the `variant_id`
 (`${gene}-${slug(transcript)}-${slug(change)}`, so
-`RYR2-NM_001035_3-c_14174A_G` for the bundled fixture) and forwards
+`NM_001035_3-c_14174A_G` for the bundled fixture) and forwards
 the run to demo-gateway. The page redirects to `/variants/[variantId]`,
 which polls the run's progress JSONL, lists per-paper download/upload
 status, and surfaces an "Open analysis" chip per category once
@@ -158,7 +158,7 @@ downloaded PDFs):
 
 ```bash
 cd examples/demo/demo-data
-VARIANT=RYR2-NM_001035_3-c_14174A_G
+VARIANT=NM_001035_3-c_14174A_G
 # Run progress is now nested under the assessment dir; clear it
 # alongside the aggregate so the next run starts clean.
 rm -f assessments/$VARIANT/aggregate.json \

@@ -18,43 +18,41 @@ describe("slug", () => {
 });
 
 describe("deriveVariantId", () => {
-  test("with transcript prefix produces gene-transcript-change", () => {
-    expect(deriveVariantId("RYR2", "NM_001035.3:c.14174A>G")).toBe(
-      "RYR2-NM_001035_3-c_14174A_G",
+  test("joins slugged transcript and c.-form with a dash", () => {
+    expect(deriveVariantId("NM_001035.3", "c.14174A>G")).toBe(
+      "NM_001035_3-c_14174A_G",
     );
   });
 
-  test("without transcript prefix collapses to gene-change", () => {
-    expect(deriveVariantId("RYR2", "c.14174A>G")).toBe("RYR2-c_14174A_G");
-  });
-
   test("transcript versions don't collide", () => {
-    const v2 = deriveVariantId("RYR2", "NM_001035.2:c.14174A>G");
-    const v3 = deriveVariantId("RYR2", "NM_001035.3:c.14174A>G");
+    const v2 = deriveVariantId("NM_001035.2", "c.14174A>G");
+    const v3 = deriveVariantId("NM_001035.3", "c.14174A>G");
     expect(v2).not.toBe(v3);
   });
 
   test("derivation is deterministic for re-analyze", () => {
-    const first = deriveVariantId("RYR2", "NM_001035.3:c.14174A>G");
-    const again = deriveVariantId("RYR2", "NM_001035.3:c.14174A>G");
+    const first = deriveVariantId("NM_001035.3", "c.14174A>G");
+    const again = deriveVariantId("NM_001035.3", "c.14174A>G");
     expect(first).toBe(again);
   });
 
   test("output is always a path-safe slug", () => {
-    expect(
-      isValidVariantId(deriveVariantId("RYR2", "NM_001035.3:c.14174A>G")),
-    ).toBe(true);
-    expect(isValidVariantId(deriveVariantId("BRCA1", "c.5266dupC"))).toBe(true);
-    expect(
-      isValidVariantId(deriveVariantId("HLA-DRB1", "NM_002124.4:c.123G>T")),
-    ).toBe(true);
+    expect(isValidVariantId(deriveVariantId("NM_001035.3", "c.14174A>G"))).toBe(
+      true,
+    );
+    expect(isValidVariantId(deriveVariantId("NM_007294.4", "c.5266dupC"))).toBe(
+      true,
+    );
+    expect(isValidVariantId(deriveVariantId("NM_002124.4", "c.123G>T"))).toBe(
+      true,
+    );
   });
 });
 
 describe("isValidVariantId", () => {
   test("accepts auto-derived variantIds", () => {
-    expect(isValidVariantId("RYR2-NM_001035_3-c_14174A_G")).toBe(true);
-    expect(isValidVariantId("BRCA1-c_5266dupC")).toBe(true);
+    expect(isValidVariantId("NM_001035_3-c_14174A_G")).toBe(true);
+    expect(isValidVariantId("NM_007294_4-c_5266dupC")).toBe(true);
   });
 
   test("rejects path traversal attempts", () => {
@@ -64,7 +62,7 @@ describe("isValidVariantId", () => {
   });
 
   test("rejects un-slugged HGVS notation", () => {
-    expect(isValidVariantId("RYR2-NM_001035.3:c.14174A>G")).toBe(false);
+    expect(isValidVariantId("NM_001035.3:c.14174A>G")).toBe(false);
   });
 
   test("rejects empty string", () => {

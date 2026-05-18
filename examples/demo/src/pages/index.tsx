@@ -1,10 +1,10 @@
 /**
  * `/` — variant submission form + paginated runs history.
  *
- * The form takes Gene + HGVS-c as free text; nothing client-side is
- * regex-validated, so an invalid input surfaces as a 4xx from
- * `/api/runs` or as a flowa runtime error on the gateway side. Submit
- * derives `variant_id` server-side and redirects to
+ * The form takes Transcript + HGVS-c as two separate free-text fields;
+ * nothing client-side is regex-validated, so an invalid input surfaces
+ * as a 4xx from `/api/runs` or as a flowa runtime error on the gateway
+ * side. Submit derives `variant_id` server-side and redirects to
  * `/variants/[variant_id]`.
  *
  * The history table is a paginated scan of `assessments/*\/runs/*`. No
@@ -35,7 +35,7 @@ import type { RunRow, RunsHistoryPage } from "@/lib/runs";
 
 export default function IndexPage() {
   const router = useRouter();
-  const [gene, setGene] = useState("");
+  const [transcript, setTranscript] = useState("");
   const [hgvsC, setHgvsC] = useState("");
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -59,8 +59,8 @@ export default function IndexPage() {
   const onSubmit = useCallback(
     async (e: React.FormEvent<HTMLFormElement>) => {
       e.preventDefault();
-      if (!gene.trim() || !hgvsC.trim()) {
-        setError("Gene and HGVS c. are both required.");
+      if (!transcript.trim() || !hgvsC.trim()) {
+        setError("Transcript and HGVS c. are both required.");
         return;
       }
       setSubmitting(true);
@@ -70,7 +70,7 @@ export default function IndexPage() {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
-            gene: gene.trim(),
+            transcript: transcript.trim(),
             hgvs_c: hgvsC.trim(),
           }),
         });
@@ -85,7 +85,7 @@ export default function IndexPage() {
         setSubmitting(false);
       }
     },
-    [gene, hgvsC, router],
+    [transcript, hgvsC, router],
   );
 
   const totalPages = history
@@ -116,18 +116,18 @@ export default function IndexPage() {
           <form onSubmit={onSubmit}>
             <Stack>
               <TextInput
-                label="Gene"
-                placeholder="e.g. RYR2"
-                description="HUGO gene symbol"
-                value={gene}
-                onChange={(e) => setGene(e.currentTarget.value)}
+                label="Transcript"
+                placeholder="e.g. NM_001035.3"
+                description="RefSeq transcript identifier (gene is derived by the normaliser)"
+                value={transcript}
+                onChange={(e) => setTranscript(e.currentTarget.value)}
                 disabled={submitting}
-                data-testid="gene-input"
+                data-testid="transcript-input"
               />
               <TextInput
                 label="HGVS c."
-                placeholder="e.g. NM_001035.3:c.14174A>G"
-                description="Full coding notation, with transcript prefix"
+                placeholder="e.g. c.14174A>G"
+                description="Coding-DNA notation, c.-form only (no transcript prefix)"
                 value={hgvsC}
                 onChange={(e) => setHgvsC(e.currentTarget.value)}
                 disabled={submitting}
@@ -173,7 +173,6 @@ export default function IndexPage() {
                 <Table.Thead>
                   <Table.Tr>
                     <Table.Th>Variant</Table.Th>
-                    <Table.Th>Gene</Table.Th>
                     <Table.Th>HGVS c.</Table.Th>
                     <Table.Th>Started</Table.Th>
                     <Table.Th>Status</Table.Th>
@@ -215,7 +214,6 @@ function RunHistoryRow({ row }: { row: RunRow }) {
           </Text>
         </Anchor>
       </Table.Td>
-      <Table.Td>{row.gene ?? "—"}</Table.Td>
       <Table.Td>
         <Text size="sm" ff="monospace">
           {row.hgvs_c ?? "—"}

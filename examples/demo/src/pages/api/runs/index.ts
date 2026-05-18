@@ -2,16 +2,23 @@
  * POST /api/runs      — trigger a pipeline run from `/` or Re-analyze.
  * GET  /api/runs?page=N — paginated runs history for the `/` page.
  *
- * The browser only ever submits `{ gene, hgvs_c }`. Mirrors what
+ * The browser submits `{ transcript, hgvs_c }`. Mirrors what
  * curation-service does at the assessment layer: variant_id is derived
  * on the trusted server, not carried in the body. The derivation is
- * deterministic, so a Re-analyze for the same gene + hgvs_c produces
- * the same variant_id and lands on the same `assessments/` dir.
+ * deterministic, so a Re-analyze for the same transcript + hgvs_c
+ * produces the same variant_id and lands on the same `assessments/`
+ * dir.
+ *
+ * The handler wraps the inputs into the canonical `variant_spec`
+ * envelope (`{ schema_version: 1, variants: [{ kind: "hgvs_c",
+ * transcript, hgvs_c }] }`) and forwards `{ variant_id, variant_spec }`
+ * to demo-gateway. This is the single canonical-shape construction
+ * site; the browser stays agnostic to the JSON envelope.
  *
  * The actual pipeline launch lives in demo-gateway (Python); this
- * handler forwards a body in demo-gateway's snake_case wire shape and
- * surfaces the gateway's status code unchanged (429 from concurrency
- * cap, 409 from a duplicate in-flight run, 5xx from the pipeline).
+ * handler surfaces the gateway's status code unchanged (429 from
+ * concurrency cap, 409 from a duplicate in-flight run, 5xx from the
+ * pipeline).
  */
 
 import type { NextApiRequest, NextApiResponse } from "next";
@@ -20,7 +27,7 @@ import { getDemoGatewayUrl } from "@/lib/demoConfig";
 import { scanRunsHistory, DEFAULT_RUNS_PAGE_SIZE } from "@/lib/runs";
 
 interface PostBody {
-  gene?: unknown;
+  transcript?: unknown;
   hgvs_c?: unknown;
 }
 
@@ -40,21 +47,25 @@ export default async function handler(
 
 async function handlePost(req: NextApiRequest, res: NextApiResponse) {
   const body = (req.body ?? {}) as PostBody;
-  if (!isNonEmptyString(body.gene) || !isNonEmptyString(body.hgvs_c)) {
-    res
-      .status(400)
-      .json({ error: "Both gene and hgvs_c are required (non-empty strings)" });
+  if (!isNonEmptyString(body.transcript) || !isNonEmptyString(body.hgvs_c)) {
+    res.status(400).json({
+      error: "Both transcript and hgvs_c are required (non-empty strings)",
+    });
     return;
   }
 
-  const gene = body.gene;
+  const transcript = body.transcript;
   const hgvs_c = body.hgvs_c;
-  const variant_id = deriveVariantId(gene, hgvs_c);
+  const variant_id = deriveVariantId(transcript, hgvs_c);
+  const variant_spec = {
+    schema_version: 1 as const,
+    variants: [{ kind: "hgvs_c" as const, transcript, hgvs_c }],
+  };
 
   const gatewayResponse = await fetch(`${getDemoGatewayUrl()}/runs`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ variant_id, gene, hgvs_c }),
+    body: JSON.stringify({ variant_id, variant_spec }),
   });
 
   // Surface the gateway's status code so the page can distinguish 409

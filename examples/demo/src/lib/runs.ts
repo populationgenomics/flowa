@@ -12,7 +12,7 @@
  * file (gateway crashed before the first event) still surfaces as an
  * in-flight run; a variant dir without `query.json` (pipeline died
  * before the query stage finished) still produces history rows with
- * `gene` / `hgvs_c` set to `null`.
+ * `hgvs_c` set to `null`.
  */
 
 import { existsSync } from "node:fs";
@@ -23,9 +23,11 @@ import { getDemoDataDir } from "./demoConfig";
 export interface RunRow {
   run_id: string;
   variant_id: string;
-  /** From `query.json`; null if the run died before the query stage. */
-  gene: string | null;
-  /** From `query.json`; null if the run died before the query stage. */
+  /**
+   * Transcript-prefixed HGVS c. expression assembled from `query.json`'s
+   * `variant_spec.variants[0].{transcript, hgvs_c}`. Null when the run
+   * died before the query stage finished.
+   */
   hgvs_c: string | null;
   /** First event's timestamp; null when no events have landed yet. */
   started_at: string | null;
@@ -48,8 +50,9 @@ export interface RunsHistoryOptions {
 export const DEFAULT_RUNS_PAGE_SIZE = 20;
 
 interface QueryFile {
-  gene?: string;
-  hgvs_c?: string;
+  variant_spec?: {
+    variants?: { transcript?: string; hgvs_c?: string }[];
+  };
 }
 
 interface ProgressEvent {
@@ -57,12 +60,12 @@ interface ProgressEvent {
   kind: "stage_started" | "paper" | "stage_done" | "run_done" | "run_error";
 }
 
-async function readQueryGeneAndHgvsC(
-  path: string,
-): Promise<{ gene: string | null; hgvs_c: string | null }> {
-  if (!existsSync(path)) return { gene: null, hgvs_c: null };
+export async function readQueryHgvsC(path: string): Promise<string | null> {
+  if (!existsSync(path)) return null;
   const q = JSON.parse(await readFile(path, "utf8")) as QueryFile;
-  return { gene: q.gene ?? null, hgvs_c: q.hgvs_c ?? null };
+  const item = q.variant_spec?.variants?.[0];
+  if (!item?.transcript || !item.hgvs_c) return null;
+  return `${item.transcript}:${item.hgvs_c}`;
 }
 
 async function readProgressEndpoints(
@@ -105,7 +108,7 @@ export async function scanRunsHistory(
     const runsRoot = join(assessmentsRoot, variantId, "runs");
     if (!existsSync(runsRoot)) continue;
 
-    const { gene, hgvs_c } = await readQueryGeneAndHgvsC(
+    const hgvs_c = await readQueryHgvsC(
       join(assessmentsRoot, variantId, "query.json"),
     );
 
@@ -117,7 +120,6 @@ export async function scanRunsHistory(
       all.push({
         run_id,
         variant_id: variantId,
-        gene,
         hgvs_c,
         started_at,
         terminal,
