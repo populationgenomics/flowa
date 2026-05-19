@@ -21,7 +21,7 @@ afterEach(() => {
 function writeAggregate(variantId: string, body: object): string {
   const dir = join(dataDir, "assessments", variantId);
   mkdirSync(dir, { recursive: true });
-  const path = join(dir, "aggregate.json");
+  const path = join(dir, "aggregation.json");
   writeFileSync(path, JSON.stringify(body));
   return path;
 }
@@ -171,7 +171,7 @@ describe("listVersions", () => {
     expect(out).toEqual([]);
   });
 
-  test("returns just v0 when only aggregate.json exists", async () => {
+  test("returns just v0 when only aggregation.json exists", async () => {
     writeAggregate("v1", SAMPLE_AGGREGATE);
     const out = await listVersions("v1", "acmg_classification", { dataDir });
     expect(out.map((v) => v.version)).toEqual([0]);

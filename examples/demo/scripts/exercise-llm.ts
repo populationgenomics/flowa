@@ -75,11 +75,11 @@ const CATEGORY = "acmg_classification";
 // Read the seeded aggregate, stringify the first result as the initial
 // artifact (mirroring what a UI page would do before posting /sessions).
 const aggregateText = await storage.readText(
-  `assessments/${VARIANT_ID}/aggregate.json`,
+  `assessments/${VARIANT_ID}/aggregation.json`,
 );
 if (!aggregateText) {
   console.error(
-    `No aggregate.json found at assessments/${VARIANT_ID}. Did the fixture copy step run?`,
+    `No aggregation.json found at assessments/${VARIANT_ID}. Did the fixture copy step run?`,
   );
   process.exit(1);
 }
@@ -88,7 +88,7 @@ const aggregate = JSON.parse(aggregateText) as {
 };
 const result = aggregate.results.find((r) => r.category === CATEGORY);
 if (!result) {
-  console.error(`No result with category=${CATEGORY} in aggregate.json.`);
+  console.error(`No result with category=${CATEGORY} in aggregation.json.`);
   process.exit(1);
 }
 const initialArtifact = JSON.stringify(result, null, 2);

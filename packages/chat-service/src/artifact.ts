@@ -6,7 +6,7 @@
 // `ArtifactSchema.extend({...})` with their additional fields; they do
 // not rename the core fields.
 //
-// Field names mirror flowa's `prompts/generic/aggregate_schema.py`.
+// Field names mirror flowa's `prompts/generic/aggregation_schema.py`.
 
 import { z } from "zod";
 
@@ -89,7 +89,7 @@ export const artifactFields = {
   category: z
     .string()
     .describe(
-      "Selector identifying which result this artifact represents within its aggregate. Mirrors aggregate.results[].category in flowa's prompts/generic/aggregate_schema.py.",
+      "Selector identifying which result this artifact represents within its aggregate. Mirrors aggregation.results[].category in flowa's prompts/generic/aggregation_schema.py.",
     ),
   description: z
     .string()

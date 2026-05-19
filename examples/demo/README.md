@@ -39,7 +39,7 @@ pnpm --filter @flowajs/demo demo
   demo-gateway directly for everything else (no proxies — see the
   note below).
 - **chat-service** on port 7701 — the deployment-style entry that
-  loads `prompts/generic/aggregate_edit_schema.ts` and passes it
+  loads `prompts/generic/aggregation_edit_schema.ts` and passes it
   into `createApp({ schema })`.
 - **demo-gateway** on port 7702 — Python FastAPI service wrapping
   `flowa.run.run_pipeline(...)` for pipeline submission and
@@ -119,7 +119,7 @@ migrator runs idempotently on first API call.
 ## Fixture data
 
 `fixtures/` ships a small aggregate (one variant) shaped per
-`prompts/generic/aggregate_schema.py:CategoryResult` and the generic
+`prompts/generic/aggregation_schema.py:CategoryResult` and the generic
 artifact schema, along with the source PDFs and Markdown transcriptions
 the aggregate cites. On first boot, `scripts/start.ts` copies the
 fixture tree to `./demo-data/` if it isn't already present, so
@@ -144,7 +144,7 @@ The Next.js handler derives the `variant_id`
 the run to demo-gateway. The page redirects to `/variants/[variantId]`,
 which polls the run's progress JSONL, lists per-paper download/upload
 status, and surfaces an "Open analysis" chip per category once
-`aggregate.json` lands.
+`aggregation.json` lands.
 
 ## Re-running an assessment from the CLI
 
@@ -160,9 +160,9 @@ downloaded PDFs):
 cd examples/demo/demo-data
 VARIANT=NM_001035_3-c_14174A_G
 # Run progress is now nested under the assessment dir; clear it
-# alongside the aggregate so the next run starts clean.
-rm -f assessments/$VARIANT/aggregate.json \
-      assessments/$VARIANT/aggregate_raw.json
+# alongside the aggregation so the next run starts clean.
+rm -f assessments/$VARIANT/aggregation.json \
+      assessments/$VARIANT/aggregation_raw.json
 rm -rf assessments/$VARIANT/extractions/ assessments/$VARIANT/runs/
 # Re-runs flowa.convert (which uses anchorite for PDF chunking).
 # Drop this line to reuse the cached markdown and only redo extract +
@@ -199,7 +199,7 @@ safe to delete — the current layout writes runs under
 To replace `examples/demo/fixtures/assessments/...` with a freshly
 captured pipeline run, run the variant end-to-end (UI submission or
 `flowa run`), then copy `demo-data/assessments/{variant_id}/` into
-`fixtures/assessments/{variant_id}/`. Skip `aggregate_raw.json` and
+`fixtures/assessments/{variant_id}/`. Skip `aggregation_raw.json` and
 `extractions/*_raw.json` — those are the raw LLM conversations, large,
 and not needed by anything downstream.
 

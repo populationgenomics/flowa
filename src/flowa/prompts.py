@@ -14,14 +14,14 @@ Configuration:
 Each prompt set must contain:
     - extraction_prompt.txt
     - extraction_schema.py     (must define ExtractionResult model)
-    - aggregate_prompt.txt
-    - aggregate_schema.py      (must define AggregateResult model)
+    - aggregation_prompt.txt
+    - aggregation_schema.py    (must define AggregationResult model)
     - transcription_prompt.txt (text-only prompt, loaded via load_text_prompt)
 
 Schema interface requirements (accessed by Flowa's validation logic):
     - ExtractionResult.claims[].citations[].quote
-    - AggregateResult.results[].papers[].paper_id
-    - AggregateResult.results[].claims[].paper_id and .citations[].quote
+    - AggregationResult.results[].papers[].paper_id
+    - AggregationResult.results[].claims[].paper_id and .citations[].quote
 """
 
 import importlib.util
@@ -76,7 +76,7 @@ def load_prompt_and_schema(step: str, prompt_set: str = 'generic') -> tuple[jinj
     aggregation). For free-form text prompts, use ``load_text_prompt`` instead.
 
     Args:
-        step: Pipeline step name (e.g. 'extraction', 'aggregate').
+        step: Pipeline step name (e.g. 'extraction', 'aggregation').
         prompt_set: Name of the prompt set directory under prompts/.
 
     Returns:

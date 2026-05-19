@@ -16,7 +16,7 @@ from flowa.clinvar import format_clinvar_for_prompt, query_clinvar
 from flowa.models import create_model, get_model_settings
 from flowa.prompts import load_prompt_and_schema
 from flowa.resolve import CitationQuery, resolve_citations
-from flowa.schema import AGGREGATE_SCHEMA_VERSION, with_schema_version
+from flowa.schema import AGGREGATION_SCHEMA_VERSION, with_schema_version
 from flowa.settings import ModelConfig, Settings
 from flowa.storage import (
     assessment_url,
@@ -211,8 +211,8 @@ async def aggregate_evidence_async(
     dry_run: bool = False,
 ) -> None:
     """Aggregate evidence across all papers for a variant."""
-    aggregate_url = assessment_url(base, variant_id, 'aggregate.json')
-    aggregate_raw_url = assessment_url(base, variant_id, 'aggregate_raw.json')
+    aggregation_url = assessment_url(base, variant_id, 'aggregation.json')
+    aggregation_raw_url = assessment_url(base, variant_id, 'aggregation_raw.json')
 
     # Load variant details and query data (stored by query command)
     variant_details = json.dumps(read_json(assessment_url(base, variant_id, 'variant_details.json')))
@@ -297,7 +297,7 @@ async def aggregate_evidence_async(
     )
 
     # Load prompt and schema from prompt set
-    prompt_template, output_type = load_prompt_and_schema('aggregate', prompt_set)
+    prompt_template, output_type = load_prompt_and_schema('aggregation', prompt_set)
 
     evidence_text = (
         json.dumps(evidence_extractions, indent=2)
@@ -332,11 +332,11 @@ async def aggregate_evidence_async(
     with logfire.span('flowa.resolve_citations', paper_count=len(paper_id_to_doi)):
         resolve_aggregate_citations(aggregate_dict, paper_id_to_doi, pdf_bytes_cache, markdown_cache, metadata_cache)
 
-    # Store structured aggregate result
-    write_json(aggregate_url, with_schema_version(aggregate_dict, AGGREGATE_SCHEMA_VERSION))
+    # Store structured aggregation result
+    write_json(aggregation_url, with_schema_version(aggregate_dict, AGGREGATION_SCHEMA_VERSION))
 
     # Store raw LLM conversation for debugging
-    write_bytes(aggregate_raw_url, result.all_messages_json())
+    write_bytes(aggregation_raw_url, result.all_messages_json())
 
     results_list = result.output.results  # type: ignore[attr-defined]
     total_claims = sum(len(cat_result.claims) for cat_result in results_list)
@@ -360,7 +360,7 @@ def aggregate_evidence(
     Reads extraction results from assessments/{variant_id}/extractions/,
     variant details from variant_details.json, and paper metadata from
     papers/{encoded_doi}/metadata.json. Calls LLM for aggregate assessment and
-    stores result to assessments/{variant_id}/aggregate.json.
+    stores result to assessments/{variant_id}/aggregation.json.
     """
     s = Settings()  # type: ignore[call-arg]
     asyncio.run(

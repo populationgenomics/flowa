@@ -47,7 +47,7 @@ function writeAggregate(variantId: string, categories: string[]): void {
   const dir = join(dataRoot, "assessments", variantId);
   mkdirSync(dir, { recursive: true });
   writeFileSync(
-    join(dir, "aggregate.json"),
+    join(dir, "aggregation.json"),
     JSON.stringify({
       schema_version: 1,
       results: categories.map((c) => ({ category: c })),
@@ -148,7 +148,7 @@ describe("listPapersForVariant", () => {
     });
   });
 
-  test("returns aggregateExists + categories when aggregate.json is present", async () => {
+  test("returns aggregateExists + categories when aggregation.json is present", async () => {
     writeQuery("V1", ["10.1234/foo"]);
     writeAggregate("V1", ["acmg_classification"]);
     const result = await listPapersForVariant("V1", { dataDir: dataRoot });

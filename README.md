@@ -81,8 +81,8 @@ Flowa supports site-specific prompt sets. Each prompt set is a directory under `
 prompts/{prompt_set}/
 ├── extraction_prompt.txt      # Prompt template for individual paper extraction
 ├── extraction_schema.py       # Pydantic model defining ExtractionResult
-├── aggregate_prompt.txt       # Prompt template for cross-paper aggregation
-└── aggregate_schema.py        # Pydantic model defining AggregateResult
+├── aggregation_prompt.txt     # Prompt template for cross-paper aggregation
+└── aggregation_schema.py      # Pydantic model defining AggregationResult
 ```
 
 ### Interface Requirements
@@ -93,7 +93,7 @@ Schema modules must define Pydantic models with specific fields that Flowa's val
 
 - `evidence[].citations[].quote` (str) — verbatim quote from the paper
 
-**aggregate_schema.py** must define `AggregateResult` with:
+**aggregation_schema.py** must define `AggregationResult` with:
 
 - `results[].citations[].paper_id` (str) — paper identifier
 - `results[].citations[].quote` (str) — verbatim quote resolved to PDF bounding boxes
@@ -126,8 +126,8 @@ assessments/{variant_id}/
   workflow.json            # Pipeline run metadata
   variant_details.json     # VariantValidator output
   query.json               # Query results (DOI list)
-  aggregate.json           # Aggregated assessment with pre-resolved bboxes
-  aggregate_raw.json       # Raw LLM conversation
+  aggregation.json         # Aggregated assessment with pre-resolved bboxes
+  aggregation_raw.json     # Raw LLM conversation
   extractions/
     {encoded_doi}.json     # Per-paper extraction (quotes + commentary)
     {encoded_doi}_raw.json # Raw LLM conversation

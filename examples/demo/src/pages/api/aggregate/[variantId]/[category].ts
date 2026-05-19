@@ -17,7 +17,7 @@ export default async function handler(
   }
   const loaded = await loadAggregate(variantId, category);
   if (!loaded) {
-    res.status(404).json({ error: "aggregate.json or category not found" });
+    res.status(404).json({ error: "aggregation.json or category not found" });
     return;
   }
   res.status(200).json({

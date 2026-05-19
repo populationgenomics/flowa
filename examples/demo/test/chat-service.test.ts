@@ -111,7 +111,7 @@ describe("chat-service entry wiring", () => {
 
   test("POST /sessions succeeds against a minimal fixture aggregate", async () => {
     // Seed the minimum chat-service expects: query.json (DOI list) +
-    // aggregate.json (with one matching category). Per-paper extracts
+    // aggregation.json (with one matching category). Per-paper extracts
     // are read on-demand by tools, not at session creation.
     const variantId = "NM_001035_3-c_14174A_G";
     writeFileSync(
@@ -119,7 +119,7 @@ describe("chat-service entry wiring", () => {
       JSON.stringify({ dois: [] }),
     );
     writeFileSync(
-      join(dataRoot, "assessments", variantId, "aggregate.json"),
+      join(dataRoot, "assessments", variantId, "aggregation.json"),
       JSON.stringify({
         results: [
           {

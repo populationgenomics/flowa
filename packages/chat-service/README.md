@@ -104,7 +104,7 @@ etc.). The default env-driven `index.ts` applies it on `/sessions` when
 | `STORAGE_GCS_BUCKET` | when `gcs` | Bucket name. Credentials come from Google Cloud's Application Default Credentials chain (`GOOGLE_APPLICATION_CREDENTIALS`, gcloud user creds, GCE metadata server, etc.). |
 | `STORAGE_PREFIX` | no | Prefix prepended to every storage key (regardless of backend). |
 | `CHAT_JWT_SECRET` | yes | Session JWT signing key. |
-| `CHAT_PROMPT_DIR` | no, default `./prompts` | Directory containing `aggregate_edit_prompt.txt`. |
+| `CHAT_PROMPT_DIR` | no, default `./prompts` | Directory containing `aggregation_edit_prompt.txt`. |
 | `CHAT_JWT_TTL_SECONDS` | no, default `14400` | Session token lifetime (4h). |
 | `PORT` | no, default `8000` | HTTP listen port. |
 | `OTEL_ENABLED` | no, default `false` | When `true`, `instrumentation.ts` boots the OpenTelemetry SDK with SigV4 OTLP transport. The demo leaves this unset; production sets it to enable CloudWatch / X-Ray. |

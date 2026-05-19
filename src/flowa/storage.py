@@ -13,8 +13,8 @@ Storage layout (DOIs are percent-encoded via encode_doi()):
         workflow.json
         variant_details.json
         query.json
-        aggregate.json
-        aggregate_raw.json
+        aggregation.json
+        aggregation_raw.json
         extractions/{encoded_doi}.json
         extractions/{encoded_doi}_raw.json
 
@@ -23,7 +23,7 @@ Usage:
 
     base = settings.flowa_storage_base
     metadata = read_json(paper_url(base, '10.1038/s41586-020-2308-7', 'metadata.json'))
-    write_json(assessment_url(base, 'var123', 'aggregate.json'), result)
+    write_json(assessment_url(base, 'var123', 'aggregation.json'), result)
 """
 
 import json

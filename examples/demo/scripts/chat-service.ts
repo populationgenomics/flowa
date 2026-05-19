@@ -51,8 +51,8 @@ const dataRoot = resolve(
 );
 
 // Locate the prompt-template directory by resolving the schema's package
-// export — `prompts/generic/aggregate_edit_schema.ts` lives in the same
-// directory as `aggregate_edit_prompt.txt`, which is what
+// export — `prompts/generic/aggregation_edit_schema.ts` lives in the same
+// directory as `aggregation_edit_prompt.txt`, which is what
 // `loadEditPromptTemplate` reads.
 const promptDir = dirname(
   fileURLToPath(import.meta.resolve("@flowajs/prompts/generic")),

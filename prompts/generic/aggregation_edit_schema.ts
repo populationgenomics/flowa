@@ -1,7 +1,7 @@
 /**
- * Generic aggregate-edit artifact schema for flowa's `prompts/generic/` set.
+ * Generic aggregation-edit artifact schema for flowa's `prompts/generic/` set.
  *
- * Mirrors `prompts/generic/aggregate_schema.py:CategoryResult`: the
+ * Mirrors `prompts/generic/aggregation_schema.py:CategoryResult`: the
  * citation-grounded core fields exposed by `@flowajs/chat-service`'s
  * `ArtifactSchema`, plus `classification` and `classification_rationale`
  * for ACMG-style variant assessment.

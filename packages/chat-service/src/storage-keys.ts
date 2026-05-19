@@ -21,7 +21,7 @@ export async function loadAggregate(
   storage: Storage,
   variantId: string,
 ): Promise<unknown> {
-  return storage.readJson(`assessments/${variantId}/aggregate.json`);
+  return storage.readJson(`assessments/${variantId}/aggregation.json`);
 }
 
 export async function loadExtraction(

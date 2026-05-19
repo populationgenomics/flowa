@@ -1,13 +1,13 @@
 /**
- * Render smoke test: load the real `prompts/generic/aggregate_edit_prompt.txt`
- * and render it with a schema that mirrors `prompts/generic/aggregate_edit_schema.ts`
+ * Render smoke test: load the real `prompts/generic/aggregation_edit_prompt.txt`
+ * and render it with a schema that mirrors `prompts/generic/aggregation_edit_schema.ts`
  * (citation-grounded core via `artifactFields` + `classification` +
  * `classification_rationale`). Verifies the deployment-extension pattern
  * compiles, the prompt template renders without `throwOnUndefined` errors,
  * the JSON Schema serialisation works, and a hand-crafted fixture artifact
  * validates against the schema.
  *
- * Does NOT import `prompts/generic/aggregate_edit_schema.ts` directly because
+ * Does NOT import `prompts/generic/aggregation_edit_schema.ts` directly because
  * that file imports `@flowajs/chat-service` by name (the public contract for
  * external deployments) and will only resolve once the package is built. The
  * test reconstructs the same schema inline using `artifactFields` from
@@ -32,7 +32,7 @@ const GENERIC_PROMPT_DIR = resolve(
   "generic",
 );
 
-// Mirrors prompts/generic/aggregate_edit_schema.ts. Kept inline (rather than
+// Mirrors prompts/generic/aggregation_edit_schema.ts. Kept inline (rather than
 // imported) because that file imports @flowajs/chat-service by name; we
 // exercise the same shape via artifactFields directly.
 const GenericArtifactSchema = z.object({
@@ -77,7 +77,7 @@ const FIXTURE_INITIAL_ARTIFACT = `   1\tcategory: acmg_classification
    8\tclaims: []
 `;
 
-describe("prompts/generic/aggregate_edit_prompt.txt", () => {
+describe("prompts/generic/aggregation_edit_prompt.txt", () => {
   test("renders against the generic deployment schema without errors", () => {
     const template = loadEditPromptTemplate(GENERIC_PROMPT_DIR);
     const rendered = promptEnv.renderString(template, {
@@ -149,9 +149,9 @@ describe("prompts/generic/aggregate_edit_prompt.txt", () => {
   });
 });
 
-describe("prompts/generic/aggregate_edit_schema.ts (companion file)", () => {
+describe("prompts/generic/aggregation_edit_schema.ts (companion file)", () => {
   test("file exists and references the documented contract", () => {
-    const path = join(GENERIC_PROMPT_DIR, "aggregate_edit_schema.ts");
+    const path = join(GENERIC_PROMPT_DIR, "aggregation_edit_schema.ts");
     const text = readFileSync(path, "utf-8");
 
     // The deployment-extension pattern from §6.2: spread artifactFields,

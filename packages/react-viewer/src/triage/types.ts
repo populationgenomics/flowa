@@ -34,7 +34,7 @@ export interface RankedPaper {
 
 /**
  * Result for a single classification category — the parsed view of one
- * `aggregate.json` entry under `results[]`. The shell renders this for the
+ * `aggregation.json` entry under `results[]`. The shell renders this for the
  * currently selected version.
  */
 export interface CategorySuggestion {

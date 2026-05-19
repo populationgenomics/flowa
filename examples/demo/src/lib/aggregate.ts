@@ -155,7 +155,7 @@ export async function loadAggregate(
   options: LoadAggregateOptions = {},
 ): Promise<LoadedAggregate | null> {
   const dataDir = options.dataDir ?? getDemoDataDir();
-  const path = join(dataDir, "assessments", variantId, "aggregate.json");
+  const path = join(dataDir, "assessments", variantId, "aggregation.json");
   if (!existsSync(path)) return null;
   const fileText = await readFile(path, "utf8");
   const raw = JSON.parse(fileText) as RawAggregate;
@@ -177,7 +177,7 @@ export async function loadAggregate(
 
 /**
  * Same shape as `loadAggregate`, but reads from a specific edit-draft file
- * rather than the pipeline's `aggregate.json`. Used when the user picks a
+ * rather than the pipeline's `aggregation.json`. Used when the user picks a
  * post-pipeline version (v >= 1) from the dropdown.
  *
  * Edit-draft files live at `edit-drafts/{variantId}/{category}/artifact-v{N}.json`
@@ -204,7 +204,7 @@ export async function loadEditDraft(
   const rawCategory = JSON.parse(artifactText) as RawCategoryResult;
   // Edit drafts don't ship paper_id_mapping; reuse the pipeline aggregate's.
   // Read from the same dataDir.
-  const aggPath = join(dataDir, "assessments", variantId, "aggregate.json");
+  const aggPath = join(dataDir, "assessments", variantId, "aggregation.json");
   let paperIdMapping: PaperIdMapping = { byAuthorYear: {}, byDoi: {} };
   if (existsSync(aggPath)) {
     const rawAgg = JSON.parse(await readFile(aggPath, "utf8")) as RawAggregate;
@@ -220,7 +220,7 @@ export async function loadEditDraft(
 
 /**
  * List edit-draft versions for a (variantId, category). v0 is the pipeline
- * output (`aggregate.json`), present iff that file exists; v1+ are
+ * output (`aggregation.json`), present iff that file exists; v1+ are
  * `artifact-v{N}.json` files under `edit-drafts/{variantId}/{category}/`.
  */
 export interface VersionListEntry {
@@ -237,7 +237,7 @@ export async function listVersions(
   const dataDir = options.dataDir ?? getDemoDataDir();
   const out: VersionListEntry[] = [];
 
-  const aggPath = join(dataDir, "assessments", variantId, "aggregate.json");
+  const aggPath = join(dataDir, "assessments", variantId, "aggregation.json");
   if (existsSync(aggPath)) {
     const s = await stat(aggPath);
     out.push({ version: 0, createdAt: s.mtime.toISOString() });

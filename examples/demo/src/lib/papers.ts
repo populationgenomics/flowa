@@ -100,7 +100,7 @@ export async function listPapersForVariant(
   const transcript = specItem?.transcript ?? null;
   const hgvs_c = specItem?.hgvs_c ?? null;
 
-  const aggregatePath = join(assessmentDir, "aggregate.json");
+  const aggregatePath = join(assessmentDir, "aggregation.json");
   let aggregateExists = false;
   let categories: string[] = [];
   if (existsSync(aggregatePath)) {

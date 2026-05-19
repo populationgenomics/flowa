@@ -39,8 +39,8 @@ def test_load_extraction_prompt_renders():
     assert '{{ full_text }}' not in rendered
 
 
-def test_load_aggregate_prompt_renders():
-    template, output_type = load_prompt_and_schema('aggregate', 'generic')
+def test_load_aggregation_prompt_renders():
+    template, output_type = load_prompt_and_schema('aggregation', 'generic')
 
     rendered = template.render(
         variant_details='STUB_VARIANT_DETAILS',
@@ -57,9 +57,9 @@ def test_load_aggregate_prompt_renders():
     assert '{{ evidence_extractions }}' not in rendered
 
 
-def test_aggregate_prompt_strict_undefined():
+def test_aggregation_prompt_strict_undefined():
     """Missing context vars must raise rather than silently render empty."""
-    template, _ = load_prompt_and_schema('aggregate', 'generic')
+    template, _ = load_prompt_and_schema('aggregation', 'generic')
 
     with pytest.raises(jinja2.UndefinedError):
         template.render(variant_details='only this one provided')

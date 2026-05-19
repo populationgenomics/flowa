@@ -47,7 +47,7 @@ export interface SessionConfig {
   storage: Storage;
   /** Zod schema for the deployment's full artifact (extends the citation-grounded core). */
   schema: z.ZodType<Artifact>;
-  /** Directory containing `aggregate_edit_prompt.txt`. */
+  /** Directory containing `aggregation_edit_prompt.txt`. */
   promptDir: string;
   /** Session JWT signing config. */
   jwtSecret: string;
@@ -256,7 +256,7 @@ export async function createEditSession(
   return { session, token, expiresAt };
 }
 
-/** Extract the artifact JSON for a category from aggregate.json. */
+/** Extract the artifact JSON for a category from aggregation.json. */
 function extractArtifactFromAggregate(
   aggregate: unknown,
   category: string,
@@ -266,17 +266,17 @@ function extractArtifactFromAggregate(
     aggregate === null ||
     !("results" in aggregate)
   ) {
-    throw new Error("aggregate.json has no results");
+    throw new Error("aggregation.json has no results");
   }
   const results = (aggregate as { results: { category: string }[] }).results;
   const result = results.find((r) => r.category === category);
   if (!result) {
-    throw new Error(`Category ${category} not found in aggregate.json`);
+    throw new Error(`Category ${category} not found in aggregation.json`);
   }
   return JSON.stringify(result, null, 2);
 }
 
-/** Extract all categories present in aggregate.json results. */
+/** Extract all categories present in aggregation.json results. */
 function extractAggregateCategories(aggregate: unknown): string[] {
   if (
     typeof aggregate !== "object" ||

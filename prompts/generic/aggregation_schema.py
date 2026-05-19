@@ -1,7 +1,7 @@
-"""Aggregate schema for generic ACMG-style variant assessment.
+"""Aggregation schema for generic ACMG-style variant assessment.
 
-This module defines the output structure for aggregate assessment across papers.
-The AggregateResult class is loaded dynamically by Flowa.
+This module defines the output structure for aggregation across papers.
+The AggregationResult class is loaded dynamically by Flowa.
 
 Interface requirements (accessed by Flowa's validation logic):
     - results[].category must exist
@@ -86,8 +86,8 @@ class CategoryResult(BaseModel):
     )
 
 
-class AggregateResult(BaseModel):
-    """Multi-category aggregate result for ACMG-style variant assessment."""
+class AggregationResult(BaseModel):
+    """Multi-category aggregation result for ACMG-style variant assessment."""
 
     results: list[CategoryResult] = Field(
         description='List of assessment results, one per selected category. '
