@@ -75,8 +75,8 @@ import re
 from datetime import UTC, datetime
 
 import httpx
-from tenacity import retry, retry_if_exception, stop_after_attempt, wait_exponential
 
+from flowa.http_retry import retry_transient_http
 from flowa.schema import NORMALIZED_VARIANT_SCHEMA_VERSION
 
 log = logging.getLogger(__name__)
@@ -148,22 +148,7 @@ _AA_3_LETTER_RE = re.compile(r'[A-Z][a-z]{2}')
 _PROMPT_RELEVANT_BIOTYPES: frozenset[str] = frozenset({'protein_coding'})
 
 
-def _is_retryable(exc: BaseException) -> bool:
-    """Retry only on transient failures (timeouts, 429, 5xx). 4xx is a permanent
-    failure (malformed HGVS, transcript not found) and should fail-fast."""
-    if isinstance(exc, httpx.TimeoutException | httpx.NetworkError):
-        return True
-    if isinstance(exc, httpx.HTTPStatusError):
-        return exc.response.status_code in {429, 500, 502, 503, 504}
-    return False
-
-
-@retry(
-    stop=stop_after_attempt(5),
-    wait=wait_exponential(multiplier=1, min=1, max=30),
-    retry=retry_if_exception(_is_retryable),
-    reraise=True,
-)
+@retry_transient_http
 async def _fetch_vep(hgvs: str) -> tuple[list[dict], str | None]:
     """Call VEP REST for a single HGVS string with RefSeq annotation enabled.
 

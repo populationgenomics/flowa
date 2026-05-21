@@ -9,8 +9,8 @@ import httpx
 import typer
 from defusedxml import ElementTree
 from pydantic import ValidationError
-from tenacity import retry, retry_if_exception_type, stop_after_attempt, wait_exponential
 
+from flowa.http_retry import retry_transient_http
 from flowa.normalize import normalize_variant
 from flowa.schema import (
     METADATA_SCHEMA_VERSION,
@@ -333,12 +333,7 @@ def _extract_date(date_elem: Element | None) -> str | None:
         return None
 
 
-@retry(
-    stop=stop_after_attempt(5),
-    wait=wait_exponential(),
-    retry=retry_if_exception_type(httpx.HTTPStatusError),
-    reraise=True,
-)
+@retry_transient_http
 async def fetch_pubmed_metadata_batch(pmids: list[int]) -> dict[int, dict[str, Any]]:
     """Fetch metadata for multiple papers from PubMed in a single EFetch request."""
     async with httpx.AsyncClient(timeout=30.0) as client:

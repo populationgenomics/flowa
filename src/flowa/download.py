@@ -15,6 +15,7 @@ from botocore.exceptions import ClientError
 from pypdf import PdfReader, PdfWriter
 from tenacity import retry, retry_if_exception_type, stop_after_attempt, wait_exponential
 
+from flowa.http_retry import retry_transient_http
 from flowa.settings import Settings
 from flowa.storage import exists, paper_url, read_json, write_bytes
 
@@ -129,6 +130,21 @@ def _s3_url_to_key(s3_url: str) -> str:
     return path.split('?')[0]
 
 
+@retry_transient_http
+async def _fetch_pmcid(client: httpx.AsyncClient, pmid: int, email: str, tool: str) -> str | None:
+    """Resolve PMID -> PMCID via NCBI idconv; None when no PMCID is registered."""
+    url = (
+        f'https://pmc.ncbi.nlm.nih.gov/tools/idconv/api/v1/articles/'
+        f'?ids={pmid}&idtype=pmid&format=json&tool={tool}&email={email}'
+    )
+    response = await client.get(url)
+    response.raise_for_status()
+    records = response.json().get('records', [])
+    if not records:
+        return None
+    return records[0].get('pmcid')
+
+
 async def fetch_pmc_pdf(pmid: int, client: httpx.AsyncClient, email: str, tool: str) -> tuple[bytes | None, str]:
     """Attempt to fetch PDF from PMC for a given PMID.
 
@@ -136,16 +152,9 @@ async def fetch_pmc_pdf(pmid: int, client: httpx.AsyncClient, email: str, tool: 
         Tuple of (pdf_bytes or None, message)
     """
     # Step 1: Get PMCID from idconv API
-    idconv_url = f'https://pmc.ncbi.nlm.nih.gov/tools/idconv/api/v1/articles/?ids={pmid}&idtype=pmid&format=json&tool={tool}&email={email}'
-    response = await client.get(idconv_url)
-    response.raise_for_status()
-    idconv_data = response.json()
-
-    records = idconv_data.get('records', [])
-    if not records or not records[0].get('pmcid'):
+    pmcid = await _fetch_pmcid(client, pmid, email, tool)
+    if pmcid is None:
         return None, 'No PMCID found (not in PMC)'
-
-    pmcid = records[0]['pmcid']
     log.debug('Found PMCID: %s', pmcid)
 
     # Step 2: Find latest version in S3 bucket

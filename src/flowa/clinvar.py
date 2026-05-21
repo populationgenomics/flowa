@@ -6,7 +6,8 @@ from typing import Any
 
 import httpx
 from defusedxml import ElementTree
-from tenacity import retry, retry_if_exception_type, stop_after_attempt, wait_exponential
+
+from flowa.http_retry import retry_transient_http
 
 log = logging.getLogger(__name__)
 
@@ -59,12 +60,7 @@ def _api_params(ncbi_api_key: str | None) -> dict[str, str]:
     return {'api_key': ncbi_api_key} if ncbi_api_key else {}
 
 
-@retry(
-    stop=stop_after_attempt(3),
-    wait=wait_exponential(),
-    retry=retry_if_exception_type(httpx.HTTPStatusError),
-    reraise=True,
-)
+@retry_transient_http
 def query_clinvar(hgvs_c: str, ncbi_api_key: str | None = None) -> dict[str, Any]:
     """Query ClinVar by HGVS c. notation and return parsed submission data.
 
