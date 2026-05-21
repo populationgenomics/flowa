@@ -99,7 +99,7 @@ describe("chat-service entry wiring", () => {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
-        variant_id: "NM_001035_3-c_14174A_G",
+        variant_id: "NM_000152_5-c_1935C_A",
         user_id: "leo@example.com",
         category: "acmg_classification",
         initial_artifact: "{}",
@@ -113,7 +113,7 @@ describe("chat-service entry wiring", () => {
     // Seed the minimum chat-service expects: query.json (DOI list) +
     // aggregation.json (with one matching category). Per-paper extracts
     // are read on-demand by tools, not at session creation.
-    const variantId = "NM_001035_3-c_14174A_G";
+    const variantId = "NM_000152_5-c_1935C_A";
     writeFileSync(
       join(makeDir(dataRoot, "assessments", variantId), "query.json"),
       JSON.stringify({ dois: [] }),

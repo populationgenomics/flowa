@@ -1,0 +1,61 @@
+{
+  "variant_discussed": true,
+  "claims": [
+    {
+      "text": "The c.1935C>A (p.Asp645Glu) variant is described as the most frequent GAA mutation in the study cohort, noted in 4 out of 10 patients (though Table 1 lists 5 patients carrying this variant).",
+      "citations": [
+        {
+          "quote": "The most frequent mutation observed in our study was c.1935C > A, with four out of ten patients having this mutation."
+        }
+      ]
+    },
+    {
+      "text": "Patient 0103 (female, Han, age 5.8 months at first infusion, disease onset age 4 months) carries c.1935C>A p.Asp645Glu (het) in compound heterozygosity with c.2662G>T p.Glu888*(het); CRIM-positive, GAA activity 1.05 (normal 2.88\u201398.02 \u03bcmol/L/h), LVMI 291.1 g/m\u00b2, LVEF 61.1%, no ventilator use at baseline.",
+      "citations": [
+        {
+          "quote": "0103 | 5.8 | F | Han | 58 | 5.0 | 4 | No | c.1935C > A, p.Asp645Glu (het) c.2662G > T, p.Glu888*(het) | + | 1.05 (2.88\u201398.02 \u03bcmol/L/h) | 291.1 | 61.1 | No"
+        }
+      ]
+    },
+    {
+      "text": "Patient 0104 (female, She ethnicity, age 7 months at first infusion, disease onset age 6 months) carries c.1432G>A p.Gly478Arg(het) in compound heterozygosity with c.1935C>A p.Asp645Glu(het); CRIM-positive, GAA activity 0.37 (normal 2.88\u201398.02 \u03bcmol/L/h), LVMI 745.5 g/m\u00b2, LVEF 49.2%, no ventilator use at baseline.",
+      "citations": [
+        {
+          "quote": "0104 | 7 | F | She | 64 | 6.2 | 6 | Yes | c.1432G > A, p.Gly478Arg(het) c.1935C > A, p.Asp645Glu(het) | + | 0.37 (2.88\u201398.02 \u03bcmol/L/h) | 745.5 | 49.2 | No"
+        }
+      ]
+    },
+    {
+      "text": "Patient 0105 (female, Han, age 5.9 months at first infusion, disease onset age 5 months) carries c.1832G>A p.Gly611Asp(het) in compound heterozygosity with c.1935C>A p.Asp645Glu(het); CRIM-positive, GAA activity 1.10 (normal 2.88\u201398.02 \u03bcmol/L/h), LVMI 298.8 g/m\u00b2, LVEF 41.1%, no ventilator use at baseline.",
+      "citations": [
+        {
+          "quote": "0105 | 5.9 | F | Han | 65.6 | 4.6 | 5 | Yes | c.1832G > A, p.Gly611Asp(het) c.1935C > A, p.Asp645Glu(het) | + | 1.10 (2.88\u201398.02 \u03bcmol/L/h) | 298.8 | 41.1 | No"
+        }
+      ]
+    },
+    {
+      "text": "Patient 0302 (male, Han, age 5.4 months at first infusion, disease onset age 4 months) carries c.1935C>A p.Asp645Glu(het) in compound heterozygosity with c.2662G>T p.Glu888*(het); CRIM-positive, GAA activity 6.8 (normal 24.8\u201393.0 nmol/g/min), LVMI 361.9 g/m\u00b2, LVEF 79.8%, no ventilator use at baseline.",
+      "citations": [
+        {
+          "quote": "0302 | 5.4 | M | Han | 65 | 6.3 | 4 | Yes | c.1935C > A, p.Asp645Glu(het) c.2662G > T, p.Glu888*(het) | + | 6.8 (24.8\u201393.0 nmol/g/min) | 361.9 | 79.8 | No"
+        }
+      ]
+    },
+    {
+      "text": "Patient 0401 (male, Han, age 7.4 months at first infusion, disease onset age 6 months) carries c.1121G>A p.Cys374Tyr(het) in compound heterozygosity with c.1935C>A p.Asp645Glu(het); CRIM-positive, GAA activity 2.4 (normal 62.3\u2013301.7 nmol/h/mgPr), LVMI 231.8 g/m\u00b2, LVEF 44.0%, no ventilator use at baseline.",
+      "citations": [
+        {
+          "quote": "0401 | 7.4 | M | Han | 70 | 6.5 | 6 | Yes | c.1121G > A, p.Cys374Tyr(het) c.1935C > A, p.Asp645Glu(het) | + | 2.4 (62.3\u2013301.7 nmol/h/mgPr) | 231.8 | 44.0 | No"
+        }
+      ]
+    },
+    {
+      "text": "All patients carrying c.1935C>A (p.Asp645Glu) were compound heterozygous (not homozygous), paired with different second alleles across unrelated individuals, and all were CRIM-positive (at least one missense mutation); the study enrolled unrelated Chinese patients with infantile-onset Pompe disease presenting with hypertrophic cardiomyopathy and onset within 12 months of age.",
+      "citations": [
+        {
+          "quote": "If a patient had at least one missense mutation, he or she was considered CRIM-positive. For patients whose CRIM status was inferred to be negative by gene mutation, an immune tolerance induction (ITI) regimen including rituximab, methotrexate, and intravenous immune globulin was recommended concomitantly with ERT"
+        }
+      ]
+    }
+  ]
+}

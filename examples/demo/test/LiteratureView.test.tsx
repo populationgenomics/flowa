@@ -37,7 +37,7 @@ vi.mock("next/link", () => ({
   ),
 }));
 
-const VARIANT = "NM_001035_3-c_14174A_G";
+const VARIANT = "NM_000152_5-c_1935C_A";
 
 let fetchSpy: ReturnType<typeof vi.spyOn>;
 
@@ -47,19 +47,20 @@ function papersResp(
   return {
     papers: [
       {
-        doi: "10.1371/journal.pone.0131517",
-        encodedDoi: "10.1371%2Fjournal.pone.0131517",
+        doi: "10.1186/s13023-023-02848-6",
+        encodedDoi: "10.1186%2Fs13023-023-02848-6",
         status: "needs_manual",
-        title: "Gender Differences in RYR2 Mutations",
-        authors: "Ohno, S",
-        pmid: 26114861,
-        url: "https://doi.org/10.1371/journal.pone.0131517",
+        title:
+          "Genotype, phenotype and treatment outcomes of 17 Malaysian patients with infantile-onset Pompe disease",
+        authors: "Chan, M-Y",
+        pmid: 37542277,
+        url: "https://doi.org/10.1186/s13023-023-02848-6",
       },
     ],
     aggregateExists: false,
     categories: [],
-    transcript: "NM_001035.3",
-    hgvs_c: "c.14174A>G",
+    transcript: "NM_000152.5",
+    hgvs_c: "c.1935C>A",
     ...overrides,
   };
 }
@@ -175,7 +176,9 @@ describe("<LiteratureView>", () => {
     renderView();
     await waitFor(() => {
       expect(
-        screen.getByText(/Gender Differences in RYR2 Mutations/),
+        screen.getByText(
+          /17 Malaysian patients with infantile-onset Pompe disease/,
+        ),
       ).toBeInTheDocument();
     });
   });
@@ -203,7 +206,9 @@ describe("<LiteratureView>", () => {
     renderView();
     await waitFor(() => {
       expect(
-        screen.getByText(/Gender Differences in RYR2 Mutations/),
+        screen.getByText(
+          /17 Malaysian patients with infantile-onset Pompe disease/,
+        ),
       ).toBeInTheDocument();
     });
     expect(screen.queryByText("Results")).not.toBeInTheDocument();

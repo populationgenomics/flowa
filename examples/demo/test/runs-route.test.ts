@@ -128,7 +128,7 @@ describe("POST /api/runs", () => {
       new Response(
         JSON.stringify({
           run_id: "abc",
-          variant_id: "NM_001035_3-c_14174A_G",
+          variant_id: "NM_000152_5-c_1935C_A",
           started_at: "2026-05-15T00:00:00.000+00:00",
           status: "running",
         }),
@@ -138,7 +138,7 @@ describe("POST /api/runs", () => {
 
     const { res, captured } = makeRes();
     await handler(
-      postReq({ transcript: "NM_001035.3", hgvs_c: "c.14174A>G" }),
+      postReq({ transcript: "NM_000152.5", hgvs_c: "c.1935C>A" }),
       res,
     );
 
@@ -148,14 +148,14 @@ describe("POST /api/runs", () => {
     expect(url).toBe("http://gateway.test/runs");
     const sentBody = JSON.parse((init as { body: string }).body);
     expect(sentBody).toEqual({
-      variant_id: "NM_001035_3-c_14174A_G",
+      variant_id: "NM_000152_5-c_1935C_A",
       variant_spec: {
         schema_version: 1,
         variants: [
           {
             kind: "hgvs_c",
-            transcript: "NM_001035.3",
-            hgvs_c: "c.14174A>G",
+            transcript: "NM_000152.5",
+            hgvs_c: "c.1935C>A",
           },
         ],
       },
@@ -171,7 +171,7 @@ describe("POST /api/runs", () => {
 
     const { res, captured } = makeRes();
     await handler(
-      postReq({ transcript: "NM_001035.3", hgvs_c: "c.14174A>G" }),
+      postReq({ transcript: "NM_000152.5", hgvs_c: "c.1935C>A" }),
       res,
     );
     expect(captured.statusCode).toBe(409);
@@ -185,7 +185,7 @@ describe("POST /api/runs", () => {
 
   test("rejects requests missing hgvs_c", async () => {
     const { res, captured } = makeRes();
-    await handler(postReq({ transcript: "NM_001035.3" }), res);
+    await handler(postReq({ transcript: "NM_000152.5" }), res);
     expect(captured.statusCode).toBe(400);
   });
 
@@ -205,11 +205,11 @@ describe("GET /api/runs", () => {
   });
 
   test("returns runs sorted descending by started_at with hgvs_c join", async () => {
-    writeQuery("NM_001035_3-c_14174A_G", "NM_001035.3", "c.14174A>G");
-    writeRun("NM_001035_3-c_14174A_G", "a".repeat(32), [
+    writeQuery("NM_000152_5-c_1935C_A", "NM_000152.5", "c.1935C>A");
+    writeRun("NM_000152_5-c_1935C_A", "a".repeat(32), [
       { timestamp: "2026-05-01T00:00:00.000+00:00", kind: "run_done" },
     ]);
-    writeRun("NM_001035_3-c_14174A_G", "b".repeat(32), [
+    writeRun("NM_000152_5-c_1935C_A", "b".repeat(32), [
       { timestamp: "2026-05-02T00:00:00.000+00:00", kind: "run_done" },
     ]);
 
@@ -219,7 +219,7 @@ describe("GET /api/runs", () => {
       runs: Array<{ run_id: string; started_at: string; hgvs_c: string }>;
     };
     expect(body.runs[0]?.started_at).toBe("2026-05-02T00:00:00.000+00:00");
-    expect(body.runs[0]?.hgvs_c).toBe("NM_001035.3:c.14174A>G");
+    expect(body.runs[0]?.hgvs_c).toBe("NM_000152.5:c.1935C>A");
   });
 
   test("rejects malformed page parameter", async () => {

@@ -72,12 +72,12 @@ describe("scanRunsHistory", () => {
   });
 
   test("returns one row per run across all variants", async () => {
-    writeQuery("NM_001035_3-c_14174A_G", "NM_001035.3", "c.14174A>G");
-    writeRun("NM_001035_3-c_14174A_G", "a".repeat(32), [
+    writeQuery("NM_000152_5-c_1935C_A", "NM_000152.5", "c.1935C>A");
+    writeRun("NM_000152_5-c_1935C_A", "a".repeat(32), [
       { timestamp: "2026-05-01T00:00:00.000+00:00", kind: "stage_started" },
       { timestamp: "2026-05-01T00:01:00.000+00:00", kind: "run_done" },
     ]);
-    writeRun("NM_001035_3-c_14174A_G", "b".repeat(32), [
+    writeRun("NM_000152_5-c_1935C_A", "b".repeat(32), [
       { timestamp: "2026-05-02T00:00:00.000+00:00", kind: "stage_started" },
     ]);
 
@@ -107,14 +107,14 @@ describe("scanRunsHistory", () => {
   });
 
   test("assembles colon-glued hgvs_c from variant_spec in sibling query.json", async () => {
-    writeQuery("NM_001035_3-c_14174A_G", "NM_001035.3", "c.14174A>G");
-    writeRun("NM_001035_3-c_14174A_G", "a".repeat(32), [
+    writeQuery("NM_000152_5-c_1935C_A", "NM_000152.5", "c.1935C>A");
+    writeRun("NM_000152_5-c_1935C_A", "a".repeat(32), [
       { timestamp: "2026-05-01T00:00:00.000+00:00", kind: "run_done" },
     ]);
 
     const result = await scanRunsHistory({ page: 1, dataDir: dataRoot });
     expect(result.runs[0]).toMatchObject({
-      hgvs_c: "NM_001035.3:c.14174A>G",
+      hgvs_c: "NM_000152.5:c.1935C>A",
     });
   });
 

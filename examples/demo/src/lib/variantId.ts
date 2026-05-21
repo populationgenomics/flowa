@@ -37,12 +37,12 @@ export function slug(s: string): string {
  * Derive `variant_id` from a transcript + c.-form HGVS expression.
  *
  * Each part is slugged independently and joined with `-`, so transcript
- * versions don't collide (`NM_001035.3` vs `NM_001035.2` produce
+ * versions don't collide (`NM_000152.5` vs `NM_000152.4` produce
  * distinct ids).
  *
  * Example:
- *   deriveVariantId("NM_001035.3", "c.14174A>G")
- *     → "NM_001035_3-c_14174A_G"
+ *   deriveVariantId("NM_000152.5", "c.1935C>A")
+ *     → "NM_000152_5-c_1935C_A"
  */
 export function deriveVariantId(transcript: string, hgvs_c: string): string {
   return `${slug(transcript)}-${slug(hgvs_c)}`;

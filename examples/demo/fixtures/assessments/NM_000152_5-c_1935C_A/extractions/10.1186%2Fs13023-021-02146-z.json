@@ -1,0 +1,37 @@
+{
+  "variant_discussed": true,
+  "claims": [
+    {
+      "text": "The GAA variant c.1935C>A (p.D645E), rs28940868, is listed as a disease-associated variant in Table 1: classified as 'Pathogenic' in ClinVar Miner, 'Potentially less severe' in the Pompe disease GAA variant database, located in Exon 14, and predicted 'Probably damaging (1.000)' by PolyPhen-2.",
+      "citations": [
+        {
+          "quote": "55 | rs28940868 | c.1935C>A | p.D645E | Exon 14 | Potentially less severe | Pathogenic | Probably damaging (1.000)"
+        }
+      ]
+    },
+    {
+      "text": "In a Japanese newborn screening program of 296,759 newborns, only one individual (subject No. 141) was detected with the c.1935C>A variant among 107 newborns who underwent GAA sequencing analysis, giving an allele frequency of 0.47% (1/214 alleles) in this cohort.",
+      "citations": [
+        {
+          "quote": "our study only detected one individual (No. 141) with the same variant among 107 newborns who underwent GAA sequencing analysis (allele frequency: 0.47%) (Table 2)"
+        }
+      ]
+    },
+    {
+      "text": "Subject No. 141 carrying c.1935C>A was classified as a carrier or potential carrier (DBS GAA activity range <1.0\u20133.6 pmol/h/disk), not as an IOPD or potential LOPD patient.",
+      "citations": [
+        {
+          "quote": "Carrier or potential carrier (DBS GAA range: <1.0\u20133.6)"
+        }
+      ]
+    },
+    {
+      "text": "The variant c.1935C>A is reported to be common in IOPD patients in Taiwan and southern China, and in Taiwan five of six IOPD patients were homozygous or heterozygous for this variant.",
+      "citations": [
+        {
+          "quote": "In Taiwan, five of six IOPD patients are homozygous or heterozygous for the same variant c.1935C>A. In contrast, our study only detected one individual (No. 141) with the same variant among 107 newborns who underwent GAA sequencing analysis (allele frequency: 0.47%) (Table 2). The high frequency of IOPD patients in Taiwan is attributed to the high frequency of allele c.1935C>A, which was most commonly found in IOPD patients in Taiwan and southern China"
+        }
+      ]
+    }
+  ]
+}

@@ -65,7 +65,7 @@ function arrangeFetch(plan: {
         status: 200,
         body: {
           run_id: "abc".repeat(11) + "f",
-          variant_id: "NM_001035_3-c_14174A_G",
+          variant_id: "NM_000152_5-c_1935C_A",
           started_at: "2026-05-15T00:00:00.000+00:00",
           status: "running",
         },
@@ -100,9 +100,9 @@ describe("/ index page", () => {
     arrangeFetch({});
     renderPage();
     expect(
-      await screen.findByPlaceholderText(/NM_001035\.3/),
+      await screen.findByPlaceholderText(/NM_000152\.5/),
     ).toBeInTheDocument();
-    expect(screen.getByPlaceholderText(/c\.14174A>G/)).toBeInTheDocument();
+    expect(screen.getByPlaceholderText(/c\.1935C>A/)).toBeInTheDocument();
     expect(
       screen.getByText(/RefSeq transcript identifier/),
     ).toBeInTheDocument();
@@ -117,13 +117,13 @@ describe("/ index page", () => {
 
     const transcript = await screen.findByTestId("transcript-input");
     const hgvs = screen.getByTestId("hgvs-input");
-    fireEvent.change(transcript, { target: { value: "NM_001035.3" } });
-    fireEvent.change(hgvs, { target: { value: "c.14174A>G" } });
+    fireEvent.change(transcript, { target: { value: "NM_000152.5" } });
+    fireEvent.change(hgvs, { target: { value: "c.1935C>A" } });
 
     fireEvent.click(screen.getByTestId("submit-button"));
 
     await waitFor(() => {
-      expect(pushMock).toHaveBeenCalledWith("/variants/NM_001035_3-c_14174A_G");
+      expect(pushMock).toHaveBeenCalledWith("/variants/NM_000152_5-c_1935C_A");
     });
     const postCall = fetchSpy.mock.calls.find(
       ([, init]: [unknown, RequestInit?]) => (init?.method ?? "GET") === "POST",
@@ -131,8 +131,8 @@ describe("/ index page", () => {
     expect(postCall).toBeDefined();
     const body = JSON.parse((postCall![1] as RequestInit).body as string);
     expect(body).toEqual({
-      transcript: "NM_001035.3",
-      hgvs_c: "c.14174A>G",
+      transcript: "NM_000152.5",
+      hgvs_c: "c.1935C>A",
     });
   });
 
@@ -156,10 +156,10 @@ describe("/ index page", () => {
     });
     renderPage();
     fireEvent.change(screen.getByTestId("transcript-input"), {
-      target: { value: "NM_001035.3" },
+      target: { value: "NM_000152.5" },
     });
     fireEvent.change(screen.getByTestId("hgvs-input"), {
-      target: { value: "c.14174A>G" },
+      target: { value: "c.1935C>A" },
     });
     fireEvent.click(screen.getByTestId("submit-button"));
 
@@ -175,8 +175,8 @@ describe("/ index page", () => {
         runs: [
           {
             run_id: "a".repeat(32),
-            variant_id: "NM_001035_3-c_14174A_G",
-            hgvs_c: "NM_001035.3:c.14174A>G",
+            variant_id: "NM_000152_5-c_1935C_A",
+            hgvs_c: "NM_000152.5:c.1935C>A",
             started_at: "2026-05-15T00:00:00.000+00:00",
             terminal: true,
           },
@@ -188,8 +188,8 @@ describe("/ index page", () => {
     });
     renderPage();
     expect(await screen.findByTestId("runs-history-table")).toBeInTheDocument();
-    expect(screen.getByText("NM_001035_3-c_14174A_G")).toBeInTheDocument();
-    expect(screen.getByText("NM_001035.3:c.14174A>G")).toBeInTheDocument();
+    expect(screen.getByText("NM_000152_5-c_1935C_A")).toBeInTheDocument();
+    expect(screen.getByText("NM_000152.5:c.1935C>A")).toBeInTheDocument();
     expect(screen.getByText("Done")).toBeInTheDocument();
   });
 });

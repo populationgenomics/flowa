@@ -1,0 +1,96 @@
+{
+  "variant_discussed": true,
+  "claims": [
+    {
+      "text": "The c.1935C>A (p.D645E) variant in the GAA gene is present in 7 of the 8 Pompe disease patients enrolled in this study (all except Subject A1), in both IOPD and LOPD patients.",
+      "citations": [
+        {
+          "quote": "Apart from Subject A1, all carried at least one allele with the c.1935C>A (p.D645E) variant in the GAA gene."
+        }
+      ]
+    },
+    {
+      "text": "In Table 1, the c.1935C>A variant is consistently reported in cis with c.1726G>A as the haplotype c.[1935C>A;1726G>A] across subjects A2, A3, B1, B2, B3, B4, and B5.",
+      "citations": [
+        {
+          "quote": "A2 | M | LOPD | Clinical | c.[1935C>A;1726G>A] | c.1781G>A | 3.2 | 20 Q2W | 9.8 | 6.6"
+        }
+      ]
+    },
+    {
+      "text": "Subject B4 (male, IOPD, NBS-diagnosed) carries c.[1935C>A;1726G>A] on both alleles (homozygous for this haplotype), started ERT at age 0.1 years at 40 mg/kg Q2W, and developed high ADA titers at age 1.6 years after 1.5 years of ERT.",
+      "citations": [
+        {
+          "quote": "B4 | M | IOPD | NBS | c.[1935C>A;1726G>A] | c.[1935C>A;1726G>A] | 0.1 | 40 Q2W | 1.6 | 1.5"
+        }
+      ]
+    },
+    {
+      "text": "Subject B1 (female, IOPD, NBS-diagnosed) carries c.[1935C>A;1726G>A] in trans with c.[1411_1414del;752C>T;761C>T], started ERT at 0.1 years at 20 mg/kg Q2W, and developed high ADA at 7.9 years after 7.8 years of ERT.",
+      "citations": [
+        {
+          "quote": "B1 | F | IOPD | NBS | c.[1935C>A;1726G>A] | c.[1411_1414del;752C>T;761C>T] | 0.1 | 20 Q2W | 7.9 | 7.8"
+        }
+      ]
+    },
+    {
+      "text": "Subject B2 (female, IOPD, NBS-diagnosed) carries c.[1935C>A;1726G>A] in trans with c.2024_2026del, started ERT at 0.02 years at 40 mg/kg Q2W, and developed high ADA at 1.4 years after 1.4 years of ERT.",
+      "citations": [
+        {
+          "quote": "B2 | F | IOPD | NBS | c.[1935C>A;1726G>A] | c.2024_2026del | 0.02 | 40 Q2W | 1.4 | 1.4"
+        }
+      ]
+    },
+    {
+      "text": "Subject B3 (female, IOPD, clinical case) carries c.[1935C>A;1726G>A] in trans with c.1340_1350del, started ERT at 0.3 years at 40 mg/kg Q2W, and developed high ADA at 0.5 years after 0.2 years of ERT.",
+      "citations": [
+        {
+          "quote": "B3 | F | IOPD | Clinical | c.[1935C>A;1726G>A] | c.1340_1350del | 0.3 | 40 Q2W | 0.5 | 0.2"
+        }
+      ]
+    },
+    {
+      "text": "Subject B5 (female, IOPD, clinical case) carries c.[1935C>A;1726G>A] in trans with c.[1001G>A;1726G>A], started ERT at 0.3 years at 40 mg/kg QW, and developed high ADA at 0.4 years after 0.1 years of ERT.",
+      "citations": [
+        {
+          "quote": "B5 | F | IOPD | Clinical | c.[1935C>A;1726G>A] | c.[1001G>A;1726G>A] | 0.3 | 40 QW | 0.4 | 0.1"
+        }
+      ]
+    },
+    {
+      "text": "Subject A2 (male, LOPD, clinical case) carries c.[1935C>A;1726G>A] in trans with c.1781G>A, started ERT at age 3.2 years, and developed high ADA at 9.8 years after 6.6 years of ERT; muscle weakness was noted during early adolescence.",
+      "citations": [
+        {
+          "quote": "Three patients were diagnosed with LOPD (Subject A1-A3) with muscle weakness noted during early adolescence, early infancy, and four years of age, respectively."
+        },
+        {
+          "quote": "A2 | M | LOPD | Clinical | c.[1935C>A;1726G>A] | c.1781G>A | 3.2 | 20 Q2W | 9.8 | 6.6"
+        }
+      ]
+    },
+    {
+      "text": "Subject A3 (male, LOPD, clinical case) carries c.[1935C>A;1726G>A] in trans with c.[842G>T;1726G>A], started ERT at age 7 years at 40 mg/kg QW, and developed high ADA at 7.3 years after 0.3 years of ERT; muscle weakness was noted from age four years.",
+      "citations": [
+        {
+          "quote": "A3 | M | LOPD | Clinical | c.[1935C>A;1726G>A] | c.[842G>T;1726G>A] | 7 | 40 QW | 7.3 | 0.3"
+        }
+      ]
+    },
+    {
+      "text": "All patients carrying c.1935C>A were CRIM-positive, confirmed by western blotting or genotyping prediction.",
+      "citations": [
+        {
+          "quote": "All IOPD patients were confirmed CRIM-positive through western blotting, described previously, or genotyping prediction"
+        }
+      ]
+    },
+    {
+      "text": "The clinical phenotypes of the c.1935C>A-carrying patients include classic IOPD (5 patients with significant cardiac complications) and LOPD (2\u20133 patients with muscle weakness but no cardiac manifestations); none of the LOPD patients exhibited cardiac involvement.",
+      "citations": [
+        {
+          "quote": "The remaining five were diagnosed with classic IOPD between 8 days and three months of age, primarily presenting with significant cardiac complications. Apart from Subject A1, all carried at least one allele with the c.1935C>A (p.D645E) variant in the GAA gene. All IOPD patients were confirmed CRIM-positive"
+        }
+      ]
+    }
+  ]
+}

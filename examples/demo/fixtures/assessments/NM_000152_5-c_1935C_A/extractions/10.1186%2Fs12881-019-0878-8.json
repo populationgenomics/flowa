@@ -1,0 +1,61 @@
+{
+  "variant_discussed": true,
+  "claims": [
+    {
+      "text": "Patient 2 carries c.1935C>A (p.Asp645Glu) in exon 14 (Catalytic GH31 domain) inherited from the father (FA), compound heterozygous with c.1933G>C (p.Asp645His) inherited from the mother (MO), with undetectable GAA activity (0% of normal).",
+      "citations": [
+        {
+          "quote": "2 | 0 | c.1935C>A | 14 | p.Asp645Glu | Catalytic GH31 | FA | Hermans et al. [13]"
+        }
+      ]
+    },
+    {
+      "text": "Patient 2 had infantile-onset Pompe disease with onset at 1-2 months, diagnosed at 1-2 months, presenting with tachypnea and mild hepatomegaly; ECG showed short PR interval, biventricular hypertrophy, EF 30%; received ERT since 4 weeks of age with favorable outcome at 4 years.",
+      "citations": [
+        {
+          "quote": "2 | 1-2 m | 1-2 m | tachypnea, mild hepatomegaly | short PR interval, BVH, EF 30% | yes, since 4 wk./ favorable outcome at 4 y | no, but two previous deceased children with cardiomyopathy"
+        }
+      ]
+    },
+    {
+      "text": "The p.Asp645Glu variant is referenced to Hermans et al. [13] and is associated with IOPD of Taiwanese descendants as a founder mutation, also being more common among Chinese and Taiwanese IOPD patients.",
+      "citations": [
+        {
+          "quote": "p.Asp645Glu associated with IOPD of Taiwanese descendants [14], and c.336-13 T > G associated with LOPD [15, 16]"
+        }
+      ]
+    },
+    {
+      "text": "Including the present study data, the prevalence of p.Asp645Glu/His among Thai IOPD patients is refined to 32.4% (11/34 mutant alleles), with exon 14 as the hotspot for GAA mutations at 50% (17/34).",
+      "citations": [
+        {
+          "quote": "the prevalence of p.Asp645Glu/His is refined to 32.4% (11/34) and exon 14 was the hot spot for GAA mutation at 50% (17/34), followed by exon 5"
+        }
+      ]
+    },
+    {
+      "text": "The p.Asp645Glu variant has been shown in prior work to cause delayed intracellular transport, deficient phosphorylation and proteolytic processing; in vitro expression studies confirmed significant loss of GAA activity and the variant was found in IOPD patients.",
+      "citations": [
+        {
+          "quote": "The p.Asp645Glu variant has been shown to cause delayed intracellular transport, deficient phosphorylation and proteolytic processing [25]. Replacement in the equivalent position p.Asp645Asn and p.Asp645His also result in severe loss of the enzyme activity [23, 31]"
+        }
+      ]
+    },
+    {
+      "text": "A prior study (Amarinthnukrowh et al.) reported p.Asp645Glu in 8/10 mutant alleles among Thai IOPD patients, establishing it as the most common mutation in this population.",
+      "citations": [
+        {
+          "quote": "Amarinthnukrowh et al. reported the p.Asp645Glu mutation in 8/10 mutant alleles found among Thai patients with IOPD [30]"
+        }
+      ]
+    },
+    {
+      "text": "Mutation screening of exons 14 and 5 (which include p.Asp645Glu) yields a 62% (21/34) detection rate and is proposed as a cost-effective strategy for rapid confirmation of IOPD among Thai and Southeast Asian descendants.",
+      "citations": [
+        {
+          "quote": "Mutation screening of exons 14 and 5, yielding 62% (21/34) detection rate, may serve as a cost-effective strategy for rapid confirmation of IOPD among Thai and Southeast Asian descendants"
+        }
+      ]
+    }
+  ]
+}

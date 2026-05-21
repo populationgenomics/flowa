@@ -1,0 +1,77 @@
+{
+  "variant_discussed": true,
+  "claims": [
+    {
+      "text": "c.1935C>A (p.Asp645Glu) was the second most common GAA variant globally in Group A (symptom onset \u226412 months with cardiomyopathy / classic infantile Pompe disease), with n=27 occurrences, and the most common variant in Asia-Pacific Group A patients (n=26).",
+      "citations": [
+        {
+          "quote": "c.1935C>A (*n* = 27) | p.(Asp645Glu) ... [Global Group A] ... c.1935C>A (*n* = 26) | p.(Asp645Glu) [Asia-Pacific Group A, most common]"
+        }
+      ]
+    },
+    {
+      "text": "c.1935C>A (p.Asp645Glu) is a known (previously published) variant reported across all three phenotypic subgroups (Groups A, B, and C) with a total of 42 variant occurrences in the Pompe Registry.",
+      "citations": [
+        {
+          "quote": "exon14 | c.1935C>A | p.(Asp645Glu) | 42 | A,B,C"
+        }
+      ]
+    },
+    {
+      "text": "c.1935C>A is listed among all variants reported in Group A patients (classic infantile Pompe disease with onset \u226412 months and cardiomyopathy), making it potentially very severe.",
+      "citations": [
+        {
+          "quote": "exon14 | c.1912G>T; c.1913G>A; c.1927G>A; c.1933G>A; c.1933G>C; c.1933G>T; c.1935C>A; c.1941C>G; c.1942G>A; c.1962_1964del; c.1979G>A; **c.2004C>A**; c.2015G>A; c.2023_2025del; c.2024_2026del; c.2040G>A"
+        }
+      ]
+    },
+    {
+      "text": "c.1935C>A was observed in homozygosity in Group A (CRIM-positive) patients (n=7), and also homozygously in single patients in Group B and Group C.",
+      "citations": [
+        {
+          "quote": "c.1935C>A (*n*=7) [Group A CRIM-positive] ... c.1935C>A [Group B] ... [Group C implicit from Table 6 structure]"
+        }
+      ]
+    },
+    {
+      "text": "Homozygous c.1935C>A, typically found in classic infantile Pompe disease, was also reported in Groups A and B; upon careful review, the Group B patients appear to have had cardiomyopathy reported in the Registry after 12 months of age.",
+      "citations": [
+        {
+          "quote": "homozygous variants c.1843G>A, c.1933G>A, and c.1935C>A, typically found in classic infantile Pompe disease, were reported in both Groups A and B (Table 6). Upon careful review, the patients in Group B appear to have had cardiomyopathy reported in the Registry after 12 months of age and are expected to be in Group A."
+        }
+      ]
+    },
+    {
+      "text": "In Asia-Pacific, c.1935C>A was reported in Group B (<5 patients) and Group C (n=7), in addition to Group A, indicating its presence across the full clinical spectrum in that region.",
+      "citations": [
+        {
+          "quote": "c.1935C>A (*n*<5) | p.(Asp645Glu) [Asia-Pacific Group B] ... c.1935C>A (*n* = 7) | p.(Asp645Glu) [Asia-Pacific Group C]"
+        }
+      ]
+    },
+    {
+      "text": "c.1935C>A and c.1726G>A are linked in cis in patients in the Asia-Pacific region; c.1726G>A is a pseudodeficiency variant that does not cause Pompe disease but reduces GAA activity.",
+      "citations": [
+        {
+          "quote": "c1726G>A also was common in Group A in this region since c.1935C>A and c.1726G>A are linked in cis in patients in the Asia\u2010Pacific. The variant is a common pseudodeficiency variant that reduces the activity of GAA substantially if present but does not lead to Pompe disease."
+        }
+      ]
+    },
+    {
+      "text": "c.1935C>A was the fourth most common variant globally across all groups due to contributions from Asia-Pacific patients, where it accounted for nearly half of reported variants in Group A.",
+      "citations": [
+        {
+          "quote": "In Asia\u2010Pacific, c.1935C>A was reported most often, but was not among the top five reported in other regions. Nevertheless, this variant was the fourth most common globally due to the input of patients from Asia\u2010Pacific where it accounted for nearly half of reported variants in Group A."
+        }
+      ]
+    },
+    {
+      "text": "The paper uses NM_000152.5 as the reference sequence for GAA variant nomenclature and GRCh38 (CM000679.2) as the genomic reference.",
+      "citations": [
+        {
+          "quote": "The following reference sequences were used to specify GAA variants: NM_000152.5 for the coding region conform the Ensembl sequence of the forward strand on Chromosome 17: 80,101,556\u201080,119,879 [GRCh38:CM000679.2]"
+        }
+      ]
+    }
+  ]
+}

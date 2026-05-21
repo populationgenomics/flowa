@@ -1,0 +1,170 @@
+{
+  "variant_discussed": true,
+  "claims": [
+    {
+      "text": "Patient 2 (male, GA 38 weeks, ERT at 15 days, follow-up 8.4 years) is homozygous for c.1935C>A (p.D645E) and c.1726G>A (p.G576S), and had mild single-ear SNHL as the post-ERT hearing outcome.",
+      "citations": [
+        {
+          "quote": "2 | M | 38, 3.5 | 15 | 15 | 8.4 | c.1935 C\u2192A, (p.D645E), homozygous; c.1726 G\u2192A, (p.G576S), homozygous"
+        },
+        {
+          "quote": "2 | Pass | + | 6.7 | 25.0 | 33.3 | A | A | Single ear SNHL, Mild"
+        }
+      ]
+    },
+    {
+      "text": "Patient 5 (female, GA 39 weeks, ERT at 9 days, follow-up 7.5 years) is homozygous for c.1935C>A (p.D645E) and c.1726G>A (p.G576S), with normal hearing at follow-up age 5.5 years.",
+      "citations": [
+        {
+          "quote": "5 | F | 39, 3.0 | 9 | 9 | 7.5 | c.1935 C\u2192A, (p.D645E), homozygous; c.1726 G\u2192A, (p.G576S), homozygous"
+        },
+        {
+          "quote": "5 | Pass | + | 5.5 | 16.7 | 15.0 | A | A | Normal"
+        }
+      ]
+    },
+    {
+      "text": "Patient 10 (female, GA 39 weeks, ERT at 10 days) is homozygous for c.1935C>A (p.D645E) and c.1726G>A (p.G576S), and had bilateral mild conductive hearing loss (type B tympanogram) at follow-up age 4.3 years.",
+      "citations": [
+        {
+          "quote": "10 | F | 39, 2.9 | 10 | 10 | 5.7 | c.1935 C\u2192A, (p.D645E), homozygous; c.1726 G\u2192A, (p.G576S), homozygous"
+        },
+        {
+          "quote": "10 | Pass | NA | 4.3 | 26.7 | 28.3 | B | B | Bil. cond. HL, Mild"
+        }
+      ]
+    },
+    {
+      "text": "Patient 11 (female, GA 41 weeks, ERT at 6 days) is homozygous for c.1935C>A (p.D645E) and c.1726G>A (p.G576S), and had bilateral mild SNHL at follow-up age 4.7 years.",
+      "citations": [
+        {
+          "quote": "11 | F | 41, 2.6 | 6 | 6 | 5.6 | c.1935 C\u2192A, (p.D645E), homozygous; c.1726 G\u2192A, (p.G576S), homozygous"
+        },
+        {
+          "quote": "11 | Pass | NA | 4.7 | 26.7 | 26.7 | A | A | Bil. SNHL, Mild"
+        }
+      ]
+    },
+    {
+      "text": "Patient 14 (female, GA 39 weeks, ERT at 8 days) is homozygous for c.1935C>A (p.D645E) and c.1726G>A (p.G576S), with normal hearing at follow-up age 1.1 years.",
+      "citations": [
+        {
+          "quote": "14 | F | 39, 3.1 | 7 | 8 | 2.4 | c.1935 C\u2192A, (p.D645E), homozygous; c.1726 G\u2192A, (p.G576S), homozygous"
+        },
+        {
+          "quote": "14 | Pass | + | 1.1 | 25.0 | 25.0 | A | A | Normal"
+        }
+      ]
+    },
+    {
+      "text": "Patient 19 (male, GA 38 weeks, failed newborn hearing screen, ERT at 8 days) is homozygous for c.1935C>A (p.D645E) and c.1726G>A (p.G576S), and had bilateral mild SNHL at follow-up age 0.3 years (threshold ABR 40 dB nHL bilaterally).",
+      "citations": [
+        {
+          "quote": "19 | M | 38, 3.8 | 7 | 8 | 2 | c.1935 C\u2192A, (p.D645E), homozygous; c.1726 G\u2192A, (p.G576S), homozygous"
+        },
+        {
+          "quote": "19 | Failed | + | 0.3 | 40.0 | 40.0 | A | A | Bil. SNHL, Mild"
+        }
+      ]
+    },
+    {
+      "text": "Patient 3 (male, GA 39 weeks, ERT at 9 days) is compound heterozygous for c.1935C>A (p.D645E) and c.2303C>T (p.P768L), and had bilateral moderate mixed hearing loss (absent OAE, type C tympanogram) at follow-up age 6.8 years.",
+      "citations": [
+        {
+          "quote": "3 | M | 39, 3.3 | 9 | 9 | 8.4 | c.1935 C\u2192A, (p.D645E), heterozygous; c.2303 C\u2192T, (p.P768L), heterozygous"
+        },
+        {
+          "quote": "3 | Pass | \u2212 | 6.8 | 41.7 | 45.0 | C | C | Bil. mixed HL, Moderate"
+        }
+      ]
+    },
+    {
+      "text": "Patient 4 (male, GA 38 weeks, ERT at 12 days) is compound heterozygous for c.1396G>T (p.V466F) and c.1935C>A (p.D645E), with normal hearing at follow-up age 1.2 years.",
+      "citations": [
+        {
+          "quote": "4 | M | 38, 3.1 | 12 | 12 | 8 | c.1396 G\u2192T, (p.V466F), heterozygous; c.1935 C\u2192A, (pD645E), heterozygous"
+        },
+        {
+          "quote": "4 | Pass | + | 1.2 | 21.7 | 21.7 | A | A | Normal"
+        }
+      ]
+    },
+    {
+      "text": "Patient 7 (female, GA 34 weeks, ERT at 12 days) and Patient 8 (male, GA 39 weeks, ERT at 7 days) each carry c.1935C>A (p.D645E) heterozygously alongside IVS7+2T>C and c.1726G>A (p.G576S), both as IOPD patients; both had normal hearing at follow-up.",
+      "citations": [
+        {
+          "quote": "7 | F | 34, 2.2 | 12 | 12 | 6.5 | c.1935 C\u2192A, (pD645E), heterozygous; IVS7+2T\u2192C, heterozygous; c.1726 G\u2192A, (p.G576S), heterozygous"
+        },
+        {
+          "quote": "8 | M | 39, 3.7 | 7 | 7 | 6.4 | IVS7+2T\u2192C, heterozygous; c.1935 C\u2192A, (p.D645E), heterozygous; c.1726 G\u2192A, (p.G576S), heterozygous"
+        }
+      ]
+    },
+    {
+      "text": "Patient 9 (female, GA 39 weeks, ERT at 13 days) carries c.1935C>A (p.D645E) heterozygously with c.1082C>T (p.P361L) and c.1726G>A (p.G576S), with normal hearing at follow-up age 4.9 years.",
+      "citations": [
+        {
+          "quote": "9 | F | 39, 2.9 | 13 | 13 | 6 | c.1082 C\u2192T, (p.P361L), heterozygous; c.1935 C\u2192A, (p.D645E), heterozygous; c.1726 G\u2192A, (p.G576S), heterozygous"
+        },
+        {
+          "quote": "9 | Pass | + | 4.9 | 25.0 | 23.3 | A | A | Normal"
+        }
+      ]
+    },
+    {
+      "text": "Patient 12 (female, GA 36 weeks, ERT at 8 days) carries c.1935C>A (p.D645E) heterozygously with c.1411_1414del (E471fsX5) and c.1726G>A (p.G576S), with normal hearing at follow-up age 3.1 years.",
+      "citations": [
+        {
+          "quote": "12 | F | 36, 3.3 | 8 | 8 | 4.8 | c.1411_1414del, (E471fsX5), heterozygous; c.1935 C\u2192A, (pD645E), heterozygous; c.1726 G\u2192A, (p.G576S), heterozygous"
+        },
+        {
+          "quote": "12 | Pass | + | 3.1 | 15.0 | 15.0 | A | A | Normal"
+        }
+      ]
+    },
+    {
+      "text": "Patient 13 (male, GA 39 weeks, ERT at 13 days) carries c.1935C>A (p.D645E) heterozygously with c.1726G>A (p.G576S) and c.2274insC (p.G759fs), with normal hearing at follow-up age 2.8 years.",
+      "citations": [
+        {
+          "quote": "13 | M | 39, 2.5 | 13 | 13 | 4.6 | c.1726 G\u2192A, (p.G576S), heterozygous; c.1935C\u2192A, (pD645E), heterozygous; c.2274insC, (p.G759fs), heterozygous"
+        },
+        {
+          "quote": "13 | Pass | + | 2.8 | 20.0 | 20.0 | A | A | Normal"
+        }
+      ]
+    },
+    {
+      "text": "Patient 17 (female, GA 38 weeks, ERT at 14 days) carries c.1935C>A (p.D645E) heterozygously with c.2228A>C (p.Q743P) and c.1726G>A (p.G576S), with normal hearing at follow-up age 1.5 years.",
+      "citations": [
+        {
+          "quote": "17 | F | 38, 3.6 | 14 | 14 | 2.8 | c.2228 A>C,p.Q743P; c.1726 G\u2192A, (p.G576S), heterozygous; c.1935C\u2192A, (pD645E), heterozygous"
+        },
+        {
+          "quote": "17 | Pass | + | 1.5 | 20.0 | 20.0 | A | A | Normal"
+        }
+      ]
+    },
+    {
+      "text": "Patient 18 (male, GA 39 weeks, ERT at 6 days) carries c.1935C>A (p.D645E) heterozygously with c.2238G>C (p.W746C) and c.1726G>A (p.G576S), with normal hearing at follow-up age 0.8 years.",
+      "citations": [
+        {
+          "quote": "18 | M | 39, 3.1 | 6 | 6 | 2.5 | c.2238 G\u2192C, (p.W746C), heterozygous; c.1726 G\u2192A, (p.G576S), heterozygous; c.1935C\u2192A, (pD645E), heterozygous"
+        },
+        {
+          "quote": "18 | Pass | + | 0.8 | 20.0 | 20.0 | A | A | Normal"
+        }
+      ]
+    },
+    {
+      "text": "All 19 IOPD patients in the study (identified through Taiwan's nationwide newborn screening program) received early ERT at a mean age of 11.05 days (range 6\u201323 days), and the overall hearing impairment rate was 31.6% (6/19) at last follow-up.",
+      "citations": [
+        {
+          "quote": "All the patients received their first ERT within 4 h of admission at a mean age of 11.05 days (range 6\u201323 days)."
+        },
+        {
+          "quote": "the HI rate was 31.6% (6/19)"
+        }
+      ]
+    }
+  ]
+}

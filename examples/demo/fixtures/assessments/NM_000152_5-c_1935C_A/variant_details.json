@@ -1,0 +1,47 @@
+{
+  "schema_version": 1,
+  "source": "vep",
+  "source_version": null,
+  "fetched_at": "2026-05-21T00:27:22.425345Z",
+  "gene_symbol": "GAA",
+  "hgnc_id": null,
+  "rsid": "rs28940868",
+  "grch38": {
+    "hgvs_g": "NC_000017.11:g.80112922C>A",
+    "chrom": "17",
+    "pos": 80112922,
+    "ref": "C",
+    "alt": "A"
+  },
+  "grch37": null,
+  "mane_select": {
+    "transcript_id": "NM_000152.5",
+    "hgvs_c": "NM_000152.5:c.1935C>A",
+    "protein_short": "NP_000143.2:p.D645E",
+    "protein_long": "NP_000143.2:p.Asp645Glu",
+    "exon": "14/20",
+    "intron": null,
+    "consequence_terms": [
+      "missense_variant"
+    ]
+  },
+  "user_transcript": null,
+  "alternate_transcripts": [
+    {
+      "transcript_id": "NM_001079803.3",
+      "hgvs_c": "NM_001079803.3:c.1935C>A"
+    },
+    {
+      "transcript_id": "NM_001079804.3",
+      "hgvs_c": "NM_001079804.3:c.1935C>A"
+    },
+    {
+      "transcript_id": "NM_001406741.1",
+      "hgvs_c": "NM_001406741.1:c.1935C>A"
+    },
+    {
+      "transcript_id": "NM_001406742.1",
+      "hgvs_c": "NM_001406742.1:c.1935C>A"
+    }
+  ]
+}

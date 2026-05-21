@@ -1,0 +1,37 @@
+{
+  "variant_discussed": true,
+  "claims": [
+    {
+      "text": "The variant NM_000152.5:c.1935C>A (p.Asp645Glu) is listed in the expanded variant nomenclature footnote of Table 2 with ClinVar ID VCV000004029.",
+      "citations": [
+        {
+          "quote": "NM_000152.5:c.1935C > A (p.Asp645Glu) (ClinVar ID VCV000004029)"
+        }
+      ]
+    },
+    {
+      "text": "In the Mini-COMET Cohort 1 overall population (n=6), at least two patients carried c.1935C>A always in cis with c.1726G>A (p.Gly576Ser) on one allele, in compound heterozygous configuration with other variants (c.[784G>A];[1935C>A;1726G>A] and c.[1062C>G;1286A>G];[1935C>A;1726G>A]).",
+      "citations": [
+        {
+          "quote": "c.[784G > A];[1935C > A;1726G > A], c.[1062C > G;1286 A > G];[1935C > A;1726G > A], c.[1222 A > G];[1927G > A], c.[236_246del];[655G > A], c.[1798C > T];[1798C > T], c.[1000G > T];[271G > A;307 T > G]"
+        }
+      ]
+    },
+    {
+      "text": "In the Mini-COMET Cohort 2 overall population (n=5), at least two patients carried c.1935C>A always in cis with c.1726G>A on at least one allele, including one patient homozygous for [1935C>A;1726G>A] and one compound heterozygous with [2842INST].",
+      "citations": [
+        {
+          "quote": "c.[1935C > A;1726G > A];[2842INST], c.[1935C > A;1726G > A];[1935C > A;1726G > A], c.[1193del];[1927G > A], c.[2015G > A];[2015G > A], c.[2646 + 2 T > A]"
+        }
+      ]
+    },
+    {
+      "text": "All patients in the Mini-COMET trial carrying c.1935C>A had infantile-onset Pompe disease (IOPD) and had previously received alglucosidase alfa with clinical decline or suboptimal response before switching to avalglucosidase alfa.",
+      "citations": [
+        {
+          "quote": "Mini-COMET is a Phase 2, multi-stage, randomized, open-label, multicenter, multinational, ascending-dose cohort trial primarily evaluating the safety of avalglucosidase alfa in patients with IOPD who previously treated with a stable dose of alglucosidase alfa. Patients who showed clinical decline with alglucosidase alfa treatment classified as stage 1 (Cohort 1 and 2), and patients who showed suboptimal clinical response with alglucosidase alfa treatment classified as stage 2 (Cohort 3)"
+        }
+      ]
+    }
+  ]
+}

@@ -91,7 +91,7 @@ function writeProgressFile(
   );
 }
 
-const VALID_VARIANT_ID = "NM_001035_3-c_14174A_G";
+const VALID_VARIANT_ID = "NM_000152_5-c_1935C_A";
 const VALID_RUN_ID = "0123456789abcdef0123456789abcdef";
 
 describe("GET /api/runs/[variantId]/[runId]/progress", () => {
@@ -124,7 +124,7 @@ describe("GET /api/runs/[variantId]/[runId]/progress", () => {
     // `:` is in HGVS-c but the auto-derivation slugs it to `_`; an
     // un-slugged value should fail the validator.
     await handler(
-      makeReq("GET", "RYR2-NM_001035.3:c.14174A>G", VALID_RUN_ID),
+      makeReq("GET", "GAA-NM_000152.5:c.1935C>A", VALID_RUN_ID),
       res,
     );
     expect(captured.statusCode).toBe(400);

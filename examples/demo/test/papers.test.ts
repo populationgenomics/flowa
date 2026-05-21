@@ -33,8 +33,8 @@ function writeQuery(variantId: string, dois: string[]): void {
         variants: [
           {
             kind: "hgvs_c",
-            transcript: "NM_001035.3",
-            hgvs_c: "c.14174A>G",
+            transcript: "NM_000152.5",
+            hgvs_c: "c.1935C>A",
           },
         ],
       },
@@ -96,8 +96,8 @@ describe("listPapersForVariant", () => {
   test("returns transcript + hgvs_c from query.json when present", async () => {
     writeQuery("V1", ["10.1234/foo"]);
     const result = await listPapersForVariant("V1", { dataDir: dataRoot });
-    expect(result.transcript).toBe("NM_001035.3");
-    expect(result.hgvs_c).toBe("c.14174A>G");
+    expect(result.transcript).toBe("NM_000152.5");
+    expect(result.hgvs_c).toBe("c.1935C>A");
   });
 
   test("status is `needs_manual` when neither PDF nor extract exist", async () => {

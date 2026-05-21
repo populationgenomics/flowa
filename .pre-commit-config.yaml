@@ -15,8 +15,10 @@ repos:
       - id: detect-private-key
       - id: debug-statements
       - id: check-added-large-files
-        # Demo fixture PDFs (real published CC-BY papers) run up to ~1MB.
-        args: ["--maxkb=1024"]
+        # Demo fixture PDFs (real published CC-BY papers) run up to ~5MB
+        # for figure-heavy articles (Sci Rep, Front Cardiovasc Med); set a
+        # 6MB ceiling that fits the current corpus with some headroom.
+        args: ["--maxkb=6144"]
 
   - repo: https://github.com/igorshubovych/markdownlint-cli
     rev: v0.38.0

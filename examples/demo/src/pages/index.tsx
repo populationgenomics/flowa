@@ -117,7 +117,7 @@ export default function IndexPage() {
             <Stack>
               <TextInput
                 label="Transcript"
-                placeholder="e.g. NM_001035.3"
+                placeholder="e.g. NM_000152.5"
                 description="RefSeq transcript identifier (gene is derived by the normaliser)"
                 value={transcript}
                 onChange={(e) => setTranscript(e.currentTarget.value)}
@@ -126,7 +126,7 @@ export default function IndexPage() {
               />
               <TextInput
                 label="HGVS c."
-                placeholder="e.g. c.14174A>G"
+                placeholder="e.g. c.1935C>A"
                 description="Coding-DNA notation, c.-form only (no transcript prefix)"
                 value={hgvsC}
                 onChange={(e) => setHgvsC(e.currentTarget.value)}
