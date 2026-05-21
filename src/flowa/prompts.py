@@ -16,7 +16,12 @@ Each prompt set must contain:
     - extraction_schema.py     (must define ExtractionResult model)
     - aggregation_prompt.txt
     - aggregation_schema.py    (must define AggregationResult model)
-    - transcription_prompt.txt (text-only prompt, loaded via load_text_prompt)
+
+Text-only prompts (loaded via load_text_prompt, e.g. transcription_prompt.txt)
+are optional in the active set: if absent, they're resolved from the generic
+set. Override only when a step needs domain-specific wording — transcription
+is a faithful PDF→Markdown task with no domain content, so most sets share
+the generic prompt.
 
 Schema interface requirements (accessed by Flowa's validation logic):
     - ExtractionResult.claims[].citations[].quote
@@ -58,15 +63,25 @@ def _prompts_dir(prompt_set: str) -> Path:
 
 
 def load_text_prompt(step: str, prompt_set: str = 'generic') -> str:
-    """Load a prompt as plain text.
+    """Load a prompt as plain text, falling back to the generic set if absent.
 
-    Use for steps whose output isn't a Pydantic-validated structure — currently
-    just transcription, which emits free-form Markdown. For prompts that pair
-    with a result schema, use ``load_prompt_and_schema`` instead.
+    If the active prompt set has its own ``{step}_prompt.txt``, that file is
+    used. Otherwise the file from the generic set is returned, so step-agnostic
+    prompts (currently transcription) don't have to be duplicated into every
+    prompt set.
+
+    Use for steps whose output isn't a Pydantic-validated structure. For prompts
+    that pair with a result schema (extraction, aggregation), use
+    ``load_prompt_and_schema`` instead — no fallback there because the prompt
+    and schema must come from the same set.
     """
-    prompts_dir = _prompts_dir(prompt_set)
-    log.info('Using prompt set: %s', prompt_set)
-    return (prompts_dir / f'{step}_prompt.txt').read_text()
+    filename = f'{step}_prompt.txt'
+    candidate = _prompts_dir(prompt_set) / filename
+    if candidate.exists():
+        log.info('Loaded %s/%s', prompt_set, filename)
+        return candidate.read_text()
+    log.info("Prompt set '%s' has no %s; loaded from generic instead", prompt_set, filename)
+    return (_prompts_dir('generic') / filename).read_text()
 
 
 def load_prompt_and_schema(step: str, prompt_set: str = 'generic') -> tuple[jinja2.Template, 'type[BaseModel]']:
@@ -87,11 +102,11 @@ def load_prompt_and_schema(step: str, prompt_set: str = 'generic') -> tuple[jinj
         ValueError: If the prompt set directory does not exist.
     """
     prompts_dir = _prompts_dir(prompt_set)
-    log.info('Using prompt set: %s', prompt_set)
 
     # Load and compile prompt template
     prompt_text = (prompts_dir / f'{step}_prompt.txt').read_text()
     template = _jinja_env.from_string(prompt_text)
+    log.info('Loaded %s/%s_prompt.txt + %s_schema.py', prompt_set, step, step)
 
     # Load schema model
     module_path = prompts_dir / f'{step}_schema.py'
