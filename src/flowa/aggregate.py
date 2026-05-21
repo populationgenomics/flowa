@@ -313,8 +313,6 @@ async def aggregate_evidence_async(
     if dry_run:
         print('=== PROMPT ===')
         print(prompt)
-        print('\n=== CLINVAR ===')
-        print(clinvar_text)
         print('\n=== PAPER ID MAPPING ===')
         for pid, doi in paper_id_to_doi.items():
             print(f'  {pid} -> {doi}')
