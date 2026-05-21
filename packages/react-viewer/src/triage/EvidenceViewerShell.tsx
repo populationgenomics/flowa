@@ -16,9 +16,8 @@ import { flattenClaimCitations, type FlatCitation } from "./citation-utils";
 import { ChatSection, type SessionInfo } from "./ChatSection";
 import type { TriageStatePayload } from "./ChatDrawer";
 import { ClaimList } from "./ClaimList";
-import { DescriptionPanel } from "./DescriptionPanel";
+import { SynthesisPanel } from "./SynthesisPanel";
 import { FocusCard } from "./FocusCard";
-import { NotesPanel } from "./NotesPanel";
 import { PaperHeader } from "./PaperHeader";
 import { PaperRail } from "./PaperRail";
 import { jumpToNextUnreviewed, useTriageKeyboard } from "./keyboard";
@@ -811,14 +810,9 @@ export function EvidenceViewerShell({
                     </>
                   )}
 
-                <DescriptionPanel
-                  content={artifact.descriptionShort}
-                  paperIdMapping={paperIdMapping}
-                  onCitationClick={handleCitationClickInternal}
-                />
-
-                <NotesPanel
-                  content={artifact.notes}
+                <SynthesisPanel
+                  description={artifact.descriptionShort}
+                  notes={artifact.notes}
                   paperIdMapping={paperIdMapping}
                   onCitationClick={handleCitationClickInternal}
                 />

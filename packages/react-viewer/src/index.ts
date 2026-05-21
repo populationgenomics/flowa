@@ -53,13 +53,12 @@ export type { TriageBackend, TriageSnapshotPayload } from "./triage/backend";
 
 // Triage workspace — render components
 export { ClaimList, type ClaimListProps } from "./triage/ClaimList";
-export {
-  DescriptionPanel,
-  type DescriptionPanelProps,
-} from "./triage/DescriptionPanel";
 export { FocusCard, type FocusCardProps } from "./triage/FocusCard";
-export { NotesPanel, type NotesPanelProps } from "./triage/NotesPanel";
 export { PaperHeader, type PaperHeaderProps } from "./triage/PaperHeader";
+export {
+  SynthesisPanel,
+  type SynthesisPanelProps,
+} from "./triage/SynthesisPanel";
 export { PaperRail, type PaperRailProps } from "./triage/PaperRail";
 export {
   ChatDrawer,
