@@ -25,16 +25,57 @@ def create_model(config: ModelConfig) -> Model | str:
     plain model string and lets pydantic-ai handle resolution.
     """
     if config.name.startswith('bedrock:'):
+        import boto3
+        from botocore.config import Config
         from pydantic_ai.models.bedrock import BedrockConverseModel
         from pydantic_ai.providers.bedrock import BedrockProvider
 
-        # Override pydantic-ai's 300s default — too short for extended-thinking
-        # LLM calls (transcription chunks, aggregation, extraction). AWS_READ_TIMEOUT
-        # still overrides this default.
-        read_timeout = float(os.getenv('AWS_READ_TIMEOUT', '600'))
+        if os.getenv('AWS_BEARER_TOKEN_BEDROCK'):
+            # pydantic-ai's default BedrockProvider builds a bearer-auth session
+            # in this case. We construct our own client below to control retry
+            # config, which means we'd silently fall through to IAM auth here.
+            # Flag rather than fail confusingly.
+            raise NotImplementedError(
+                'AWS_BEARER_TOKEN_BEDROCK is set but flowa.models.create_model '
+                'currently only constructs IAM-auth Bedrock clients. Either unset '
+                'the env var or extend create_model to build a bearer-auth session.'
+            )
+
+        # We construct the bedrock-runtime client ourselves (rather than letting
+        # BedrockProvider build its default) to override two boto3/pydantic-ai
+        # defaults that bite on extended-thinking LLM calls:
+        #
+        #   1. read_timeout: pydantic-ai's default of 300s is far too short for
+        #      Sonnet-class extended-thinking calls, which can generate tens of
+        #      thousands of internal thinking tokens before any byte arrives
+        #      back. AWS_READ_TIMEOUT still overrides this default.
+        #
+        #   2. retry max_attempts: boto3 defaults to 3 attempts with silent
+        #      retries on read_timeout — a single 20-min hang becomes 60 min,
+        #      and CloudWatch only records the final attempt, so the retries
+        #      are invisible. Pin to 1 so failures surface as errors instead
+        #      of getting masked. This relies on callers using streaming
+        #      (see aggregate / extract / convert), which keeps bytes flowing
+        #      so legitimate long thinking doesn't trip read_timeout in the
+        #      first place. Throttle / 5xx still need caller-level retry
+        #      handling — currently they propagate.
+        #
+        # Everything else matches pydantic-ai's defaults: connect_timeout=60s
+        # (also via AWS_CONNECT_TIMEOUT env), and region / profile / credentials
+        # come from boto3's default session (AWS_REGION, AWS_PROFILE, etc.).
+        read_timeout = float(os.getenv('AWS_READ_TIMEOUT', '1200'))
+        connect_timeout = float(os.getenv('AWS_CONNECT_TIMEOUT', '60'))
+        bedrock_client = boto3.client(
+            'bedrock-runtime',
+            config=Config(
+                read_timeout=read_timeout,
+                connect_timeout=connect_timeout,
+                retries={'max_attempts': 1, 'mode': 'standard'},
+            ),
+        )
         return BedrockConverseModel(
             config.name.removeprefix('bedrock:'),
-            provider=BedrockProvider(aws_read_timeout=read_timeout),
+            provider=BedrockProvider(bedrock_client=bedrock_client),
         )
     return config.name
 
