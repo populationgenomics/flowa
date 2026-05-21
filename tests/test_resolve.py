@@ -92,8 +92,13 @@ def test_resolve_citation_in_pdf_returns_entry_per_input_quote_and_wraps_page(fa
     ]
     # Unlocated quote gets empty list (distinct from "DOI absent" at the resolve_citations layer).
     assert result['second quote'] == []
-    # Markdown was passed through to the PdfIndex constructor.
-    assert fake_pdf_index.constructed_with == [(b'pdf-bytes', '# md')]
+    # Markdown is currently NOT passed through to PdfIndex — anchorite's
+    # markdown-aware denoise drops entire pages of atoms when the markdown
+    # reorders content relative to PDF page order. The caller still plumbs
+    # markdown through to resolve_citation_in_pdf so the wiring is in place
+    # for the eventual revert. Update this assertion back to '# md' when the
+    # anchorite-side fix lands.
+    assert fake_pdf_index.constructed_with == [(b'pdf-bytes', None)]
 
 
 def test_resolve_citations_groups_results_per_doi(fake_pdf_index):
@@ -115,8 +120,9 @@ def test_resolve_citations_groups_results_per_doi(fake_pdf_index):
     assert result.resolved['10.1/a']['quote A'] == [HighlightBbox(page=1, top=1, left=2, bottom=3, right=4)]
     assert result.resolved['10.2/b']['quote B'] == [HighlightBbox(page=7, top=5, left=6, bottom=7, right=8)]
     assert result.errors == {}
-    # Each DOI's PDF + markdown was loaded once (no double-fetch).
-    assert sorted(fake_pdf_index.constructed_with) == [(b'pdf-A', '# md-A'), (b'pdf-B', '# md-B')]
+    # Each DOI's PDF was loaded once (no double-fetch). Markdown is currently
+    # not forwarded to PdfIndex (see test_resolve_citation_in_pdf_returns_entry_per_input_quote_and_wraps_page).
+    assert sorted(fake_pdf_index.constructed_with) == [(b'pdf-A', None), (b'pdf-B', None)]
 
 
 def test_resolve_citations_records_errors_when_pdf_loader_returns_none(fake_pdf_index):
