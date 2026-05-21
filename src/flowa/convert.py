@@ -65,16 +65,20 @@ class _ChunkResult:
 
 async def _generate_markdown(chunk_bytes: bytes, model: ModelConfig, prompt: str) -> _ChunkResult:
     """Convert a single PDF chunk to Markdown via a vision-capable LLM."""
-    result = await _agent.run(
+    # Stream so bytes flow during long transcription chunks; otherwise the
+    # connection goes silent for minutes and trips our Bedrock read_timeout.
+    async with _agent.run_stream(
         [BinaryContent(data=chunk_bytes, media_type='application/pdf'), prompt],
         model=create_model(model),
         model_settings=get_model_settings(model, max_tokens=_TRANSCRIBE_MAX_TOKENS),
-    )
+    ) as stream_result:
+        output = await stream_result.get_output()
+        raw_messages_json = stream_result.all_messages_json()
     # Strip the line-number prefixes added to bypass Claude's content filter.
-    markdown = _LINE_NUM_RE.sub('', result.output)
+    markdown = _LINE_NUM_RE.sub('', output)
     # NFKC-normalize so superscript digits, ligatures, etc. match the
     # normalized character text extracted from PDFs by pypdfium2.
-    all_messages: list[dict[str, Any]] = json.loads(result.all_messages_json())
+    all_messages: list[dict[str, Any]] = json.loads(raw_messages_json)
     return _ChunkResult(
         markdown=unicodedata.normalize('NFKC', markdown),
         all_messages=all_messages,

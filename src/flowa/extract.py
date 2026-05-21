@@ -89,20 +89,24 @@ async def extract_paper_async(
 
     log.info('Extracting %s (%d chars, model: %s)', doi, len(full_text), model.name)
     t0 = time.monotonic()
-    result = await agent.run(prompt)
+    # Stream so bytes flow during extended thinking; otherwise the connection
+    # goes silent for many minutes and trips our Bedrock read_timeout.
+    async with agent.run_stream(prompt) as stream_result:
+        output = await stream_result.get_output()
+        raw_messages_json = stream_result.all_messages_json()
     elapsed = time.monotonic() - t0
 
     # Store structured extraction result
-    write_json(extraction_url, result.output.model_dump())
+    write_json(extraction_url, output.model_dump())
 
     # Store raw LLM conversation for debugging
-    write_bytes(extraction_raw_url, result.all_messages_json())
+    write_bytes(extraction_raw_url, raw_messages_json)
 
     log.info(
         'Extracted %s: variant_discussed=%s, %d claims in %.1fs',
         doi,
-        result.output.variant_discussed,  # type: ignore[attr-defined]
-        len(result.output.claims),  # type: ignore[attr-defined]
+        output.variant_discussed,  # type: ignore[attr-defined]
+        len(output.claims),  # type: ignore[attr-defined]
         elapsed,
     )
 

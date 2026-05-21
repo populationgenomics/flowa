@@ -322,11 +322,15 @@ async def aggregate_evidence_async(
 
     log.info('Calling LLM for aggregate assessment')
     t0 = time.monotonic()
-    result = await agent.run(prompt)
+    # Stream so bytes flow during extended thinking; otherwise the connection
+    # goes silent for many minutes and trips our Bedrock read_timeout.
+    async with agent.run_stream(prompt) as stream_result:
+        output = await stream_result.get_output()
+        raw_messages_json = stream_result.all_messages_json()
     elapsed = time.monotonic() - t0
 
     # Post-LLM: resolve quotes to bboxes, replace paper_id with DOI
-    aggregate_dict = result.output.model_dump()
+    aggregate_dict = output.model_dump()
     with logfire.span('flowa.resolve_citations', paper_count=len(paper_id_to_doi)):
         resolve_aggregate_citations(aggregate_dict, paper_id_to_doi, pdf_bytes_cache, markdown_cache, metadata_cache)
 
@@ -334,9 +338,9 @@ async def aggregate_evidence_async(
     write_json(aggregation_url, with_schema_version(aggregate_dict, AGGREGATION_SCHEMA_VERSION))
 
     # Store raw LLM conversation for debugging
-    write_bytes(aggregation_raw_url, result.all_messages_json())
+    write_bytes(aggregation_raw_url, raw_messages_json)
 
-    results_list = result.output.results  # type: ignore[attr-defined]
+    results_list = output.results  # type: ignore[attr-defined]
     total_claims = sum(len(cat_result.claims) for cat_result in results_list)
     total_papers = sum(len(cat_result.papers) for cat_result in results_list)
     log.info(
