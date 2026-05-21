@@ -2078,8 +2078,42 @@
           "text": "c.1935C>A (p.Asp645Glu) had 42 total occurrences in the Pompe Registry (NM_000152.5), was the second most common variant globally in Group A (classic IOPD, n=27) and the most common in Asia-Pacific Group A (n=26), accounting for nearly half of Group A variants in that region.",
           "citations": [
             {
-              "quote": "c.1935C>A (*n* = 27) | p.(Asp645Glu) ... [Global Group A] ... c.1935C>A (*n* = 26) | p.(Asp645Glu) [Asia-Pacific Group A, most common]",
-              "bboxes": []
+              "quote": "The variant c.1935C>A was the second most common globally and the most common in Asia\u2010Pacific but was not frequently reported in any other region.",
+              "bboxes": [
+                {
+                  "page": 8,
+                  "top": 858,
+                  "left": 273,
+                  "bottom": 865,
+                  "right": 484
+                },
+                {
+                  "page": 8,
+                  "top": 874,
+                  "left": 77,
+                  "bottom": 884,
+                  "right": 479
+                },
+                {
+                  "page": 8,
+                  "top": 891,
+                  "left": 78,
+                  "bottom": 900,
+                  "right": 450
+                }
+              ]
+            },
+            {
+              "quote": "| exon14 | c.1935C>A | p.(Asp645Glu) | 42 | A,B,C |",
+              "bboxes": [
+                {
+                  "page": 26,
+                  "top": 792,
+                  "left": 136,
+                  "bottom": 805,
+                  "right": 843
+                }
+              ]
             },
             {
               "quote": "In Asia\u2010Pacific, c.1935C>A was reported most often, but was not among the top five reported in other regions. Nevertheless, this variant was the fourth most common globally due to the input of patients from Asia\u2010Pacific where it accounted for nearly half of reported variants in Group A.",
