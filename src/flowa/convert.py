@@ -16,7 +16,7 @@ from anchorite.document import chunks  # type: ignore[import-untyped]
 from pydantic_ai import Agent
 from pydantic_ai.messages import BinaryContent
 
-from flowa.models import get_model_settings
+from flowa.models import create_model, get_model_settings
 from flowa.prompts import load_text_prompt
 from flowa.settings import ModelConfig, Settings
 from flowa.storage import exists, paper_url, read_bytes, write_bytes, write_text
@@ -67,7 +67,7 @@ async def _generate_markdown(chunk_bytes: bytes, model: ModelConfig, prompt: str
     """Convert a single PDF chunk to Markdown via a vision-capable LLM."""
     result = await _agent.run(
         [BinaryContent(data=chunk_bytes, media_type='application/pdf'), prompt],
-        model=model.name,
+        model=create_model(model),
         model_settings=get_model_settings(model, max_tokens=_TRANSCRIBE_MAX_TOKENS),
     )
     # Strip the line-number prefixes added to bypass Claude's content filter.

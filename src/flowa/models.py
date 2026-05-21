@@ -4,6 +4,7 @@ Provider-specific settings types are imported inline because only one
 provider is installed at a time (via optional extras).
 """
 
+import os
 from typing import Literal
 
 from pydantic_ai.models import Model
@@ -25,8 +26,16 @@ def create_model(config: ModelConfig) -> Model | str:
     """
     if config.name.startswith('bedrock:'):
         from pydantic_ai.models.bedrock import BedrockConverseModel
+        from pydantic_ai.providers.bedrock import BedrockProvider
 
-        return BedrockConverseModel(config.name.removeprefix('bedrock:'))
+        # Override pydantic-ai's 300s default — too short for extended-thinking
+        # LLM calls (transcription chunks, aggregation with effort='high').
+        # AWS_READ_TIMEOUT still overrides this default.
+        read_timeout = float(os.getenv('AWS_READ_TIMEOUT', '600'))
+        return BedrockConverseModel(
+            config.name.removeprefix('bedrock:'),
+            provider=BedrockProvider(aws_read_timeout=read_timeout),
+        )
     return config.name
 
 
