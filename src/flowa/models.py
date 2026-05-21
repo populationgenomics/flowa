@@ -29,8 +29,8 @@ def create_model(config: ModelConfig) -> Model | str:
         from pydantic_ai.providers.bedrock import BedrockProvider
 
         # Override pydantic-ai's 300s default — too short for extended-thinking
-        # LLM calls (transcription chunks, aggregation with effort='high').
-        # AWS_READ_TIMEOUT still overrides this default.
+        # LLM calls (transcription chunks, aggregation, extraction). AWS_READ_TIMEOUT
+        # still overrides this default.
         read_timeout = float(os.getenv('AWS_READ_TIMEOUT', '600'))
         return BedrockConverseModel(
             config.name.removeprefix('bedrock:'),

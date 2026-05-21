@@ -114,7 +114,7 @@ def create_aggregate_agent(
         create_model(model),
         output_type=NativeOutput(output_type),
         retries=3,
-        model_settings=get_model_settings(model, effort='high', max_tokens=_AGGREGATE_MAX_TOKENS),
+        model_settings=get_model_settings(model, effort='medium', max_tokens=_AGGREGATE_MAX_TOKENS),
     )
 
     @agent.output_validator
