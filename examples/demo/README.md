@@ -125,13 +125,15 @@ the aggregate cites. On first boot, `scripts/start.ts` copies the
 fixture tree to `./demo-data/` if it isn't already present, so
 chat-service has artifacts to load when serving a session.
 
-Two CC-BY 4.0 PLOS ONE papers ship under `fixtures/papers/` with full
-content (PDF + extracted Markdown + metadata); three more papers ship
-metadata only (no PDF, no abstract) so the literature page can render
-five rows that match what flowa originally queried, with the curator
-dropping their own PDFs in via the upload UI. See `fixtures/LICENSES.md`
-for per-paper attribution and the rule block to follow before staging
-anything new under `fixtures/papers/`.
+CC-BY papers under `fixtures/papers/` ship with full content (PDF +
+extracted Markdown + metadata). Additional papers ship metadata-only —
+either because the source paper isn't in PMC's OA subset (curator drops
+their own PDF in via the upload UI), or because the source has a
+redistribution-restricting license (e.g. CC-BY-NC-ND or paywalled), in
+which case the `abstract` field is replaced with a sentinel string
+noting the omission. See `fixtures/LICENSES.md` for per-paper
+attribution and the rule block to follow before staging anything new
+under `fixtures/papers/`.
 
 ## Submitting a variant from the demo UI
 
@@ -203,26 +205,28 @@ captured pipeline run, run the variant end-to-end (UI submission or
 `extractions/*_raw.json` — those are the raw LLM conversations, large,
 and not needed by anything downstream.
 
-For papers whose source license blocks redistribution (CC-BY-NC-ND
-specifically; see `fixtures/LICENSES.md` for the rule), do **not** delete
+For papers whose source license blocks redistribution (CC-BY-NC-ND,
+paywalled; see `fixtures/LICENSES.md` for the rule), do **not** delete
 the whole `papers/{encodedDoi}/` directory — only delete `source.pdf`,
 `markdown.md`, and `convert_raw.json`. Keep `metadata.json` (the
-bibliographic fields are factual data, not copyrightable) but strip its
-`abstract` field for safety:
+bibliographic fields are factual data, not copyrightable) but replace
+its `abstract` field with a sentinel string, so the omission reads as
+deliberate (not a missing-data bug) when the literature view renders
+the row:
 
 ```bash
 python3 -c "
 import json
 p = 'papers/<encoded-doi>/metadata.json'
 d = json.load(open(p))
-d.pop('abstract', None)
+d['abstract'] = '[Abstract intentionally omitted (publisher copyright); populated automatically by a live \`flowa query\`.]'
 json.dump(d, open(p, 'w'), indent=2, ensure_ascii=False)
 "
 ```
 
-The metadata.json lets the literature page render the paper's title +
-author list (so the row reads sensibly), while no derivative content
-ships in the open-source repo.
+The metadata.json lets the literature page render title, authors,
+journal, date, and the sentinel-as-abstract (so the row reads
+sensibly); no derivative content ships in the open-source repo.
 
 ## Tests
 
