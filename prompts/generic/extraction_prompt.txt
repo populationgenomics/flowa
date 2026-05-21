@@ -28,6 +28,7 @@ Output each factual statement as a CLAIM. Each claim has:
 For each citation quote:
 - Quote the relevant passage verbatim — enough context to validate the claim (typically a sentence or key clause). The quote will be highlighted in the PDF for curators to review.
 - The quote MUST appear verbatim in the paper text. Do not paraphrase or summarize.
+- The quote MUST be a single contiguous span copied character-for-character from the source. Do not use `...` or `…` to skip over intervening text, do not insert bracketed annotations or summaries, and do not stitch together non-adjacent passages. If two separate passages jointly support the claim, emit them as two separate citations on the same claim.
 - Quotes must be at least 30 characters long. Avoid quoting isolated values, single cells, or short fragments — include surrounding context (e.g. a full sentence or full table row).
 
 CLAIM GRANULARITY:

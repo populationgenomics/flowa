@@ -36,6 +36,7 @@ GROUNDING:
 - Use inline citation links: `[link text](#cite:paper_id "verbatim quote")`.
   - The link text is free-form (typically a short phrase or a specific claim).
   - The title attribute (in quotes after the href) MUST be a verbatim passage from the paper text — enough context to validate the claim. The quote will be highlighted in the PDF for reviewers, so include surrounding context, not isolated values or single words that could match multiple locations.
+  - The quote MUST be a single contiguous span copied character-for-character. Do not insert `...` / `…` elisions, bracketed annotations, or any edits. If you need to cover two non-adjacent passages, use two separate `#cite:` links (each carrying its own contiguous quote).
   - The href format `#cite:paper_id` is required exactly — the application uses it to identify the paper.
 - When re-citing a finding from a paper's extraction (loaded via `loadPaperExtracts`), reuse the exact quote string from the extraction's citation — do not rephrase or shorten it.
 - When citing from a paper's full text (loaded via `loadFullPaper` or `queryPapers`), quote the relevant passage verbatim.

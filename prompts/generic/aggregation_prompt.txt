@@ -223,7 +223,7 @@ Format (use Markdown):
 - One concise entry per paper or ClinVar source, with the paper_id (or "ClinVar") in bold as the leading identifier
 - For paper evidence: use inline Markdown citation links: `[link text](#cite:paper_id "verbatim quote from that paper")`
 - The link text is free-form — use the paper_id label, a descriptive phrase, or a specific claim, whatever reads most naturally
-- The title attribute (in quotes after the href) MUST be copied verbatim from the extraction input — use the exact quote strings provided, do not rephrase or shorten them
+- The title attribute (in quotes after the href) MUST be copied verbatim from the extraction input — use the exact quote strings provided, do not rephrase or shorten them. Do not insert `...` / `…` elisions, bracketed annotations, or any edits that aren't in the source quote string. If you need to cover two non-adjacent passages, use two separate citations on the same claim.
 - Be generous with links: whenever a factual claim can be traced to a specific evidence location, link it
 - The href format `#cite:paper_id` is required exactly — the application uses it to identify the paper
 - Each citation link must resolve to a claim in claims[] (same paper_id, matching citations[].quote)
