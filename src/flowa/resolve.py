@@ -92,9 +92,10 @@ def resolve_citation_in_pdf(
     if not quotes:
         return {}
     # TODO: pass `markdown=markdown` once anchorite's markdown-aware denoise is
-    # fixed — its monotonic chained-alignment drops entire pages when markdown
-    # reorders content relative to PDF page order, leaving the resolver unable
-    # to match quotes from those pages.
+    # fixed (https://github.com/populationgenomics/anchorite/issues/19) — its
+    # monotonic chained-alignment drops entire pages when markdown reorders
+    # content relative to PDF page order, leaving the resolver unable to match
+    # quotes from those pages.
     doc = PdfIndex(pdf_bytes, markdown=None)
     raw = doc.resolve(quotes)
     return {
