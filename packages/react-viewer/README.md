@@ -41,23 +41,22 @@ fails this format or whose `AuthorYear` is absent from the mapping.
 All highlight bboxes use a 0–1000 normalized scale (left/top/right/bottom),
 1-indexed pages. The viewer rescales to rendered pixels.
 
-## Tailwind
+## Styles
 
-The components ship with Tailwind utility classes (e.g. `flex`, `text-cyan-700`).
-Consumers using Tailwind should add the package's `dist` directory to the
-`content` array in `tailwind.config`:
+The package ships a pre-built stylesheet at `@flowajs/react-viewer/styles.css`.
+Import it once (e.g. in your top-level page or `_app.tsx`):
 
-```js
-{
-  content: [
-    "./src/**/*.{ts,tsx}",
-    "./node_modules/@flowajs/react-viewer/dist/**/*.{js,mjs}",
-  ],
-}
+```tsx
+import "@flowajs/react-viewer/styles.css";
 ```
 
-If you don't use Tailwind, the components still render — only the visual
-treatment of citation links and viewer chrome is affected.
+The bundle contains only the Tailwind utilities used by the package itself —
+no Preflight reset, so it won't fight your existing base styles (Mantine's
+own reset stays in effect).
+
+Consumers do **not** need a Tailwind toolchain. The CSS is statically built
+at package release time; nothing in your `tailwind.config` needs to point at
+`node_modules/@flowajs/react-viewer`.
 
 ## SSR
 

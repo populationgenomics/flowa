@@ -3,6 +3,7 @@ import Head from "next/head";
 import { MantineProvider } from "@mantine/core";
 
 import "@mantine/core/styles.css";
+import "@flowajs/react-viewer/styles.css";
 import "@/styles/globals.css";
 
 export default function App({ Component, pageProps }: AppProps) {

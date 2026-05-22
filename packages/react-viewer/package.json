@@ -1,6 +1,6 @@
 {
   "name": "@flowajs/react-viewer",
-  "version": "0.0.6",
+  "version": "0.0.7",
   "description": "React components for rendering flowa pipeline outputs: citation-grounded Markdown, PDF viewer with bbox highlights, triage workspace.",
   "license": "MIT",
   "repository": {
@@ -30,15 +30,19 @@
       "types": "./dist/index.d.ts",
       "import": "./dist/index.mjs",
       "require": "./dist/index.cjs"
-    }
+    },
+    "./styles.css": "./dist/styles.css"
   },
-  "sideEffects": false,
+  "sideEffects": [
+    "**/*.css"
+  ],
   "engines": {
     "node": ">=20"
   },
   "scripts": {
-    "build": "tsup",
-    "build:watch": "tsup --watch",
+    "build": "tsup && tailwindcss -i src/styles.css -o dist/styles.css --minify",
+    "build:js:watch": "tsup --watch",
+    "build:css:watch": "tailwindcss -i src/styles.css -o dist/styles.css --watch",
     "test": "vitest run",
     "test:watch": "vitest",
     "typecheck": "tsc --noEmit"
@@ -64,13 +68,17 @@
     "@mantine/core": "8.3.18",
     "@mantine/hooks": "8.3.18",
     "@tabler/icons-react": "3.44.0",
+    "@tailwindcss/typography": "0.5.19",
     "@testing-library/react": "16.3.2",
     "@types/react": "18.3.18",
     "@types/react-dom": "18.3.5",
     "ai": "6.0.182",
+    "autoprefixer": "10.5.0",
     "happy-dom": "20.9.0",
+    "postcss": "8.5.14",
     "react": "18.2.0",
     "react-dom": "18.2.0",
+    "tailwindcss": "3.4.17",
     "tsup": "8.5.1",
     "typescript": "5.7.3",
     "vite": "8.0.13",

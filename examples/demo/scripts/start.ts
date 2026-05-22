@@ -122,16 +122,23 @@ const { result } = concurrently(
   [
     {
       // `@flowajs/react-viewer` is consumed via its `exports` map, which
-      // points at `dist/`. Without a watcher, source edits in
+      // points at `dist/`. Without watchers, source edits in
       // `packages/react-viewer/src/` are invisible to Next dev until
-      // the package is rebuilt manually. Run tsup in watch mode so
-      // every src edit re-emits dist/ and Next picks it up via its
-      // own HMR.
-      name: "viewer",
-      command: "pnpm --filter @flowajs/react-viewer build:watch",
+      // the package is rebuilt manually. Two parallel watchers: tsup for
+      // the JS surface, and Tailwind for the bundled CSS that the demo
+      // imports via `@flowajs/react-viewer/styles.css`.
+      name: "viewer-js",
+      command: "pnpm --filter @flowajs/react-viewer build:js:watch",
       cwd: demoRoot,
       env,
       prefixColor: "blue",
+    },
+    {
+      name: "viewer-css",
+      command: "pnpm --filter @flowajs/react-viewer build:css:watch",
+      cwd: demoRoot,
+      env,
+      prefixColor: "cyan",
     },
     {
       name: "chat",
