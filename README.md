@@ -2,6 +2,10 @@
 
 Variant literature assessment pipeline with AI extraction.
 
+![Flowa's interactive evidence viewer: paper list on the left, aggregated assessment with inline citations in the centre, and the source PDF with bounding-box highlights on the right.](docs/images/viewer.png)
+
+*Each citation in the aggregated assessment links back to the exact highlighted quote in the source paper's PDF.*
+
 ## Architecture
 
 Flowa is a single async pipeline that processes genetic variant literature:
@@ -12,9 +16,9 @@ query → download → convert → extract → aggregate
 
 - **Query**: Search Mastermind/LitVar for papers, resolve PMIDs to DOIs via PubMed
 - **Download**: Fetch PDFs from PMC (main article + supplements)
-- **Convert**: PDF → Markdown via [groundmark](https://github.com/populationgenomics/groundmark) (LLM-based conversion)
+- **Convert**: PDF → Markdown via [anchorite](https://github.com/populationgenomics/anchorite) (LLM-based conversion)
 - **Extract**: Per-paper evidence extraction via LLM
-- **Aggregate**: Cross-paper synthesis via LLM, resolving citation quotes to PDF bounding boxes via groundmark
+- **Aggregate**: Cross-paper synthesis via LLM, resolving citation quotes to PDF bounding boxes via anchorite
 
 Papers are processed in parallel. LLM concurrency is controlled via `--llm-concurrency`.
 
@@ -39,7 +43,7 @@ flowa aggregate --variant-id VAR123
 | Variable                | Description                                                       | Example                                            |
 | ----------------------- | ----------------------------------------------------------------- | -------------------------------------------------- |
 | `FLOWA_STORAGE_BASE`    | Storage path for PDFs, extractions, results                       | `s3://bucket`, `gs://bucket`, `file:///path`        |
-| `FLOWA_CONVERT_MODEL`   | LLM for PDF→Markdown conversion (groundmark)                     | `bedrock:au.anthropic.claude-sonnet-4-6`        |
+| `FLOWA_CONVERT_MODEL`   | LLM for PDF→Markdown conversion (anchorite)                     | `bedrock:au.anthropic.claude-sonnet-4-6`        |
 | `FLOWA_EXTRACTION_MODEL`| LLM for extraction and aggregation                               | `bedrock:au.anthropic.claude-opus-4-6`          |
 
 ### LLM Providers
@@ -112,7 +116,7 @@ The pipeline uses a unified citation format:
 - The **title attribute** carries a verbatim quote that scopes the PDF highlight
 - Display text is free-form
 
-During aggregation, quotes are resolved against each paper's source PDF (via `groundmark.DocumentIndex`) to produce bounding box coordinates. The aggregate output contains pre-resolved `bboxes` arrays for each citation. Quotes that cannot be resolved get empty `bboxes`.
+During aggregation, quotes are resolved against each paper's source PDF (via `anchorite.PdfIndex`) to produce bounding box coordinates. The aggregate output contains pre-resolved `bboxes` arrays for each citation. Quotes that cannot be resolved get empty `bboxes`.
 
 ## Storage Layout
 
