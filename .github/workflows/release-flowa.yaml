@@ -4,18 +4,23 @@
 # Gating: the `pypi` GitHub environment requires manual approval before the
 # publish step runs.
 #
+# The PyPI distribution is named `flowapy` (the `flowa` name was already
+# taken on PyPI by an unrelated owner). Import name and CLI command stay
+# `flowa`; only the install line and the URL below carry the distinct
+# distribution name.
+#
 # Per-package setup needed once before the first OIDC publish:
-#   1. Bootstrap-publish 0.1.0 with a one-shot PyPI API token, then revoke
-#      the token. PyPI requires the project to exist before trusted-publisher
-#      configuration is available — same chicken-and-egg as npm.
-#   2. Configure the trusted publisher on pypi.org (Project: flowa, Owner:
-#      populationgenomics, Repository: flowa, Workflow filename:
-#      release-flowa.yaml, Environment: pypi).
-#   3. Create the `pypi` GitHub environment with required reviewers + a
+#   1. Configure a pending publisher on pypi.org under your account
+#      (https://pypi.org/manage/account/publishing/) — PyPI Project Name:
+#      flowapy, Owner: populationgenomics, Repository: flowa, Workflow:
+#      release-flowa.yaml, Environment: pypi. Pending publishers reserve
+#      the name and let the first OIDC publish create the project; no
+#      bootstrap API token is needed.
+#   2. Create the `pypi` GitHub environment with required reviewers + a
 #      deployment-branch-policy that matches `flowa-v*` tags.
-#   4. Extend the `release-tag protection` ruleset to also match `flowa-v*`,
+#   3. Extend the `release-tag protection` ruleset to also match `flowa-v*`,
 #      mirroring the `react-viewer-v*` / `chat-service-v*` patterns.
-#   5. Toggle PyPI's project setting to disallow API tokens once the first
+#   4. Toggle PyPI's project setting to disallow API tokens once the first
 #      OIDC publish has been verified end-to-end.
 #
 # Setup is documented in specs/flowa_demo.md and the publishing guide it
