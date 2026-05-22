@@ -1,0 +1,89 @@
+# Tag-driven release of flowa to PyPI via OIDC trusted publishing.
+#
+# Trigger: `git tag flowa-v$VERSION && git push origin flowa-v$VERSION`.
+# Gating: the `pypi` GitHub environment requires manual approval before the
+# publish step runs.
+#
+# Per-package setup needed once before the first OIDC publish:
+#   1. Bootstrap-publish 0.1.0 with a one-shot PyPI API token, then revoke
+#      the token. PyPI requires the project to exist before trusted-publisher
+#      configuration is available — same chicken-and-egg as npm.
+#   2. Configure the trusted publisher on pypi.org (Project: flowa, Owner:
+#      populationgenomics, Repository: flowa, Workflow filename:
+#      release-flowa.yaml, Environment: pypi).
+#   3. Create the `pypi` GitHub environment with required reviewers + a
+#      deployment-branch-policy that matches `flowa-v*` tags.
+#   4. Extend the `release-tag protection` ruleset to also match `flowa-v*`,
+#      mirroring the `react-viewer-v*` / `chat-service-v*` patterns.
+#   5. Toggle PyPI's project setting to disallow API tokens once the first
+#      OIDC publish has been verified end-to-end.
+#
+# Setup is documented in specs/flowa_demo.md and the publishing guide it
+# references.
+#
+# Action versions are pinned to major-version tags here, matching lint.yaml
+# and the npm release workflows. Switch to SHA pins via Dependabot before
+# going to production.
+
+name: Release flowa
+
+on:
+  push:
+    tags:
+      - "flowa-v*"
+
+permissions:
+  contents: read
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    environment:
+      name: pypi
+      url: https://pypi.org/p/flowa
+    permissions:
+      id-token: write # Required for PyPI OIDC trusted publishing.
+    timeout-minutes: 15
+
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+
+      - uses: astral-sh/setup-uv@v8
+        with:
+          python-version: "3.13"
+
+      - name: Verify tag matches pyproject version
+        run: |
+          tag="${GITHUB_REF_NAME#flowa-v}"
+          ver="$(python -c 'import tomllib; print(tomllib.load(open("pyproject.toml","rb"))["project"]["version"])')"
+          if [ "$tag" != "$ver" ]; then
+            echo "::error::Tag flowa-v${tag} does not match pyproject.toml version ${ver}"
+            exit 1
+          fi
+
+      - name: Install dependencies
+        run: uv sync --all-extras --group dev --frozen
+
+      - name: Lint
+        run: uv run ruff check src/
+
+      - name: Format check
+        run: uv run ruff format --check src/
+
+      - name: Typecheck
+        run: uv run mypy src/
+
+      - name: Test
+        run: uv run pytest tests/
+
+      - name: Build distribution
+        run: uv build
+
+      - name: List built artifacts
+        run: ls -l dist/
+
+      - name: Publish to PyPI
+        uses: pypa/gh-action-pypi-publish@release/v1

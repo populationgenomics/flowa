@@ -5,6 +5,14 @@ description = "Variant literature assessment pipeline with AI extraction"
 readme = "README.md"
 requires-python = "==3.13.*"
 license = { file = "LICENSE" }
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.13",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+    "Topic :: Scientific/Engineering :: Bio-Informatics",
+    "Development Status :: 4 - Beta",
+]
 dependencies = [
     "anchorite>=0.4.0",
     "boto3",
@@ -31,6 +39,11 @@ anthropic = ["pydantic-ai-slim[anthropic]==1.101.0"]
 bedrock = ["pydantic-ai-slim[bedrock]==1.101.0"]
 google = ["pydantic-ai-slim[google]==1.101.0"]
 openai = ["pydantic-ai-slim[openai]==1.101.0"]
+
+[project.urls]
+Homepage = "https://github.com/populationgenomics/flowa"
+Source = "https://github.com/populationgenomics/flowa"
+Issues = "https://github.com/populationgenomics/flowa/issues"
 
 [tool.uv]
 # Supply-chain hygiene: only install package versions ≥ 7 days old. Pairs with

@@ -22,6 +22,18 @@ query → download → convert → extract → aggregate
 
 Papers are processed in parallel. LLM concurrency is controlled via `--llm-concurrency`.
 
+## Installation
+
+Install from PyPI, opting into the provider extras you need (one of `anthropic`, `bedrock`, `google`, `openai`):
+
+```bash
+pip install 'flowa[bedrock]==0.1.0'
+# or
+uv pip install 'flowa[bedrock,anthropic]==0.1.0'
+```
+
+The `flowa` CLI is exposed as a console script. See [Configuration](#configuration) for credentials and storage setup.
+
 ## Usage
 
 ```bash
@@ -170,6 +182,17 @@ same hook so local and CI behaviour match:
 ```bash
 uv run pre-commit run --all-files
 ```
+
+### Releasing
+
+Bump `[project].version` in `pyproject.toml`, commit, then push a matching tag:
+
+```bash
+git tag flowa-v0.1.0
+git push origin flowa-v0.1.0
+```
+
+The tag-driven workflow (`.github/workflows/release-flowa.yaml`) builds the package and publishes to PyPI via OIDC trusted publishing. The `pypi` GitHub environment requires manual approval before the publish step runs.
 
 ## Deployment
 
