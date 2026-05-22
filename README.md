@@ -188,11 +188,11 @@ uv run pre-commit run --all-files
 Bump `[project].version` in `pyproject.toml`, commit, then push a matching tag:
 
 ```bash
-git tag flowa-v0.1.0
-git push origin flowa-v0.1.0
+git tag flowapy-v0.1.0
+git push origin flowapy-v0.1.0
 ```
 
-The tag-driven workflow (`.github/workflows/release-flowa.yaml`) builds the package and publishes to PyPI via OIDC trusted publishing. The `pypi` GitHub environment requires manual approval before the publish step runs.
+The tag-driven workflow (`.github/workflows/release-flowapy.yaml`) builds the package and publishes to PyPI via OIDC trusted publishing. The `pypi` GitHub environment requires manual approval before the publish step runs.
 
 ## Deployment
 

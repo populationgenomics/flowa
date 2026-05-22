@@ -1,6 +1,6 @@
-# Tag-driven release of flowa to PyPI via OIDC trusted publishing.
+# Tag-driven release of flowapy to PyPI via OIDC trusted publishing.
 #
-# Trigger: `git tag flowa-v$VERSION && git push origin flowa-v$VERSION`.
+# Trigger: `git tag flowapy-v$VERSION && git push origin flowapy-v$VERSION`.
 # Gating: the `pypi` GitHub environment requires manual approval before the
 # publish step runs.
 #
@@ -13,12 +13,12 @@
 #   1. Configure a pending publisher on pypi.org under your account
 #      (https://pypi.org/manage/account/publishing/) — PyPI Project Name:
 #      flowapy, Owner: populationgenomics, Repository: flowa, Workflow:
-#      release-flowa.yaml, Environment: pypi. Pending publishers reserve
+#      release-flowapy.yaml, Environment: pypi. Pending publishers reserve
 #      the name and let the first OIDC publish create the project; no
 #      bootstrap API token is needed.
 #   2. Create the `pypi` GitHub environment with required reviewers + a
-#      deployment-branch-policy that matches `flowa-v*` tags.
-#   3. Extend the `release-tag protection` ruleset to also match `flowa-v*`,
+#      deployment-branch-policy that matches `flowapy-v*` tags.
+#   3. Extend the `release-tag protection` ruleset to also match `flowapy-v*`,
 #      mirroring the `react-viewer-v*` / `chat-service-v*` patterns.
 #   4. Toggle PyPI's project setting to disallow API tokens once the first
 #      OIDC publish has been verified end-to-end.
@@ -30,12 +30,12 @@
 # and the npm release workflows. Switch to SHA pins via Dependabot before
 # going to production.
 
-name: Release flowa
+name: Release flowapy
 
 on:
   push:
     tags:
-      - "flowa-v*"
+      - "flowapy-v*"
 
 permissions:
   contents: read
@@ -62,10 +62,10 @@ jobs:
 
       - name: Verify tag matches pyproject version
         run: |
-          tag="${GITHUB_REF_NAME#flowa-v}"
+          tag="${GITHUB_REF_NAME#flowapy-v}"
           ver="$(python -c 'import tomllib; print(tomllib.load(open("pyproject.toml","rb"))["project"]["version"])')"
           if [ "$tag" != "$ver" ]; then
-            echo "::error::Tag flowa-v${tag} does not match pyproject.toml version ${ver}"
+            echo "::error::Tag flowapy-v${tag} does not match pyproject.toml version ${ver}"
             exit 1
           fi
 
