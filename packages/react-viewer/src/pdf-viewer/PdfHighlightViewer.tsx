@@ -223,11 +223,24 @@ export const PdfHighlightViewer = ({
     return () => observer.disconnect();
   }, []);
 
-  // Capture first page's aspect ratio for sizing calculations
+  // Capture first page's aspect ratio for sizing calculations.
+  //
+  // ``originalWidth`` / ``originalHeight`` are react-pdf's ``page.view[2]`` /
+  // ``page.view[3]`` — the *unrotated* viewbox dims. For a ``/Rotate=90`` or
+  // ``270`` page the actual rendered Page div is landscape (react-pdf creates
+  // its viewport with ``rotation: page.rotate``), so the unrotated ratio
+  // would size the page too small inside the container. Swap when rotated.
   const handleFirstPageLoad = useCallback(
-    (page: { originalWidth: number; originalHeight: number }) => {
+    (page: {
+      originalWidth: number;
+      originalHeight: number;
+      rotate: number;
+    }) => {
       if (pageAspectRatio === null) {
-        setPageAspectRatio(page.originalWidth / page.originalHeight);
+        const rotated = page.rotate === 90 || page.rotate === 270;
+        const w = rotated ? page.originalHeight : page.originalWidth;
+        const h = rotated ? page.originalWidth : page.originalHeight;
+        setPageAspectRatio(w / h);
       }
     },
     [pageAspectRatio],
