@@ -7,7 +7,7 @@ requires-python = "==3.13.*"
 license = { text = "MIT" }
 dependencies = [
     "fastapi",
-    "flowa[bedrock,anthropic,google,openai]",
+    "flowapy[bedrock,anthropic,google,openai]",
     "pydantic",
     "pydantic-settings",
     "uvicorn[standard]",
@@ -29,10 +29,11 @@ exclude-newer = "7 days"
 exclude-newer-package = { anchorite = "0 days", seq-smith = "0 days", pydantic-ai-slim = "0 days", pydantic-graph = "0 days" }
 
 [tool.uv.sources]
-# flowa lives one directory up. demo-gateway never installs from PyPI; it
-# always tracks the in-tree flowa it lives alongside. Editable so source
-# edits to flowa propagate without `uv sync` between iterations.
-flowa = { path = "../..", editable = true }
+# flowapy (the PyPI distribution name; import is still `flowa`) lives one
+# directory up. demo-gateway never installs from PyPI; it always tracks the
+# in-tree flowa it lives alongside. Editable so source edits to flowa
+# propagate without `uv sync` between iterations.
+flowapy = { path = "../..", editable = true }
 
 [dependency-groups]
 dev = [

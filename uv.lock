@@ -3,14 +3,14 @@ revision = 3
 requires-python = "==3.13.*"
 
 [options]
-exclude-newer = "0001-01-01T00:00:00Z" # This has no effect and is included for backwards compatibility when using relative exclude-newer values.
+exclude-newer = "2026-05-15T07:02:13.901036Z"
 exclude-newer-span = "P7D"
 
 [options.exclude-newer-package]
-pydantic-ai-slim = { timestamp = "0001-01-01T00:00:00Z", span = "PT0S" }
-anchorite = { timestamp = "0001-01-01T00:00:00Z", span = "PT0S" }
-seq-smith = { timestamp = "0001-01-01T00:00:00Z", span = "PT0S" }
-pydantic-graph = { timestamp = "0001-01-01T00:00:00Z", span = "PT0S" }
+pydantic-ai-slim = { timestamp = "2026-05-22T07:02:13.901047Z", span = "PT0S" }
+anchorite = { timestamp = "2026-05-22T07:02:13.901042Z", span = "PT0S" }
+seq-smith = { timestamp = "2026-05-22T07:02:13.901047Z", span = "PT0S" }
+pydantic-graph = { timestamp = "2026-05-22T07:02:13.901048Z", span = "PT0S" }
 
 [[package]]
 name = "aiobotocore"
@@ -414,7 +414,7 @@ wheels = [
 ]
 
 [[package]]
-name = "flowa"
+name = "flowapy"
 version = "0.1.0"
 source = { editable = "." }
 dependencies = [

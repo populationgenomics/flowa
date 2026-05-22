@@ -3,14 +3,14 @@ revision = 3
 requires-python = "==3.13.*"
 
 [options]
-exclude-newer = "2026-05-15T06:27:57.850946Z"
+exclude-newer = "2026-05-15T07:00:00.800635Z"
 exclude-newer-span = "P7D"
 
 [options.exclude-newer-package]
-pydantic-ai-slim = { timestamp = "2026-05-22T06:27:57.850955Z", span = "PT0S" }
-anchorite = { timestamp = "2026-05-22T06:27:57.85095Z", span = "PT0S" }
-seq-smith = { timestamp = "2026-05-22T06:27:57.850955Z", span = "PT0S" }
-pydantic-graph = { timestamp = "2026-05-22T06:27:57.850955Z", span = "PT0S" }
+pydantic-ai-slim = { timestamp = "2026-05-22T07:00:00.800649Z", span = "PT0S" }
+anchorite = { timestamp = "2026-05-22T07:00:00.800642Z", span = "PT0S" }
+seq-smith = { timestamp = "2026-05-22T07:00:00.800649Z", span = "PT0S" }
+pydantic-graph = { timestamp = "2026-05-22T07:00:00.800649Z", span = "PT0S" }
 
 [[package]]
 name = "aiohappyeyeballs"
@@ -317,7 +317,7 @@ version = "0.0.0"
 source = { editable = "." }
 dependencies = [
     { name = "fastapi" },
-    { name = "flowa", extra = ["anthropic", "bedrock", "google", "openai"] },
+    { name = "flowapy", extra = ["anthropic", "bedrock", "google", "openai"] },
     { name = "pydantic" },
     { name = "pydantic-settings" },
     { name = "uvicorn", extra = ["standard"] },
@@ -336,7 +336,7 @@ dev = [
 [package.metadata]
 requires-dist = [
     { name = "fastapi" },
-    { name = "flowa", extras = ["bedrock", "anthropic", "google", "openai"], editable = "../../" },
+    { name = "flowapy", extras = ["bedrock", "anthropic", "google", "openai"], editable = "../../" },
     { name = "pydantic" },
     { name = "pydantic-settings" },
     { name = "uvicorn", extras = ["standard"] },
@@ -414,7 +414,7 @@ wheels = [
 ]
 
 [[package]]
-name = "flowa"
+name = "flowapy"
 version = "0.1.0"
 source = { editable = "../../" }
 dependencies = [

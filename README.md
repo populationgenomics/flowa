@@ -27,9 +27,9 @@ Papers are processed in parallel. LLM concurrency is controlled via `--llm-concu
 Install from PyPI, opting into the provider extras you need (one of `anthropic`, `bedrock`, `google`, `openai`):
 
 ```bash
-pip install 'flowa[bedrock]==0.1.0'
+pip install 'flowapy[bedrock]==0.1.0'
 # or
-uv pip install 'flowa[bedrock,anthropic]==0.1.0'
+uv pip install 'flowapy[bedrock,anthropic]==0.1.0'
 ```
 
 The `flowa` CLI is exposed as a console script. See [Configuration](#configuration) for credentials and storage setup.

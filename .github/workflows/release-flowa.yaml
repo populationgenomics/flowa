@@ -40,7 +40,7 @@ jobs:
     runs-on: ubuntu-latest
     environment:
       name: pypi
-      url: https://pypi.org/p/flowa
+      url: https://pypi.org/p/flowapy
     permissions:
       id-token: write # Required for PyPI OIDC trusted publishing.
     timeout-minutes: 15
