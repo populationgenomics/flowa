@@ -30,7 +30,7 @@ export function SynthesisPanel({
     >
       <section className="px-3 pb-3 pt-2">
         <SectionHeading>Description</SectionHeading>
-        <div className="prose prose-sm mt-2 max-w-none text-sm">
+        <div className="flowa-llm-content mt-2">
           <LlmContent
             markdown={description ?? null}
             paperIdMapping={paperIdMapping}
@@ -40,7 +40,7 @@ export function SynthesisPanel({
       </section>
       <section className="border-t border-blue-200 px-3 pb-3 pt-3">
         <SectionHeading>Notes</SectionHeading>
-        <div className="prose prose-sm mt-2 max-w-none text-sm">
+        <div className="flowa-llm-content mt-2">
           <LlmContent
             markdown={notes ?? null}
             paperIdMapping={paperIdMapping}

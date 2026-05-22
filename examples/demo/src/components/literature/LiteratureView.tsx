@@ -244,7 +244,7 @@ export function LiteratureView({ variantId }: LiteratureViewProps) {
             Literature triage
           </Text>
           {/* Variant ids are technical identifiers; the monospace
-              treatment reads as "system value" rather than prose. */}
+              treatment reads as "system value" rather than free text. */}
           <Title order={2} ff="monospace">
             {variantId}
           </Title>

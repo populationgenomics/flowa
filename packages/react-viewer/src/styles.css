@@ -1,2 +1,113 @@
 @tailwind components;
 @tailwind utilities;
+
+/* LLM-rendered markdown content (paragraphs, lists, bold, code, etc.).
+ * Replaces @tailwindcss/typography's `.prose` / `.prose-sm` class system
+ * with a single namespaced class so a consumer's own Tailwind build can
+ * never emit a colliding `.prose` rule that overrides ours via cascade. */
+
+.flowa-llm-content {
+  font-size: 0.875rem;
+  line-height: 1.7;
+  color: #374151;
+}
+
+.flowa-llm-content > :first-child {
+  margin-top: 0;
+}
+
+.flowa-llm-content > :last-child {
+  margin-bottom: 0;
+}
+
+.flowa-llm-content p {
+  margin: 1em 0;
+}
+
+.flowa-llm-content strong {
+  font-weight: 600;
+  color: #111827;
+}
+
+.flowa-llm-content em {
+  font-style: italic;
+}
+
+.flowa-llm-content ul,
+.flowa-llm-content ol {
+  margin: 1em 0;
+  padding-left: 1.5em;
+}
+
+.flowa-llm-content ul {
+  list-style: disc;
+}
+
+.flowa-llm-content ol {
+  list-style: decimal;
+}
+
+.flowa-llm-content li {
+  margin: 0.35em 0;
+}
+
+.flowa-llm-content li > p {
+  margin: 0.35em 0;
+}
+
+.flowa-llm-content code {
+  background: #f3f4f6;
+  padding: 0.1em 0.3em;
+  border-radius: 0.25em;
+  font-size: 0.875em;
+  font-family:
+    ui-monospace, SFMono-Regular, Menlo, Monaco, "Courier New", monospace;
+}
+
+.flowa-llm-content pre {
+  background: #1f2937;
+  color: #e5e7eb;
+  padding: 0.75em 1em;
+  border-radius: 0.5em;
+  overflow-x: auto;
+  margin: 1em 0;
+  font-family:
+    ui-monospace, SFMono-Regular, Menlo, Monaco, "Courier New", monospace;
+}
+
+.flowa-llm-content pre code {
+  background: none;
+  padding: 0;
+  font-size: 0.875em;
+}
+
+.flowa-llm-content blockquote {
+  border-left: 3px solid #d1d5db;
+  padding-left: 1em;
+  color: #6b7280;
+  margin: 1em 0;
+}
+
+.flowa-llm-content h1,
+.flowa-llm-content h2,
+.flowa-llm-content h3,
+.flowa-llm-content h4,
+.flowa-llm-content h5,
+.flowa-llm-content h6 {
+  font-weight: 600;
+  color: #111827;
+  margin: 1em 0 0.5em;
+  line-height: 1.3;
+}
+
+.flowa-llm-content h1 {
+  font-size: 1.4em;
+}
+
+.flowa-llm-content h2 {
+  font-size: 1.2em;
+}
+
+.flowa-llm-content h3 {
+  font-size: 1.1em;
+}

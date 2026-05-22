@@ -139,7 +139,7 @@ export function ChatDrawer({
                     {message.parts.map((part, i) => {
                       if (part.type === "text") {
                         return (
-                          <div key={i} className="prose prose-sm max-w-none">
+                          <div key={i} className="flowa-llm-content">
                             <LlmContent
                               markdown={part.text}
                               paperIdMapping={paperIdMapping}
