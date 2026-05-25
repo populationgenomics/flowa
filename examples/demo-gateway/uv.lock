@@ -3,14 +3,14 @@ revision = 3
 requires-python = "==3.13.*"
 
 [options]
-exclude-newer = "2026-05-18T01:52:50.257061Z"
+exclude-newer = "2026-05-18T23:20:46.024938Z"
 exclude-newer-span = "P7D"
 
 [options.exclude-newer-package]
-pydantic-ai-slim = { timestamp = "2026-05-25T01:52:50.257074Z", span = "PT0S" }
-anchorite = { timestamp = "2026-05-25T01:52:50.257067Z", span = "PT0S" }
-seq-smith = { timestamp = "2026-05-25T01:52:50.257074Z", span = "PT0S" }
-pydantic-graph = { timestamp = "2026-05-25T01:52:50.257074Z", span = "PT0S" }
+pydantic-ai-slim = { timestamp = "2026-05-25T23:20:46.024946Z", span = "PT0S" }
+anchorite = { timestamp = "2026-05-25T23:20:46.024942Z", span = "PT0S" }
+seq-smith = { timestamp = "2026-05-25T23:20:46.024946Z", span = "PT0S" }
+pydantic-graph = { timestamp = "2026-05-25T23:20:46.024946Z", span = "PT0S" }
 
 [[package]]
 name = "aiohappyeyeballs"
@@ -415,7 +415,7 @@ wheels = [
 
 [[package]]
 name = "flowapy"
-version = "0.1.0"
+version = "0.1.1"
 source = { editable = "../../" }
 dependencies = [
     { name = "anchorite" },
