@@ -3,14 +3,14 @@ revision = 3
 requires-python = "==3.13.*"
 
 [options]
-exclude-newer = "2026-05-15T07:02:13.901036Z"
+exclude-newer = "2026-05-18T01:52:46.044617Z"
 exclude-newer-span = "P7D"
 
 [options.exclude-newer-package]
-pydantic-ai-slim = { timestamp = "2026-05-22T07:02:13.901047Z", span = "PT0S" }
-anchorite = { timestamp = "2026-05-22T07:02:13.901042Z", span = "PT0S" }
-seq-smith = { timestamp = "2026-05-22T07:02:13.901047Z", span = "PT0S" }
-pydantic-graph = { timestamp = "2026-05-22T07:02:13.901048Z", span = "PT0S" }
+pydantic-ai-slim = { timestamp = "2026-05-25T01:52:46.044629Z", span = "PT0S" }
+anchorite = { timestamp = "2026-05-25T01:52:46.044623Z", span = "PT0S" }
+seq-smith = { timestamp = "2026-05-25T01:52:46.044629Z", span = "PT0S" }
+pydantic-graph = { timestamp = "2026-05-25T01:52:46.04463Z", span = "PT0S" }
 
 [[package]]
 name = "aiobotocore"
@@ -96,16 +96,16 @@ wheels = [
 
 [[package]]
 name = "anchorite"
-version = "0.4.0"
+version = "0.4.1"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "fsspec" },
     { name = "pypdfium2" },
     { name = "seq-smith" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/af/07/891783f146c8dd84314656b5164b1cc301f19acc195bbdf41d49be73c7f5/anchorite-0.4.0.tar.gz", hash = "sha256:564baa07c651eb18370a7eb76e24102052ea318469bf4668a80686fdc2b5f577", size = 4320679, upload-time = "2026-05-14T06:26:11.81Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/96/3e/5ea1d72a11e5457bc38d93c4150ec91f3cb0d4e9aba2a524925532e46a9d/anchorite-0.4.1.tar.gz", hash = "sha256:941e65540bc850bf79de289379e7dd2b1b8484566aaacf4c5352593cc76e7b25", size = 4323222, upload-time = "2026-05-25T01:37:50.596Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/97/29/640fb7fe416f122e6217f66beda0fe66460c77199ecdc5c7f9f6d65e5f9f/anchorite-0.4.0-py3-none-any.whl", hash = "sha256:fe3d16850597dacbc15b795de00085dc080e0e45401384ba1498659fd3bb404e", size = 58227, upload-time = "2026-05-14T06:26:10.011Z" },
+    { url = "https://files.pythonhosted.org/packages/66/c2/7a599b0b402167960298da8355bf9654fb51964d6408099c82b6ac699fdd/anchorite-0.4.1-py3-none-any.whl", hash = "sha256:6766052f39a6273f756b628470fab009f773050c5a0963b158d767cc8d312577", size = 59006, upload-time = "2026-05-25T01:37:48.92Z" },
 ]
 
 [[package]]
@@ -459,7 +459,7 @@ dev = [
 
 [package.metadata]
 requires-dist = [
-    { name = "anchorite", specifier = ">=0.4.0" },
+    { name = "anchorite", specifier = ">=0.4.1" },
     { name = "boto3" },
     { name = "defusedxml" },
     { name = "fsspec" },

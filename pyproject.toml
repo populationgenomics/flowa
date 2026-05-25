@@ -14,7 +14,7 @@ classifiers = [
     "Development Status :: 4 - Beta",
 ]
 dependencies = [
-    "anchorite>=0.4.0",
+    "anchorite>=0.4.1",
     "boto3",
     "defusedxml",
     "fsspec",

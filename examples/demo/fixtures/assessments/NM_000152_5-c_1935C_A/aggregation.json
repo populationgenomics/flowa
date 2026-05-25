@@ -4,13 +4,13 @@
     {
       "category": "acmg_classification",
       "classification": "Pathogenic",
-      "classification_rationale": "3-star ClinGen expert panel Pathogenic classification; far exceeds \u226510 unrelated cases threshold with >50 documented unrelated individuals across literature and registry data; strong functional evidence (GAA activity <2.3% of WT in multiple assay systems); most common IOPD-causing variant in Southern Han Chinese, Taiwanese, Malaysian, and Thai populations.",
-      "description": "This variant has strong previous evidence of pathogenicity in unrelated individuals. Classified Pathogenic by the ClinGen Lysosomal Storage Disorders VCEP (3-star expert panel, 2021) applying PM3_Very Strong (>30 homozygotes and \u22655 compound heterozygotes with confirmed pathogenic second alleles), PS3_Moderate (GAA activity <10% of normal in COS-cell expression studies; patient homozygous fibroblasts 0.08\u20130.82% of normal; knock-in cell line ~2.3% WT activity; knock-in mice ~1% WT activity in heart, skeletal muscle, and brain), PP4_Moderate, PM5, and PP3 (REVEL 0.8). This variant is the most common pathogenic GAA allele in IOPD among Southern Han Chinese, Taiwanese, Malaysian, and Thai populations (36\u201380% of mutant alleles), with 42 total occurrences in the Pompe Registry and representation across the full clinical spectrum. Infantile-onset Pompe disease (IOPD) phenotype: neonatal to 6-month onset with severe hypertrophic cardiomyopathy (LVEF as low as 9.9%), profound muscle hypotonia, respiratory failure, and hepatomegaly; median death at 24.8 months without ERT. Late-onset Pompe disease (LOPD) also reported (muscle weakness onset age 1\u20137 years). Heterozygous carriers are unaffected.",
-      "notes": "**Summary:** Pathogenic. ClinGen LSD VCEP 3-star expert panel classified this variant as Pathogenic (approved 2021-08-17), applying PM3_Very Strong, PS3_Moderate, PM5, PP4_Moderate, and PP3. The evidence base is extensive: >50 unrelated individuals documented in the literature with affected GAA activity, plus 42 occurrences in the Pompe Registry (Reuser2019). The variant is the most common IOPD-causing GAA allele in Southern Han Chinese, Taiwanese, Malaysian, and Thai populations (36\u201380% of mutant alleles), and multiple validated functional assays converge on near-complete loss of GAA function. A knock-in mouse model (Kan2022) recapitulates the human IOPD phenotype. No credible refuting evidence exists. The population frequency in East Asians (0.17% gnomAD) is slightly above the ClinGen LSD VCEP PM2 threshold (<0.001) but does not challenge pathogenicity given the extensive case and functional evidence. Heterozygous carriers (Ron2025, Kan2022) are uniformly unaffected, consistent with autosomal recessive inheritance.\n\nNote on haplotype: c.1935C>A frequently occurs in cis with the pseudodeficiency variant c.1726G>A (p.Gly576Ser) in Asian populations. This combined allele [c.1935C>A;c.1726G>A] is pathogenic; c.1726G>A alone does not cause disease. Cases in Chen2024, Hsueh2021, and Moriyoshimura2025 carrying this cis haplotype are counted as carrying the pathogenic c.1935C>A allele.\n\nDeduplication: ClinVar's cited foundational papers (PMID 8094613, 9554747, 18458862) are not in the extracted paper evidence set and represent independent historical cases. The papers extracted here (2019\u20132025) largely report independent cohorts, though some Pompe Registry (Reuser2019) patients may overlap with national cohort studies.\n\n**Supporting evidence:**\n\n- **ClinVar (ClinGen LSD VCEP):** 3-star expert panel Pathogenic (2021). PM3_Very Strong (>30 homozygotes + \u22655 compound het with confirmed pathogenic second alleles across PMID 8094613, 9554747, 18458862, 28394184), PS3_Moderate (<10% normal GAA activity in COS cells; no mature 76 kDa protein by pulse-chase), PM5 (p.Asp645Asn classified Pathogenic by same VCEP), PP4_Moderate (most common IOPD variant in China/Taiwan/Thailand), PP3 (REVEL 0.8). 16 additional laboratory submitters classify as Pathogenic.\n\n- **Kan2022:** [Most frequent pathogenic GAA mutation in Southern Han Chinese IOPD](#cite:Kan2022 \"The c.1935C>A (p.Asp645Glu) variant, the most frequent GAA pathogenic mutation in people of Southern Han Chinese ancestry, causes infantile-onset Pompe disease (IOPD), presenting neonatally with severe hypertrophic cardiomyopathy, profound muscle hypotonia, respiratory failure, and infantile mortality.\"), comprising [36\u201380% of IOPD alleles in Taiwanese populations](#cite:Kan2022 \"In Taiwanese populations, this c.1935C>A variant represents 36\u201380% of mutations11\u00b712, and occur in context of a specific haplotype with conserved polymorphic markers linked to Taiwanese Pompe IOPD patients comparing to normal individuals. This may suggest the existence of a founder effect stemming from a diaspora of Southern Han Chinese to Taiwan and other locations\"). CRISPR knock-in C2C12 myoblast cell line showed [~2.3% of WT GAA activity](#cite:Kan2022 \"GAA enzymatic activity was almost abolished in Gaa c.1935C>A KI cells relative to Gaa wt cells; less than 2.3% of WT GAA activity was detected in the KI cell line\"). Knock-in mice had [~1% of WT GAA activity in heart, skeletal muscle, and brain](#cite:Kan2022 \"KI mice had normal Gaa mRNA levels with significantly reduced level of GAA hydrolysis activity (about 1% of WT) in heart and skeletal muscle, as well as brain tissue\"), with [hypertrophic cardiomyopathy at ~2\u20133 months and skeletal muscle weakness](#cite:Kan2022 \"Homozygous Gaa em1935C>A knock-in mice exhibited normal Gaa mRNA expression levels relative to wild-type mice, had near-abolished GAA enzymatic activity, markedly increased tissue glycogen storage, and concomitantly impaired autophagy. Three-month-old mice demonstrated skeletal muscle weakness and hypertrophic cardiomyopathy but no premature mortality.\"). In human homozygous fibroblasts, [GAA activity was previously 0.08\u20130.82% of normal](#cite:Kan2022 \"This aligns with observed levels of low GAA enzyme activity (0.08\u20130.82% of normal range for control) previously measured in homozygous GAA c.1935C>A patient fibroblasts\"). [Heterozygous KI mice had ~50% WT activity and no phenotypic differences](#cite:Kan2022 \"While no phenotypic differences were noted between GAA c.1935C>A HET and WT mice aside from the expected 50% reduction in HET GAA enzymatic activity, the homozygous KI mice demonstrated a significant, PD-like phenotype.\"), supporting autosomal recessive pattern. The variant [does not affect GAA mRNA levels](#cite:Kan2022 \"The comparative \u0394Ct between mouse Gaa and housekeeping gene Gapdh acquired by RT-PCR among WT, HET, and KI groups are almost identical, indicating the Gaa c.1935C>A mutation does not affect Gaa mRNA levels\"), confirming missense (not NMD) mechanism.\n\n- **Chan2023:** [Most common mutation in Malaysian IOPD, 8 patients (10 alleles, 33% allele frequency)](#cite:Chan2023 \"The most common mutation identified was c.1935C>A p.(D645E), occurring in eight patients (10 alleles) with allele frequency of (33%).\"), comprising [2 unrelated homozygotes and 6 compound heterozygotes](#cite:Chan2023 \"Two unrelated patients were homozygous for the c.1935C>A p.(D645E) mutation. The other 13 were compound heterozygotes.\"). Patient 13 (homozygous, Chinese): [GAA 2.0%, age of presentation 4 months, LVEF 28%, LVMI 483 g/m\u00b2, heart failure, died age 2 years](#cite:Chan2023 \"|13|Chinese|c.1935C>A p.(D645E)|c.1935C>A p.(D645E)|2.0%|4|Yes|1, 2, 3, 4, 5|1100|Yes|28%|483|Yes|\"). Patient 17 (homozygous, Malay): [GAA 1.7%, age of presentation 2 months, LVEF 29%, heart failure, died age 6 months despite early ERT at 2.5 months](#cite:Chan2023 \"|17|Malay|c.1935C>A p.(D645E)|c.1935C>A p.(D645E)|1.7%|2|Yes|1, 2, 3, 4, 5|930|Yes|29%|NA|Yes|\"). [Cohort median age of presentation 3 months, 100% hypertrophic cardiomyopathy](#cite:Chan2023 \"Our cohort had a median age of presentation of 3 months and median age of diagnosis of 6 months. Presenting features were hypertrophic cardiomyopathy (100%), respiratory insufficiency (94%), hypotonia (88%), failure to thrive (82%), feeding difficulties (76%), and hepatomegaly (76%).\"). Variant confirmed as most common in Southern China (25%), Taiwan (36%), and Thailand (32.4%).\n\n- **Reuser2019 (Pompe Registry):** [42 total variant occurrences globally, second most common in Group A (classic IOPD, onset \u226412 months with cardiomyopathy; n=27), most common in Asia-Pacific Group A (n=26)](#cite:Reuser2019 \"c.1935C>A (*n* = 27) | p.(Asp645Glu) ... [Global Group A] ... c.1935C>A (*n* = 26) | p.(Asp645Glu) [Asia-Pacific Group A, most common]\"). [Fourth most common globally, accounting for nearly half of Asia-Pacific Group A variants](#cite:Reuser2019 \"In Asia\u2010Pacific, c.1935C>A was reported most often, but was not among the top five reported in other regions. Nevertheless, this variant was the fourth most common globally due to the input of patients from Asia\u2010Pacific where it accounted for nearly half of reported variants in Group A.\"). [c.1935C>A and c.1726G>A are linked in cis in Asia-Pacific patients](#cite:Reuser2019 \"c1726G>A also was common in Group A in this region since c.1935C>A and c.1726G>A are linked in cis in patients in the Asia\u2010Pacific. The variant is a common pseudodeficiency variant that reduces the activity of GAA substantially if present but does not lead to Pompe disease.\"). [Homozygous c.1935C>A reported in Groups A, B, and C, with Group B patients likely misclassified Group A](#cite:Reuser2019 \"homozygous variants c.1843G>A, c.1933G>A, and c.1935C>A, typically found in classic infantile Pompe disease, were reported in both Groups A and B (Table 6). Upon careful review, the patients in Group B appear to have had cardiomyopathy reported in the Registry after 12 months of age and are expected to be in Group A.\").\n\n- **Chen2024:** [7 of 8 Pompe disease patients carry at least one allele with c.1935C>A (p.D645E)](#cite:Chen2024 \"Apart from Subject A1, all carried at least one allele with the c.1935C>A (p.D645E) variant in the GAA gene.\"), across IOPD (5 patients) and LOPD (2\u20133 patients). [IOPD patients presented with significant cardiac complications between 8 days and 3 months of age](#cite:Chen2024 \"The remaining five were diagnosed with classic IOPD between 8 days and three months of age, primarily presenting with significant cardiac complications. Apart from Subject A1, all carried at least one allele with the c.1935C>A (p.D645E) variant in the GAA gene. All IOPD patients were confirmed CRIM-positive\"). [LOPD patients had muscle weakness noted during early adolescence, early infancy, and age 4 years respectively](#cite:Chen2024 \"Three patients were diagnosed with LOPD (Subject A1-A3) with muscle weakness noted during early adolescence, early infancy, and four years of age, respectively.\"). All carriers confirmed CRIM-positive. This series demonstrates phenotypic spectrum from classic IOPD to LOPD with this allele.\n\n- **Zhu2022:** 5 unrelated Chinese IOPD patients compound heterozygous for c.1935C>A with different second alleles (c.2662G>T\u00d72, c.1432G>A, c.1832G>A, c.1121G>A), all CRIM-positive, all presenting age 4\u20137 months at first infusion (disease onset 4\u20136 months) with markedly elevated LVMI (231\u2013745 g/m\u00b2) and reduced GAA activity (0.37\u20136.8 in respective units). [c.1935C>A described as the most frequent GAA mutation in the cohort](#cite:Zhu2022 \"The most frequent mutation observed in our study was c.1935C > A, with four out of ten patients having this mutation.\").\n\n- **Hsueh2021:** 19 Taiwanese NBS IOPD patients, multiple carrying c.1935C>A. 6 patients are homozygous for both c.1935C>A and c.1726G>A (Patients 2, 5, 10, 11, 14, 19), all with classic IOPD, early ERT (mean 11 days), followed for hearing outcomes at ages 0.3\u20138.4 years. [All 19 patients received first ERT within 4h of admission at mean 11.05 days](#cite:Hsueh2021 \"All the patients received their first ERT within 4 h of admission at a mean age of 11.05 days (range 6\u201323 days).\"). Additional compound het patients (Patients 3, 4, 7, 8, 9, 12, 13, 17, 18) also carry c.1935C>A. All patients IOPD.\n\n- **Li2024:** 2 patients in a Chinese cohort of 15 IOPD patients (1 cHet c.1669A>T/c.1935C>A, 1 hom c.1935C>A/c.1935C>A) with hypertrophic cardiomyopathy (LVEF 48\u201354%, GLS 7.6\u20139%). [Cohort died at median 24.80 months from cardiorespiratory failure](#cite:Li2024 \"Fifteen patients died at a median age of 24.80 months due to cardiorespiratory failure (range 3\u2013120 months). Myasthenia symptoms and severe hypertrophic cardiomyopathy were universally present (15/15 = 100%).\"). [Most common mutation in southern China reported as c.1935C>A, accounting for 20\u201325% of mutant alleles](#cite:Li2024 \"The most common mutation in patients from southern China was c.1C > A (p.Asp 645Glu), accounting for 20%\u201325% of the total mutant alleles (20).\").\n\n- **Xu2019:** c.1935C>A in 5 patients across ~4 unrelated families (P2 and P3 are siblings): [P1 (cHet c.1082C>T), P2+P3 siblings (cHet c.1216G>A), P5 (hom), P6 (cHet c.1822C>T)](#cite:Xu2019 \"Genotypec | c.1082C>T, c.1935C>A (both potentially less severe) | c.1216G>A (unknow), c.1935C>A (potentially less severe) | c.1216G>A (unknow), c.1935C>A (potentially less severe) | c.1557G>A (unknown), c.1978C>T (potentially less severe) | homozygotic mutation of c.1935C>A (potentially less severe) | c.1822C>T (very severe), c.1935C>A (potentially less severe)\"). [GAA activities near-absent: P1=0.90, P2=1.45, P3=1.03, P5=0.00, P6=2.86 nmol/h/mg (normal >14)](#cite:Xu2019 \"GAA activity in PBLCb | 0.90 | 1.45 | 1.03 | 8.20 | 0.00 | 2.86\"). Phenotype ranges from infantile-onset (P5, onset 1 month; P6, onset 4 months) to juvenile-onset (P1, onset 15 months; P2, onset 20 months; P3, onset 47 months), consistent with 'potentially less severe' designation in Pompe variant database.\n\n- **Ngiwsara2019:** 1 Thai IOPD patient (Patient 2) compound het c.1935C>A/c.1933G>C (p.Asp645His), onset 1\u20132 months with tachypnea, mild hepatomegaly, biventricular hypertrophy, EF 30%; [GAA activity 0% of normal](#cite:Ngiwsara2019 \"2 | 0 | c.1935C>A | 14 | p.Asp645Glu | Catalytic GH31 | FA | Hermans et al. [13]\"). [p.Asp645Glu shown to cause delayed intracellular transport, deficient phosphorylation and proteolytic processing; replacements at same position (p.Asp645Asn, p.Asp645His) also result in severe loss of activity](#cite:Ngiwsara2019 \"The p.Asp645Glu variant has been shown to cause delayed intracellular transport, deficient phosphorylation and proteolytic processing [25]. Replacement in the equivalent position p.Asp645Asn and p.Asp645His also result in severe loss of the enzyme activity [23, 31]\").\n\n- **Ron2025:** Heterozygous carriers of c.1935C>A with a pseudodeficiency allele on the other chromosome (Subjects 16 and 38 in Pennsylvania NBS) show normal GAA activity and are classified as unaffected carriers. [No reports of affected carriers are known to the authors](#cite:Ron2025 \"Carriers have about 50% of the average normal enzyme activity [6]; to our knowledge, there are no reports of affected carriers.\"). Supports autosomal recessive inheritance.\n\n- **Liu2021:** 1 Taiwanese infant (compound het c.424_440del17 / c.1935C>A), presenting at birth with mild hypotonia, elevated CK (872 U/L), [GAA activity 0.04 \u00b5M/h (normal >0.80)](#cite:Liu2021 \"Laboratory data revealed abnormally high aspartate aminotransferase (AST), alanine aminotransferase (ALT), and creatinine kinase (CK), which were 125 U/L (normal range: <32 U/L), 48 U/L (normal range: <33 U/L), and 872 U/L (normal range: 26\u2013192 U/L), respectively. The enzyme activity test of GAA was 0.04 \u00b5M/h (normal range: >0.80 \u00b5M/h).\"), LVMI 105.49 g/m\u00b2, ERT initiated at 15 days.\n\n- **Sawada2021, Sawada2020:** Japanese NBS studies confirm c.1935C>A is classified Pathogenic, common in Taiwan/southern China IOPD; in Japan, only 1 carrier detected among 107 NBS-screened newborns, consistent with lower frequency outside East Asian founder populations.\n\n- **Moriyoshimura2025:** Clinical trial in Japan; patients carrying c.1935C>A always in cis with c.1726G>A, with IOPD diagnoses and prior alglucosidase alfa treatment failure, consistent with severe disease course.\n\n- **Huang2023:** iPSC modeling review; iPSC-derived cardiomyocytes from IOPD patients with c.1935C>A showed [massive glycogen accumulation with ultrastructural aberrances including swollen mitochondria and autophagosome-like structures, alleviated by rhGAA](#cite:Huang2023 \"a mass of glycogen accumulated in PD-iCM, underlying the ultrastructural aberrances including swollen mitochondria, the formation of vacuoles containing glycogen particles, and the formation of autophagosome-like structures. The above major pathologic phenotypes of PD-iPSC-derived cardiomyocytes were alleviated by rhGAA\"), providing additional cellular functional corroboration.\n\n**Refuting evidence:** None. No paper or ClinVar submission classifies this variant as benign, likely benign, or VUS. Population frequency in East Asians (0.17% gnomAD) is consistent with the known high carrier frequency in this founder population given IOPD prevalence of ~1/50,000 in Taiwan.",
+      "classification_rationale": "3-star ClinGen expert panel Pathogenic classification; far exceeds ≥10 unrelated cases threshold with >50 documented unrelated individuals across literature and registry data; strong functional evidence (GAA activity <2.3% of WT in multiple assay systems); most common IOPD-causing variant in Southern Han Chinese, Taiwanese, Malaysian, and Thai populations.",
+      "description": "This variant has strong previous evidence of pathogenicity in unrelated individuals. Classified Pathogenic by the ClinGen Lysosomal Storage Disorders VCEP (3-star expert panel, 2021) applying PM3_Very Strong (>30 homozygotes and ≥5 compound heterozygotes with confirmed pathogenic second alleles), PS3_Moderate (GAA activity <10% of normal in COS-cell expression studies; patient homozygous fibroblasts 0.08–0.82% of normal; knock-in cell line ~2.3% WT activity; knock-in mice ~1% WT activity in heart, skeletal muscle, and brain), PP4_Moderate, PM5, and PP3 (REVEL 0.8). This variant is the most common pathogenic GAA allele in IOPD among Southern Han Chinese, Taiwanese, Malaysian, and Thai populations (36–80% of mutant alleles), with 42 total occurrences in the Pompe Registry and representation across the full clinical spectrum. Infantile-onset Pompe disease (IOPD) phenotype: neonatal to 6-month onset with severe hypertrophic cardiomyopathy (LVEF as low as 9.9%), profound muscle hypotonia, respiratory failure, and hepatomegaly; median death at 24.8 months without ERT. Late-onset Pompe disease (LOPD) also reported (muscle weakness onset age 1–7 years). Heterozygous carriers are unaffected.",
+      "notes": "**Summary:** Pathogenic. ClinGen LSD VCEP 3-star expert panel classified this variant as Pathogenic (approved 2021-08-17), applying PM3_Very Strong, PS3_Moderate, PM5, PP4_Moderate, and PP3. The evidence base is extensive: >50 unrelated individuals documented in the literature with affected GAA activity, plus 42 occurrences in the Pompe Registry (Reuser2019). The variant is the most common IOPD-causing GAA allele in Southern Han Chinese, Taiwanese, Malaysian, and Thai populations (36–80% of mutant alleles), and multiple validated functional assays converge on near-complete loss of GAA function. A knock-in mouse model (Kan2022) recapitulates the human IOPD phenotype. No credible refuting evidence exists. The population frequency in East Asians (0.17% gnomAD) is slightly above the ClinGen LSD VCEP PM2 threshold (<0.001) but does not challenge pathogenicity given the extensive case and functional evidence. Heterozygous carriers (Ron2025, Kan2022) are uniformly unaffected, consistent with autosomal recessive inheritance.\n\nNote on haplotype: c.1935C>A frequently occurs in cis with the pseudodeficiency variant c.1726G>A (p.Gly576Ser) in Asian populations. This combined allele [c.1935C>A;c.1726G>A] is pathogenic; c.1726G>A alone does not cause disease. Cases in Chen2024, Hsueh2021, and Moriyoshimura2025 carrying this cis haplotype are counted as carrying the pathogenic c.1935C>A allele.\n\nDeduplication: ClinVar's cited foundational papers (PMID 8094613, 9554747, 18458862) are not in the extracted paper evidence set and represent independent historical cases. The papers extracted here (2019–2025) largely report independent cohorts, though some Pompe Registry (Reuser2019) patients may overlap with national cohort studies.\n\n**Supporting evidence:**\n\n- **ClinVar (ClinGen LSD VCEP):** 3-star expert panel Pathogenic (2021). PM3_Very Strong (>30 homozygotes + ≥5 compound het with confirmed pathogenic second alleles across PMID 8094613, 9554747, 18458862, 28394184), PS3_Moderate (<10% normal GAA activity in COS cells; no mature 76 kDa protein by pulse-chase), PM5 (p.Asp645Asn classified Pathogenic by same VCEP), PP4_Moderate (most common IOPD variant in China/Taiwan/Thailand), PP3 (REVEL 0.8). 16 additional laboratory submitters classify as Pathogenic.\n\n- **Kan2022:** [Most frequent pathogenic GAA mutation in Southern Han Chinese IOPD](#cite:Kan2022 \"The c.1935C>A (p.Asp645Glu) variant, the most frequent GAA pathogenic mutation in people of Southern Han Chinese ancestry, causes infantile-onset Pompe disease (IOPD), presenting neonatally with severe hypertrophic cardiomyopathy, profound muscle hypotonia, respiratory failure, and infantile mortality.\"), comprising [36–80% of IOPD alleles in Taiwanese populations](#cite:Kan2022 \"In Taiwanese populations, this c.1935C>A variant represents 36–80% of mutations11·12, and occur in context of a specific haplotype with conserved polymorphic markers linked to Taiwanese Pompe IOPD patients comparing to normal individuals. This may suggest the existence of a founder effect stemming from a diaspora of Southern Han Chinese to Taiwan and other locations\"). CRISPR knock-in C2C12 myoblast cell line showed [~2.3% of WT GAA activity](#cite:Kan2022 \"GAA enzymatic activity was almost abolished in Gaa c.1935C>A KI cells relative to Gaa wt cells; less than 2.3% of WT GAA activity was detected in the KI cell line\"). Knock-in mice had [~1% of WT GAA activity in heart, skeletal muscle, and brain](#cite:Kan2022 \"KI mice had normal Gaa mRNA levels with significantly reduced level of GAA hydrolysis activity (about 1% of WT) in heart and skeletal muscle, as well as brain tissue\"), with [hypertrophic cardiomyopathy at ~2–3 months and skeletal muscle weakness](#cite:Kan2022 \"Homozygous Gaa em1935C>A knock-in mice exhibited normal Gaa mRNA expression levels relative to wild-type mice, had near-abolished GAA enzymatic activity, markedly increased tissue glycogen storage, and concomitantly impaired autophagy. Three-month-old mice demonstrated skeletal muscle weakness and hypertrophic cardiomyopathy but no premature mortality.\"). In human homozygous fibroblasts, [GAA activity was previously 0.08–0.82% of normal](#cite:Kan2022 \"This aligns with observed levels of low GAA enzyme activity (0.08–0.82% of normal range for control) previously measured in homozygous GAA c.1935C>A patient fibroblasts\"). [Heterozygous KI mice had ~50% WT activity and no phenotypic differences](#cite:Kan2022 \"While no phenotypic differences were noted between GAA c.1935C>A HET and WT mice aside from the expected 50% reduction in HET GAA enzymatic activity, the homozygous KI mice demonstrated a significant, PD-like phenotype.\"), supporting autosomal recessive pattern. The variant [does not affect GAA mRNA levels](#cite:Kan2022 \"The comparative ΔCt between mouse Gaa and housekeeping gene Gapdh acquired by RT-PCR among WT, HET, and KI groups are almost identical, indicating the Gaa c.1935C>A mutation does not affect Gaa mRNA levels\"), confirming missense (not NMD) mechanism.\n\n- **Chan2023:** [Most common mutation in Malaysian IOPD, 8 patients (10 alleles, 33% allele frequency)](#cite:Chan2023 \"The most common mutation identified was c.1935C>A p.(D645E), occurring in eight patients (10 alleles) with allele frequency of (33%).\"), comprising [2 unrelated homozygotes and 6 compound heterozygotes](#cite:Chan2023 \"Two unrelated patients were homozygous for the c.1935C>A p.(D645E) mutation. The other 13 were compound heterozygotes.\"). Patient 13 (homozygous, Chinese): [GAA 2.0%, age of presentation 4 months, LVEF 28%, LVMI 483 g/m², heart failure, died age 2 years](#cite:Chan2023 \"|13|Chinese|c.1935C>A p.(D645E)|c.1935C>A p.(D645E)|2.0%|4|Yes|1, 2, 3, 4, 5|1100|Yes|28%|483|Yes|\"). Patient 17 (homozygous, Malay): [GAA 1.7%, age of presentation 2 months, LVEF 29%, heart failure, died age 6 months despite early ERT at 2.5 months](#cite:Chan2023 \"|17|Malay|c.1935C>A p.(D645E)|c.1935C>A p.(D645E)|1.7%|2|Yes|1, 2, 3, 4, 5|930|Yes|29%|NA|Yes|\"). [Cohort median age of presentation 3 months, 100% hypertrophic cardiomyopathy](#cite:Chan2023 \"Our cohort had a median age of presentation of 3 months and median age of diagnosis of 6 months. Presenting features were hypertrophic cardiomyopathy (100%), respiratory insufficiency (94%), hypotonia (88%), failure to thrive (82%), feeding difficulties (76%), and hepatomegaly (76%).\"). Variant confirmed as most common in Southern China (25%), Taiwan (36%), and Thailand (32.4%).\n\n- **Reuser2019 (Pompe Registry):** [42 total variant occurrences globally, second most common in Group A (classic IOPD, onset ≤12 months with cardiomyopathy; n=27), most common in Asia-Pacific Group A (n=26)](#cite:Reuser2019 \"c.1935C>A (*n* = 27) | p.(Asp645Glu) ... [Global Group A] ... c.1935C>A (*n* = 26) | p.(Asp645Glu) [Asia-Pacific Group A, most common]\"). [Fourth most common globally, accounting for nearly half of Asia-Pacific Group A variants](#cite:Reuser2019 \"In Asia‐Pacific, c.1935C>A was reported most often, but was not among the top five reported in other regions. Nevertheless, this variant was the fourth most common globally due to the input of patients from Asia‐Pacific where it accounted for nearly half of reported variants in Group A.\"). [c.1935C>A and c.1726G>A are linked in cis in Asia-Pacific patients](#cite:Reuser2019 \"c1726G>A also was common in Group A in this region since c.1935C>A and c.1726G>A are linked in cis in patients in the Asia‐Pacific. The variant is a common pseudodeficiency variant that reduces the activity of GAA substantially if present but does not lead to Pompe disease.\"). [Homozygous c.1935C>A reported in Groups A, B, and C, with Group B patients likely misclassified Group A](#cite:Reuser2019 \"homozygous variants c.1843G>A, c.1933G>A, and c.1935C>A, typically found in classic infantile Pompe disease, were reported in both Groups A and B (Table 6). Upon careful review, the patients in Group B appear to have had cardiomyopathy reported in the Registry after 12 months of age and are expected to be in Group A.\").\n\n- **Chen2024:** [7 of 8 Pompe disease patients carry at least one allele with c.1935C>A (p.D645E)](#cite:Chen2024 \"Apart from Subject A1, all carried at least one allele with the c.1935C>A (p.D645E) variant in the GAA gene.\"), across IOPD (5 patients) and LOPD (2–3 patients). [IOPD patients presented with significant cardiac complications between 8 days and 3 months of age](#cite:Chen2024 \"The remaining five were diagnosed with classic IOPD between 8 days and three months of age, primarily presenting with significant cardiac complications. Apart from Subject A1, all carried at least one allele with the c.1935C>A (p.D645E) variant in the GAA gene. All IOPD patients were confirmed CRIM-positive\"). [LOPD patients had muscle weakness noted during early adolescence, early infancy, and age 4 years respectively](#cite:Chen2024 \"Three patients were diagnosed with LOPD (Subject A1-A3) with muscle weakness noted during early adolescence, early infancy, and four years of age, respectively.\"). All carriers confirmed CRIM-positive. This series demonstrates phenotypic spectrum from classic IOPD to LOPD with this allele.\n\n- **Zhu2022:** 5 unrelated Chinese IOPD patients compound heterozygous for c.1935C>A with different second alleles (c.2662G>T×2, c.1432G>A, c.1832G>A, c.1121G>A), all CRIM-positive, all presenting age 4–7 months at first infusion (disease onset 4–6 months) with markedly elevated LVMI (231–745 g/m²) and reduced GAA activity (0.37–6.8 in respective units). [c.1935C>A described as the most frequent GAA mutation in the cohort](#cite:Zhu2022 \"The most frequent mutation observed in our study was c.1935C > A, with four out of ten patients having this mutation.\").\n\n- **Hsueh2021:** 19 Taiwanese NBS IOPD patients, multiple carrying c.1935C>A. 6 patients are homozygous for both c.1935C>A and c.1726G>A (Patients 2, 5, 10, 11, 14, 19), all with classic IOPD, early ERT (mean 11 days), followed for hearing outcomes at ages 0.3–8.4 years. [All 19 patients received first ERT within 4h of admission at mean 11.05 days](#cite:Hsueh2021 \"All the patients received their first ERT within 4 h of admission at a mean age of 11.05 days (range 6–23 days).\"). Additional compound het patients (Patients 3, 4, 7, 8, 9, 12, 13, 17, 18) also carry c.1935C>A. All patients IOPD.\n\n- **Li2024:** 2 patients in a Chinese cohort of 15 IOPD patients (1 cHet c.1669A>T/c.1935C>A, 1 hom c.1935C>A/c.1935C>A) with hypertrophic cardiomyopathy (LVEF 48–54%, GLS 7.6–9%). [Cohort died at median 24.80 months from cardiorespiratory failure](#cite:Li2024 \"Fifteen patients died at a median age of 24.80 months due to cardiorespiratory failure (range 3–120 months). Myasthenia symptoms and severe hypertrophic cardiomyopathy were universally present (15/15 = 100%).\"). [Most common mutation in southern China reported as c.1935C>A, accounting for 20–25% of mutant alleles](#cite:Li2024 \"The most common mutation in patients from southern China was c.1C > A (p.Asp 645Glu), accounting for 20%–25% of the total mutant alleles (20).\").\n\n- **Xu2019:** c.1935C>A in 5 patients across ~4 unrelated families (P2 and P3 are siblings): [P1 (cHet c.1082C>T), P2+P3 siblings (cHet c.1216G>A), P5 (hom), P6 (cHet c.1822C>T)](#cite:Xu2019 \"Genotypec | c.1082C>T, c.1935C>A (both potentially less severe) | c.1216G>A (unknow), c.1935C>A (potentially less severe) | c.1216G>A (unknow), c.1935C>A (potentially less severe) | c.1557G>A (unknown), c.1978C>T (potentially less severe) | homozygotic mutation of c.1935C>A (potentially less severe) | c.1822C>T (very severe), c.1935C>A (potentially less severe)\"). [GAA activities near-absent: P1=0.90, P2=1.45, P3=1.03, P5=0.00, P6=2.86 nmol/h/mg (normal >14)](#cite:Xu2019 \"GAA activity in PBLCb | 0.90 | 1.45 | 1.03 | 8.20 | 0.00 | 2.86\"). Phenotype ranges from infantile-onset (P5, onset 1 month; P6, onset 4 months) to juvenile-onset (P1, onset 15 months; P2, onset 20 months; P3, onset 47 months), consistent with 'potentially less severe' designation in Pompe variant database.\n\n- **Ngiwsara2019:** 1 Thai IOPD patient (Patient 2) compound het c.1935C>A/c.1933G>C (p.Asp645His), onset 1–2 months with tachypnea, mild hepatomegaly, biventricular hypertrophy, EF 30%; [GAA activity 0% of normal](#cite:Ngiwsara2019 \"2 | 0 | c.1935C>A | 14 | p.Asp645Glu | Catalytic GH31 | FA | Hermans et al. [13]\"). [p.Asp645Glu shown to cause delayed intracellular transport, deficient phosphorylation and proteolytic processing; replacements at same position (p.Asp645Asn, p.Asp645His) also result in severe loss of activity](#cite:Ngiwsara2019 \"The p.Asp645Glu variant has been shown to cause delayed intracellular transport, deficient phosphorylation and proteolytic processing [25]. Replacement in the equivalent position p.Asp645Asn and p.Asp645His also result in severe loss of the enzyme activity [23, 31]\").\n\n- **Ron2025:** Heterozygous carriers of c.1935C>A with a pseudodeficiency allele on the other chromosome (Subjects 16 and 38 in Pennsylvania NBS) show normal GAA activity and are classified as unaffected carriers. [No reports of affected carriers are known to the authors](#cite:Ron2025 \"Carriers have about 50% of the average normal enzyme activity [6]; to our knowledge, there are no reports of affected carriers.\"). Supports autosomal recessive inheritance.\n\n- **Liu2021:** 1 Taiwanese infant (compound het c.424_440del17 / c.1935C>A), presenting at birth with mild hypotonia, elevated CK (872 U/L), [GAA activity 0.04 µM/h (normal >0.80)](#cite:Liu2021 \"Laboratory data revealed abnormally high aspartate aminotransferase (AST), alanine aminotransferase (ALT), and creatinine kinase (CK), which were 125 U/L (normal range: <32 U/L), 48 U/L (normal range: <33 U/L), and 872 U/L (normal range: 26–192 U/L), respectively. The enzyme activity test of GAA was 0.04 µM/h (normal range: >0.80 µM/h).\"), LVMI 105.49 g/m², ERT initiated at 15 days.\n\n- **Sawada2021, Sawada2020:** Japanese NBS studies confirm c.1935C>A is classified Pathogenic, common in Taiwan/southern China IOPD; in Japan, only 1 carrier detected among 107 NBS-screened newborns, consistent with lower frequency outside East Asian founder populations.\n\n- **Moriyoshimura2025:** Clinical trial in Japan; patients carrying c.1935C>A always in cis with c.1726G>A, with IOPD diagnoses and prior alglucosidase alfa treatment failure, consistent with severe disease course.\n\n- **Huang2023:** iPSC modeling review; iPSC-derived cardiomyocytes from IOPD patients with c.1935C>A showed [massive glycogen accumulation with ultrastructural aberrances including swollen mitochondria and autophagosome-like structures, alleviated by rhGAA](#cite:Huang2023 \"a mass of glycogen accumulated in PD-iCM, underlying the ultrastructural aberrances including swollen mitochondria, the formation of vacuoles containing glycogen particles, and the formation of autophagosome-like structures. The above major pathologic phenotypes of PD-iPSC-derived cardiomyocytes were alleviated by rhGAA\"), providing additional cellular functional corroboration.\n\n**Refuting evidence:** None. No paper or ClinVar submission classifies this variant as benign, likely benign, or VUS. Population frequency in East Asians (0.17% gnomAD) is consistent with the known high carrier frequency in this founder population given IOPD prevalence of ~1/50,000 in Taiwan.",
       "papers": [
         {
           "paper_id": "Kan2022",
-          "rank_rationale": "Provides the most comprehensive functional characterization including a validated CRISPR knock-in mouse and cell line model demonstrating near-complete loss of GAA activity (~1\u20132.3% of WT), recapitulating human IOPD phenotype, and confirms absent NMD mechanism."
+          "rank_rationale": "Provides the most comprehensive functional characterization including a validated CRISPR knock-in mouse and cell line model demonstrating near-complete loss of GAA activity (~1–2.3% of WT), recapitulating human IOPD phenotype, and confirms absent NMD mechanism."
         },
         {
           "paper_id": "Chan2023",
@@ -50,7 +50,7 @@
         },
         {
           "paper_id": "Liu2021",
-          "rank_rationale": "Single Taiwanese infant case report with detailed biochemical data (GAA 0.04 \u00b5M/h) and early ERT initiation, corroborating pathogenicity in an independent clinical setting."
+          "rank_rationale": "Single Taiwanese infant case report with detailed biochemical data (GAA 0.04 µM/h) and early ERT initiation, corroborating pathogenicity in an independent clinical setting."
         },
         {
           "paper_id": "Moriyoshimura2025",
@@ -158,7 +158,7 @@
               ]
             },
             {
-              "quote": "The comparative \u0394Ct between mouse Gaa and housekeeping gene Gapdh acquired by RT-PCR among WT, HET, and KI groups are almost identical, indicating the Gaa c.1935C>A mutation does not affect Gaa mRNA levels",
+              "quote": "The comparative ΔCt between mouse Gaa and housekeeping gene Gapdh acquired by RT-PCR among WT, HET, and KI groups are almost identical, indicating the Gaa c.1935C>A mutation does not affect Gaa mRNA levels",
               "bboxes": [
                 {
                   "page": 5,
@@ -259,10 +259,10 @@
         },
         {
           "paper_id": "Kan2022",
-          "text": "In human homozygous c.1935C>A patient fibroblasts, GAA enzyme activity was previously measured at 0.08\u20130.82% of normal control range; in Taiwanese populations the variant represents 36\u201380% of IOPD mutations.",
+          "text": "In human homozygous c.1935C>A patient fibroblasts, GAA enzyme activity was previously measured at 0.08–0.82% of normal control range; in Taiwanese populations the variant represents 36–80% of IOPD mutations.",
           "citations": [
             {
-              "quote": "This aligns with observed levels of low GAA enzyme activity (0.08\u20130.82% of normal range for control) previously measured in homozygous GAA c.1935C>A patient fibroblasts",
+              "quote": "This aligns with observed levels of low GAA enzyme activity (0.08–0.82% of normal range for control) previously measured in homozygous GAA c.1935C>A patient fibroblasts",
               "bboxes": [
                 {
                   "page": 8,
@@ -288,7 +288,7 @@
               ]
             },
             {
-              "quote": "In Taiwanese populations, this c.1935C>A variant represents 36\u201380% of mutations11\u00b712, and occur in context of a specific haplotype with conserved polymorphic markers linked to Taiwanese Pompe IOPD patients comparing to normal individuals. This may suggest the existence of a founder effect stemming from a diaspora of Southern Han Chinese to Taiwan and other locations",
+              "quote": "In Taiwanese populations, this c.1935C>A variant represents 36–80% of mutations11·12, and occur in context of a specific haplotype with conserved polymorphic markers linked to Taiwanese Pompe IOPD patients comparing to normal individuals. This may suggest the existence of a founder effect stemming from a diaspora of Southern Han Chinese to Taiwan and other locations",
               "bboxes": [
                 {
                   "page": 2,
@@ -389,7 +389,7 @@
         },
         {
           "paper_id": "Chan2023",
-          "text": "Patient 13 (Chinese, homozygous): GAA activity 2.0%, presentation age 4 months with HCM (LVEF 28%, LVMI 483 g/m\u00b2), heart failure; started ERT at 8 months; died at age 2 years. Patient 17 (Malay, homozygous): GAA activity 1.7%, presentation age 2 months with HCM (LVEF 29%); started ERT at 2.5 months; died at age 6 months.",
+          "text": "Patient 13 (Chinese, homozygous): GAA activity 2.0%, presentation age 4 months with HCM (LVEF 28%, LVMI 483 g/m²), heart failure; started ERT at 8 months; died at age 2 years. Patient 17 (Malay, homozygous): GAA activity 1.7%, presentation age 2 months with HCM (LVEF 29%); started ERT at 2.5 months; died at age 6 months.",
           "citations": [
             {
               "quote": "|13|Chinese|c.1935C>A p.(D645E)|c.1935C>A p.(D645E)|2.0%|4|Yes|1, 2, 3, 4, 5|1100|Yes|28%|483|Yes|",
@@ -1175,10 +1175,10 @@
         },
         {
           "paper_id": "Chan2023",
-          "text": "Multiple compound heterozygous patients (Patients 5, 6, 7, 9, 12, 15) with c.1935C>A paired with different second alleles, all presenting with classic IOPD features (HCM, respiratory insufficiency, hypotonia, hepatomegaly) at age 2\u20136 months.",
+          "text": "Multiple compound heterozygous patients (Patients 5, 6, 7, 9, 12, 15) with c.1935C>A paired with different second alleles, all presenting with classic IOPD features (HCM, respiratory insufficiency, hypotonia, hepatomegaly) at age 2–6 months.",
           "citations": [
             {
-              "quote": "|7|Chinese|c.1411_1414delGAGA p.(E471Pfs*5)|c.1935C>A p.(D645E)|<0.1\u2020|3|No|1, 2, 3, 4|NA|Yes|9.9%|485|Yes|",
+              "quote": "|7|Chinese|c.1411_1414delGAGA p.(E471Pfs*5)|c.1935C>A p.(D645E)|<0.1†|3|No|1, 2, 3, 4|NA|Yes|9.9%|485|Yes|",
               "bboxes": [
                 {
                   "page": 4,
@@ -2078,7 +2078,7 @@
           "text": "c.1935C>A (p.Asp645Glu) had 42 total occurrences in the Pompe Registry (NM_000152.5), was the second most common variant globally in Group A (classic IOPD, n=27) and the most common in Asia-Pacific Group A (n=26), accounting for nearly half of Group A variants in that region.",
           "citations": [
             {
-              "quote": "The variant c.1935C>A was the second most common globally and the most common in Asia\u2010Pacific but was not frequently reported in any other region.",
+              "quote": "The variant c.1935C>A was the second most common globally and the most common in Asia‐Pacific but was not frequently reported in any other region.",
               "bboxes": [
                 {
                   "page": 8,
@@ -2116,7 +2116,7 @@
               ]
             },
             {
-              "quote": "In Asia\u2010Pacific, c.1935C>A was reported most often, but was not among the top five reported in other regions. Nevertheless, this variant was the fourth most common globally due to the input of patients from Asia\u2010Pacific where it accounted for nearly half of reported variants in Group A.",
+              "quote": "In Asia‐Pacific, c.1935C>A was reported most often, but was not among the top five reported in other regions. Nevertheless, this variant was the fourth most common globally due to the input of patients from Asia‐Pacific where it accounted for nearly half of reported variants in Group A.",
               "bboxes": [
                 {
                   "page": 15,
@@ -2162,7 +2162,7 @@
           "text": "c.1935C>A is linked in cis with pseudodeficiency variant c.1726G>A in Asia-Pacific patients; c.1726G>A alone does not cause Pompe disease but reduces GAA activity substantially.",
           "citations": [
             {
-              "quote": "c1726G>A also was common in Group A in this region since c.1935C>A and c.1726G>A are linked in cis in patients in the Asia\u2010Pacific. The variant is a common pseudodeficiency variant that reduces the activity of GAA substantially if present but does not lead to Pompe disease.",
+              "quote": "c1726G>A also was common in Group A in this region since c.1935C>A and c.1726G>A are linked in cis in patients in the Asia‐Pacific. The variant is a common pseudodeficiency variant that reduces the activity of GAA substantially if present but does not lead to Pompe disease.",
               "bboxes": [
                 {
                   "page": 15,
@@ -2388,974 +2388,43 @@
         },
         {
           "paper_id": "Zhu2022",
-          "text": "5 unrelated Chinese IOPD patients are compound heterozygous for c.1935C>A paired with distinct second alleles (c.2662G>T\u00d72, c.1432G>A, c.1832G>A, c.1121G>A), all CRIM-positive, presenting at 4\u20137 months with markedly elevated LVMI (231\u2013745 g/m\u00b2) and severely reduced GAA activity.",
+          "text": "5 unrelated Chinese IOPD patients are compound heterozygous for c.1935C>A paired with distinct second alleles (c.2662G>T×2, c.1432G>A, c.1832G>A, c.1121G>A), all CRIM-positive, presenting at 4–7 months with markedly elevated LVMI (231–745 g/m²) and severely reduced GAA activity.",
           "citations": [
             {
-              "quote": "0103 | 5.8 | F | Han | 58 | 5.0 | 4 | No | c.1935C > A, p.Asp645Glu (het) c.2662G > T, p.Glu888*(het) | + | 1.05 (2.88\u201398.02 \u00b5mol/L/h) | 291.1 | 61.1 | No",
+              "quote": "0103 | 5.8 | F | Han | 58 | 5.0 | 4 | No | c.1935C > A, p.Asp645Glu (het) c.2662G > T, p.Glu888*(het) | + | 1.05 (2.88–98.02 µmol/L/h) | 291.1 | 61.1 | No",
               "bboxes": [
                 {
                   "page": 4,
-                  "top": -177,
-                  "left": 305,
-                  "bottom": -171,
-                  "right": 310
+                  "top": 397,
+                  "left": 89,
+                  "bottom": 407,
+                  "right": 898
                 },
                 {
                   "page": 4,
-                  "top": -170,
-                  "left": 303,
-                  "bottom": -163,
-                  "right": 309
-                },
-                {
-                  "page": 4,
-                  "top": -120,
-                  "left": 303,
-                  "bottom": -117,
-                  "right": 309
-                },
-                {
-                  "page": 4,
-                  "top": -115,
-                  "left": 308,
-                  "bottom": -114,
-                  "right": 309
-                },
-                {
-                  "page": 4,
-                  "top": -110,
-                  "left": 303,
-                  "bottom": -108,
-                  "right": 309
-                },
-                {
-                  "page": 4,
-                  "top": -106,
-                  "left": 303,
-                  "bottom": -100,
-                  "right": 310
-                },
-                {
-                  "page": 4,
-                  "top": -70,
-                  "left": 303,
-                  "bottom": -67,
-                  "right": 309
-                },
-                {
-                  "page": 4,
-                  "top": -65,
-                  "left": 308,
-                  "bottom": -64,
-                  "right": 309
-                },
-                {
-                  "page": 4,
-                  "top": -61,
-                  "left": 303,
-                  "bottom": -58,
-                  "right": 309
-                },
-                {
-                  "page": 4,
-                  "top": -56,
-                  "left": 303,
-                  "bottom": -50,
-                  "right": 310
-                },
-                {
-                  "page": 4,
-                  "top": -49,
-                  "left": 303,
-                  "bottom": -44,
-                  "right": 309
-                },
-                {
-                  "page": 4,
-                  "top": -12,
-                  "left": 303,
-                  "bottom": -10,
-                  "right": 311
-                },
-                {
-                  "page": 4,
-                  "top": -9,
-                  "left": 303,
-                  "bottom": -4,
-                  "right": 309
-                },
-                {
-                  "page": 4,
-                  "top": -4,
-                  "left": 303,
-                  "bottom": 6,
-                  "right": 310
-                },
-                {
-                  "page": 4,
-                  "top": 6,
-                  "left": 303,
-                  "bottom": 10,
-                  "right": 310
-                },
-                {
-                  "page": 4,
-                  "top": 11,
-                  "left": 303,
-                  "bottom": 12,
-                  "right": 309
-                },
-                {
-                  "page": 4,
-                  "top": 13,
-                  "left": 305,
-                  "bottom": 18,
-                  "right": 310
-                },
-                {
-                  "page": 4,
-                  "top": 19,
-                  "left": 305,
-                  "bottom": 28,
-                  "right": 309
-                },
-                {
-                  "page": 4,
-                  "top": 29,
-                  "left": 305,
-                  "bottom": 34,
-                  "right": 311
-                },
-                {
-                  "page": 4,
-                  "top": 39,
-                  "left": 303,
-                  "bottom": 44,
-                  "right": 309
-                },
-                {
-                  "page": 4,
-                  "top": 45,
-                  "left": 303,
-                  "bottom": 51,
-                  "right": 310
-                },
-                {
-                  "page": 4,
-                  "top": 52,
-                  "left": 308,
-                  "bottom": 53,
-                  "right": 309
-                },
-                {
-                  "page": 4,
-                  "top": 55,
-                  "left": 303,
-                  "bottom": 60,
-                  "right": 310
-                },
-                {
-                  "page": 4,
-                  "top": 61,
-                  "left": 303,
-                  "bottom": 67,
-                  "right": 310
-                },
-                {
-                  "page": 4,
-                  "top": 67,
-                  "left": 307,
-                  "bottom": 73,
-                  "right": 307
-                },
-                {
-                  "page": 4,
-                  "top": 73,
-                  "left": 303,
-                  "bottom": 79,
-                  "right": 310
-                },
-                {
-                  "page": 4,
-                  "top": 80,
-                  "left": 303,
-                  "bottom": 86,
-                  "right": 310
-                },
-                {
-                  "page": 4,
-                  "top": 87,
-                  "left": 308,
-                  "bottom": 88,
-                  "right": 309
-                },
-                {
-                  "page": 4,
-                  "top": 90,
-                  "left": 303,
-                  "bottom": 95,
-                  "right": 309
-                },
-                {
-                  "page": 4,
-                  "top": 96,
-                  "left": 303,
-                  "bottom": 98,
-                  "right": 311
-                },
-                {
-                  "page": 4,
-                  "top": 103,
-                  "left": 303,
-                  "bottom": 108,
-                  "right": 310
-                },
-                {
-                  "page": 4,
-                  "top": 109,
-                  "left": 303,
-                  "bottom": 115,
-                  "right": 310
-                },
-                {
-                  "page": 4,
-                  "top": 116,
-                  "left": 308,
-                  "bottom": 117,
-                  "right": 309
-                },
-                {
-                  "page": 4,
-                  "top": 121,
-                  "left": 303,
-                  "bottom": 124,
-                  "right": 309
-                },
-                {
-                  "page": 4,
-                  "top": 164,
-                  "left": 305,
-                  "bottom": 170,
-                  "right": 309
-                },
-                {
-                  "page": 4,
-                  "top": 230,
-                  "left": 303,
-                  "bottom": 241,
-                  "right": 311
-                },
-                {
-                  "page": 4,
-                  "top": 241,
-                  "left": 303,
-                  "bottom": 246,
-                  "right": 309
-                },
-                {
-                  "page": 4,
-                  "top": 247,
-                  "left": 303,
-                  "bottom": 249,
-                  "right": 311
-                },
-                {
-                  "page": 4,
-                  "top": 249,
-                  "left": 303,
-                  "bottom": 260,
-                  "right": 323
-                },
-                {
-                  "page": 4,
-                  "top": 260,
-                  "left": 303,
-                  "bottom": 306,
-                  "right": 323
-                },
-                {
-                  "page": 4,
-                  "top": 307,
-                  "left": 308,
-                  "bottom": 308,
-                  "right": 322
-                },
-                {
-                  "page": 4,
-                  "top": 309,
-                  "left": 305,
-                  "bottom": 315,
-                  "right": 323
-                },
-                {
-                  "page": 4,
-                  "top": 320,
-                  "left": 308,
-                  "bottom": 322,
-                  "right": 323
-                },
-                {
-                  "page": 4,
-                  "top": 322,
-                  "left": 303,
-                  "bottom": 329,
-                  "right": 322
-                },
-                {
-                  "page": 4,
-                  "top": 333,
-                  "left": 305,
-                  "bottom": 339,
-                  "right": 322
-                },
-                {
-                  "page": 4,
-                  "top": 344,
-                  "left": 303,
-                  "bottom": 351,
-                  "right": 322
-                },
-                {
-                  "page": 4,
-                  "top": 352,
-                  "left": 303,
-                  "bottom": 357,
-                  "right": 322
-                },
-                {
-                  "page": 4,
-                  "top": 358,
-                  "left": 303,
-                  "bottom": 364,
-                  "right": 322
-                },
-                {
-                  "page": 4,
-                  "top": 364,
-                  "left": 303,
-                  "bottom": 370,
-                  "right": 322
-                },
-                {
-                  "page": 4,
-                  "top": 370,
-                  "left": 303,
-                  "bottom": 376,
-                  "right": 322
-                },
-                {
-                  "page": 4,
-                  "top": 377,
-                  "left": 308,
-                  "bottom": 378,
-                  "right": 322
-                },
-                {
-                  "page": 4,
-                  "top": 379,
-                  "left": 305,
-                  "bottom": 384,
-                  "right": 322
-                },
-                {
-                  "page": 4,
-                  "top": 428,
-                  "left": 305,
-                  "bottom": 434,
-                  "right": 310
-                },
-                {
-                  "page": 4,
-                  "top": 435,
-                  "left": 303,
-                  "bottom": 442,
-                  "right": 309
-                },
-                {
-                  "page": 4,
-                  "top": 512,
-                  "left": 303,
-                  "bottom": 518,
-                  "right": 309
-                },
-                {
-                  "page": 4,
-                  "top": 572,
-                  "left": 303,
-                  "bottom": 577,
-                  "right": 310
-                },
-                {
-                  "page": 4,
-                  "top": 579,
-                  "left": 308,
-                  "bottom": 580,
-                  "right": 309
-                },
-                {
-                  "page": 4,
-                  "top": 582,
-                  "left": 303,
-                  "bottom": 587,
-                  "right": 310
-                },
-                {
-                  "page": 4,
-                  "top": 629,
-                  "left": 303,
-                  "bottom": 635,
-                  "right": 310
-                },
-                {
-                  "page": 4,
-                  "top": 636,
-                  "left": 303,
-                  "bottom": 641,
-                  "right": 310
-                },
-                {
-                  "page": 4,
-                  "top": 685,
-                  "left": 305,
-                  "bottom": 690,
-                  "right": 309
-                },
-                {
-                  "page": 4,
-                  "top": 691,
-                  "left": 305,
-                  "bottom": 697,
-                  "right": 310
-                },
-                {
-                  "page": 4,
-                  "top": 698,
-                  "left": 303,
-                  "bottom": 704,
-                  "right": 309
-                },
-                {
-                  "page": 4,
-                  "top": 741,
-                  "left": 303,
-                  "bottom": 746,
-                  "right": 309
-                },
-                {
-                  "page": 4,
-                  "top": 792,
-                  "left": 303,
-                  "bottom": 798,
-                  "right": 310
-                },
-                {
-                  "page": 4,
-                  "top": 799,
-                  "left": 308,
-                  "bottom": 800,
-                  "right": 309
-                },
-                {
-                  "page": 4,
-                  "top": 802,
-                  "left": 303,
-                  "bottom": 807,
-                  "right": 310
-                },
-                {
-                  "page": 4,
-                  "top": 858,
-                  "left": 303,
-                  "bottom": 864,
-                  "right": 310
-                },
-                {
-                  "page": 4,
-                  "top": 865,
-                  "left": 303,
-                  "bottom": 870,
-                  "right": 310
+                  "top": 413,
+                  "left": 470,
+                  "bottom": 423,
+                  "right": 573
                 }
               ]
             },
             {
-              "quote": "0104 | 7 | F | She | 64 | 6.2 | 6 | Yes | c.1432G > A, p.Gly478Arg(het) c.1935C > A, p.Asp645Glu(het) | + | 0.37 (2.88\u201398.02 \u00b5mol/L/h) | 745.5 | 49.2 | No",
+              "quote": "0104 | 7 | F | She | 64 | 6.2 | 6 | Yes | c.1432G > A, p.Gly478Arg(het) c.1935C > A, p.Asp645Glu(het) | + | 0.37 (2.88–98.02 µmol/L/h) | 745.5 | 49.2 | No",
               "bboxes": [
                 {
                   "page": 4,
-                  "top": -177,
-                  "left": 329,
-                  "bottom": -171,
-                  "right": 334
+                  "top": 428,
+                  "left": 89,
+                  "bottom": 439,
+                  "right": 898
                 },
                 {
                   "page": 4,
-                  "top": -170,
-                  "left": 327,
-                  "bottom": -163,
-                  "right": 334
-                },
-                {
-                  "page": 4,
-                  "top": -122,
-                  "left": 327,
-                  "bottom": -116,
-                  "right": 334
-                },
-                {
-                  "page": 4,
-                  "top": -115,
-                  "left": 333,
-                  "bottom": -114,
-                  "right": 334
-                },
-                {
-                  "page": 4,
-                  "top": -112,
-                  "left": 327,
-                  "bottom": -107,
-                  "right": 334
-                },
-                {
-                  "page": 4,
-                  "top": -106,
-                  "left": 327,
-                  "bottom": -100,
-                  "right": 334
-                },
-                {
-                  "page": 4,
-                  "top": -72,
-                  "left": 327,
-                  "bottom": -67,
-                  "right": 334
-                },
-                {
-                  "page": 4,
-                  "top": -65,
-                  "left": 333,
-                  "bottom": -64,
-                  "right": 334
-                },
-                {
-                  "page": 4,
-                  "top": -63,
-                  "left": 327,
-                  "bottom": -57,
-                  "right": 334
-                },
-                {
-                  "page": 4,
-                  "top": -56,
-                  "left": 327,
-                  "bottom": -50,
-                  "right": 334
-                },
-                {
-                  "page": 4,
-                  "top": -49,
-                  "left": 327,
-                  "bottom": -44,
-                  "right": 334
-                },
-                {
-                  "page": 4,
-                  "top": -12,
-                  "left": 327,
-                  "bottom": -10,
-                  "right": 335
-                },
-                {
-                  "page": 4,
-                  "top": -9,
-                  "left": 327,
-                  "bottom": -4,
-                  "right": 334
-                },
-                {
-                  "page": 4,
-                  "top": -4,
-                  "left": 327,
-                  "bottom": 6,
-                  "right": 334
-                },
-                {
-                  "page": 4,
-                  "top": 6,
-                  "left": 327,
-                  "bottom": 10,
-                  "right": 334
-                },
-                {
-                  "page": 4,
-                  "top": 11,
-                  "left": 327,
-                  "bottom": 12,
-                  "right": 334
-                },
-                {
-                  "page": 4,
-                  "top": 13,
-                  "left": 329,
-                  "bottom": 18,
-                  "right": 334
-                },
-                {
-                  "page": 4,
-                  "top": 19,
-                  "left": 329,
-                  "bottom": 28,
-                  "right": 334
-                },
-                {
-                  "page": 4,
-                  "top": 29,
-                  "left": 329,
-                  "bottom": 34,
-                  "right": 335
-                },
-                {
-                  "page": 4,
-                  "top": 39,
-                  "left": 327,
-                  "bottom": 44,
-                  "right": 334
-                },
-                {
-                  "page": 4,
-                  "top": 45,
-                  "left": 327,
-                  "bottom": 51,
-                  "right": 334
-                },
-                {
-                  "page": 4,
-                  "top": 52,
-                  "left": 333,
-                  "bottom": 53,
-                  "right": 334
-                },
-                {
-                  "page": 4,
-                  "top": 55,
-                  "left": 327,
-                  "bottom": 60,
-                  "right": 334
-                },
-                {
-                  "page": 4,
-                  "top": 61,
-                  "left": 327,
-                  "bottom": 67,
-                  "right": 334
-                },
-                {
-                  "page": 4,
-                  "top": 67,
-                  "left": 331,
-                  "bottom": 73,
-                  "right": 331
-                },
-                {
-                  "page": 4,
-                  "top": 73,
-                  "left": 327,
-                  "bottom": 79,
-                  "right": 334
-                },
-                {
-                  "page": 4,
-                  "top": 80,
-                  "left": 327,
-                  "bottom": 86,
-                  "right": 334
-                },
-                {
-                  "page": 4,
-                  "top": 87,
-                  "left": 333,
-                  "bottom": 88,
-                  "right": 334
-                },
-                {
-                  "page": 4,
-                  "top": 90,
-                  "left": 327,
-                  "bottom": 95,
-                  "right": 334
-                },
-                {
-                  "page": 4,
-                  "top": 96,
-                  "left": 327,
-                  "bottom": 98,
-                  "right": 335
-                },
-                {
-                  "page": 4,
-                  "top": 103,
-                  "left": 327,
-                  "bottom": 108,
-                  "right": 334
-                },
-                {
-                  "page": 4,
-                  "top": 109,
-                  "left": 327,
-                  "bottom": 115,
-                  "right": 334
-                },
-                {
-                  "page": 4,
-                  "top": 116,
-                  "left": 333,
-                  "bottom": 117,
-                  "right": 334
-                },
-                {
-                  "page": 4,
-                  "top": 119,
-                  "left": 327,
-                  "bottom": 124,
-                  "right": 334
-                },
-                {
-                  "page": 4,
-                  "top": 164,
-                  "left": 329,
-                  "bottom": 170,
-                  "right": 334
-                },
-                {
-                  "page": 4,
-                  "top": 226,
-                  "left": 339,
-                  "bottom": 228,
-                  "right": 348
-                },
-                {
-                  "page": 4,
-                  "top": 228,
-                  "left": 327,
-                  "bottom": 246,
-                  "right": 348
-                },
-                {
-                  "page": 4,
-                  "top": 246,
-                  "left": 327,
-                  "bottom": 255,
-                  "right": 346
-                },
-                {
-                  "page": 4,
-                  "top": 255,
-                  "left": 327,
-                  "bottom": 291,
-                  "right": 348
-                },
-                {
-                  "page": 4,
-                  "top": 290,
-                  "left": 327,
-                  "bottom": 302,
-                  "right": 346
-                },
-                {
-                  "page": 4,
-                  "top": 303,
-                  "left": 333,
-                  "bottom": 304,
-                  "right": 346
-                },
-                {
-                  "page": 4,
-                  "top": 305,
-                  "left": 329,
-                  "bottom": 312,
-                  "right": 348
-                },
-                {
-                  "page": 4,
-                  "top": 317,
-                  "left": 333,
-                  "bottom": 318,
-                  "right": 347
-                },
-                {
-                  "page": 4,
-                  "top": 319,
-                  "left": 327,
-                  "bottom": 327,
-                  "right": 346
-                },
-                {
-                  "page": 4,
-                  "top": 331,
-                  "left": 329,
-                  "bottom": 337,
-                  "right": 346
-                },
-                {
-                  "page": 4,
-                  "top": 342,
-                  "left": 327,
-                  "bottom": 349,
-                  "right": 346
-                },
-                {
-                  "page": 4,
-                  "top": 350,
-                  "left": 327,
-                  "bottom": 356,
-                  "right": 346
-                },
-                {
-                  "page": 4,
-                  "top": 356,
-                  "left": 327,
-                  "bottom": 362,
-                  "right": 346
-                },
-                {
-                  "page": 4,
-                  "top": 363,
-                  "left": 327,
-                  "bottom": 369,
-                  "right": 346
-                },
-                {
-                  "page": 4,
-                  "top": 371,
-                  "left": 327,
-                  "bottom": 374,
-                  "right": 346
-                },
-                {
-                  "page": 4,
-                  "top": 376,
-                  "left": 333,
-                  "bottom": 377,
-                  "right": 346
-                },
-                {
-                  "page": 4,
-                  "top": 379,
-                  "left": 329,
-                  "bottom": 384,
-                  "right": 346
-                },
-                {
-                  "page": 4,
-                  "top": 426,
-                  "left": 329,
-                  "bottom": 431,
-                  "right": 334
-                },
-                {
-                  "page": 4,
-                  "top": 431,
-                  "left": 329,
-                  "bottom": 437,
-                  "right": 334
-                },
-                {
-                  "page": 4,
-                  "top": 437,
-                  "left": 327,
-                  "bottom": 444,
-                  "right": 334
-                },
-                {
-                  "page": 4,
-                  "top": 512,
-                  "left": 327,
-                  "bottom": 517,
-                  "right": 334
-                },
-                {
-                  "page": 4,
-                  "top": 572,
-                  "left": 327,
-                  "bottom": 577,
-                  "right": 334
-                },
-                {
-                  "page": 4,
-                  "top": 579,
-                  "left": 333,
-                  "bottom": 580,
-                  "right": 334
-                },
-                {
-                  "page": 4,
-                  "top": 581,
-                  "left": 327,
-                  "bottom": 587,
-                  "right": 334
-                },
-                {
-                  "page": 4,
-                  "top": 629,
-                  "left": 327,
-                  "bottom": 635,
-                  "right": 334
-                },
-                {
-                  "page": 4,
-                  "top": 636,
-                  "left": 327,
-                  "bottom": 641,
-                  "right": 334
-                },
-                {
-                  "page": 4,
-                  "top": 685,
-                  "left": 329,
-                  "bottom": 691,
-                  "right": 334
-                },
-                {
-                  "page": 4,
-                  "top": 692,
-                  "left": 327,
-                  "bottom": 697,
-                  "right": 334
-                },
-                {
-                  "page": 4,
-                  "top": 698,
-                  "left": 327,
-                  "bottom": 704,
-                  "right": 334
-                },
-                {
-                  "page": 4,
-                  "top": 741,
-                  "left": 327,
-                  "bottom": 746,
-                  "right": 334
-                },
-                {
-                  "page": 4,
-                  "top": 797,
-                  "left": 327,
-                  "bottom": 802,
-                  "right": 334
-                },
-                {
-                  "page": 4,
-                  "top": 858,
-                  "left": 327,
-                  "bottom": 864,
-                  "right": 334
-                },
-                {
-                  "page": 4,
-                  "top": 865,
-                  "left": 327,
-                  "bottom": 870,
-                  "right": 334
+                  "top": 444,
+                  "left": 470,
+                  "bottom": 455,
+                  "right": 591
                 }
               ]
             }
@@ -3363,10 +2432,10 @@
         },
         {
           "paper_id": "Hsueh2021",
-          "text": "At least 6 Taiwan NBS IOPD patients (Patients 2, 5, 10, 11, 14, 19) are homozygous for both c.1935C>A and c.1726G>A, and multiple additional patients carry c.1935C>A as compound heterozygotes; all received ERT at mean age 11.05 days (range 6\u201323 days).",
+          "text": "At least 6 Taiwan NBS IOPD patients (Patients 2, 5, 10, 11, 14, 19) are homozygous for both c.1935C>A and c.1726G>A, and multiple additional patients carry c.1935C>A as compound heterozygotes; all received ERT at mean age 11.05 days (range 6–23 days).",
           "citations": [
             {
-              "quote": "2 | M | 38, 3.5 | 15 | 15 | 8.4 | c.1935 C\u2192A, (p.D645E), homozygous; c.1726 G\u2192A, (p.G576S), homozygous",
+              "quote": "2 | M | 38, 3.5 | 15 | 15 | 8.4 | c.1935 C→A, (p.D645E), homozygous; c.1726 G→A, (p.G576S), homozygous",
               "bboxes": [
                 {
                   "page": 3,
@@ -3399,7 +2468,7 @@
               ]
             },
             {
-              "quote": "All the patients received their first ERT within 4 h of admission at a mean age of 11.05 days (range 6\u201323 days).",
+              "quote": "All the patients received their first ERT within 4 h of admission at a mean age of 11.05 days (range 6–23 days).",
               "bboxes": [
                 {
                   "page": 4,
@@ -3450,7 +2519,7 @@
               ]
             },
             {
-              "quote": "Fifteen patients died at a median age of 24.80 months due to cardiorespiratory failure (range 3\u2013120 months). Myasthenia symptoms and severe hypertrophic cardiomyopathy were universally present (15/15 = 100%).",
+              "quote": "Fifteen patients died at a median age of 24.80 months due to cardiorespiratory failure (range 3–120 months). Myasthenia symptoms and severe hypertrophic cardiomyopathy were universally present (15/15 = 100%).",
               "bboxes": [
                 {
                   "page": 1,
@@ -3486,7 +2555,7 @@
         },
         {
           "paper_id": "Xu2019",
-          "text": "c.1935C>A is present in 5 patients across 4 unrelated families (P2 and P3 are siblings): P1 (cHet c.1082C>T), P2+P3 (cHet c.1216G>A), P5 (hom), P6 (cHet c.1822C>T); GAA activities near-absent (0.00\u20132.86 nmol/h/mg vs normal >14); phenotype spans infantile-onset (P5 age 1 month, P6 age 4 months) to juvenile-onset (P1\u2013P3, age 15\u201347 months).",
+          "text": "c.1935C>A is present in 5 patients across 4 unrelated families (P2 and P3 are siblings): P1 (cHet c.1082C>T), P2+P3 (cHet c.1216G>A), P5 (hom), P6 (cHet c.1822C>T); GAA activities near-absent (0.00–2.86 nmol/h/mg vs normal >14); phenotype spans infantile-onset (P5 age 1 month, P6 age 4 months) to juvenile-onset (P1–P3, age 15–47 months).",
           "citations": [
             {
               "quote": "Genotypec | c.1082C>T, c.1935C>A (both potentially less severe) | c.1216G>A (unknow), c.1935C>A (potentially less severe) | c.1216G>A (unknow), c.1935C>A (potentially less severe) | c.1557G>A (unknown), c.1978C>T (potentially less severe) | homozygotic mutation of c.1935C>A (potentially less severe) | c.1822C>T (very severe), c.1935C>A (potentially less severe)",
@@ -4076,7 +3145,7 @@
         },
         {
           "paper_id": "Ngiwsara2019",
-          "text": "1 Thai IOPD patient (Patient 2) carries c.1935C>A (paternal) compound het with c.1933G>C (p.Asp645His, maternal), with 0% GAA activity, onset 1\u20132 months, biventricular hypertrophy EF 30%; p.Asp645Glu shown to cause delayed intracellular transport, deficient phosphorylation and proteolytic processing.",
+          "text": "1 Thai IOPD patient (Patient 2) carries c.1935C>A (paternal) compound het with c.1933G>C (p.Asp645His, maternal), with 0% GAA activity, onset 1–2 months, biventricular hypertrophy EF 30%; p.Asp645Glu shown to cause delayed intracellular transport, deficient phosphorylation and proteolytic processing.",
           "citations": [
             {
               "quote": "2 | 0 | c.1935C>A | 14 | p.Asp645Glu | Catalytic GH31 | FA | Hermans et al. [13]",
@@ -4178,7 +3247,7 @@
         },
         {
           "paper_id": "Liu2021",
-          "text": "A 4-month-old Taiwanese female infant with IOPD carries c.1935C>A (p.Asp645Glu) in compound heterozygosity with c.424_440del17 (p.Ser142Leufs*29); GAA activity 0.04 \u00b5M/h (normal >0.80 \u00b5M/h), LVMI 105.49 g/m\u00b2, ERT initiated at 15 days of age.",
+          "text": "A 4-month-old Taiwanese female infant with IOPD carries c.1935C>A (p.Asp645Glu) in compound heterozygosity with c.424_440del17 (p.Ser142Leufs*29); GAA activity 0.04 µM/h (normal >0.80 µM/h), LVMI 105.49 g/m², ERT initiated at 15 days of age.",
           "citations": [
             {
               "quote": "GAA gene sequencing was performed, and the patient had two pathogenic heterozygous mutations, c.424_440del17 (p.Ser142Leufs*29) and c.1935C>A (p.Asp645Glu). One heterogenous pseudodeficiency mutation, p.Gly576Ser, was also noticed.",
@@ -4221,7 +3290,7 @@
               ]
             },
             {
-              "quote": "Laboratory data revealed abnormally high aspartate aminotransferase (AST), alanine aminotransferase (ALT), and creatinine kinase (CK), which were 125 U/L (normal range: <32 U/L), 48 U/L (normal range: <33 U/L), and 872 U/L (normal range: 26\u2013192 U/L), respectively. The enzyme activity test of GAA was 0.04 \u00b5M/h (normal range: >0.80 \u00b5M/h).",
+              "quote": "Laboratory data revealed abnormally high aspartate aminotransferase (AST), alanine aminotransferase (ALT), and creatinine kinase (CK), which were 125 U/L (normal range: <32 U/L), 48 U/L (normal range: <33 U/L), and 872 U/L (normal range: 26–192 U/L), respectively. The enzyme activity test of GAA was 0.04 µM/h (normal range: >0.80 µM/h).",
               "bboxes": [
                 {
                   "page": 2,
@@ -4590,619 +3659,38 @@
               "bboxes": [
                 {
                   "page": 3,
-                  "top": -192,
-                  "left": 170,
-                  "bottom": -189,
-                  "right": 177
+                  "top": 241,
+                  "left": 122,
+                  "bottom": 251,
+                  "right": 842
                 },
                 {
                   "page": 3,
-                  "top": -188,
-                  "left": 171,
-                  "bottom": -184,
-                  "right": 176
+                  "top": 255,
+                  "left": 300,
+                  "bottom": 266,
+                  "right": 819
                 },
                 {
                   "page": 3,
-                  "top": -183,
-                  "left": 171,
-                  "bottom": -179,
-                  "right": 176
+                  "top": 269,
+                  "left": 300,
+                  "bottom": 280,
+                  "right": 547
                 },
                 {
                   "page": 3,
-                  "top": -178,
-                  "left": 170,
-                  "bottom": -175,
-                  "right": 177
+                  "top": 284,
+                  "left": 300,
+                  "bottom": 294,
+                  "right": 536
                 },
                 {
                   "page": 3,
-                  "top": -158,
-                  "left": 181,
-                  "bottom": -152,
-                  "right": 186
-                },
-                {
-                  "page": 3,
-                  "top": -151,
-                  "left": 182,
-                  "bottom": -146,
-                  "right": 186
-                },
-                {
-                  "page": 3,
-                  "top": -146,
-                  "left": 181,
-                  "bottom": -139,
-                  "right": 186
-                },
-                {
-                  "page": 3,
-                  "top": -137,
-                  "left": 181,
-                  "bottom": -134,
-                  "right": 186
-                },
-                {
-                  "page": 3,
-                  "top": -132,
-                  "left": 181,
-                  "bottom": -125,
-                  "right": 186
-                },
-                {
-                  "page": 3,
-                  "top": -124,
-                  "left": 181,
-                  "bottom": -120,
-                  "right": 186
-                },
-                {
-                  "page": 3,
-                  "top": -119,
-                  "left": 181,
-                  "bottom": -114,
-                  "right": 186
-                },
-                {
-                  "page": 3,
-                  "top": -114,
-                  "left": 181,
-                  "bottom": -109,
-                  "right": 186
-                },
-                {
-                  "page": 3,
-                  "top": -108,
-                  "left": 181,
-                  "bottom": -104,
-                  "right": 186
-                },
-                {
-                  "page": 3,
-                  "top": -103,
-                  "left": 185,
-                  "bottom": -102,
-                  "right": 186
-                },
-                {
-                  "page": 3,
-                  "top": -101,
-                  "left": 182,
-                  "bottom": -97,
-                  "right": 186
-                },
-                {
-                  "page": 3,
-                  "top": -96,
-                  "left": 181,
-                  "bottom": -93,
-                  "right": 186
-                },
-                {
-                  "page": 3,
-                  "top": -93,
-                  "left": 171,
-                  "bottom": -85,
-                  "right": 186
-                },
-                {
-                  "page": 3,
-                  "top": -85,
-                  "left": 172,
-                  "bottom": -80,
-                  "right": 186
-                },
-                {
-                  "page": 3,
-                  "top": -79,
-                  "left": 171,
-                  "bottom": -73,
-                  "right": 186
-                },
-                {
-                  "page": 3,
-                  "top": -72,
-                  "left": 171,
-                  "bottom": -67,
-                  "right": 186
-                },
-                {
-                  "page": 3,
-                  "top": -66,
-                  "left": 171,
-                  "bottom": -62,
-                  "right": 186
-                },
-                {
-                  "page": 3,
-                  "top": -61,
-                  "left": 171,
-                  "bottom": -57,
-                  "right": 186
-                },
-                {
-                  "page": 3,
-                  "top": -55,
-                  "left": 171,
-                  "bottom": -52,
-                  "right": 186
-                },
-                {
-                  "page": 3,
-                  "top": -51,
-                  "left": 175,
-                  "bottom": -49,
-                  "right": 186
-                },
-                {
-                  "page": 3,
-                  "top": -49,
-                  "left": 172,
-                  "bottom": -45,
-                  "right": 186
-                },
-                {
-                  "page": 3,
-                  "top": -21,
-                  "left": 172,
-                  "bottom": -17,
-                  "right": 176
-                },
-                {
-                  "page": 3,
-                  "top": -17,
-                  "left": 172,
-                  "bottom": -11,
-                  "right": 176
-                },
-                {
-                  "page": 3,
-                  "top": -11,
-                  "left": 171,
-                  "bottom": -8,
-                  "right": 176
-                },
-                {
-                  "page": 3,
-                  "top": -8,
-                  "left": 171,
-                  "bottom": -5,
-                  "right": 176
-                },
-                {
-                  "page": 3,
-                  "top": -4,
-                  "left": 171,
-                  "bottom": -2,
-                  "right": 176
-                },
-                {
-                  "page": 3,
-                  "top": -1,
-                  "left": 172,
-                  "bottom": 4,
-                  "right": 176
-                },
-                {
-                  "page": 3,
-                  "top": 4,
-                  "left": 172,
-                  "bottom": 8,
-                  "right": 176
-                },
-                {
-                  "page": 3,
-                  "top": 8,
-                  "left": 172,
-                  "bottom": 13,
-                  "right": 176
-                },
-                {
-                  "page": 3,
-                  "top": 13,
-                  "left": 172,
-                  "bottom": 17,
-                  "right": 176
-                },
-                {
-                  "page": 3,
-                  "top": 18,
-                  "left": 174,
-                  "bottom": 21,
-                  "right": 174
-                },
-                {
-                  "page": 3,
-                  "top": 22,
-                  "left": 171,
-                  "bottom": 27,
-                  "right": 176
-                },
-                {
-                  "page": 3,
-                  "top": 30,
-                  "left": 171,
-                  "bottom": 37,
-                  "right": 176
-                },
-                {
-                  "page": 3,
-                  "top": 37,
-                  "left": 171,
-                  "bottom": 45,
-                  "right": 176
-                },
-                {
-                  "page": 3,
-                  "top": 45,
-                  "left": 171,
-                  "bottom": 52,
-                  "right": 176
-                },
-                {
-                  "page": 3,
-                  "top": 53,
-                  "left": 170,
-                  "bottom": 58,
-                  "right": 176
-                },
-                {
-                  "page": 3,
-                  "top": 58,
-                  "left": 172,
-                  "bottom": 62,
-                  "right": 176
-                },
-                {
-                  "page": 3,
-                  "top": 226,
-                  "left": 192,
-                  "bottom": 229,
-                  "right": 196
-                },
-                {
-                  "page": 3,
-                  "top": 230,
-                  "left": 192,
-                  "bottom": 234,
-                  "right": 196
-                },
-                {
-                  "page": 3,
-                  "top": 234,
-                  "left": 170,
-                  "bottom": 287,
-                  "right": 208
-                },
-                {
-                  "page": 3,
-                  "top": 286,
-                  "left": 170,
-                  "bottom": 340,
-                  "right": 206
-                },
-                {
-                  "page": 3,
-                  "top": 392,
-                  "left": 192,
-                  "bottom": 397,
-                  "right": 196
-                },
-                {
-                  "page": 3,
-                  "top": 398,
-                  "left": 192,
-                  "bottom": 403,
-                  "right": 196
-                },
-                {
-                  "page": 3,
-                  "top": 403,
-                  "left": 191,
-                  "bottom": 406,
-                  "right": 196
-                },
-                {
-                  "page": 3,
-                  "top": 406,
-                  "left": 191,
-                  "bottom": 409,
-                  "right": 196
-                },
-                {
-                  "page": 3,
-                  "top": 409,
-                  "left": 192,
-                  "bottom": 414,
-                  "right": 196
-                },
-                {
-                  "page": 3,
-                  "top": 414,
-                  "left": 192,
-                  "bottom": 418,
-                  "right": 196
-                },
-                {
-                  "page": 3,
-                  "top": 418,
-                  "left": 191,
-                  "bottom": 421,
-                  "right": 196
-                },
-                {
-                  "page": 3,
-                  "top": 421,
-                  "left": 192,
-                  "bottom": 426,
-                  "right": 198
-                },
-                {
-                  "page": 3,
-                  "top": 427,
-                  "left": 192,
-                  "bottom": 430,
-                  "right": 196
-                },
-                {
-                  "page": 3,
-                  "top": 431,
-                  "left": 192,
-                  "bottom": 435,
-                  "right": 196
-                },
-                {
-                  "page": 3,
-                  "top": 435,
-                  "left": 192,
-                  "bottom": 439,
-                  "right": 196
-                },
-                {
-                  "page": 3,
-                  "top": 442,
-                  "left": 192,
-                  "bottom": 445,
-                  "right": 196
-                },
-                {
-                  "page": 3,
-                  "top": 446,
-                  "left": 192,
-                  "bottom": 450,
-                  "right": 196
-                },
-                {
-                  "page": 3,
-                  "top": 451,
-                  "left": 190,
-                  "bottom": 453,
-                  "right": 196
-                },
-                {
-                  "page": 3,
-                  "top": 453,
-                  "left": 192,
-                  "bottom": 459,
-                  "right": 196
-                },
-                {
-                  "page": 3,
-                  "top": 459,
-                  "left": 190,
-                  "bottom": 462,
-                  "right": 196
-                },
-                {
-                  "page": 3,
-                  "top": 462,
-                  "left": 170,
-                  "bottom": 575,
-                  "right": 218
-                },
-                {
-                  "page": 3,
-                  "top": 597,
-                  "left": 172,
-                  "bottom": 600,
-                  "right": 176
-                },
-                {
-                  "page": 3,
-                  "top": 600,
-                  "left": 172,
-                  "bottom": 604,
-                  "right": 176
-                },
-                {
-                  "page": 3,
-                  "top": 605,
-                  "left": 171,
-                  "bottom": 613,
-                  "right": 178
-                },
-                {
-                  "page": 3,
-                  "top": 613,
-                  "left": 172,
-                  "bottom": 617,
-                  "right": 176
-                },
-                {
-                  "page": 3,
-                  "top": 618,
-                  "left": 172,
-                  "bottom": 623,
-                  "right": 176
-                },
-                {
-                  "page": 3,
-                  "top": 623,
-                  "left": 172,
-                  "bottom": 628,
-                  "right": 178
-                },
-                {
-                  "page": 3,
-                  "top": 628,
-                  "left": 172,
-                  "bottom": 637,
-                  "right": 176
-                },
-                {
-                  "page": 3,
-                  "top": 638,
-                  "left": 172,
-                  "bottom": 642,
-                  "right": 176
-                },
-                {
-                  "page": 3,
-                  "top": 643,
-                  "left": 171,
-                  "bottom": 645,
-                  "right": 176
-                },
-                {
-                  "page": 3,
-                  "top": 646,
-                  "left": 170,
-                  "bottom": 651,
-                  "right": 176
-                },
-                {
-                  "page": 3,
-                  "top": 651,
-                  "left": 172,
-                  "bottom": 655,
-                  "right": 176
-                },
-                {
-                  "page": 3,
-                  "top": 655,
-                  "left": 172,
-                  "bottom": 660,
-                  "right": 176
-                },
-                {
-                  "page": 3,
-                  "top": 660,
-                  "left": 171,
-                  "bottom": 667,
-                  "right": 176
-                },
-                {
-                  "page": 3,
-                  "top": 714,
-                  "left": 172,
-                  "bottom": 717,
-                  "right": 176
-                },
-                {
-                  "page": 3,
-                  "top": 718,
-                  "left": 172,
-                  "bottom": 723,
-                  "right": 176
-                },
-                {
-                  "page": 3,
-                  "top": 723,
-                  "left": 172,
-                  "bottom": 727,
-                  "right": 176
-                },
-                {
-                  "page": 3,
-                  "top": 728,
-                  "left": 171,
-                  "bottom": 730,
-                  "right": 176
-                },
-                {
-                  "page": 3,
-                  "top": 730,
-                  "left": 172,
-                  "bottom": 735,
-                  "right": 176
-                },
-                {
-                  "page": 3,
-                  "top": 736,
-                  "left": 172,
-                  "bottom": 741,
-                  "right": 176
-                },
-                {
-                  "page": 3,
-                  "top": 741,
-                  "left": 172,
-                  "bottom": 745,
-                  "right": 176
-                },
-                {
-                  "page": 3,
-                  "top": 745,
-                  "left": 171,
-                  "bottom": 748,
-                  "right": 176
-                },
-                {
-                  "page": 3,
-                  "top": 749,
-                  "left": 172,
-                  "bottom": 753,
-                  "right": 176
-                },
-                {
-                  "page": 3,
-                  "top": 753,
-                  "left": 171,
-                  "bottom": 759,
-                  "right": 176
-                },
-                {
-                  "page": 3,
-                  "top": 803,
-                  "left": 171,
-                  "bottom": 810,
-                  "right": 176
-                },
-                {
-                  "page": 3,
-                  "top": 810,
-                  "left": 171,
-                  "bottom": 816,
-                  "right": 176
-                },
-                {
-                  "page": 3,
-                  "top": 817,
-                  "left": 171,
-                  "bottom": 824,
-                  "right": 176
+                  "top": 298,
+                  "left": 300,
+                  "bottom": 308,
+                  "right": 361
                 }
               ]
             }
