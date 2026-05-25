@@ -79,68 +79,8 @@ export function parseArtifactYaml(yamlStr: string): unknown {
 }
 
 // ---------------------------------------------------------------------------
-// Line-numbered display (mirrors Claude's text editor tool)
+// Artifact-text mutation
 // ---------------------------------------------------------------------------
-
-/** Add 1-indexed line numbers to YAML for display. */
-export function addLineNumbers(yamlStr: string): string {
-  const lines = yamlStr.split("\n");
-  const width = String(lines.length).length;
-  return lines
-    .map((line, i) => `${String(i + 1).padStart(width)}\t${line}`)
-    .join("\n");
-}
-
-/**
- * Extract a line range from YAML and return with line numbers.
- * Uses 1-indexed lines; end=-1 means end of file.
- */
-export function viewRange(yamlStr: string, start: number, end: number): string {
-  const lines = yamlStr.split("\n");
-  const s = Math.max(1, start);
-  const e = end === -1 ? lines.length : Math.min(end, lines.length);
-  const width = String(e).length;
-  return lines
-    .slice(s - 1, e)
-    .map((line, i) => `${String(s + i).padStart(width)}\t${line}`)
-    .join("\n");
-}
-
-/**
- * Find lines containing a literal substring. Returns matches with one line
- * of context either side; adjacent or overlapping blocks are merged and
- * separated by "--".
- */
-export function searchArtifact(
-  yamlStr: string,
-  pattern: string,
-): { output: string; count: number } {
-  if (!pattern) return { output: "", count: 0 };
-  const lines = yamlStr.split("\n");
-  const hits: number[] = [];
-  for (let i = 0; i < lines.length; i++) {
-    if (lines[i]?.includes(pattern)) hits.push(i);
-  }
-  if (hits.length === 0) return { output: "", count: 0 };
-
-  const ranges: [number, number][] = [];
-  for (const i of hits) {
-    const start = Math.max(0, i - 1);
-    const end = Math.min(lines.length - 1, i + 1);
-    const last = ranges[ranges.length - 1];
-    if (last && start <= last[1] + 1) last[1] = Math.max(last[1], end);
-    else ranges.push([start, end]);
-  }
-
-  const width = String(lines.length).length;
-  const blocks = ranges.map(([s, e]) =>
-    lines
-      .slice(s, e + 1)
-      .map((line, i) => `${String(s + 1 + i).padStart(width)}\t${line}`)
-      .join("\n"),
-  );
-  return { output: blocks.join("\n--\n"), count: hits.length };
-}
 
 /**
  * Insert text after a specific line number (1-indexed).

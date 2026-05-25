@@ -20,8 +20,8 @@ import type { Storage } from "../src/storage/interface.js";
 
 const stubProvider: LlmProvider = {
   name: "test",
-  // queryPapers / loadFullPaper are the only paths that touch model. Tests
-  // here don't exercise them, so an unwired model is fine.
+  // askPaperAgent is the only tool that touches the model; tests here don't
+  // exercise it, so an unwired model is fine.
   model: undefined as unknown as LanguageModel,
   providerOptions: {},
 };
@@ -84,6 +84,7 @@ function makeSession(overrides: Partial<SessionContext> = {}): SessionContext {
     category: "cat-A",
     aggregateCategories: ["cat-A"],
     bboxCache: new Map(),
+    paperMarkdownCache: new Map(),
     ...overrides,
   };
 }
@@ -104,6 +105,29 @@ function buildArtifact(overrides: Partial<Artifact> = {}): Artifact {
     ...overrides,
   };
 }
+
+// ---------------------------------------------------------------------------
+// Tool surface
+// ---------------------------------------------------------------------------
+
+describe("buildTools surface", () => {
+  test("exposes exactly the expected tool set", () => {
+    const tools = makeTools(makeSession());
+    expect(Object.keys(tools).sort()).toEqual(
+      [
+        "askPaperAgent",
+        "insert",
+        "loadPaperExtracts",
+        "search",
+        "searchPaper",
+        "str_replace",
+        "view",
+        "viewPaper",
+        "write",
+      ].sort(),
+    );
+  });
+});
 
 // ---------------------------------------------------------------------------
 // str_replace — match counting
@@ -528,7 +552,7 @@ describe("renderTriageStateBlock", () => {
     expect(block).toMatch(/No triage in progress/);
   });
 
-  test("reviewer comments render under their claim", () => {
+  test("curator comments render under their claim", () => {
     const artifact = buildArtifact({
       papers: [{ paper_id: "Smith2024", rank_rationale: "top" }],
       claims: [
@@ -561,11 +585,11 @@ describe("renderTriageStateBlock", () => {
         },
       ],
     });
-    expect(block).toMatch(/reviewer note: duplicate of Smith2024/);
+    expect(block).toMatch(/curator note: duplicate of Smith2024/);
     // Empty comment body must not produce a note line for claim B.
     const noteLines = block
       .split("\n")
-      .filter((l) => l.includes("reviewer note:"));
+      .filter((l) => l.includes("curator note:"));
     expect(noteLines).toHaveLength(1);
   });
 

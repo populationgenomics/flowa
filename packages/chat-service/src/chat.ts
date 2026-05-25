@@ -21,7 +21,11 @@ import {
   recordCachedInputTokens,
   type ToolMetricsContext,
 } from "./telemetry.js";
-import { type SessionContext, CITATION_INSTRUCTIONS } from "./session.js";
+import {
+  type SessionContext,
+  CITATION_INSTRUCTIONS,
+  getPaperMarkdown,
+} from "./session.js";
 import {
   loadExtraction,
   loadMarkdown,
@@ -39,12 +43,15 @@ import type { Storage } from "./storage/interface.js";
 import {
   parseArtifactYaml,
   reattachBboxes,
-  addLineNumbers,
-  viewRange,
   insertAtLine,
-  searchArtifact,
   artifactToYaml,
 } from "./yaml.js";
+import {
+  addLineNumbers,
+  viewLineRange,
+  viewLineRangeCapped,
+  searchLines,
+} from "./text.js";
 
 const tracer = trace.getTracer("chat-service");
 
@@ -94,7 +101,7 @@ export const TriageStateSchema = z.object({
     .default([]),
   papers_done: z.array(z.string()).default([]),
   /**
-   * Per-claim comments. Reviewers often explain why they rejected a claim
+   * Per-claim comments. Curators often explain why they rejected a claim
    * or what caveat applies to an accepted one; those notes are
    * rewrite-relevant.
    */
@@ -121,7 +128,7 @@ export function renderTriageStateBlock(
   state: TriageState | null | undefined,
 ): string {
   if (!state) {
-    return "No triage in progress; edit freely based on the reviewer's chat.";
+    return "No triage in progress; edit freely based on the curator's chat.";
   }
 
   const accKey = (p: string, i: number) => `${p}#${i}`;
@@ -174,7 +181,7 @@ export function renderTriageStateBlock(
     if (comment) {
       const normalised = comment.trim().replace(/\r\n/g, "\n");
       for (const line of normalised.split("\n")) {
-        rows.push(`      ↳ reviewer note: ${line}`);
+        rows.push(`      ↳ curator note: ${line}`);
       }
     }
   }
@@ -189,7 +196,7 @@ export function renderTriageStateBlock(
     .join("\n");
 
   return [
-    "Papers with triage marked done (reviewer has reviewed to their satisfaction for these):",
+    "Papers with triage marked done (curator has reviewed to their satisfaction for these):",
     doneBlock,
     "",
     "Claim triage (order matches claims[] order in the current artifact):",
@@ -421,39 +428,83 @@ export function buildTools(ctx: ChatBuildContext) {
       ),
     },
 
-    loadFullPaper: {
+    searchPaper: {
       description:
-        "Load the full Markdown text of a paper into conversation context. Use when the reviewer wants to discuss specific passages.",
+        "Find lines in a paper's text containing a literal substring. Returns matches with line numbers and ±1 line of context, merged on overlap. Use this to locate the passages relevant to the curator's question before deciding what to read in detail.",
       inputSchema: z.object({
         paperId: z.string().describe("Paper ID (e.g. 'Miyata2018')"),
+        pattern: z
+          .string()
+          .describe("Literal substring to find (case-sensitive, no regex)."),
       }),
       execute: withToolMetrics(
         metricsContext,
-        "loadFullPaper",
-        async ({ paperId }: { paperId: string }) => {
-          console.log(`[tool] loadFullPaper: ${paperId}`);
-          const doi = resolveDoi(session, paperId);
-          if (!doi) return { error: `Unknown paper ID: ${paperId}` };
-          const text = await loadMarkdown(storage, doi);
-          if (!text) return { error: `Full text not available for ${paperId}` };
+        "searchPaper",
+        async ({ paperId, pattern }: { paperId: string; pattern: string }) => {
           console.log(
-            `[tool] loadFullPaper: ${paperId} → ${text.length} chars`,
+            `[tool] searchPaper: ${paperId} — ${JSON.stringify(pattern)}`,
           );
-          return text;
+          const text = await getPaperMarkdown(storage, session, paperId);
+          if (text === null)
+            return {
+              error: `Unknown paper ID or full text not available: ${paperId}`,
+            };
+          const { output, count } = searchLines(text, pattern);
+          if (count === 0)
+            return `No matches for ${JSON.stringify(pattern)} in ${paperId}.`;
+          return `${count} match${count === 1 ? "" : "es"} in ${paperId}:\n${output}`;
         },
       ),
     },
 
-    queryPapers: {
+    viewPaper: {
       description:
-        "Run a subagent that reads the full text of the specified papers and answers a question about them. The paper texts are not added to this conversation's context, keeping it lean. Prefer this over loadFullPaper unless the reviewer needs the text to remain available for follow-up discussion.",
+        "View a paper's text with line numbers. Returns up to ~25K tokens per call (~100K characters); larger ranges are truncated with a notice. Use view_range to read a specific section. For most curator questions, call searchPaper first to locate the relevant passages.",
       inputSchema: z.object({
-        question: z.string().describe("The specific question to answer"),
-        paperIds: z.array(z.string()).describe("Paper IDs to query"),
+        paperId: z.string().describe("Paper ID (e.g. 'Miyata2018')"),
+        view_range: z
+          .tuple([z.number(), z.number()])
+          .optional()
+          .describe(
+            "Optional [start, end] line range (1-indexed). Use -1 for end to mean end of file. Omit to view from the beginning up to the size cap.",
+          ),
       }),
       execute: withToolMetrics(
         metricsContext,
-        "queryPapers",
+        "viewPaper",
+        async ({
+          paperId,
+          view_range,
+        }: {
+          paperId: string;
+          view_range?: [number, number];
+        }) => {
+          console.log(
+            `[tool] viewPaper: ${paperId}${view_range ? ` range=[${view_range[0]},${view_range[1]}]` : ""}`,
+          );
+          const text = await getPaperMarkdown(storage, session, paperId);
+          if (text === null)
+            return {
+              error: `Unknown paper ID or full text not available: ${paperId}`,
+            };
+          const [start, end] = view_range ?? [1, -1];
+          return viewLineRangeCapped(text, start, end);
+        },
+      ),
+    },
+
+    askPaperAgent: {
+      description:
+        "Spawn a subagent that reads the full text of the specified papers and answers a question about them. The paper texts are not added to this conversation's context, keeping it lean. Most curator questions are handled better with searchPaper + viewPaper, which leave the source visible here — reach for askPaperAgent when a single question genuinely needs synthesis across a paper's full text.",
+      inputSchema: z.object({
+        question: z.string().describe("The specific question to answer"),
+        paperIds: z
+          .array(z.string())
+          .describe("Paper IDs to read in the subagent"),
+      }),
+      execute: withToolMetrics(
+        metricsContext,
+        "askPaperAgent",
         async ({
           question,
           paperIds: ids,
@@ -461,7 +512,9 @@ export function buildTools(ctx: ChatBuildContext) {
           question: string;
           paperIds: string[];
         }) => {
-          console.log(`[tool] queryPapers: ${ids.join(", ")} — "${question}"`);
+          console.log(
+            `[tool] askPaperAgent: ${ids.join(", ")} — "${question}"`,
+          );
           const { dois, invalid } = resolveDois(session, ids);
           if (invalid.length)
             return { error: `Unknown paper IDs: ${invalid.join(", ")}` };
@@ -484,7 +537,7 @@ export function buildTools(ctx: ChatBuildContext) {
               isEnabled: true,
               recordInputs: false,
               recordOutputs: false,
-              functionId: "query-papers",
+              functionId: "ask-paper-agent",
             },
             prompt: `${available.join("\n\n---\n\n")}\n\n${CITATION_INSTRUCTIONS}\n\nQuestion: ${question}`,
           });
@@ -530,7 +583,7 @@ export function buildTools(ctx: ChatBuildContext) {
             return { error: "Artifact not initialized" };
           }
           if (view_range) {
-            return viewRange(
+            return viewLineRange(
               session.artifactYaml,
               view_range[0],
               view_range[1],
@@ -556,10 +609,7 @@ export function buildTools(ctx: ChatBuildContext) {
           if (!session.artifactYaml) {
             return { error: "Artifact not initialized" };
           }
-          const { output, count } = searchArtifact(
-            session.artifactYaml,
-            pattern,
-          );
+          const { output, count } = searchLines(session.artifactYaml, pattern);
           if (count === 0) return `No matches for ${JSON.stringify(pattern)}.`;
           return `${count} match${count === 1 ? "" : "es"}:\n${output}`;
         },
@@ -712,7 +762,7 @@ export async function handleChat(
   // Triage state is prepended as a synthesised user message at the head of
   // this turn's messages array rather than being spliced into the system
   // prompt. That keeps session.systemPrompt byte-stable across turns so
-  // prompt caching can reuse it as a cached prefix even when reviewer
+  // prompt caching can reuse it as a cached prefix even when curator
   // triage decisions change. (If we baked triage into the system prompt,
   // any decision flip between turns would invalidate the entire cached
   // prefix — the largest part of every request.)
@@ -724,7 +774,7 @@ export async function handleChat(
     parts: [
       {
         type: "text",
-        text: `Reviewer triage state for this turn:\n\n${triageBlock}`,
+        text: `Curator triage state for this turn:\n\n${triageBlock}`,
       },
     ],
   };

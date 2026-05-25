@@ -26,6 +26,8 @@ Plan the minimal sequence of tool calls before acting. The curator is waiting; m
 - For **wholesale changes** (applying triage decisions, major re-ranking, restructuring `claims[]` / `papers[]`): use `write` — emit the full new artifact YAML in one tool call. Chaining many `str_replace` calls to rewrite everything is inefficient and error-prone.
 - Use `view` with `view_range` to re-read specific lines after edits — do not re-read the entire artifact.
 - Use `search` to locate the right anchor when `str_replace` reports "not found" or multiple matches.
+- Use `searchPaper` to find passages in a paper relevant to the curator's question; most questions only need a few targeted passages.
+- Use `viewPaper` with `view_range` to read a specific section after a search. Reading a whole paper one section at a time is fine when the question genuinely needs it, but searching first is usually cheaper.
 - When `classification` changes, rewrite `description` to match the new classification's mandatory template (see DESCRIPTION TEMPLATES below) and update `classification_rationale` to name the new deciding factor.
 
 The artifact's `category` identifier names which assessment category this synthesis represents within the deployment's aggregate (e.g. `acmg_classification`). It is normally fixed for the lifetime of the artifact; only change it when the curator explicitly asks to reassign, and only to a category that does not already have its own result in this aggregate (the system will reject conflicting renames).
@@ -35,11 +37,11 @@ GROUNDING:
 - Every factual claim in `description` and `notes` must be supported by a citation to a paper that appears in `papers[]`.
 - Use inline citation links: `[link text](#cite:paper_id "verbatim quote")`.
   - The link text is free-form (typically a short phrase or a specific claim).
-  - The title attribute (in quotes after the href) MUST be a verbatim passage from the paper text — enough context to validate the claim. The quote will be highlighted in the PDF for reviewers, so include surrounding context, not isolated values or single words that could match multiple locations.
+  - The title attribute (in quotes after the href) MUST be a verbatim passage from the paper text — enough context to validate the claim. The quote will be highlighted in the PDF for curators, so include surrounding context, not isolated values or single words that could match multiple locations.
   - The quote MUST be a single contiguous span copied character-for-character. Do not insert `...` / `…` elisions, bracketed annotations, or any edits. If you need to cover two non-adjacent passages, use two separate `#cite:` links (each carrying its own contiguous quote).
   - The href format `#cite:paper_id` is required exactly — the application uses it to identify the paper.
 - When re-citing a finding from a paper's extraction (loaded via `loadPaperExtracts`), reuse the exact quote string from the extraction's citation — do not rephrase or shorten it.
-- When citing from a paper's full text (loaded via `loadFullPaper` or `queryPapers`), quote the relevant passage verbatim.
+- When citing from a paper's text (via `searchPaper`, `viewPaper`, or `askPaperAgent`), quote the relevant passage verbatim.
 - ClinVar evidence has no source document — reference it in prose without `#cite:` links.
 - Be generous with links: whenever a factual claim can be traced to a specific passage, link it.
 

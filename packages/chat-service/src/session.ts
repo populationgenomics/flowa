@@ -7,18 +7,15 @@ import { signSessionToken, type SessionClaims } from "./auth/jwt.js";
 import {
   loadQueryResult,
   loadAggregate,
+  loadMarkdown,
   loadPaperMetadata,
   listEditDrafts,
 } from "./storage-keys.js";
 import { schemaForPrompt, type Artifact } from "./artifact.js";
 import { loadEditPromptTemplate } from "./prompts.js";
 import type { Storage } from "./storage/interface.js";
-import {
-  type BboxCache,
-  buildBboxCache,
-  artifactToYaml,
-  addLineNumbers,
-} from "./yaml.js";
+import { type BboxCache, buildBboxCache, artifactToYaml } from "./yaml.js";
+import { addLineNumbers } from "./text.js";
 
 export interface SessionContext {
   id: string;
@@ -40,6 +37,8 @@ export interface SessionContext {
   aggregateCategories: string[];
   /** Cached bboxes from the initial artifact, keyed by (paperId, quote). */
   bboxCache: BboxCache;
+  /** Paper ID → full markdown text, lazy-populated by paper tools. */
+  paperMarkdownCache: Map<string, string>;
 }
 
 export interface SessionConfig {
@@ -86,6 +85,29 @@ export function clearSessionCache(): void {
     clearInterval(sweeper);
     sweeper = null;
   }
+}
+
+/**
+ * Resolve a paper ID to its full markdown text, memoised on the session.
+ * Returns null for unknown paper IDs and for papers whose markdown is not
+ * available in storage. Misses do not insert into the cache.
+ */
+export async function getPaperMarkdown(
+  storage: Storage,
+  session: SessionContext,
+  paperId: string,
+): Promise<string | null> {
+  const cached = session.paperMarkdownCache.get(paperId);
+  if (cached !== undefined) return cached;
+
+  const doi = session.paperIds[paperId];
+  if (!doi) return null;
+
+  const text = await loadMarkdown(storage, doi);
+  if (text === null) return null;
+
+  session.paperMarkdownCache.set(paperId, text);
+  return text;
 }
 
 /**
@@ -154,6 +176,7 @@ export async function rebuildSession(
     category,
     aggregateCategories: extractAggregateCategories(aggregate),
     bboxCache,
+    paperMarkdownCache: new Map(),
   };
   sessions.set(session.id, session);
   return session;
@@ -250,6 +273,7 @@ export async function createEditSession(
     category: input.category,
     aggregateCategories,
     bboxCache,
+    paperMarkdownCache: new Map(),
   };
   sessions.set(sessionId, session);
 
@@ -299,9 +323,9 @@ export const CITATION_INSTRUCTIONS = `## Citations
 When referencing a finding from a paper, use inline Markdown citation links with a verbatim quote: \`[link text](#cite:paperId "verbatim quote")\`.
 
 - The **link text** is free-form — use a descriptive phrase or specific claim, whatever reads naturally.
-- The **title attribute** (in quotes after the href) must be a verbatim passage from the paper text — enough context to validate the claim (typically a sentence or key clause). The quote will be highlighted in the PDF for reviewers, so avoid quoting isolated values or single words that could match multiple locations — include surrounding context.
+- The **title attribute** (in quotes after the href) must be a verbatim passage from the paper text — enough context to validate the claim (typically a sentence or key clause). The quote will be highlighted in the PDF for curators, so avoid quoting isolated values or single words that could match multiple locations — include surrounding context.
 - When re-citing a finding from a paper's extraction results (loaded via loadPaperExtracts), reuse the exact quote string from the extraction's citation — do not rephrase or shorten it.
-- When citing from a paper's full text (loaded via loadFullPaper or queryPapers), quote the relevant passage verbatim.
+- When citing from a paper's text, quote the relevant passage verbatim.
 - The href format \`#cite:paperId\` is required exactly — the application uses it to identify the paper.
 - Be generous with links: whenever a factual claim can be traced to a specific passage, link it.`;
 
