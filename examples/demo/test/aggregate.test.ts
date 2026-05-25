@@ -40,7 +40,7 @@ function writeDraft(
 }
 
 const SAMPLE_AGGREGATE = {
-  schema_version: 1,
+  schema_version: 2,
   paper_id_mapping: {
     Smith2024: { doi: "10.1234/smith.2024", pmid: 11111 },
     Jones2023: { doi: "10.1234/jones.2023" },

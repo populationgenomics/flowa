@@ -121,7 +121,7 @@ describe("GET /api/papers", () => {
     writeFileSync(
       join(dataRoot, "assessments", variant, "aggregation.json"),
       JSON.stringify({
-        schema_version: 1,
+        schema_version: 2,
         results: [{ category: "acmg_classification" }],
       }),
     );

@@ -49,7 +49,7 @@ function writeAggregate(variantId: string, categories: string[]): void {
   writeFileSync(
     join(dir, "aggregation.json"),
     JSON.stringify({
-      schema_version: 1,
+      schema_version: 2,
       results: categories.map((c) => ({ category: c })),
     }),
   );
