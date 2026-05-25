@@ -651,7 +651,6 @@ export function EvidenceViewerShell({
   // ── Document title ────────────────────────────────────────────────
   const titleParts: string[] = ["Evidence Viewer"];
   if (categoryName) titleParts.push(categoryName);
-  if (artifact?.code) titleParts.push(artifact.code);
   const title = titleParts.join(" — ");
   useEffect(() => {
     if (typeof document !== "undefined") document.title = title;
@@ -811,7 +810,7 @@ export function EvidenceViewerShell({
                   )}
 
                 <SynthesisPanel
-                  description={artifact.descriptionShort}
+                  description={artifact.description}
                   notes={artifact.notes}
                   paperIdMapping={paperIdMapping}
                   onCitationClick={handleCitationClickInternal}

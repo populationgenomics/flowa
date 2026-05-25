@@ -50,9 +50,8 @@ const MAPPING: PaperIdMapping = {
 };
 
 const ARTIFACT: CategorySuggestion = {
-  code: "Pathogenic",
-  codeRationale: "Strong functional + clinical evidence.",
-  descriptionShort: "Description.",
+  category: "acmg_classification",
+  description: "Description.",
   notes: "Notes.",
   papers: [
     { paperId: "Smith2024", rankRationale: "Functional." },

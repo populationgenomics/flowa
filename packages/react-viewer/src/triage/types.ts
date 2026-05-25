@@ -33,14 +33,16 @@ export interface RankedPaper {
 }
 
 /**
- * Result for a single classification category — the parsed view of one
- * `aggregation.json` entry under `results[]`. The shell renders this for the
- * currently selected version.
+ * Result for a single assessment category — the parsed view of one
+ * `aggregation.json` entry under `results[]`. Mirrors the field shape
+ * `@flowajs/chat-service` exposes via `artifactFields`. Deployments may
+ * extend this shape with their own fields and pass the wider type to
+ * the shell — TypeScript's structural compatibility accepts the
+ * superset since the shell only reads the core fields.
  */
 export interface CategorySuggestion {
-  code: string;
-  codeRationale: string;
-  descriptionShort: string;
+  category: string;
+  description: string;
   notes: string;
   papers: RankedPaper[];
   claims: Claim[];
