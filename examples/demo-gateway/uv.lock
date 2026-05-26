@@ -3,14 +3,14 @@ revision = 3
 requires-python = "==3.13.*"
 
 [options]
-exclude-newer = "2026-05-19T00:00:39.870651Z"
+exclude-newer = "0001-01-01T00:00:00Z" # This has no effect and is included for backwards compatibility when using relative exclude-newer values.
 exclude-newer-span = "P7D"
 
 [options.exclude-newer-package]
-pydantic-ai-slim = { timestamp = "2026-05-26T00:00:39.87066Z", span = "PT0S" }
-anchorite = { timestamp = "2026-05-26T00:00:39.870656Z", span = "PT0S" }
-seq-smith = { timestamp = "2026-05-26T00:00:39.87066Z", span = "PT0S" }
-pydantic-graph = { timestamp = "2026-05-26T00:00:39.870661Z", span = "PT0S" }
+pydantic-ai-slim = { timestamp = "0001-01-01T00:00:00Z", span = "PT0S" }
+anchorite = { timestamp = "0001-01-01T00:00:00Z", span = "PT0S" }
+seq-smith = { timestamp = "0001-01-01T00:00:00Z", span = "PT0S" }
+pydantic-graph = { timestamp = "0001-01-01T00:00:00Z", span = "PT0S" }
 
 [[package]]
 name = "aiohappyeyeballs"
@@ -415,7 +415,7 @@ wheels = [
 
 [[package]]
 name = "flowapy"
-version = "0.1.2"
+version = "0.1.3"
 source = { editable = "../../" }
 dependencies = [
     { name = "anchorite" },
