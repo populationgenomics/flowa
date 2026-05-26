@@ -1,6 +1,6 @@
 [project]
 name = "flowapy"
-version = "0.1.1"
+version = "0.1.2"
 description = "Variant literature assessment pipeline with AI extraction"
 readme = "README.md"
 requires-python = "==3.13.*"
@@ -112,3 +112,21 @@ build-backend = "hatchling.build"
 # package from `[project].name` by default, so we have to tell it explicitly.
 [tool.hatch.build.targets.wheel]
 packages = ["src/flowa"]
+
+# Ship the generic prompt set inside the wheel so `pip install flowapy` is
+# self-contained. The on-disk source lives at `prompts/generic/` (so the
+# pnpm workspace package `@flowajs/prompts` can also expose its TypeScript
+# schemas); force-include mirrors the .py/.txt files into the wheel at
+# `flowa/prompts/generic/`, where flowa.prompts._prompts_dir picks them up
+# as a sibling of the loader module.
+[tool.hatch.build.targets.wheel.force-include]
+"prompts/generic" = "flowa/prompts/generic"
+
+# `uv build` builds the sdist first, then builds the wheel _from_ the sdist —
+# so the wheel's force-include rule above needs `prompts/generic/` to be in
+# the sdist at its natural path. Hatch's default sdist VCS scan inexplicably
+# drops the `prompts/` tree, so make the inclusion explicit here. Identity
+# remap (prompts/generic → prompts/generic) preserves the natural layout in
+# the sdist; the wheel target then remaps to flowa/prompts/generic/.
+[tool.hatch.build.targets.sdist.force-include]
+"prompts/generic" = "prompts/generic"

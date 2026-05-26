@@ -1,15 +1,16 @@
 """Prompt set loading utilities.
 
 Flowa supports configurable prompt sets for different integrations (e.g., the
-in-tree `generic` set, or a private deployment-specific overlay).
-Prompt sets are directories under `prompts/` containing prompt templates and Pydantic schema modules.
+in-tree ``generic`` set, or a private deployment-specific overlay).
+Prompt sets are directories containing prompt templates and Pydantic schema modules.
 
-Configuration:
-    FLOWA_PROMPT_SET: Name of the prompt set directory to use (default: 'generic')
-    FLOWA_PROMPT_DIR: Path to the directory holding prompt-set subdirectories.
-        Defaults to `./prompts` (cwd-relative) — fine for `flowa <command>`
-        invoked from the repo root, but external consumers running flowa
-        from a different cwd should set this explicitly.
+Resolution order for a given prompt set:
+
+1. External overlay: ``FLOWA_PROMPT_DIR/<set>`` (FLOWA_PROMPT_DIR defaults to
+   ``./prompts``, cwd-relative). Use this for deployment-specific sets.
+2. Bundled fallback: prompt sets shipped inside the flowa wheel as a sibling
+   of this module. Today only ``generic`` ships bundled, so ``pip install
+   flowapy`` is self-contained for the in-tree pipeline.
 
 Each prompt set must contain:
     - extraction_prompt.txt
@@ -49,17 +50,39 @@ _jinja_env = jinja2.Environment(
     keep_trailing_newline=True,
 )
 
+# Root for bundled prompt sets — populated by the wheel's hatch force-include
+# rule (see pyproject.toml [tool.hatch.build.targets.wheel.force-include]).
+# Exposed so tests can monkeypatch it to a fixture location, since the source
+# tree only carries `prompts/generic/` at the repo root, not as a sibling of
+# this module.
+_BUNDLED_ROOT = Path(__file__).parent
+
 
 def _prompts_dir(prompt_set: str) -> Path:
-    """Resolve and validate the prompt-set directory."""
+    """Resolve a prompt-set directory.
+
+    Checks the external overlay first (``FLOWA_PROMPT_DIR/<set>``, defaulting
+    to ``./prompts/<set>``), then falls back to a set bundled inside the flowa
+    package. Deployment-specific sets (e.g. private curated overlays) come via
+    the external overlay; today only ``generic`` ships bundled.
+    """
     prompts_root = Path(os.environ.get('FLOWA_PROMPT_DIR', 'prompts'))
-    prompts_dir = prompts_root / prompt_set
+    external = prompts_root / prompt_set
+    if external.exists():
+        return external
 
-    if not prompts_dir.exists():
-        available = [p.name for p in prompts_root.iterdir() if p.is_dir()] if prompts_root.exists() else []
-        raise ValueError(f"Prompt set '{prompt_set}' not found at {prompts_dir}. Available: {available}")
+    bundled = _BUNDLED_ROOT / prompt_set
+    if bundled.is_dir():
+        return bundled
 
-    return prompts_dir
+    external_available = [p.name for p in prompts_root.iterdir() if p.is_dir()] if prompts_root.exists() else []
+    bundled_available = [p.name for p in _BUNDLED_ROOT.iterdir() if p.is_dir() and p.name != '__pycache__']
+    raise ValueError(
+        f"Prompt set '{prompt_set}' not found. "
+        f'External overlay searched at {external} (set FLOWA_PROMPT_DIR to override); '
+        f'bundled fallback searched at {bundled}. '
+        f'External available: {external_available}; bundled available: {bundled_available}.'
+    )
 
 
 def load_text_prompt(step: str, prompt_set: str = 'generic') -> str:

@@ -3,14 +3,14 @@ revision = 3
 requires-python = "==3.13.*"
 
 [options]
-exclude-newer = "2026-05-18T23:20:31.016774Z"
+exclude-newer = "2026-05-18T23:52:59.955354Z"
 exclude-newer-span = "P7D"
 
 [options.exclude-newer-package]
-pydantic-ai-slim = { timestamp = "2026-05-25T23:20:31.016783Z", span = "PT0S" }
-anchorite = { timestamp = "2026-05-25T23:20:31.016778Z", span = "PT0S" }
-seq-smith = { timestamp = "2026-05-25T23:20:31.016783Z", span = "PT0S" }
-pydantic-graph = { timestamp = "2026-05-25T23:20:31.016783Z", span = "PT0S" }
+pydantic-ai-slim = { timestamp = "2026-05-25T23:52:59.955363Z", span = "PT0S" }
+anchorite = { timestamp = "2026-05-25T23:52:59.955358Z", span = "PT0S" }
+seq-smith = { timestamp = "2026-05-25T23:52:59.955363Z", span = "PT0S" }
+pydantic-graph = { timestamp = "2026-05-25T23:52:59.955363Z", span = "PT0S" }
 
 [[package]]
 name = "aiobotocore"
@@ -415,7 +415,7 @@ wheels = [
 
 [[package]]
 name = "flowapy"
-version = "0.1.1"
+version = "0.1.2"
 source = { editable = "." }
 dependencies = [
     { name = "anchorite" },
