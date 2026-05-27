@@ -1,6 +1,6 @@
 {
   "name": "@flowajs/chat-service",
-  "version": "0.0.3",
+  "version": "0.0.4",
   "description": "Stateless service that orchestrates LLM conversations over flowa artifacts.",
   "license": "MIT",
   "type": "module",
@@ -71,7 +71,7 @@
     "zod": "4.4.3"
   },
   "peerDependencies": {
-    "@ai-sdk/amazon-bedrock": "^4.0.0",
+    "@ai-sdk/amazon-bedrock": "^4.0.101",
     "@ai-sdk/anthropic": "^3.0.0",
     "@ai-sdk/google": "^3.0.0",
     "@ai-sdk/google-vertex": "^4.0.0",
