@@ -17,9 +17,11 @@ from pydantic_ai import Agent
 from pydantic_ai.messages import BinaryContent
 
 from flowa.models import create_model, get_model_settings
+from flowa.pdf_index_cache import build as build_pdf_index_payload
+from flowa.pdf_index_cache import serialize as serialize_pdf_index_payload
 from flowa.prompts import load_text_prompt
 from flowa.settings import ModelConfig, Settings
-from flowa.storage import exists, paper_url, read_bytes, write_bytes, write_text
+from flowa.storage import exists, paper_url, read_bytes, read_text, write_bytes, write_text
 
 log = logging.getLogger(__name__)
 
@@ -120,14 +122,22 @@ async def transcribe(
 
 
 async def convert_paper_async(base: str, doi: str, model: ModelConfig, prompt_set: str = 'generic') -> None:
-    """Convert a single paper's PDF to Markdown.
+    """Convert a single paper's PDF to Markdown and persist its `PdfIndex`.
 
-    Reads PDF from papers/{encoded_doi}/source.pdf in object storage.
-    Stores result to papers/{encoded_doi}/markdown.md.
+    Reads PDF from papers/{encoded_doi}/source.pdf and writes
+    papers/{encoded_doi}/markdown.md plus papers/{encoded_doi}/pdf_index.pkl.zst
+    (consumed by the gateway's resolve endpoint).
+
+    Either artifact can be missing independently — if a previous run failed
+    or pre-dates the pdf_index step, the next call fills in only what's
+    missing without re-transcribing or re-building work that's already done.
     """
     md_url = paper_url(base, doi, 'markdown.md')
+    index_url = paper_url(base, doi, 'pdf_index.pkl.zst')
+    md_needed = not exists(md_url)
+    index_needed = not exists(index_url)
 
-    if exists(md_url):
+    if not md_needed and not index_needed:
         log.info('Already converted: %s', md_url)
         return
 
@@ -138,21 +148,36 @@ async def convert_paper_async(base: str, doi: str, model: ModelConfig, prompt_se
         log.info('Skipping DOI %s: PDF not available', doi)
         return
 
-    log.info(
-        'Converting DOI %s (%d bytes, model: %s, chunk: %d pages)', doi, len(pdf_bytes), model.name, PAGES_PER_CHUNK
-    )
+    markdown: str | None = None
+    if md_needed:
+        log.info(
+            'Converting DOI %s (%d bytes, model: %s, chunk: %d pages)', doi, len(pdf_bytes), model.name, PAGES_PER_CHUNK
+        )
+        prompt = load_text_prompt('transcription', prompt_set)
+        t0 = time.monotonic()
+        result = await transcribe(pdf_bytes, model=model, prompt=prompt, page_count=PAGES_PER_CHUNK)
+        elapsed = time.monotonic() - t0
 
-    prompt = load_text_prompt('transcription', prompt_set)
-    t0 = time.monotonic()
-    result = await transcribe(pdf_bytes, model=model, prompt=prompt, page_count=PAGES_PER_CHUNK)
-    elapsed = time.monotonic() - t0
+        markdown = result.markdown
+        write_text(md_url, markdown)
+        write_bytes(paper_url(base, doi, 'convert_raw.json'), json.dumps(result.all_messages).encode())
+        log.info('Converted DOI %s: %d chars in %.1fs', doi, len(markdown), elapsed)
 
-    write_text(md_url, result.markdown)
-
-    raw_url = paper_url(base, doi, 'convert_raw.json')
-    write_bytes(raw_url, json.dumps(result.all_messages).encode())
-
-    log.info('Converted DOI %s: %d chars in %.1fs', doi, len(result.markdown), elapsed)
+    if index_needed:
+        # PdfIndex construction is CPU-bound (~8s on the deployed gateway
+        # hardware) and dominates per-call latency at `/api/v1/resolve` if
+        # rebuilt on every call. Pay the cost here once per paper and ship
+        # the result; see `flowa.pdf_index_cache` for the storage format.
+        # `asyncio.to_thread` keeps the rest of the convert pipeline (other
+        # papers being transcribed concurrently) unblocked.
+        if markdown is None:  # index missing but markdown already on disk
+            markdown = read_text(md_url)
+        t0 = time.monotonic()
+        blob = await asyncio.to_thread(
+            lambda: serialize_pdf_index_payload(build_pdf_index_payload(pdf_bytes, markdown))
+        )
+        write_bytes(index_url, blob)
+        log.info('Wrote pdf_index for DOI %s: %.1f MB in %.1fs', doi, len(blob) / 1e6, time.monotonic() - t0)
 
 
 def convert_paper(

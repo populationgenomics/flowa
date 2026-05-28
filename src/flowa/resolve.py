@@ -1,12 +1,11 @@
 """Citation-bbox resolver: align verbatim quotes to PDF page+bbox locations.
 
-Two entry points:
-
-- `resolve_citation_in_pdf(pdf_bytes, quotes)` — pure, no I/O. For callers that
-  already hold PDF bytes (e.g. `flowa.aggregate`'s post-LLM step).
-- `resolve_citations(citations, pdf_loader)` — fetches each DOI's source PDF via
-  the supplied loader and resolves all quotes. Used by demo-gateway and the
-  `flowa resolve` CLI.
+The resolver doesn't construct `PdfIndex` objects itself. Construction
+dominates per-call latency (~8s on the deployed gateway hardware against
+~300ms for the actual alignment), so every paper carries a pre-built
+`pdf_index.pkl.zst` next to its `source.pdf` — written by `flowa.convert`
+when the paper is first transcribed, and persisted in storage thereafter.
+Callers supply an `index_provider` that loads the pickle for a given DOI.
 
 Wire-format types (`CitationQuery`, `HighlightBbox`, `ResolvedCitations`,
 `ResolveRequest`) are the canonical Pydantic shapes shared with HTTP consumers.
@@ -19,10 +18,11 @@ import time
 from collections.abc import Callable
 
 import typer
-from anchorite import PdfIndex  # type: ignore[import-untyped]
+from anchorite import PdfIndex
 from pydantic import BaseModel, Field
 
-from flowa.storage import paper_url, read_bytes, read_text
+from flowa.pdf_index_cache import deserialize as deserialize_pdf_index_payload
+from flowa.storage import exists, paper_url, read_bytes
 
 log = logging.getLogger(__name__)
 
@@ -52,9 +52,9 @@ class ResolvedCitations(BaseModel):
 
     `resolved[doi][quote]` is the list of bboxes for `quote` in that DOI's source
     PDF. An empty list means the quote was searched but could not be aligned with
-    sufficient confidence. DOIs whose source.pdf or markdown.md could not be
-    loaded are absent from `resolved` and surface in `errors` instead — consumers
-    can distinguish "asset unavailable" from "quote not found in PDF".
+    sufficient confidence. DOIs whose `PdfIndex` could not be loaded are absent
+    from `resolved` and surface in `errors` — consumers can distinguish "index
+    unavailable" from "quote not found".
     """
 
     resolved: dict[str, dict[str, list[HighlightBbox]]] = Field(default_factory=dict)
@@ -69,35 +69,18 @@ class ResolveRequest(BaseModel):
 
 # --- Resolver ---------------------------------------------------------------
 
-PdfLoader = Callable[[str], bytes | None]
-MarkdownLoader = Callable[[str], str | None]
+IndexProvider = Callable[[str], PdfIndex | None]
 
 
-def resolve_citation_in_pdf(
-    pdf_bytes: bytes,
-    quotes: list[str],
-    markdown: str,
-) -> dict[str, list[HighlightBbox]]:
-    """Build a PdfIndex over the PDF bytes and align each quote.
+def resolve_quotes_in_index(pdf_index: PdfIndex, quotes: list[str]) -> dict[str, list[HighlightBbox]]:
+    """Align each quote against an already-constructed `PdfIndex`.
 
-    `markdown` is required — anchorite uses it to denoise the cached PDF char
-    string (drop running heads / page numbers / footnote markers the LLM didn't
-    transcribe), which materially improves quote alignment.
-
-    Returns one entry per input quote (empty list when no alignment scored above
-    anchorite's threshold). Consumers of `resolve_citations` distinguish "no
-    match" (empty list here) from "asset unavailable" (DOI absent from the
-    surrounding result entirely).
+    Pure — no I/O. Returns one entry per input quote (empty list when no
+    alignment scored above anchorite's threshold).
     """
     if not quotes:
         return {}
-    # TODO: pass `markdown=markdown` once anchorite's markdown-aware denoise is
-    # fixed (https://github.com/populationgenomics/anchorite/issues/19) — its
-    # monotonic chained-alignment drops entire pages when markdown reorders
-    # content relative to PDF page order, leaving the resolver unable to match
-    # quotes from those pages.
-    doc = PdfIndex(pdf_bytes, markdown=None)
-    raw = doc.resolve(quotes)
+    raw = pdf_index.resolve(quotes)
     return {
         quote: [
             # anchorite returns 0-indexed pages; flowa's downstream wire format
@@ -112,36 +95,26 @@ def resolve_citation_in_pdf(
 
 def resolve_citations(
     citations: list[CitationQuery],
-    pdf_loader: PdfLoader,
-    markdown_loader: MarkdownLoader,
+    index_provider: IndexProvider,
 ) -> ResolvedCitations:
     """Resolve quote-to-bbox mappings for a batch of (DOI, quotes) inputs.
 
-    `pdf_loader(doi)` returns source PDF bytes; `markdown_loader(doi)` returns
-    the LLM-generated Markdown transcription. Either returning `None` is surfaced
-    as a per-DOI error in `result.errors`. Other exceptions propagate.
-
-    The pipeline produces source.pdf and markdown.md together, so finding one
-    without the other indicates a storage-invariant violation. The handler logs
-    a warning and continues with the next DOI.
+    `index_provider(doi)` returns a `PdfIndex` for the DOI, or `None` if the
+    artifact is unavailable. `None` is surfaced as a per-DOI error in
+    `result.errors`. Other exceptions propagate.
     """
     resolved: dict[str, dict[str, list[HighlightBbox]]] = {}
     errors: dict[str, str] = {}
     total_start = time.monotonic()
 
     for citation in citations:
-        pdf_bytes = pdf_loader(citation.doi)
-        if pdf_bytes is None:
-            log.warning('PDF not available for %s', citation.doi)
-            errors[citation.doi] = 'source.pdf not found'
-            continue
-        markdown = markdown_loader(citation.doi)
-        if markdown is None:
-            log.warning('Markdown not available for %s (source.pdf present)', citation.doi)
-            errors[citation.doi] = 'markdown.md not found'
+        pdf_index = index_provider(citation.doi)
+        if pdf_index is None:
+            log.warning('PdfIndex not available for %s', citation.doi)
+            errors[citation.doi] = 'pdf_index not available'
             continue
         t0 = time.monotonic()
-        bboxes_by_quote = resolve_citation_in_pdf(pdf_bytes, citation.quotes, markdown)
+        bboxes_by_quote = resolve_quotes_in_index(pdf_index, citation.quotes)
         elapsed = time.monotonic() - t0
         resolved_count = sum(1 for q in citation.quotes if bboxes_by_quote.get(q))
         log.info(
@@ -167,6 +140,24 @@ def resolve_citations(
     return ResolvedCitations(resolved=resolved, errors=errors)
 
 
+def load_pdf_index_from_storage(base: str, doi: str) -> PdfIndex | None:
+    """Read and deserialise `papers/{doi}/pdf_index.pkl.zst` from a flowa storage base.
+
+    Returns `None` when the artifact is missing. Storage exceptions and
+    pickle/header errors propagate — the caller decides whether stale or
+    corrupt artifacts are recoverable.
+
+    Used by every in-process caller (aggregate post-LLM, CLI). Out-of-process
+    consumers (`flowa-gateway`) implement their own loader against whichever
+    storage client they already hold.
+    """
+    index_url = paper_url(base, doi, 'pdf_index.pkl.zst')
+    if not exists(index_url):
+        return None
+    blob = read_bytes(index_url)
+    return deserialize_pdf_index_payload(blob).pdf_index
+
+
 # --- CLI --------------------------------------------------------------------
 
 
@@ -176,7 +167,7 @@ def resolve(
         '--base',
         help=(
             'Storage base URL (e.g. s3://bucket, gs://bucket, ./local-dir). '
-            'PDFs are fetched from {base}/papers/{encoded_doi}/source.pdf via fsspec.'
+            'Indices are read from {base}/papers/{encoded_doi}/pdf_index.pkl.zst.'
         ),
     ),
 ) -> None:
@@ -184,22 +175,16 @@ def resolve(
 
     Reads `{ "citations": [ { "doi": "...", "quotes": ["..."] } ] }` from stdin.
     Writes `{ "resolved": {...}, "errors": {...} }` to stdout.
+
+    DOIs whose `pdf_index.pkl.zst` is missing from storage surface in
+    `errors` rather than rebuilding the index from source.pdf on the fly —
+    run `flowa convert` (or backfill) to produce the artifact.
     """
     payload = json.load(sys.stdin)
     citations = [CitationQuery.model_validate(c) for c in payload['citations']]
-
-    def pdf_loader(doi: str) -> bytes | None:
-        try:
-            return read_bytes(paper_url(base, doi, 'source.pdf'))
-        except FileNotFoundError:
-            return None
-
-    def md_loader(doi: str) -> str | None:
-        try:
-            return read_text(paper_url(base, doi, 'markdown.md'))
-        except FileNotFoundError:
-            return None
-
-    result = resolve_citations(citations, pdf_loader=pdf_loader, markdown_loader=md_loader)
+    result = resolve_citations(
+        citations,
+        index_provider=lambda doi: load_pdf_index_from_storage(base, doi),
+    )
     json.dump(result.model_dump(), sys.stdout)
     sys.stdout.write('\n')

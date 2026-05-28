@@ -166,10 +166,10 @@ VARIANT=NM_001035_3-c_14174A_G
 rm -f assessments/$VARIANT/aggregation.json \
       assessments/$VARIANT/aggregation_raw.json
 rm -rf assessments/$VARIANT/extractions/ assessments/$VARIANT/runs/
-# Re-runs flowa.convert (which uses anchorite for PDF chunking).
-# Drop this line to reuse the cached markdown and only redo extract +
-# aggregate.
-rm -f papers/*/markdown.md papers/*/convert_raw.json
+# Re-runs flowa.convert (which uses anchorite for PDF chunking and
+# builds pdf_index.pkl.zst). Drop this line to reuse the cached markdown
+# + index and only redo extract + aggregate.
+rm -f papers/*/markdown.md papers/*/convert_raw.json papers/*/pdf_index.pkl.zst
 ```
 
 Then drive the pipeline. The demo's `scripts/start.ts` translates the
@@ -208,11 +208,13 @@ and not needed by anything downstream.
 For papers whose source license blocks redistribution (CC-BY-NC-ND,
 paywalled; see `fixtures/LICENSES.md` for the rule), do **not** delete
 the whole `papers/{encodedDoi}/` directory — only delete `source.pdf`,
-`markdown.md`, and `convert_raw.json`. Keep `metadata.json` (the
-bibliographic fields are factual data, not copyrightable) but replace
-its `abstract` field with a sentinel string, so the omission reads as
-deliberate (not a missing-data bug) when the literature view renders
-the row:
+`markdown.md`, `convert_raw.json`, and `pdf_index.pkl.zst`. The
+`pdf_index.pkl.zst` embeds the PDF's extracted text (anchorite's char
+index), so it carries the same copyright as `source.pdf` and must not
+ship in the open-source repo. Keep `metadata.json` (the bibliographic
+fields are factual data, not copyrightable) but replace its `abstract`
+field with a sentinel string, so the omission reads as deliberate (not
+a missing-data bug) when the literature view renders the row:
 
 ```bash
 python3 -c "

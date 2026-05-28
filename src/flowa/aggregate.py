@@ -15,7 +15,7 @@ from pydantic_ai import Agent, ModelRetry, NativeOutput, RunContext
 from flowa.clinvar import format_clinvar_for_prompt, query_clinvar
 from flowa.models import create_model, get_model_settings
 from flowa.prompts import load_prompt_and_schema
-from flowa.resolve import CitationQuery, resolve_citations
+from flowa.resolve import CitationQuery, load_pdf_index_from_storage, resolve_citations
 from flowa.schema import AGGREGATION_SCHEMA_VERSION, with_schema_version
 from flowa.settings import ModelConfig, Settings
 from flowa.storage import (
@@ -23,9 +23,7 @@ from flowa.storage import (
     encode_doi,
     exists,
     paper_url,
-    read_bytes,
     read_json,
-    read_text,
     write_bytes,
     write_json,
 )
@@ -158,16 +156,14 @@ def create_aggregate_agent(
 def resolve_aggregate_citations(
     aggregate_dict: dict[str, Any],
     paper_id_to_doi: dict[str, str],
-    pdf_bytes_cache: dict[str, bytes],
-    markdown_cache: dict[str, str],
+    base: str,
     metadata_cache: dict[str, dict[str, Any]],
 ) -> None:
     """Post-process aggregate output: resolve quotes to bboxes on claim citations.
 
-    Delegates the actual alignment to `flowa.resolve.resolve_citations` with
-    cache-backed loaders, then attaches the resulting bboxes onto each claim's
-    citations in place. Claims are grouped by paper_id so every (paper_id,
-    quote) pair resolves to exactly one paper.
+    Loads each paper's pre-built `pdf_index.pkl.zst` via the same path the
+    gateway uses; the convert step that ran earlier in this pipeline wrote
+    the artifact, so it's guaranteed to be present.
     """
     # Collect all (doi, quote) pairs, grouped by DOI.
     doi_quotes: dict[str, list[str]] = {}
@@ -180,8 +176,7 @@ def resolve_aggregate_citations(
     citations_input = [CitationQuery(doi=doi, quotes=quotes) for doi, quotes in doi_quotes.items()]
     result = resolve_citations(
         citations_input,
-        pdf_loader=pdf_bytes_cache.get,
-        markdown_loader=markdown_cache.get,
+        index_provider=lambda doi: load_pdf_index_from_storage(base, doi),
     )
 
     # Attach resolved bboxes onto each claim's citations.
@@ -229,14 +224,11 @@ async def aggregate_evidence_async(
     clinvar_data = query_clinvar(hgvs_c_full, ncbi_api_key)
     clinvar_text = format_clinvar_for_prompt(clinvar_data)
 
-    # Load extractions and metadata for each paper. PDF bytes and Markdown are
-    # cached for post-LLM citation resolution: PdfIndex takes both (markdown
-    # denoises the indexed PDF chars). Both files are produced together by the
-    # pipeline; a missing markdown.md at this point is a storage corruption and
-    # surfaces as FileNotFoundError below.
+    # Load extractions and metadata for each paper. PDF bytes and markdown
+    # are NOT loaded here — the post-LLM citation resolver loads the paper's
+    # pre-built `pdf_index.pkl.zst` directly from storage, so this step only
+    # needs the LLM inputs.
     evidence_extractions: list[dict[str, Any]] = []
-    pdf_bytes_cache: dict[str, bytes] = {}
-    markdown_cache: dict[str, str] = {}
     metadata_cache: dict[str, dict[str, Any]] = {}
 
     for doi in dois:
@@ -252,8 +244,6 @@ async def aggregate_evidence_async(
             log.info('Skipping %s: variant not discussed', doi)
             continue
 
-        pdf_bytes_cache[doi] = read_bytes(paper_url(base, doi, 'source.pdf'))
-        markdown_cache[doi] = read_text(paper_url(base, doi, 'markdown.md'))
         metadata = read_json(paper_url(base, doi, 'metadata.json'))
         metadata_cache[doi] = metadata
 
@@ -332,7 +322,7 @@ async def aggregate_evidence_async(
     # Post-LLM: resolve quotes to bboxes, replace paper_id with DOI
     aggregate_dict = output.model_dump()
     with logfire.span('flowa.resolve_citations', paper_count=len(paper_id_to_doi)):
-        resolve_aggregate_citations(aggregate_dict, paper_id_to_doi, pdf_bytes_cache, markdown_cache, metadata_cache)
+        resolve_aggregate_citations(aggregate_dict, paper_id_to_doi, base, metadata_cache)
 
     # Store structured aggregation result
     write_json(aggregation_url, with_schema_version(aggregate_dict, AGGREGATION_SCHEMA_VERSION))
