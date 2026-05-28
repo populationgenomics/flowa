@@ -96,13 +96,22 @@ function buildVersionLabel(v: VersionEntry): string {
   return base;
 }
 
+/** Key for the pending-resolution set. Newline can't appear in a DOI. */
+function resolutionKey(doi: string, quote: string): string {
+  return `${doi}\n${quote}`;
+}
+
 function citationToHighlight(
   citation: FlatCitation,
   resolvedBboxes: Record<string, Record<string, HighlightBbox[]>>,
+  pendingResolutions: Set<string>,
 ): PdfHighlight {
   const resolved = resolvedBboxes[citation.doi]?.[citation.quote];
   const bboxes = resolved ?? citation.bboxes ?? [];
-  return { bboxes, label: citation.quote };
+  const pending =
+    bboxes.length === 0 &&
+    pendingResolutions.has(resolutionKey(citation.doi, citation.quote));
+  return { bboxes, label: citation.quote, pending };
 }
 
 const REWRITE_DEFAULT_PROMPT =
@@ -247,6 +256,12 @@ export function EvidenceViewerShell({
   const [resolvedBboxes, setResolvedBboxes] = useState<
     Record<string, Record<string, HighlightBbox[]>>
   >({});
+  // Quotes whose resolution round-trip is in flight, keyed `${doi}\n${quote}`.
+  // Lets the PDF panel show "locating…" instead of "could not locate" while
+  // we wait for the resolver.
+  const [pendingResolutions, setPendingResolutions] = useState<Set<string>>(
+    () => new Set(),
+  );
   const resolvedForVersion = useRef(-1);
   useEffect(() => {
     if (!artifact || selectedVersion === resolvedForVersion.current) return;
@@ -264,6 +279,10 @@ export function EvidenceViewerShell({
       doi,
       quotes: [...quotes],
     }));
+    const pendingKeys = citationsToResolve.flatMap(({ doi, quotes }) =>
+      quotes.map((q) => resolutionKey(doi, q)),
+    );
+    setPendingResolutions((prev) => new Set([...prev, ...pendingKeys]));
     void (async () => {
       try {
         const result = await resolveCitations(citationsToResolve);
@@ -276,6 +295,12 @@ export function EvidenceViewerShell({
         });
       } catch (err) {
         console.error("[viewer] citation resolution failed", err);
+      } finally {
+        setPendingResolutions((prev) => {
+          const next = new Set(prev);
+          for (const k of pendingKeys) next.delete(k);
+          return next;
+        });
       }
     })();
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -300,7 +325,12 @@ export function EvidenceViewerShell({
         resolvedBboxes[chatOverrideCitation.doi]?.[
           chatOverrideCitation.quote
         ] ?? [];
-      return [{ bboxes, label: chatOverrideCitation.quote }];
+      const pending =
+        bboxes.length === 0 &&
+        pendingResolutions.has(
+          resolutionKey(chatOverrideCitation.doi, chatOverrideCitation.quote),
+        );
+      return [{ bboxes, label: chatOverrideCitation.quote, pending }];
     }
     if (!focusedClaim) return [];
     const active =
@@ -318,6 +348,7 @@ export function EvidenceViewerShell({
           claimText: focusedClaim.text,
         },
         resolvedBboxes,
+        pendingResolutions,
       ),
     ];
   }, [
@@ -328,6 +359,7 @@ export function EvidenceViewerShell({
     focusedClaimIndex,
     quoteIndex,
     resolvedBboxes,
+    pendingResolutions,
   ]);
 
   // ── Triage actions ────────────────────────────────────────────────

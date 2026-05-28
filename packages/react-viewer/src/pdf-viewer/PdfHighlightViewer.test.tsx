@@ -46,7 +46,7 @@ describe("PdfHighlightViewer", () => {
     expect(container.querySelector(".relative")).not.toBeNull();
   });
 
-  it("surfaces an alert when a highlight has no bboxes but a label", () => {
+  it("surfaces a not-found alert when a highlight has no bboxes but a label", () => {
     const highlights: PdfHighlight[] = [
       { bboxes: [], label: "the quote that could not be located" },
     ];
@@ -60,8 +60,28 @@ describe("PdfHighlightViewer", () => {
         />,
       ),
     );
+    expect(screen.getByText(/Could not locate quote/)).toBeDefined();
     expect(
       screen.getByText(/the quote that could not be located/),
     ).toBeDefined();
+  });
+
+  it("shows a locating state for a pending highlight, not the not-found warning", () => {
+    const highlights: PdfHighlight[] = [
+      { bboxes: [], label: "a quote still being resolved", pending: true },
+    ];
+    render(
+      wrap(
+        <PdfHighlightViewer
+          pdfUrl="/some.pdf"
+          highlights={highlights}
+          workerSrc="/pdfjs/pdf.worker.min.mjs"
+          cMapUrl="/pdfjs/cmaps/"
+        />,
+      ),
+    );
+    expect(screen.getByText(/Locating quote/)).toBeDefined();
+    expect(screen.getByText(/a quote still being resolved/)).toBeDefined();
+    expect(screen.queryByText(/Could not locate quote/)).toBeNull();
   });
 });

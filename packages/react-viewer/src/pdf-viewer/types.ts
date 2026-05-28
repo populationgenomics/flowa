@@ -13,4 +13,11 @@ export interface PdfHighlight {
   bboxes: HighlightBbox[];
   /** Optional label shown when the quote could not be located in the PDF. */
   label?: string;
+  /**
+   * True while this quote's bboxes are still being resolved (the async
+   * citation-resolution round-trip is in flight). With empty `bboxes`, a
+   * `pending` highlight renders as "locating…" rather than "could not
+   * locate" — distinguishing in-flight latency from a genuine miss.
+   */
+  pending?: boolean;
 }

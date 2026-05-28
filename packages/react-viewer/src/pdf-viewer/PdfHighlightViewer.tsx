@@ -166,13 +166,23 @@ export const PdfHighlightViewer = ({
     [onZoomChange],
   );
 
-  // Detect highlights that couldn't be resolved (requested but no bboxes)
-  const unresolvedQuotes = useMemo(() => {
-    if (!highlights) return [];
-    return highlights
-      .filter((h) => h.bboxes.length === 0 && h.label)
-      .map((h) => h.label!);
-  }, [highlights]);
+  // Highlights with no bboxes split two ways: still resolving (pending) vs
+  // searched-and-not-found. The viewer surfaces them differently so an
+  // in-flight resolve doesn't read as a failure.
+  const pendingQuotes = useMemo(
+    () =>
+      (highlights ?? [])
+        .filter((h) => h.bboxes.length === 0 && h.pending && h.label)
+        .map((h) => h.label!),
+    [highlights],
+  );
+  const unresolvedQuotes = useMemo(
+    () =>
+      (highlights ?? [])
+        .filter((h) => h.bboxes.length === 0 && !h.pending && h.label)
+        .map((h) => h.label!),
+    [highlights],
+  );
 
   // Group highlights by page number (1-indexed, matching PDF conventions)
   const highlightsByPage = useMemo(() => {
@@ -399,6 +409,20 @@ export const PdfHighlightViewer = ({
             <IconZoomIn size={16} />
           </ActionIcon>
         </div>
+      )}
+
+      {/* In-flight: quote bboxes are still being resolved */}
+      {pendingQuotes.length > 0 && (
+        <Alert
+          icon={<Loader size={16} />}
+          color="blue"
+          variant="light"
+          className="rounded-none"
+        >
+          {pendingQuotes.map((quote, i) => (
+            <div key={i}>Locating quote in PDF: &ldquo;{quote}&rdquo;</div>
+          ))}
+        </Alert>
       )}
 
       {/* Warning for quotes that couldn't be located in the PDF */}
