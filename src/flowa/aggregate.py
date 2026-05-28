@@ -5,6 +5,7 @@ import json
 import logging
 import re
 import time
+from collections.abc import AsyncIterable
 from typing import Any
 
 import logfire
@@ -13,6 +14,7 @@ from pydantic import BaseModel
 from pydantic_ai import Agent, ModelRetry, NativeOutput, RunContext
 
 from flowa.clinvar import format_clinvar_for_prompt, query_clinvar
+from flowa.content_validation import validate_aggregate_category
 from flowa.models import create_model, get_model_settings
 from flowa.prompts import load_prompt_and_schema
 from flowa.resolve import CitationQuery, load_pdf_index_from_storage, resolve_citations
@@ -102,12 +104,34 @@ _aggregate_retry_counter = logfire.metric_counter(
 )
 
 
+async def _drain_events(ctx: RunContext[None], stream: AsyncIterable[Any]) -> None:
+    """No-op sink so `agent.run(..., event_stream_handler=...)` streams the model
+    request — keeping the connection alive through long extended-thinking while
+    the graph still owns the loop, so an output-validator `ModelRetry` actually
+    retries. (`agent.run_stream` streams to the caller and can't retry a
+    validated output — it raises `UnexpectedModelBehavior` instead.)
+    """
+    async for _ in stream:
+        pass
+
+
 def create_aggregate_agent(
     model: ModelConfig,
     paper_id_to_doi: dict[str, str],
     output_type: type[BaseModel],
+    extraction_quotes_by_paper: dict[str, set[str]],
 ) -> Agent[None, BaseModel]:
-    """Create a Pydantic AI agent with paper_id validation."""
+    """Create a Pydantic AI agent that validates artifact content at genesis.
+
+    The output validator enforces the same rules chat-service applies on every
+    edit — paper-id membership, claim grouping/order, and citation fidelity
+    (`content_validation.validate_aggregate_category`) — plus the genesis-only
+    rule that each claim quote comes from the paper's extraction input. A
+    violation raises ModelRetry; callers must drive this agent with `run`
+    (+ `_drain_events`), not `run_stream`, for that retry to fire.
+    """
+    valid_paper_ids = set(paper_id_to_doi)
+
     agent: Agent[None, BaseModel] = Agent(
         create_model(model),
         output_type=NativeOutput(output_type),
@@ -116,37 +140,16 @@ def create_aggregate_agent(
     )
 
     @agent.output_validator
-    def validate_shape(ctx: RunContext[None], result: BaseModel) -> BaseModel:
-        """Shape-only validation: paper_id membership + group integrity.
-
-        Semantic cross-field checks (citation fidelity, grouping order) live in
-        chat-service — every artifact mutation flows through it, so the rules
-        stay authored in one place.
-        """
-        errors: list[str] = []
-
+    def validate_content(ctx: RunContext[None], result: BaseModel) -> BaseModel:
+        messages: list[str] = []
         for cat_result in result.results:  # type: ignore[attr-defined]
-            code = getattr(cat_result, 'code', '<unknown>')
-            paper_ids_in_papers = [p.paper_id for p in cat_result.papers]
-            paper_ids_set = set(paper_ids_in_papers)
+            code = getattr(cat_result, 'code', None) or getattr(cat_result, 'category', '<unknown>')
+            for rule, message in validate_aggregate_category(cat_result, valid_paper_ids, extraction_quotes_by_paper):
+                _aggregate_retry_counter.add(1, {'rule': rule})
+                messages.append(f'code={code}: {message}')
 
-            if len(paper_ids_in_papers) != len(paper_ids_set):
-                duplicates = [pid for pid in paper_ids_set if paper_ids_in_papers.count(pid) > 1]
-                errors.append(f'code={code}: papers[] has duplicate paper_ids: {sorted(duplicates)}')
-                _aggregate_retry_counter.add(1, {'rule': 'paper_id_duplicate'})
-
-            for paper in cat_result.papers:
-                if paper.paper_id not in paper_id_to_doi:
-                    errors.append(f'code={code}: papers[] has unknown paper_id={paper.paper_id}')
-                    _aggregate_retry_counter.add(1, {'rule': 'paper_id_unknown'})
-
-            for claim in cat_result.claims:
-                if claim.paper_id not in paper_ids_set:
-                    errors.append(f'code={code}: claim cites paper_id={claim.paper_id} not present in papers[]')
-                    _aggregate_retry_counter.add(1, {'rule': 'claim_paper_missing'})
-
-        if errors:
-            raise ModelRetry('Invalid aggregate output: ' + '; '.join(errors))
+        if messages:
+            raise ModelRetry('Invalid aggregate output: ' + '; '.join(messages))
 
         return result
 
@@ -280,6 +283,15 @@ async def aggregate_evidence_async(
             entry['paper_id'] = doi_to_paper_id[entry.pop('doi')]
         evidence_extractions.sort(key=lambda x: x['date'], reverse=True)
 
+    # Genesis citation-fidelity gate input: the quotes the extraction surfaced
+    # per paper. The aggregate stage never loads the paper Markdown, so this is
+    # what create_aggregate_agent checks each claim quote against.
+    extraction_quotes_by_paper: dict[str, set[str]] = {}
+    for entry in evidence_extractions:
+        bucket = extraction_quotes_by_paper.setdefault(entry['paper_id'], set())
+        for claim in entry['claims']:
+            bucket.update(citation['quote'] for citation in claim['citations'])
+
     log.info(
         'Aggregating evidence from %d papers + ClinVar (model: %s)',
         len(evidence_extractions),
@@ -308,15 +320,17 @@ async def aggregate_evidence_async(
             print(f'  {pid} -> {doi}')
         return
 
-    agent = create_aggregate_agent(model, paper_id_to_doi, output_type)
+    agent = create_aggregate_agent(model, paper_id_to_doi, output_type, extraction_quotes_by_paper)
 
     log.info('Calling LLM for aggregate assessment')
     t0 = time.monotonic()
-    # Stream so bytes flow during extended thinking; otherwise the connection
-    # goes silent for many minutes and trips our Bedrock read_timeout.
-    async with agent.run_stream(prompt) as stream_result:
-        output = await stream_result.get_output()
-        raw_messages_json = stream_result.all_messages_json()
+    # run() (not run_stream) so the graph owns the loop and the output-validator
+    # ModelRetry actually retries; the event-stream handler keeps the model
+    # request streaming so long extended-thinking doesn't go silent and trip a
+    # provider read-timeout. See _drain_events.
+    result = await agent.run(prompt, event_stream_handler=_drain_events)
+    output = result.output
+    raw_messages_json = result.all_messages_json()
     elapsed = time.monotonic() - t0
 
     # Post-LLM: resolve quotes to bboxes, replace paper_id with DOI
