@@ -2,7 +2,7 @@ import { useCallback, useEffect, useRef, type KeyboardEvent } from "react";
 import { Alert, Button, Loader, Text, Textarea } from "@mantine/core";
 import { IconAlertCircle, IconSend, IconX } from "@tabler/icons-react";
 import type { UIMessage } from "ai";
-import { LlmContent } from "../llm-content/LlmContent";
+import { MessageParts } from "./MessageParts";
 import type { PaperIdMapping } from "../citations/types";
 
 export interface TriageStatePayload {
@@ -136,42 +136,10 @@ export function ChatDrawer({
                       message.role === "user" ? "bg-blue-50" : "bg-gray-50"
                     }`}
                   >
-                    {message.parts.map((part, i) => {
-                      if (part.type === "text") {
-                        return (
-                          <div key={i} className="flowa-llm-content">
-                            <LlmContent
-                              markdown={part.text}
-                              paperIdMapping={paperIdMapping}
-                            />
-                          </div>
-                        );
-                      }
-                      if (part.type === "reasoning") {
-                        return (
-                          <div
-                            key={i}
-                            className="my-1 text-xs italic text-gray-400"
-                          >
-                            Thinking…
-                          </div>
-                        );
-                      }
-                      if (
-                        part.type === "dynamic-tool" ||
-                        part.type.startsWith("tool-")
-                      ) {
-                        return (
-                          <div
-                            key={i}
-                            className="my-1 text-xs italic text-gray-500"
-                          >
-                            Working…
-                          </div>
-                        );
-                      }
-                      return null;
-                    })}
+                    <MessageParts
+                      message={message}
+                      paperIdMapping={paperIdMapping}
+                    />
                   </div>
                 </div>
               ))
