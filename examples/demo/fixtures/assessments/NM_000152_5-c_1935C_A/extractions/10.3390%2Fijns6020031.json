@@ -2,7 +2,7 @@
   "variant_discussed": true,
   "claims": [
     {
-      "text": "c.1935C>A (p.D645E) was detected in all cases of IOPD (5 cases) identified in the Taiwan NBS program covering 191,786 newborns screened by MS/MS.",
+      "text": "c.1935C>A (p.D645E) was detected in all cases of IOPD in the Taiwan NBS program of 191,786 newborns (5 IOPD cases confirmed by GAA gene analysis).",
       "citations": [
         {
           "quote": "GAA gene analysis demonstrated that c.1935C>A (p.D645E) was detected in all cases of IOPD, c.[752C>T; 761C>T] (p.[S251L; S254L]) was detected in 8 cases of LOPD, and the c.1726G>A (p.G576S) pseudodeficiency variant was detected in 2 cases of IOPD and 5 cases of LOPD."
@@ -10,7 +10,7 @@
       ]
     },
     {
-      "text": "c.1935C>A is listed as one of the frequently detected pathogenic variants in the Taiwan NBS program covering 473,738 newborns (Chiang et al. 2012), which identified 9 IOPD and 19 LOPD patients.",
+      "text": "c.1935C>A is listed as one of the frequently detected pathogenic variants in the Taiwan NBS program of 473,738 newborns (9 IOPD, 19 LOPD identified).",
       "citations": [
         {
           "quote": "Taiwan (473,738) | 2210 (0.47) | 9 (1/52,638) | 19 (1/24,934) | fluorometric assay | c.1935C>A, c.2238G>C | Chiang et al. (2012) [36]"
@@ -18,7 +18,7 @@
       ]
     },
     {
-      "text": "c.1935C>A is listed as one of the frequently detected pathogenic variants in the Taiwan NBS program covering 191,786 newborns (Liao et al. 2014), which identified 5 IOPD and 11 LOPD patients.",
+      "text": "c.1935C>A is listed as one of the frequently detected pathogenic variants in the Taiwan NBS program of 191,786 newborns (5 IOPD, 11 LOPD identified).",
       "citations": [
         {
           "quote": "Taiwan (191,786) | 874 (0.46) | 5 (1/38,357) | 11 (1/17,435) | MS/MS | c.1935C>A, c.[752C>T; 761C>T] | Liao et al. (2014) [37]"

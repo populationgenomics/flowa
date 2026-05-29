@@ -2,7 +2,7 @@
   "variant_discussed": true,
   "claims": [
     {
-      "text": "Patient 1 (female) carries c.1935C>A (p.D645E) as a heterozygous maternally-inherited pathogenic variant in compound heterozygosity with c.1669A>T (p.I557F) inherited from the father; the variant is classified as pathogenic.",
+      "text": "The variant c.1935C>A (p.D645E) is listed in Table 3 for Patient 1 (heterozygous, maternal origin, classified as pathogenic) in compound heterozygosity with c.1669A>T (p.I557F, paternal, pathogenic) in exon 12.",
       "citations": [
         {
           "quote": "1 | exon12 | c.1669A > T | p.I557F | het | paternal | pathogenic |\n| | exon14 | c.1935C > A | p.D645E | het | maternal | pathogenic |"
@@ -10,7 +10,7 @@
       ]
     },
     {
-      "text": "Patient 8 (male) carries c.1935C>A (p.D645E) as a homozygous variant inherited from both parents; the variant is classified as pathogenic.",
+      "text": "Patient 8 carries c.1935C>A (p.D645E) in homozygous form (parental origin), classified as pathogenic.",
       "citations": [
         {
           "quote": "8 | exon14 | c.1935C > A | p.D645E | hom | parental | pathogenic |"
@@ -18,31 +18,7 @@
       ]
     },
     {
-      "text": "Patient 1 (female, BSA 0.35 m\u00b2) had MLVWT 22 mm, LVPW 15 mm, LVOT gradient 1 mmHg, LVEF 54%, E/e\u2032 ratio 15.8, and GLS 9%, consistent with hypertrophic cardiomyopathy.",
-      "citations": [
-        {
-          "quote": "1 | F | 0.35 | 22 | 15 | 1 | 0 | 54 | 15.8 | 9 |"
-        }
-      ]
-    },
-    {
-      "text": "Patient 8 (male, BSA 0.31 m\u00b2) had MLVWT 13 mm, LVPW 7 mm, LVOT gradient 3 mmHg, LVEF 48%, E/e\u2032 ratio 26.7, and GLS 7.6%, consistent with hypertrophic cardiomyopathy.",
-      "citations": [
-        {
-          "quote": "8 | M | 0.31 | 13 | 7 | 3 | 0 | 48 | 26.7 | 7.6 |"
-        }
-      ]
-    },
-    {
-      "text": "The paper identifies two patients (one compound heterozygous, one homozygous) carrying c.1935C>A (p.D645E), classified as pathogenic in the context of infantile-onset Pompe disease in a Chinese cohort of 15 patients who all died at a median age of 24.80 months due to cardiorespiratory failure.",
-      "citations": [
-        {
-          "quote": "Fifteen patients died at a median age of 24.80 months due to cardiorespiratory failure (range 3\u2013120 months). Myasthenia symptoms and severe hypertrophic cardiomyopathy were universally present (15/15 = 100%)."
-        }
-      ]
-    },
-    {
-      "text": "The variant c.1935C>A (p.D645E) is cited as accounting for 80% of mutant alleles and being the most common mutation in Thai patients with infantile-onset Pompe disease, referencing Amarinthnukrowh et al.",
+      "text": "The variant c.1935C>A is noted to account for 80% of mutant alleles in Thai patients with infantile-onset Pompe disease, making it the most common mutation in the Thai population.",
       "citations": [
         {
           "quote": "In Thai patients, Amarinthnukrowh et al. reported that mutation c.1935C > A accounted for 80% of the mutant alleles and is the most common mutation in the Thai population (7)."
@@ -50,7 +26,7 @@
       ]
     },
     {
-      "text": "The paper's discussion references p.Asp645Glu (attributed to c.1C>A, likely a typographic error for c.1935C>A) as the most common mutation in patients from southern China, accounting for 20\u201325% of total mutant alleles.",
+      "text": "The paper references p.D645E (c.1935C>A) as the most common mutation in southern Chinese patients, accounting for 20\u201325% of total mutant alleles.",
       "citations": [
         {
           "quote": "The most common mutation in patients from southern China was c.1C > A (p.Asp 645Glu), accounting for 20%\u201325% of the total mutant alleles (20)."
@@ -58,10 +34,10 @@
       ]
     },
     {
-      "text": "The cohort's median age at symptom onset was 5.07 months (range 1\u201324 months) and median age at diagnosis was 19.53 months (range 3\u2013109 months), applicable to the patients carrying c.1935C>A.",
+      "text": "Both patients with this variant (Patients 1 and 8) had infantile-onset Pompe disease and died at a median age of 24.80 months due to cardiorespiratory failure; all 15 patients in the cohort presented with myasthenia symptoms and severe hypertrophic cardiomyopathy.",
       "citations": [
         {
-          "quote": "the median age of 15 patients at symptom onset was 5.07 months (1\u201324 months). The median age at diagnosis was 19.53 months (range: 3 to 109 months, n = 15)."
+          "quote": "Fifteen patients died at a median age of 24.80 months due to cardiorespiratory failure (range 3\u2013120 months). Myasthenia symptoms and severe hypertrophic cardiomyopathy were universally present (15/15 = 100%)."
         }
       ]
     }

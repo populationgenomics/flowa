@@ -2,15 +2,15 @@
   "variant_discussed": true,
   "claims": [
     {
-      "text": "Patient 2 carries c.1935C>A (p.Asp645Glu) in exon 14 (Catalytic GH31 domain) inherited from the father (FA), compound heterozygous with c.1933G>C (p.Asp645His) inherited from the mother (MO), with undetectable GAA activity (0% of normal).",
+      "text": "Patient 2 carries c.1935C>A (p.Asp645Glu) in exon 14 (catalytic GH31 domain), inherited from the father, compound heterozygous with c.1933G>C (p.Asp645His) inherited from the mother, with undetectable GAA activity (0% of normal).",
       "citations": [
         {
-          "quote": "2 | 0 | c.1935C>A | 14 | p.Asp645Glu | Catalytic GH31 | FA | Hermans et al. [13]"
+          "quote": "2 | 0 | c.1935C>A | 14 | p.Asp645Glu | Catalytic GH31 | FA | Hermans et al. [13]\n| | | c.1933G>C | 14 | p.Asp645His | Catalytic GH31 | MO | Lin&Shieh [15]"
         }
       ]
     },
     {
-      "text": "Patient 2 had infantile-onset Pompe disease with onset at 1-2 months, diagnosed at 1-2 months, presenting with tachypnea and mild hepatomegaly; ECG showed short PR interval, biventricular hypertrophy, EF 30%; received ERT since 4 weeks of age with favorable outcome at 4 years.",
+      "text": "Patient 2 had infantile-onset Pompe disease with onset at 1\u20132 months, diagnosed at 1\u20132 months, presenting with tachypnea and mild hepatomegaly, with ECG showing short PR interval, biventricular hypertrophy, and EF 30%; received ERT since age 4 weeks with favorable outcome at age 4 years.",
       "citations": [
         {
           "quote": "2 | 1-2 m | 1-2 m | tachypnea, mild hepatomegaly | short PR interval, BVH, EF 30% | yes, since 4 wk./ favorable outcome at 4 y | no, but two previous deceased children with cardiomyopathy"
@@ -18,42 +18,50 @@
       ]
     },
     {
-      "text": "The p.Asp645Glu variant is referenced to Hermans et al. [13] and is associated with IOPD of Taiwanese descendants as a founder mutation, also being more common among Chinese and Taiwanese IOPD patients.",
+      "text": "The p.Asp645Glu variant (c.1935C>A) is referenced as a previously reported mutation associated with IOPD in Taiwanese descendants and as a founder mutation among Chinese and Taiwanese patients.",
       "citations": [
         {
-          "quote": "p.Asp645Glu associated with IOPD of Taiwanese descendants [14], and c.336-13 T > G associated with LOPD [15, 16]"
+          "quote": "p.Asp645Glu associated with IOPD of Taiwanese descendants [14]"
         }
       ]
     },
     {
-      "text": "Including the present study data, the prevalence of p.Asp645Glu/His among Thai IOPD patients is refined to 32.4% (11/34 mutant alleles), with exon 14 as the hotspot for GAA mutations at 50% (17/34).",
+      "text": "Including the present study's data, the prevalence of p.Asp645Glu/His among Thai IOPD patients is 32.4% (11/34 mutant alleles), making exon 14 the hotspot for GAA mutations at 50% (17/34).",
       "citations": [
         {
-          "quote": "the prevalence of p.Asp645Glu/His is refined to 32.4% (11/34) and exon 14 was the hot spot for GAA mutation at 50% (17/34), followed by exon 5"
+          "quote": "Including the data from the present study, the prevalence of p.Asp645Glu/His is refined to 32.4% (11/34) and exon 14 was the hot spot for GAA mutation at 50% (17/34)"
         }
       ]
     },
     {
-      "text": "The p.Asp645Glu variant has been shown in prior work to cause delayed intracellular transport, deficient phosphorylation and proteolytic processing; in vitro expression studies confirmed significant loss of GAA activity and the variant was found in IOPD patients.",
+      "text": "The p.Asp645Glu variant has been shown to cause delayed intracellular transport, deficient phosphorylation and proteolytic processing; replacement at the equivalent position (p.Asp645Asn and p.Asp645His) also results in severe loss of enzyme activity.",
       "citations": [
         {
-          "quote": "The p.Asp645Glu variant has been shown to cause delayed intracellular transport, deficient phosphorylation and proteolytic processing [25]. Replacement in the equivalent position p.Asp645Asn and p.Asp645His also result in severe loss of the enzyme activity [23, 31]"
+          "quote": "The p.Asp645Glu variant has been shown to cause delayed intracellular transport, deficient phosphorylation and proteolytic processing [25]. Replacement in the equivalent position p.Asp645Asn and p.Asp645His also result in severe loss of the enzyme activity [23, 31]."
         }
       ]
     },
     {
-      "text": "A prior study (Amarinthnukrowh et al.) reported p.Asp645Glu in 8/10 mutant alleles among Thai IOPD patients, establishing it as the most common mutation in this population.",
+      "text": "The c.1935C>A (p.Asp645Glu) variant is listed in Table 3 with the reference to Hermans et al. and is classified as a pathogenic mutation identified in a Thai IOPD patient; it is among the 17 pathogenic mutations identified in this cohort.",
       "citations": [
         {
-          "quote": "Amarinthnukrowh et al. reported the p.Asp645Glu mutation in 8/10 mutant alleles found among Thai patients with IOPD [30]"
+          "quote": "Seventeen mutations were identified, including 12 missense mutations: c.781G > A (p.Ala261Thr); c.877G > A (p.Gly293Arg), c.1003G > A (p.Gly335Arg), c.1099 T > C (p.Trp367Arg), c.1437G > C (p.Lys479Asn), c.1538A > G (p.Asp513Gly), c.1895 T > G (p.Leu632Arg), c.1935C > A (p.Asp645Glu), c.1933G > C (p.Asp645His)"
         }
       ]
     },
     {
-      "text": "Mutation screening of exons 14 and 5 (which include p.Asp645Glu) yields a 62% (21/34) detection rate and is proposed as a cost-effective strategy for rapid confirmation of IOPD among Thai and Southeast Asian descendants.",
+      "text": "Patient 2 at age 48 months had mild myopathic facies, could speak in short sentences, walk up and down stairs with support, attend preschool, with weight and height around the 25\u201350 centiles, and never experienced significant respiratory/medical problems since ERT initiation; IgG antibody analysis at 34 months was negative.",
       "citations": [
         {
-          "quote": "Mutation screening of exons 14 and 5, yielding 62% (21/34) detection rate, may serve as a cost-effective strategy for rapid confirmation of IOPD among Thai and Southeast Asian descendants"
+          "quote": "At the time of this report, patient 2 is 48 months old and has mild myopathic facies; the patient can speak in short sentences and communicate fairly, walk up and down stairs with holding, and attend local preschool. The patient's weight and height has been around the 25\u201350 centiles. Patient 2 never experienced significant respiratory/medical problem since the initiation of ERT. CRIM status was not performed before the start of ERT. In addition, glucosidase alpha IgG antibody analysis using enzyme-linked immunosorbent assay (ELISA) at 34 months was negative."
+        }
+      ]
+    },
+    {
+      "text": "Previous in vitro expression studies of p.Asp645Glu have confirmed significant loss of GAA activity and this variant was found in IOPD patients.",
+      "citations": [
+        {
+          "quote": "Previous in vitro expression studies of the mutations p.Gly293Arg, p.Trp367Arg, p.Asp645Glu, and p.Cys647Trp have confirmed significant loss of GAA activity and these variants were found in IOPD patients [23, 31\u201333]."
         }
       ]
     }

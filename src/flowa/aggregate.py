@@ -301,8 +301,12 @@ async def aggregate_evidence_async(
     # Load prompt and schema from prompt set
     prompt_template, output_type = load_prompt_and_schema('aggregation', prompt_set)
 
+    # ensure_ascii=False so the model sees the extraction quotes' real unicode
+    # (en-dashes, µ, Greek letters); the escaped \uXXXX form confuses verbatim
+    # copying — the model mangles it, producing claim quotes that don't match
+    # the extraction input and don't resolve to bboxes.
     evidence_text = (
-        json.dumps(evidence_extractions, indent=2)
+        json.dumps(evidence_extractions, indent=2, ensure_ascii=False)
         if evidence_extractions
         else 'No papers discussing this variant were found.'
     )

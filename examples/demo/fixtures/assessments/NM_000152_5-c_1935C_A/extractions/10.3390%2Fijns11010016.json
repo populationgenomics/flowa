@@ -2,7 +2,7 @@
   "variant_discussed": true,
   "claims": [
     {
-      "text": "Subject 16 (female, age 23 days at initial consult) carries c.1935C>A (p.Asp645Glu) on one allele and combined pseudodeficiency alleles c.1726G>A/c.2065G>A on the other allele, with GAA=2.3, Hex4=5, CK=108, AST=103, ALT=40, and is classified as a Carrier.",
+      "text": "Subject 16 (female, age 23 days at initial consult) carries c.1935C>A (p.Asp645Glu) on Allele 1 paired with combined pseudodeficiency alleles c.1726G>A(p.Gly576Ser)/c.2065G>A(p.Glu689Lys) on Allele 2; GAA 2.3, Hex4 5.0, CK 108, AST 103, ALT 40; classified as Carrier.",
       "citations": [
         {
           "quote": "16 | F | 23 | 2.02 | 1.07 | c.1935C>A (p.Asp645Glu) | combined pseudodef alleles c.1726G>A(p.Gly576Ser)/c.2065G>A(p.Glu689Lys) | 2.3 | 5 | 108 | 103 | 40 | | | Carrier"
@@ -10,7 +10,7 @@
       ]
     },
     {
-      "text": "Subject 38 (male, age 21 days at initial consult) carries c.1935C>A (p.Asp645Glu) on one allele and c.2065G>A (p.Glu689Lys) on the other allele, with GAA=3.2, Hex4=3.3, CK=69, AST=93, ALT=32, and is classified as a Carrier.",
+      "text": "Subject 38 (male, age 21 days at initial consult) carries c.1935C>A (p.Asp645Glu) on Allele 1 paired with c.2065G>A (p.Glu689Lys) on Allele 2; GAA 3.2, Hex4 3.3, CK 69, AST 93, ALT 32; classified as Carrier.",
       "citations": [
         {
           "quote": "38 | M | 21 | 1.1 | 1.08 | c.1935C>A (p.Asp645Glu) | c.2065G>A (p.Glu689Lys) | 3.2 | 3.3 | 69 | 93 | 32 | | | Carrier"
@@ -18,18 +18,10 @@
       ]
     },
     {
-      "text": "Subject 7 (female, Late Onset diagnosis) carries c.-32-13T>G on allele 1 and an allele 2 that appears garbled in the table but contains repeated instances of 'c.1935C>A (p.Asp645Glu)' interspersed with text resembling c.260C>T (p.Arg84X); this entry is uncertain due to OCR/formatting artifact but suggests possible involvement of the variant. Initial EKG and echo both showed hypertrophy.",
+      "text": "Subject 7 (female, age 17 days at initial consult) carries c.-32-13T>G on Allele 1 and a garbled Allele 2 entry that appears to include c.1935C>A (p.Asp645Glu); EKG showed hypertrophy, echo showed hypertrophy; classified as Late Onset.",
       "citations": [
         {
           "quote": "7 | F | 17 | 1.28 | 0.63 | c.-32-13T>G | c.2c.1935C>A (p.Asp645Glu)60C>T (p.Arg8c.1935C>A (p.Asp645Glu)4X) | 3 | 4.5 | 421 | 125 | 50 | Hypertrophy | Hypertrophy | Late Onset"
-        }
-      ]
-    },
-    {
-      "text": "In this cohort, carriers (including those heterozygous for a single GAA variant with no second pathogenic allele) are not considered affected, and no reports of affected carriers are known according to the authors.",
-      "citations": [
-        {
-          "quote": "Carriers have about 50% of the average normal enzyme activity [6]; to our knowledge, there are no reports of affected carriers."
         }
       ]
     }

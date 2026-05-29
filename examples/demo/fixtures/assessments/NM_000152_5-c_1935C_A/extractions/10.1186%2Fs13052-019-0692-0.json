@@ -2,39 +2,31 @@
   "variant_discussed": true,
   "claims": [
     {
-      "text": "The GAA c.1935C>A variant is present in 5 of 6 GSD II patients in this series: P1 as compound heterozygous with c.1082C>T, P2 and P3 as compound heterozygous with c.1216G>A, P5 as homozygous, and P6 as compound heterozygous with c.1822C>T. In all cases the variant is annotated as 'potentially less severe.'",
+      "text": "Five of six GSD II patients in this case series carry the c.1935C>A variant: P1 (compound het with c.1082C>T, both 'potentially less severe'), P2 and P3 (compound het with c.1216G>A, 'potentially less severe'), P5 (homozygous, 'potentially less severe'), and P6 (compound het with c.1822C>T 'very severe', c.1935C>A 'potentially less severe').",
       "citations": [
         {
-          "quote": "Genotypec | c.1082C>T, c.1935C>A (both potentially less severe) | c.1216G>A (unknow), c.1935C>A (potentially less severe) | c.1216G>A (unknow), c.1935C>A (potentially less severe) | c.1557G>A (unknown), c.1978C>T (potentially less severe) | homozygotic mutation of c.1935C>A (potentially less severe) | c.1822C>T (very severe), c.1935C>A (potentially less severe)"
+          "quote": "c.1082C>T, c.1935C>A (both potentially less severe) | c.1216G>A (unknow), c.1935C>A (potentially less severe) | c.1216G>A (unknow), c.1935C>A (potentially less severe) | c.1557G>A (unknown), c.1978C>T (potentially less severe) | homozygotic mutation of c.1935C>A (potentially less severe) | c.1822C>T (very severe), c.1935C>A (potentially less severe)"
         }
       ]
     },
     {
-      "text": "Patients P2 and P3, who carry c.1935C>A compound heterozygous with c.1216G>A, are siblings (younger brother and older sister), while P1, P5, and P6 carrying c.1935C>A belong to unrelated families; thus c.1935C>A is represented across 4 unrelated families.",
+      "text": "Patient 2 (juvenile-onset, male) and Patient 3 (juvenile-onset, female) are siblings sharing the same genotype (compound heterozygous c.1216G>A / c.1935C>A), but the younger brother presented with more severe respiratory involvement and more difficult weaning than his older sister.",
       "citations": [
         {
-          "quote": "Patients 2 and 3 belonged to the same family, and the other patients had no family history of neuromuscular disorders."
+          "quote": "Patient 2, the younger brother of Patient 3, presented with severe respiratory involvement and weaning from mechanical ventilation proved more difficult than in his older sister. Patients 2 and 3 had the same genotype, but the younger brother who had higher GAA activity levels presented with severe respiratory involvement leading to more severe weaning difficulties."
         }
       ]
     },
     {
-      "text": "GAA enzyme activity (normal >14 nmol/h/mg) in patients carrying c.1935C>A: P1=0.90, P2=1.45, P3=1.03, P5=0.00, P6=2.86 nmol/h/mg.",
+      "text": "The paper asserts that five of six patients likely had CRIM-positive status because they carried the c.1935C>A mutation, which may explain their relatively better clinical outcomes.",
       "citations": [
         {
-          "quote": "GAA activity in PBLCb | 0.90 | 1.45 | 1.03 | 8.20 | 0.00 | 2.86"
+          "quote": "We believe five of our six patients may have had a CRIM-positive status as they had the c.1935 C > A mutation [31]; this may be a reason for their better clinical outcomes."
         }
       ]
     },
     {
-      "text": "Patient P5 (infantile-onset, male), homozygous for c.1935C>A with zero GAA activity, had onset at 1 month with myocardial hypertrophy, was successfully weaned from the ventilator (twice), and was walking independently with delayed gross motor skills at 21 months follow-up after 17 months of ERT.",
-      "citations": [
-        {
-          "quote": "Form | Juvenile-onset | Juvenile-onset | Juvenile-onset | Infantile-onset | Infantile-onset | Infantile-onset\n| Gender | F | M | F | M | M | M\n| Age of onset (mo) | 15 | 20 | 47 | 5 | 1 | 4"
-        }
-      ]
-    },
-    {
-      "text": "Patient P5 homozygous for c.1935C>A having zero GAA activity was successfully weaned twice, leading the authors to conclude there may be no significant correlation between GAA enzyme activity and severity of respiratory symptoms.",
+      "text": "Patient 5, homozygous for c.1935C>A with zero GAA activity, was successfully weaned from mechanical ventilation twice, demonstrating no obligate correlation between GAA enzyme activity level and severity of respiratory symptoms.",
       "citations": [
         {
           "quote": "patient 5, who had zero GAA activity, was successfully weaned from mechanical ventilation twice. This shows that there maybe no significant correlation between severe clinical manifestations such as respiratory symptoms and GAA enzyme activity."
@@ -42,42 +34,10 @@
       ]
     },
     {
-      "text": "The authors state that 5 of their 6 patients may have CRIM-positive status because they carry the c.1935C>A mutation, citing Yang et al. [31] who reported that 12/14 infantile-onset CRIM-positive patients had this mutation as the most commonly found.",
+      "text": "Yang et al. (reference 31) reported that 12 of 14 CRIM-positive infantile-onset Pompe disease patients carried the c.1935C>A variant, identifying it as the most commonly found mutation in that cohort.",
       "citations": [
         {
-          "quote": "Yang et al. [31] who reported on 14 infantile-onset patients who were CRIM-positive showed that 12/14 patients had the most commonly found mutation--c.1935 C > A. Juvenile form are by definition CRIM positive because they present residual enzymatic activity. However, none of our patients were tested for their CRIM status. We believe five of our six patients may have had a CRIM-positive status as they had the c.1935 C > A mutation [31]; this may be a reason for their better clinical outcomes."
-        }
-      ]
-    },
-    {
-      "text": "Patient P1 (juvenile-onset, female, compound het c.1082C>T + c.1935C>A, GAA activity 0.90) had onset at 15 months with unsteady walking, lost ability to walk at 26 months, required 24-h invasive mechanical ventilation from age 30 months, and at 72-month follow-up remained wheelchair-bound with tracheal intubation and 24-h mechanical ventilation despite 15.5 months of ERT.",
-      "citations": [
-        {
-          "quote": "Age (mo); follow up status | 72mo, wheelchair, tracheal intubation, 24-h mechanical ventilation | 48mo, wheelchair, Weaned from the ventilator | 96mo, went to school normally, physical exercise intolerable | 36mo, died after abandoning treatment | 21mo, walk independently, delayed gross motor skills | 7mo, died after abandoning treatment"
-        }
-      ]
-    },
-    {
-      "text": "Patient P3 (juvenile-onset, female, compound het c.1216G>A + c.1935C>A, GAA activity 1.03, older sister of P2) had onset at 47 months with generalized fatigue, ptosis, slow running, and hoarse voice, required mechanical ventilation twice, and at 96-month follow-up was able to attend school normally though physical exercise was intolerable after 2 months of ERT.",
-      "citations": [
-        {
-          "quote": "Patient 3 with the juvenile form of GSD II is the older sister of Patient 2. She experienced generalized fatigue, showed bilateral ptosis, ran slowly, and spoke with a hoarse voice at age 47 months."
-        }
-      ]
-    },
-    {
-      "text": "Patient P6 (infantile-onset, male, compound het c.1822C>T [very severe] + c.1935C>A [potentially less severe], GAA activity 2.86) had onset at 4 months with hypertrophic cardiomyopathy, required invasive ventilation at age 5 months, showed weaning failure after 2 months of ERT, and died at 7 months after treatment abandonment.",
-      "citations": [
-        {
-          "quote": "c.1822C>T (very severe), c.1935C>A (potentially less severe)"
-        }
-      ]
-    },
-    {
-      "text": "Patient P2 (juvenile-onset, male, compound het c.1216G>A + c.1935C>A, GAA activity 1.45) had onset at 20 months, required mechanical ventilation twice due to pneumonia, and was successfully weaned after 3 months of ERT the second time; at 48-month follow-up he was wheelchair-bound but weaned from the ventilator.",
-      "citations": [
-        {
-          "quote": "Patient 2: The patient received invasive mechanical ventilation twice due to pneumonia. Using the sequential invasive-noninvasive strategy, he was successfully weaned from ventilation without ERT the first time (age 23 months) and after 3 months of ERT the second time (age 30 months)."
+          "quote": "Yang et al. [31] who reported on 14 infantile-onset patients who were CRIM-positive showed that 12/14 patients had the most commonly found mutation--c.1935 C > A."
         }
       ]
     }

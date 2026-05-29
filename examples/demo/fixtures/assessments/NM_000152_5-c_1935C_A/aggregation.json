@@ -3,76 +3,132 @@
   "results": [
     {
       "category": "acmg_classification",
-      "classification": "Pathogenic",
-      "classification_rationale": "3-star ClinGen expert panel Pathogenic classification; far exceeds ≥10 unrelated cases threshold with >50 documented unrelated individuals across literature and registry data; strong functional evidence (GAA activity <2.3% of WT in multiple assay systems); most common IOPD-causing variant in Southern Han Chinese, Taiwanese, Malaysian, and Thai populations.",
-      "description": "This variant has strong previous evidence of pathogenicity in unrelated individuals. Classified Pathogenic by the ClinGen Lysosomal Storage Disorders VCEP (3-star expert panel, 2021) applying PM3_Very Strong (>30 homozygotes and ≥5 compound heterozygotes with confirmed pathogenic second alleles), PS3_Moderate (GAA activity <10% of normal in COS-cell expression studies; patient homozygous fibroblasts 0.08–0.82% of normal; knock-in cell line ~2.3% WT activity; knock-in mice ~1% WT activity in heart, skeletal muscle, and brain), PP4_Moderate, PM5, and PP3 (REVEL 0.8). This variant is the most common pathogenic GAA allele in IOPD among Southern Han Chinese, Taiwanese, Malaysian, and Thai populations (36–80% of mutant alleles), with 42 total occurrences in the Pompe Registry and representation across the full clinical spectrum. Infantile-onset Pompe disease (IOPD) phenotype: neonatal to 6-month onset with severe hypertrophic cardiomyopathy (LVEF as low as 9.9%), profound muscle hypotonia, respiratory failure, and hepatomegaly; median death at 24.8 months without ERT. Late-onset Pompe disease (LOPD) also reported (muscle weakness onset age 1–7 years). Heterozygous carriers are unaffected.",
-      "notes": "**Summary:** Pathogenic. ClinGen LSD VCEP 3-star expert panel classified this variant as Pathogenic (approved 2021-08-17), applying PM3_Very Strong, PS3_Moderate, PM5, PP4_Moderate, and PP3. The evidence base is extensive: >50 unrelated individuals documented in the literature with affected GAA activity, plus 42 occurrences in the Pompe Registry (Reuser2019). The variant is the most common IOPD-causing GAA allele in Southern Han Chinese, Taiwanese, Malaysian, and Thai populations (36–80% of mutant alleles), and multiple validated functional assays converge on near-complete loss of GAA function. A knock-in mouse model (Kan2022) recapitulates the human IOPD phenotype. No credible refuting evidence exists. The population frequency in East Asians (0.17% gnomAD) is slightly above the ClinGen LSD VCEP PM2 threshold (<0.001) but does not challenge pathogenicity given the extensive case and functional evidence. Heterozygous carriers (Ron2025, Kan2022) are uniformly unaffected, consistent with autosomal recessive inheritance.\n\nNote on haplotype: c.1935C>A frequently occurs in cis with the pseudodeficiency variant c.1726G>A (p.Gly576Ser) in Asian populations. This combined allele [c.1935C>A;c.1726G>A] is pathogenic; c.1726G>A alone does not cause disease. Cases in Chen2024, Hsueh2021, and Moriyoshimura2025 carrying this cis haplotype are counted as carrying the pathogenic c.1935C>A allele.\n\nDeduplication: ClinVar's cited foundational papers (PMID 8094613, 9554747, 18458862) are not in the extracted paper evidence set and represent independent historical cases. The papers extracted here (2019–2025) largely report independent cohorts, though some Pompe Registry (Reuser2019) patients may overlap with national cohort studies.\n\n**Supporting evidence:**\n\n- **ClinVar (ClinGen LSD VCEP):** 3-star expert panel Pathogenic (2021). PM3_Very Strong (>30 homozygotes + ≥5 compound het with confirmed pathogenic second alleles across PMID 8094613, 9554747, 18458862, 28394184), PS3_Moderate (<10% normal GAA activity in COS cells; no mature 76 kDa protein by pulse-chase), PM5 (p.Asp645Asn classified Pathogenic by same VCEP), PP4_Moderate (most common IOPD variant in China/Taiwan/Thailand), PP3 (REVEL 0.8). 16 additional laboratory submitters classify as Pathogenic.\n\n- **Kan2022:** [Most frequent pathogenic GAA mutation in Southern Han Chinese IOPD](#cite:Kan2022 \"The c.1935C>A (p.Asp645Glu) variant, the most frequent GAA pathogenic mutation in people of Southern Han Chinese ancestry, causes infantile-onset Pompe disease (IOPD), presenting neonatally with severe hypertrophic cardiomyopathy, profound muscle hypotonia, respiratory failure, and infantile mortality.\"), comprising [36–80% of IOPD alleles in Taiwanese populations](#cite:Kan2022 \"In Taiwanese populations, this c.1935C>A variant represents 36–80% of mutations11·12, and occur in context of a specific haplotype with conserved polymorphic markers linked to Taiwanese Pompe IOPD patients comparing to normal individuals. This may suggest the existence of a founder effect stemming from a diaspora of Southern Han Chinese to Taiwan and other locations\"). CRISPR knock-in C2C12 myoblast cell line showed [~2.3% of WT GAA activity](#cite:Kan2022 \"GAA enzymatic activity was almost abolished in Gaa c.1935C>A KI cells relative to Gaa wt cells; less than 2.3% of WT GAA activity was detected in the KI cell line\"). Knock-in mice had [~1% of WT GAA activity in heart, skeletal muscle, and brain](#cite:Kan2022 \"KI mice had normal Gaa mRNA levels with significantly reduced level of GAA hydrolysis activity (about 1% of WT) in heart and skeletal muscle, as well as brain tissue\"), with [hypertrophic cardiomyopathy at ~2–3 months and skeletal muscle weakness](#cite:Kan2022 \"Homozygous Gaa em1935C>A knock-in mice exhibited normal Gaa mRNA expression levels relative to wild-type mice, had near-abolished GAA enzymatic activity, markedly increased tissue glycogen storage, and concomitantly impaired autophagy. Three-month-old mice demonstrated skeletal muscle weakness and hypertrophic cardiomyopathy but no premature mortality.\"). In human homozygous fibroblasts, [GAA activity was previously 0.08–0.82% of normal](#cite:Kan2022 \"This aligns with observed levels of low GAA enzyme activity (0.08–0.82% of normal range for control) previously measured in homozygous GAA c.1935C>A patient fibroblasts\"). [Heterozygous KI mice had ~50% WT activity and no phenotypic differences](#cite:Kan2022 \"While no phenotypic differences were noted between GAA c.1935C>A HET and WT mice aside from the expected 50% reduction in HET GAA enzymatic activity, the homozygous KI mice demonstrated a significant, PD-like phenotype.\"), supporting autosomal recessive pattern. The variant [does not affect GAA mRNA levels](#cite:Kan2022 \"The comparative ΔCt between mouse Gaa and housekeeping gene Gapdh acquired by RT-PCR among WT, HET, and KI groups are almost identical, indicating the Gaa c.1935C>A mutation does not affect Gaa mRNA levels\"), confirming missense (not NMD) mechanism.\n\n- **Chan2023:** [Most common mutation in Malaysian IOPD, 8 patients (10 alleles, 33% allele frequency)](#cite:Chan2023 \"The most common mutation identified was c.1935C>A p.(D645E), occurring in eight patients (10 alleles) with allele frequency of (33%).\"), comprising [2 unrelated homozygotes and 6 compound heterozygotes](#cite:Chan2023 \"Two unrelated patients were homozygous for the c.1935C>A p.(D645E) mutation. The other 13 were compound heterozygotes.\"). Patient 13 (homozygous, Chinese): [GAA 2.0%, age of presentation 4 months, LVEF 28%, LVMI 483 g/m², heart failure, died age 2 years](#cite:Chan2023 \"|13|Chinese|c.1935C>A p.(D645E)|c.1935C>A p.(D645E)|2.0%|4|Yes|1, 2, 3, 4, 5|1100|Yes|28%|483|Yes|\"). Patient 17 (homozygous, Malay): [GAA 1.7%, age of presentation 2 months, LVEF 29%, heart failure, died age 6 months despite early ERT at 2.5 months](#cite:Chan2023 \"|17|Malay|c.1935C>A p.(D645E)|c.1935C>A p.(D645E)|1.7%|2|Yes|1, 2, 3, 4, 5|930|Yes|29%|NA|Yes|\"). [Cohort median age of presentation 3 months, 100% hypertrophic cardiomyopathy](#cite:Chan2023 \"Our cohort had a median age of presentation of 3 months and median age of diagnosis of 6 months. Presenting features were hypertrophic cardiomyopathy (100%), respiratory insufficiency (94%), hypotonia (88%), failure to thrive (82%), feeding difficulties (76%), and hepatomegaly (76%).\"). Variant confirmed as most common in Southern China (25%), Taiwan (36%), and Thailand (32.4%).\n\n- **Reuser2019 (Pompe Registry):** [42 total variant occurrences globally, second most common in Group A (classic IOPD, onset ≤12 months with cardiomyopathy; n=27), most common in Asia-Pacific Group A (n=26)](#cite:Reuser2019 \"c.1935C>A (*n* = 27) | p.(Asp645Glu) ... [Global Group A] ... c.1935C>A (*n* = 26) | p.(Asp645Glu) [Asia-Pacific Group A, most common]\"). [Fourth most common globally, accounting for nearly half of Asia-Pacific Group A variants](#cite:Reuser2019 \"In Asia‐Pacific, c.1935C>A was reported most often, but was not among the top five reported in other regions. Nevertheless, this variant was the fourth most common globally due to the input of patients from Asia‐Pacific where it accounted for nearly half of reported variants in Group A.\"). [c.1935C>A and c.1726G>A are linked in cis in Asia-Pacific patients](#cite:Reuser2019 \"c1726G>A also was common in Group A in this region since c.1935C>A and c.1726G>A are linked in cis in patients in the Asia‐Pacific. The variant is a common pseudodeficiency variant that reduces the activity of GAA substantially if present but does not lead to Pompe disease.\"). [Homozygous c.1935C>A reported in Groups A, B, and C, with Group B patients likely misclassified Group A](#cite:Reuser2019 \"homozygous variants c.1843G>A, c.1933G>A, and c.1935C>A, typically found in classic infantile Pompe disease, were reported in both Groups A and B (Table 6). Upon careful review, the patients in Group B appear to have had cardiomyopathy reported in the Registry after 12 months of age and are expected to be in Group A.\").\n\n- **Chen2024:** [7 of 8 Pompe disease patients carry at least one allele with c.1935C>A (p.D645E)](#cite:Chen2024 \"Apart from Subject A1, all carried at least one allele with the c.1935C>A (p.D645E) variant in the GAA gene.\"), across IOPD (5 patients) and LOPD (2–3 patients). [IOPD patients presented with significant cardiac complications between 8 days and 3 months of age](#cite:Chen2024 \"The remaining five were diagnosed with classic IOPD between 8 days and three months of age, primarily presenting with significant cardiac complications. Apart from Subject A1, all carried at least one allele with the c.1935C>A (p.D645E) variant in the GAA gene. All IOPD patients were confirmed CRIM-positive\"). [LOPD patients had muscle weakness noted during early adolescence, early infancy, and age 4 years respectively](#cite:Chen2024 \"Three patients were diagnosed with LOPD (Subject A1-A3) with muscle weakness noted during early adolescence, early infancy, and four years of age, respectively.\"). All carriers confirmed CRIM-positive. This series demonstrates phenotypic spectrum from classic IOPD to LOPD with this allele.\n\n- **Zhu2022:** 5 unrelated Chinese IOPD patients compound heterozygous for c.1935C>A with different second alleles (c.2662G>T×2, c.1432G>A, c.1832G>A, c.1121G>A), all CRIM-positive, all presenting age 4–7 months at first infusion (disease onset 4–6 months) with markedly elevated LVMI (231–745 g/m²) and reduced GAA activity (0.37–6.8 in respective units). [c.1935C>A described as the most frequent GAA mutation in the cohort](#cite:Zhu2022 \"The most frequent mutation observed in our study was c.1935C > A, with four out of ten patients having this mutation.\").\n\n- **Hsueh2021:** 19 Taiwanese NBS IOPD patients, multiple carrying c.1935C>A. 6 patients are homozygous for both c.1935C>A and c.1726G>A (Patients 2, 5, 10, 11, 14, 19), all with classic IOPD, early ERT (mean 11 days), followed for hearing outcomes at ages 0.3–8.4 years. [All 19 patients received first ERT within 4h of admission at mean 11.05 days](#cite:Hsueh2021 \"All the patients received their first ERT within 4 h of admission at a mean age of 11.05 days (range 6–23 days).\"). Additional compound het patients (Patients 3, 4, 7, 8, 9, 12, 13, 17, 18) also carry c.1935C>A. All patients IOPD.\n\n- **Li2024:** 2 patients in a Chinese cohort of 15 IOPD patients (1 cHet c.1669A>T/c.1935C>A, 1 hom c.1935C>A/c.1935C>A) with hypertrophic cardiomyopathy (LVEF 48–54%, GLS 7.6–9%). [Cohort died at median 24.80 months from cardiorespiratory failure](#cite:Li2024 \"Fifteen patients died at a median age of 24.80 months due to cardiorespiratory failure (range 3–120 months). Myasthenia symptoms and severe hypertrophic cardiomyopathy were universally present (15/15 = 100%).\"). [Most common mutation in southern China reported as c.1935C>A, accounting for 20–25% of mutant alleles](#cite:Li2024 \"The most common mutation in patients from southern China was c.1C > A (p.Asp 645Glu), accounting for 20%–25% of the total mutant alleles (20).\").\n\n- **Xu2019:** c.1935C>A in 5 patients across ~4 unrelated families (P2 and P3 are siblings): [P1 (cHet c.1082C>T), P2+P3 siblings (cHet c.1216G>A), P5 (hom), P6 (cHet c.1822C>T)](#cite:Xu2019 \"Genotypec | c.1082C>T, c.1935C>A (both potentially less severe) | c.1216G>A (unknow), c.1935C>A (potentially less severe) | c.1216G>A (unknow), c.1935C>A (potentially less severe) | c.1557G>A (unknown), c.1978C>T (potentially less severe) | homozygotic mutation of c.1935C>A (potentially less severe) | c.1822C>T (very severe), c.1935C>A (potentially less severe)\"). [GAA activities near-absent: P1=0.90, P2=1.45, P3=1.03, P5=0.00, P6=2.86 nmol/h/mg (normal >14)](#cite:Xu2019 \"GAA activity in PBLCb | 0.90 | 1.45 | 1.03 | 8.20 | 0.00 | 2.86\"). Phenotype ranges from infantile-onset (P5, onset 1 month; P6, onset 4 months) to juvenile-onset (P1, onset 15 months; P2, onset 20 months; P3, onset 47 months), consistent with 'potentially less severe' designation in Pompe variant database.\n\n- **Ngiwsara2019:** 1 Thai IOPD patient (Patient 2) compound het c.1935C>A/c.1933G>C (p.Asp645His), onset 1–2 months with tachypnea, mild hepatomegaly, biventricular hypertrophy, EF 30%; [GAA activity 0% of normal](#cite:Ngiwsara2019 \"2 | 0 | c.1935C>A | 14 | p.Asp645Glu | Catalytic GH31 | FA | Hermans et al. [13]\"). [p.Asp645Glu shown to cause delayed intracellular transport, deficient phosphorylation and proteolytic processing; replacements at same position (p.Asp645Asn, p.Asp645His) also result in severe loss of activity](#cite:Ngiwsara2019 \"The p.Asp645Glu variant has been shown to cause delayed intracellular transport, deficient phosphorylation and proteolytic processing [25]. Replacement in the equivalent position p.Asp645Asn and p.Asp645His also result in severe loss of the enzyme activity [23, 31]\").\n\n- **Ron2025:** Heterozygous carriers of c.1935C>A with a pseudodeficiency allele on the other chromosome (Subjects 16 and 38 in Pennsylvania NBS) show normal GAA activity and are classified as unaffected carriers. [No reports of affected carriers are known to the authors](#cite:Ron2025 \"Carriers have about 50% of the average normal enzyme activity [6]; to our knowledge, there are no reports of affected carriers.\"). Supports autosomal recessive inheritance.\n\n- **Liu2021:** 1 Taiwanese infant (compound het c.424_440del17 / c.1935C>A), presenting at birth with mild hypotonia, elevated CK (872 U/L), [GAA activity 0.04 µM/h (normal >0.80)](#cite:Liu2021 \"Laboratory data revealed abnormally high aspartate aminotransferase (AST), alanine aminotransferase (ALT), and creatinine kinase (CK), which were 125 U/L (normal range: <32 U/L), 48 U/L (normal range: <33 U/L), and 872 U/L (normal range: 26–192 U/L), respectively. The enzyme activity test of GAA was 0.04 µM/h (normal range: >0.80 µM/h).\"), LVMI 105.49 g/m², ERT initiated at 15 days.\n\n- **Sawada2021, Sawada2020:** Japanese NBS studies confirm c.1935C>A is classified Pathogenic, common in Taiwan/southern China IOPD; in Japan, only 1 carrier detected among 107 NBS-screened newborns, consistent with lower frequency outside East Asian founder populations.\n\n- **Moriyoshimura2025:** Clinical trial in Japan; patients carrying c.1935C>A always in cis with c.1726G>A, with IOPD diagnoses and prior alglucosidase alfa treatment failure, consistent with severe disease course.\n\n- **Huang2023:** iPSC modeling review; iPSC-derived cardiomyocytes from IOPD patients with c.1935C>A showed [massive glycogen accumulation with ultrastructural aberrances including swollen mitochondria and autophagosome-like structures, alleviated by rhGAA](#cite:Huang2023 \"a mass of glycogen accumulated in PD-iCM, underlying the ultrastructural aberrances including swollen mitochondria, the formation of vacuoles containing glycogen particles, and the formation of autophagosome-like structures. The above major pathologic phenotypes of PD-iPSC-derived cardiomyocytes were alleviated by rhGAA\"), providing additional cellular functional corroboration.\n\n**Refuting evidence:** None. No paper or ClinVar submission classifies this variant as benign, likely benign, or VUS. Population frequency in East Asians (0.17% gnomAD) is consistent with the known high carrier frequency in this founder population given IOPD prevalence of ~1/50,000 in Taiwan.",
+      "description": "This variant has strong previous evidence of pathogenicity in unrelated individuals. Classified Pathogenic (3-star) by the ClinGen Lysosomal Storage Disorder Variant Curation Expert Panel (2021) with criteria PM3_Very Strong + PM5 + PS3_Moderate + PP4_Moderate + PP3. Reported in >50 unrelated individuals with Pompe disease across multiple independent cohorts, including >30 homozygotes and >5 compound heterozygous cases confirmed in trans with pathogenic GAA variants. Onset is typically classic IOPD: neonatal to early infantile (1\u20136 months) with severe hypertrophic cardiomyopathy (EF as low as 9\u201333%), profound hypotonia, respiratory failure, and infantile mortality if untreated; rarely associated with LOPD (muscle weakness onset early adolescence to age 4, no cardiac involvement). Functional studies consistently show <10% normal GAA activity. Founder effect in Southern Chinese, Taiwanese, and Southeast Asian populations (allele frequency 0.173% East Asian gnomAD, consistent with founder allele in recessive condition).",
+      "notes": "**Summary:** Pathogenic. ClinVar 3-star classification by ClinGen Lysosomal Storage Disorder VCEP (approved 2021-08-17) with PM3_Very Strong + PM5 + PS3_Moderate + PP4_Moderate + PP3. This is the most common GAA mutation in Southern Chinese, Taiwanese, and Southeast Asian IOPD patients, representing a founder allele. Evidence base spans >50 unrelated affected individuals documented across multiple independent cohorts, including >30 homozygotes and multiple cHet cases confirmed in trans. Functional studies consistently demonstrate severely reduced GAA enzymatic activity (<10% of normal) both in vitro and in knock-in animal models. Phenotype is predominantly classic IOPD with neonatal\u2013early-infantile onset (symptoms 1\u20136 months, diagnosis as early as day 8\u201315 via NBS) featuring severe hypertrophic cardiomyopathy (LVMI 159\u2013930 g/m\u00b2, EF 9\u201381%), profound hypotonia, and respiratory failure; untreated cases die at median ~24.8 months. Also rarely documented in LOPD (onset muscle weakness early adolescence to age 4, no cardiac). Population frequency 0.173% in East Asian gnomAD is elevated but consistent with a high-frequency founder allele in a recessive disorder; PM2 criterion not met per ClinGen LSD VCEP threshold. No refuting evidence identified from any source.\n\n**Supporting evidence:**\n\n- **ClinVar (ClinGen LSD VCEP)**: Pathogenic (3-star, reviewed by expert panel, 2021-08-17). Applied PM3_Very Strong (>30 hom + >5 cHet confirmed in trans), PM5 (c.1933G>A p.Asp645Asn at same codon classified P), PS3_Moderate (<10% GAA activity in COS cells, absent mature 76 kDa protein by pulse-chase, PMID:8094613, 19862843), PP4_Moderate (\u226550 individuals with GAA activity in the affected range), PP3 (REVEL 0.8, above 0.7 threshold). PM2 explicitly not met (East Asian frequency 0.001729 exceeds ClinGen LSD threshold of <0.001). 16 additional laboratory submitters classify as Pathogenic.\n\n- **Kan2022**: [Most frequent pathogenic variant in IOPD in Southern Chinese, Taiwanese, SE Asian populations of Han ancestry](#cite:Kan2022 \"the GAA c.1935C>A transversion in exon 14, which results in the p.Asp645Glu (p.D645E) missense mutation, is the most frequent pathogenic variant associated with IOPD in the Southern Chinese, Taiwanese, and Southeast Asian populations of Han ancestry, but is not frequently reported in any other region\"), [representing 36\u201380% of mutations in Taiwanese IOPD patients](#cite:Kan2022 \"In Taiwanese populations, this c.1935C>A variant represents 36\u201380% of mutations\"). Human phenotype: [neonatal onset with severe hypertrophic cardiomyopathy, profound muscle hypotonia, respiratory failure, and infantile mortality](#cite:Kan2022 \"The c.1935C>A (p.Asp645Glu) variant, the most frequent GAA pathogenic mutation in people of Southern Han Chinese ancestry, causes infantile-onset Pompe disease (IOPD), presenting neonatally with severe hypertrophic cardiomyopathy, profound muscle hypotonia, respiratory failure, and infantile mortality.\"). Homozygous patient fibroblasts show [0.08\u20130.82% of normal GAA activity](#cite:Kan2022 \"This aligns with observed levels of low GAA enzyme activity (0.08\u20130.82% of normal range for control) previously measured in homozygous GAA c.1935C>A patient fibroblasts\"). CRISPR C2C12 knock-in cells show [<2.3% of WT GAA activity with increased glycogen accumulation](#cite:Kan2022 \"GAA enzymatic activity was almost abolished in Gaa c.1935C>A KI cells relative to Gaawt cells; less than 2.3% of WT GAA activity was detected in the KI cell line\"). Knock-in mice have [~1% WT GAA activity in heart, skeletal muscle, and brain with normal mRNA levels (no NMD)](#cite:Kan2022 \"KI mice had normal Gaa mRNA levels with significantly reduced level of GAA hydrolysis activity (about 1% of WT) in heart and skeletal muscle, as well as brain tissue.\") and display [hypertrophic cardiomyopathy (increased IVSd, LVPWd, LVMI) and ~19% reduced forelimb grip strength](#cite:Kan2022 \"Increases in interventricular septal diameter (IVSd), LV posterior wall diameter (LVPWd), and LV mass index (LVMI) were observed in KI mice, compared to WT and/or HET mice, indicating pronounced hypertrophic cardiomyopathy.\") [the male Gaaem1935C>A KI mouse showed a significant reduction (~19%) in normalized peak tension force compared to WT mice, indicating decreased forelimb muscle strength in KI mice](#cite:Kan2022 \"the male Gaaem1935C>A KI mouse showed a significant reduction (~19%) in normalized peak tension force compared to WT mice, indicating decreased forelimb muscle strength in KI mice\"). Possible founder effect from Southern Han Chinese diaspora.\n\n- **Chan2023**: [Most common mutation in Malaysian IOPD cohort: 8 patients (10 alleles, 33% allele frequency)](#cite:Chan2023 \"The most common mutation identified was c.1935C>A p.(D645E), occurring in eight patients (10 alleles) with allele frequency of (33%).\") including [2 homozygotes (patients 13, 17) and 6 compound heterozygotes](#cite:Chan2023 \"Two unrelated patients were homozygous for the c.1935C>A p.(D645E) mutation. The other 13 were compound heterozygotes.\"). Classic IOPD onset 2\u20136 months; all had hypertrophic cardiomyopathy and respiratory insufficiency. Patient 13 (hom, GAA 2.0%, EF 28%, LVMI 483 g/m\u00b2) deceased at 2 years; Patient 17 (hom, GAA 1.7%, EF 29%) deceased at 6 months; Patients 7, 9 (cHet with c.1411_1414del) deceased at 2\u20133 years. Patient 12 (cHet, GAA 5.3%, EF 81.6%) alive at age 5y10m. [Mutation established as founder in Chinese population; reported to cause both IOPD and LOPD](#cite:Chan2023 \"This mutation has been reported to cause both IOPD and LOPD [28, 29]. The Chinese patients in Malaysia share other common mutations with patients from China and Taiwan\").\n\n- **Reuser2019**: [42 total instances in Pompe Registry spanning classic infantile (Group A) and late-onset (Group C) phenotypes](#cite:Reuser2019 \"exon14 | c.1935C>A | p.(Asp645Glu) | 42 | A,B,C\"). [Second most common globally and most common in Asia-Pacific Group A (classic infantile Pompe disease, cardiomyopathy \u226412 months; n=26 Asia-Pacific, n=27 globally)](#cite:Reuser2019 \"The variant c.1935C>A was the second most common globally and the most common in Asia\u2010Pacific but was not frequently reported in any other region.\"). [7 homozygous CRIM-positive Group A patients](#cite:Reuser2019 \"c.1935C>A (*n*=7)\"). Homozygosity for this variant considered to lead to classic infantile Pompe phenotype.\n\n- **Hsueh2021**: 13+ Taiwanese IOPD patients identified by NBS carrying c.1935C>A in various configurations (hom for [1935C>A;1726G>A] and multiple cHet combinations). [All received ERT at mean 11.05 days (range 6\u201323 days)](#cite:Hsueh2021 \"The mean age of the initial time to ERT was 11.05\u00b14.31 days, and the HI rate was 31.6% (6/19).\"). Hearing outcomes ranged from normal to mild SNHL and mild conductive HL on long-term follow-up. Cases include patients 2, 5, 10, 11, 14, 19 (hom for [1935C>A;1726G>A]) and patients 3, 4, 7, 8, 9, 12, 13, 17, 18 (cHet with various second alleles).\n\n- **Zhu2022**: [4 of 10 Chinese patients with infantile-onset Pompe disease carried c.1935C>A](#cite:Zhu2022 \"The most frequent mutation observed in our study was c.1935C > A, with four out of ten patients having this mutation.\"), all in compound heterozygosity with c.2662G>T p.Glu888* (patients 0103, 0302), c.1432G>A p.Gly478Arg (patient 0104), c.1832G>A p.Gly611Asp (patient 0105), c.1121G>A p.Cys374Tyr (patient 0401). All classic IOPD: onset 4\u20136 months, severely reduced GAA activity, high LVMI (231\u2013745 g/m\u00b2). A fifth patient (0401) carried cHet c.1121G>A / c.1935C>A. All CRIM-positive.\n\n- **Chen2024**: 7 of 8 enrolled patients carried c.1935C>A, all with c.[1935C>A;1726G>A] haplotype on one allele. [5 classic IOPD patients (B1\u2013B5) diagnosed 8 days to 3 months with significant cardiac complications](#cite:Chen2024 \"The remaining five were diagnosed with classic IOPD between 8 days and three months of age, primarily presenting with significant cardiac complications.\"); [2 LOPD patients (A2, A3) with muscle weakness onset during early adolescence or age 4, no cardiac manifestations](#cite:Chen2024 \"Three patients were diagnosed with LOPD (Subject A1-A3) with muscle weakness noted during early adolescence, early infancy, and four years of age, respectively. None exhibited any cardiac manifestations.\"). Patient B4 homozygous for [1935C>A;1726G>A], IOPD, NBS-diagnosed, ERT at age 0.1y. [All patients confirmed CRIM-positive](#cite:Chen2024 \"All IOPD patients were confirmed CRIM-positive through western blotting, described previously, or genotyping prediction\").\n\n- **Ngiwsara2019**: 1 Thai patient (Patient 2) compound heterozygous [c.1935C>A (paternal) / c.1933G>C p.Asp645His (maternal) with 0% GAA activity](#cite:Ngiwsara2019 \"2 | 0 | c.1935C>A | 14 | p.Asp645Glu | Catalytic GH31 | FA | Hermans et al. [13]\n| | | c.1933G>C | 14 | p.Asp645His | Catalytic GH31 | MO | Lin&Shieh [15]\"), IOPD onset 1\u20132 months, ERT since age 4 weeks with favorable outcome at 4 years. [p.Asp645Glu/His prevalence 32.4% (11/34 alleles) in Thai IOPD patients; exon 14 is the hotspot at 50%](#cite:Ngiwsara2019 \"Including the data from the present study, the prevalence of p.Asp645Glu/His is refined to 32.4% (11/34) and exon 14 was the hot spot for GAA mutation at 50% (17/34)\"). [p.Asp645Glu causes delayed intracellular transport, deficient phosphorylation and proteolytic processing; equivalent positions p.Asp645Asn/His also cause severe activity loss](#cite:Ngiwsara2019 \"The p.Asp645Glu variant has been shown to cause delayed intracellular transport, deficient phosphorylation and proteolytic processing [25]. Replacement in the equivalent position p.Asp645Asn and p.Asp645His also result in severe loss of the enzyme activity [23, 31].\").\n\n- **Li2024**: Patient 1 (cHet c.1935C>A / c.1669A>T p.I557F) and Patient 8 (hom c.1935C>A), both classic IOPD. [All 15 IOPD patients in cohort died at median 24.80 months due to cardiorespiratory failure; 100% had myasthenia and severe hypertrophic cardiomyopathy](#cite:Li2024 \"Fifteen patients died at a median age of 24.80 months due to cardiorespiratory failure (range 3\u2013120 months). Myasthenia symptoms and severe hypertrophic cardiomyopathy were universally present (15/15 = 100%).\"). [c.1935C>A accounts for 80% of mutant alleles in Thai IOPD and 20\u201325% in Southern China](#cite:Li2024 \"In Thai patients, Amarinthnukrowh et al. reported that mutation c.1935C > A accounted for 80% of the mutant alleles and is the most common mutation in the Thai population (7).\").\n\n- **Xu2019**: 5 of 6 GSD II patients carry c.1935C>A: [P1 (cHet c.1082C>T), P2/P3 siblings (cHet c.1216G>A), P5 (hom), P6 (cHet c.1822C>T)](#cite:Xu2019 \"c.1082C>T, c.1935C>A (both potentially less severe) | c.1216G>A (unknow), c.1935C>A (potentially less severe) | c.1216G>A (unknow), c.1935C>A (potentially less severe) | c.1557G>A (unknown), c.1978C>T (potentially less severe) | homozygotic mutation of c.1935C>A (potentially less severe) | c.1822C>T (very severe), c.1935C>A (potentially less severe)\"). [Patient 5 (hom, zero GAA activity) successfully weaned from ventilation twice, demonstrating variable phenotypic severity](#cite:Xu2019 \"patient 5, who had zero GAA activity, was successfully weaned from mechanical ventilation twice. This shows that there maybe no significant correlation between severe clinical manifestations such as respiratory symptoms and GAA enzyme activity.\").\n\n- **Sawada2021**: c.1935C>A classified as [disease-associated, 'Pathogenic' in ClinVar, 'Probably damaging' by PolyPhen-2](#cite:Sawada2021 \"55 | rs28940868 | c.1935C>A | p.D645E | Exon 14 | Potentially less severe | Pathogenic | Probably damaging (1.000)\"). [Five of six Taiwanese IOPD patients carry c.1935C>A; high IOPD frequency in Taiwan attributed to high allele frequency](#cite:Sawada2021 \"In Taiwan, five of six IOPD patients are homozygous or heterozygous for the same variant c.1935C>A\") [The high frequency of IOPD patients in Taiwan is attributed to the high frequency of allele c.1935C>A, which was most commonly found in IOPD patients in Taiwan and southern China](#cite:Sawada2021 \"The high frequency of IOPD patients in Taiwan is attributed to the high frequency of allele c.1935C>A, which was most commonly found in IOPD patients in Taiwan and southern China\").\n\n- **Sawada2020**: [c.1935C>A detected in all 5 IOPD cases confirmed by GAA gene analysis in the Taiwan NBS program of 191,786 newborns](#cite:Sawada2020 \"GAA gene analysis demonstrated that c.1935C>A (p.D645E) was detected in all cases of IOPD, c.[752C>T; 761C>T] (p.[S251L; S254L]) was detected in 8 cases of LOPD, and the c.1726G>A (p.G576S) pseudodeficiency variant was detected in 2 cases of IOPD and 5 cases of LOPD.\"). Listed as a frequently detected pathogenic variant across two large Taiwan NBS programs (191,786 and 473,738 newborns).\n\n- **Ron2025**: Two Pennsylvania NBS subjects (16 and 38) carry c.1935C>A paired with pseudodeficiency alleles (c.1726G>A/c.2065G>A or c.2065G>A alone) and are classified as Carriers, consistent with non-pathogenic compound configurations. [Subject 38 (male, 21 days) carries c.1935C>A / c.2065G>A, classified Carrier](#cite:Ron2025 \"38 | M | 21 | 1.1 | 1.08 | c.1935C>A (p.Asp645Glu) | c.2065G>A (p.Glu689Lys) | 3.2 | 3.3 | 69 | 93 | 32 | | | Carrier\"). Subject 7 (female, 17 days) is classified as Late Onset IOPD and appears to carry c.1935C>A on one allele paired with a truncating variant.\n\n- **Liu2021**: Single cHet case \u2014 [4-month-old Taiwanese female IOPD with c.1935C>A / c.424_440del17 (p.Ser142Leufs*29), GAA activity 0.04 \u00b5M/h (normal >0.80), LVMI 105.49 g/m\u00b2, ERT started at day 15](#cite:Liu2021 \"GAA gene sequencing was performed, and the patient had two pathogenic heterozygous mutations, c.424_440del17 (p.Ser142Leufs*29) and c.1935C>A (p.Asp645Glu). One heterogenous pseudodeficiency mutation, p.Gly576Ser, was also noticed. Her cross-reactive immunological material (CRIM) status was positive linked to c.1935C>A (p.Asp645Glu). All above findings indicated the diagnosis of Pompe disease.\"). CRIM-positive attributed to the c.1935C>A allele.\n\n- **Moriyoshimura2025**: Multiple patients with c.1935C>A (often in cis with c.1726G>A) enrolled in the Mini-COMET trial (IOPD previously treated with alglucosidase alfa showing clinical decline or suboptimal response), confirming clinical relevance in therapeutic context.\n\n- **Huang2023**: iPSC-derived cardiomyocyte and neural cell models carrying c.1935C>A (hom and cHet with c.2040+1G>T) used for therapeutic compound screening; GAA enzyme activity confirmed reduced in patient-derived cells.\n\n**No refuting evidence identified.** All sources consistently classify this variant as pathogenic or disease-causing. The elevated East Asian allele frequency (0.173% gnomAD) reflects founder effect rather than benign variation; it does not reach thresholds for benign reclassification in an autosomal recessive disease with this clinical severity. Two NBS subjects classified as carriers (Ron2025) carried c.1935C>A paired with established pseudodeficiency alleles (not true pathogenic second variants), which is consistent with \u2014 not contradictory to \u2014 the variant's pathogenicity.",
       "papers": [
         {
           "paper_id": "Kan2022",
-          "rank_rationale": "Provides the most comprehensive functional characterization including a validated CRISPR knock-in mouse and cell line model demonstrating near-complete loss of GAA activity (~1–2.3% of WT), recapitulating human IOPD phenotype, and confirms absent NMD mechanism."
+          "rank_rationale": "Provides the most comprehensive mechanistic evidence: establishes near-zero GAA activity in CRISPR knock-in cells and mice, documents founder effect, and characterizes the human IOPD phenotype caused specifically by this variant."
         },
         {
           "paper_id": "Chan2023",
-          "rank_rationale": "Largest single-paper case series directly genotyping this variant (8 patients, 2 homozygous + 6 compound heterozygous) with detailed phenotypic and biochemical data in an independent Malaysian cohort."
+          "rank_rationale": "Largest single-paper direct case series (8 unrelated Malaysian IOPD patients, 2 hom + 6 cHet) with detailed quantitative phenotyping including GAA activity, LVMI, and EF values."
         },
         {
           "paper_id": "Reuser2019",
-          "rank_rationale": "Largest registry-based evidence (Pompe Registry, n=42 occurrences globally) quantifying variant prevalence across phenotypic groups A/B/C and confirming dominant role in Asia-Pacific classic IOPD."
-        },
-        {
-          "paper_id": "Chen2024",
-          "rank_rationale": "Documents 7 unrelated Taiwanese Pompe patients carrying the variant across both IOPD and LOPD, with detailed ERT response and ADA data, and confirms CRIM-positive status linked to c.1935C>A."
-        },
-        {
-          "paper_id": "Zhu2022",
-          "rank_rationale": "Prospective multicenter Chinese study with 5 unrelated IOPD compound heterozygotes, providing independent clinical and biochemical confirmation with distinct second alleles."
+          "rank_rationale": "Pompe Registry data documenting 42 total instances across phenotypic groups (Groups A, B, C) from a large multinational cohort, providing the broadest case-count evidence."
         },
         {
           "paper_id": "Hsueh2021",
-          "rank_rationale": "Documents multiple c.1935C>A-carrying patients (6 homozygous + multiple cHet) in the well-characterized Taiwan NBS cohort with early ERT initiation and long follow-up."
+          "rank_rationale": "Documents 13+ Taiwanese NBS-identified IOPD patients carrying c.1935C>A with early ERT and long-term hearing outcomes, reinforcing high allele prevalence and early-onset severity in this population."
         },
         {
-          "paper_id": "Li2024",
-          "rank_rationale": "Adds 2 independent Chinese IOPD cases (1 cHet, 1 hom) with cardiac imaging data and contextualizes mortality in an untreated/late-treated Chinese IOPD cohort."
+          "paper_id": "Zhu2022",
+          "rank_rationale": "Provides individual-level genotype and quantitative phenotype data for 4\u20135 unrelated Chinese IOPD patients with c.1935C>A in compound heterozygosity with diverse second alleles."
         },
         {
-          "paper_id": "Xu2019",
-          "rank_rationale": "Demonstrates phenotypic spectrum from infantile to juvenile onset across 4 unrelated families carrying the variant, including one homozygote with zero GAA activity who survived with ERT."
+          "paper_id": "Chen2024",
+          "rank_rationale": "Documents 7 patients including both classic IOPD (onset 8 days\u20133 months with cardiac) and LOPD (onset adolescence\u2013age 4, no cardiac), establishing phenotypic spectrum associated with this variant."
         },
         {
           "paper_id": "Ngiwsara2019",
-          "rank_rationale": "Provides independent Thai IOPD case and functional literature synthesis, including confirmation of molecular mechanism (defective transport, phosphorylation, processing) and population prevalence data."
+          "rank_rationale": "Provides Thai patient-level data with confirmed undetectable GAA activity and mechanistic context (delayed transport, deficient phosphorylation), and quantifies allele prevalence in Thai IOPD."
         },
         {
-          "paper_id": "Ron2025",
-          "rank_rationale": "Directly documents that heterozygous carriers of c.1935C>A with pseudodeficiency alleles are clinically unaffected, supporting autosomal recessive inheritance and distinguishing carrier from affected genotype."
+          "paper_id": "Li2024",
+          "rank_rationale": "Adds 2 Chinese patients (1 cHet, 1 hom) with classic IOPD and reports population-level context for the variant's prevalence in Southern China and Thailand."
         },
         {
-          "paper_id": "Liu2021",
-          "rank_rationale": "Single Taiwanese infant case report with detailed biochemical data (GAA 0.04 µM/h) and early ERT initiation, corroborating pathogenicity in an independent clinical setting."
-        },
-        {
-          "paper_id": "Moriyoshimura2025",
-          "rank_rationale": "Confirms variant presence in Japanese IOPD patients enrolled in a phase 2 clinical trial, providing additional independent cases in a distinct clinical context."
+          "paper_id": "Xu2019",
+          "rank_rationale": "Documents 5 GSD II patients (1 hom, 4 cHet) including juvenile-onset cases, broadening the phenotypic range; demonstrates zero GAA activity in a homozygous patient with variable respiratory severity."
         },
         {
           "paper_id": "Sawada2021",
-          "rank_rationale": "Japanese NBS study confirming variant classification and low frequency in Japan vs. high frequency in Taiwan/southern China, supporting founder effect interpretation."
+          "rank_rationale": "Provides Japanese NBS context and confirms c.1935C>A is the dominant IOPD-causing variant in Taiwan (5/6 IOPD cases), supporting high founder allele frequency in East Asian populations."
         },
         {
           "paper_id": "Sawada2020",
-          "rank_rationale": "Population-level NBS review confirming the variant as the dominant IOPD allele in Taiwan across two large NBS programs totaling 665,524 newborns."
+          "rank_rationale": "Confirms c.1935C>A was detected in all 5 IOPD cases in a large Taiwan NBS program and lists it as a frequently detected pathogenic variant across two Taiwan NBS programs."
+        },
+        {
+          "paper_id": "Ron2025",
+          "rank_rationale": "Contributes NBS context from Pennsylvania showing c.1935C>A paired with pseudodeficiency alleles produces carriers (not affected), informing genotype-phenotype interpretation at the allele level."
+        },
+        {
+          "paper_id": "Liu2021",
+          "rank_rationale": "Adds a single well-characterized cHet IOPD case with quantitative enzyme activity, LVMI data, and confirmation of CRIM-positive status via the c.1935C>A allele."
+        },
+        {
+          "paper_id": "Moriyoshimura2025",
+          "rank_rationale": "Confirms clinical relevance of c.1935C>A in a therapeutic trial context (Mini-COMET) but adds no new independently documented cases beyond registry-level genotype information."
         },
         {
           "paper_id": "Huang2023",
-          "rank_rationale": "iPSC review providing cellular functional corroboration of pathogenic mechanism (glycogen accumulation, ultrastructural aberrances) in cardiomyocytes from IOPD patients carrying the variant."
+          "rank_rationale": "Review of iPSC models; confirms reduced GAA activity in patient-derived cells carrying this variant but does not add independent clinical case evidence."
         }
       ],
       "claims": [
         {
           "paper_id": "Kan2022",
-          "text": "GAA c.1935C>A (p.Asp645Glu) is the most frequent pathogenic GAA variant in IOPD among Southern Han Chinese, Taiwanese, and Southeast Asian populations, causing neonatal-onset severe hypertrophic cardiomyopathy, profound muscle hypotonia, respiratory failure, and infantile mortality.",
+          "text": "c.1935C>A (p.Asp645Glu) is the most frequent pathogenic variant associated with IOPD in Southern Chinese, Taiwanese, and Southeast Asian populations of Han ancestry, representing 36\u201380% of mutations in Taiwanese IOPD patients.",
+          "citations": [
+            {
+              "quote": "the GAA c.1935C>A transversion in exon 14, which results in the p.Asp645Glu (p.D645E) missense mutation, is the most frequent pathogenic variant associated with IOPD in the Southern Chinese, Taiwanese, and Southeast Asian populations of Han ancestry, but is not frequently reported in any other region",
+              "bboxes": [
+                {
+                  "page": 2,
+                  "top": 359,
+                  "left": 682,
+                  "bottom": 367,
+                  "right": 931
+                },
+                {
+                  "page": 2,
+                  "top": 371,
+                  "left": 264,
+                  "bottom": 382,
+                  "right": 931
+                },
+                {
+                  "page": 2,
+                  "top": 384,
+                  "left": 262,
+                  "bottom": 395,
+                  "right": 931
+                },
+                {
+                  "page": 2,
+                  "top": 397,
+                  "left": 262,
+                  "bottom": 408,
+                  "right": 538
+                }
+              ]
+            },
+            {
+              "quote": "In Taiwanese populations, this c.1935C>A variant represents 36\u201380% of mutations",
+              "bboxes": [
+                {
+                  "page": 2,
+                  "top": 397,
+                  "left": 562,
+                  "bottom": 408,
+                  "right": 931
+                },
+                {
+                  "page": 2,
+                  "top": 410,
+                  "left": 263,
+                  "bottom": 418,
+                  "right": 393
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "paper_id": "Kan2022",
+          "text": "The c.1935C>A variant causes classic IOPD with neonatal onset, severe hypertrophic cardiomyopathy, profound muscle hypotonia, respiratory failure, and infantile mortality if untreated.",
           "citations": [
             {
               "quote": "The c.1935C>A (p.Asp645Glu) variant, the most frequent GAA pathogenic mutation in people of Southern Han Chinese ancestry, causes infantile-onset Pompe disease (IOPD), presenting neonatally with severe hypertrophic cardiomyopathy, profound muscle hypotonia, respiratory failure, and infantile mortality.",
@@ -111,158 +167,10 @@
         },
         {
           "paper_id": "Kan2022",
-          "text": "CRISPR knock-in C2C12 myoblast cell line showed near-abolished GAA enzymatic activity (~2.3% of wild-type) with increased glycogen accumulation by PAS staining.",
+          "text": "Homozygous GAA c.1935C>A patient fibroblasts show extremely low GAA enzyme activity (0.08\u20130.82% of normal range for controls).",
           "citations": [
             {
-              "quote": "GAA enzymatic activity was almost abolished in Gaa c.1935C>A KI cells relative to Gaa wt cells; less than 2.3% of WT GAA activity was detected in the KI cell line",
-              "bboxes": [
-                {
-                  "page": 2,
-                  "top": 810,
-                  "left": 544,
-                  "bottom": 822,
-                  "right": 930
-                },
-                {
-                  "page": 2,
-                  "top": 824,
-                  "left": 262,
-                  "bottom": 835,
-                  "right": 828
-                }
-              ]
-            }
-          ]
-        },
-        {
-          "paper_id": "Kan2022",
-          "text": "Homozygous Gaa em1935C>A knock-in mice had approximately 1% of wild-type GAA hydrolysis activity in heart, skeletal muscle, and brain tissue, with normal mRNA levels confirming the variant acts at the protein level without nonsense-mediated decay.",
-          "citations": [
-            {
-              "quote": "KI mice had normal Gaa mRNA levels with significantly reduced level of GAA hydrolysis activity (about 1% of WT) in heart and skeletal muscle, as well as brain tissue",
-              "bboxes": [
-                {
-                  "page": 8,
-                  "top": 675,
-                  "left": 385,
-                  "bottom": 686,
-                  "right": 930
-                },
-                {
-                  "page": 8,
-                  "top": 688,
-                  "left": 262,
-                  "bottom": 699,
-                  "right": 731
-                }
-              ]
-            },
-            {
-              "quote": "The comparative ΔCt between mouse Gaa and housekeeping gene Gapdh acquired by RT-PCR among WT, HET, and KI groups are almost identical, indicating the Gaa c.1935C>A mutation does not affect Gaa mRNA levels",
-              "bboxes": [
-                {
-                  "page": 5,
-                  "top": 777,
-                  "left": 336,
-                  "bottom": 788,
-                  "right": 931
-                },
-                {
-                  "page": 5,
-                  "top": 789,
-                  "left": 262,
-                  "bottom": 800,
-                  "right": 931
-                },
-                {
-                  "page": 5,
-                  "top": 802,
-                  "left": 262,
-                  "bottom": 810,
-                  "right": 341
-                }
-              ]
-            }
-          ]
-        },
-        {
-          "paper_id": "Kan2022",
-          "text": "Homozygous knock-in mice developed hypertrophic cardiomyopathy at ~2 months (marked by 3 months) and skeletal muscle weakness, recapitulating human IOPD; heterozygous mice showed only the expected ~50% reduction in activity and no phenotypic differences from wild-type.",
-          "citations": [
-            {
-              "quote": "Homozygous Gaa em1935C>A knock-in mice exhibited normal Gaa mRNA expression levels relative to wild-type mice, had near-abolished GAA enzymatic activity, markedly increased tissue glycogen storage, and concomitantly impaired autophagy. Three-month-old mice demonstrated skeletal muscle weakness and hypertrophic cardiomyopathy but no premature mortality.",
-              "bboxes": [
-                {
-                  "page": 1,
-                  "top": 587,
-                  "left": 470,
-                  "bottom": 599,
-                  "right": 921
-                },
-                {
-                  "page": 1,
-                  "top": 602,
-                  "left": 262,
-                  "bottom": 613,
-                  "right": 901
-                },
-                {
-                  "page": 1,
-                  "top": 616,
-                  "left": 263,
-                  "bottom": 627,
-                  "right": 902
-                },
-                {
-                  "page": 1,
-                  "top": 630,
-                  "left": 262,
-                  "bottom": 641,
-                  "right": 870
-                },
-                {
-                  "page": 1,
-                  "top": 644,
-                  "left": 263,
-                  "bottom": 655,
-                  "right": 326
-                }
-              ]
-            },
-            {
-              "quote": "While no phenotypic differences were noted between GAA c.1935C>A HET and WT mice aside from the expected 50% reduction in HET GAA enzymatic activity, the homozygous KI mice demonstrated a significant, PD-like phenotype.",
-              "bboxes": [
-                {
-                  "page": 8,
-                  "top": 649,
-                  "left": 282,
-                  "bottom": 661,
-                  "right": 931
-                },
-                {
-                  "page": 8,
-                  "top": 662,
-                  "left": 262,
-                  "bottom": 673,
-                  "right": 930
-                },
-                {
-                  "page": 8,
-                  "top": 675,
-                  "left": 263,
-                  "bottom": 686,
-                  "right": 380
-                }
-              ]
-            }
-          ]
-        },
-        {
-          "paper_id": "Kan2022",
-          "text": "In human homozygous c.1935C>A patient fibroblasts, GAA enzyme activity was previously measured at 0.08–0.82% of normal control range; in Taiwanese populations the variant represents 36–80% of IOPD mutations.",
-          "citations": [
-            {
-              "quote": "This aligns with observed levels of low GAA enzyme activity (0.08–0.82% of normal range for control) previously measured in homozygous GAA c.1935C>A patient fibroblasts",
+              "quote": "This aligns with observed levels of low GAA enzyme activity (0.08\u20130.82% of normal range for control) previously measured in homozygous GAA c.1935C>A patient fibroblasts",
               "bboxes": [
                 {
                   "page": 8,
@@ -286,21 +194,115 @@
                   "right": 483
                 }
               ]
-            },
+            }
+          ]
+        },
+        {
+          "paper_id": "Kan2022",
+          "text": "CRISPR-generated C2C12 knock-in cells carrying Gaa c.1935C>A show near-abolished GAA enzymatic activity (<2.3% of WT) with increased glycogen accumulation.",
+          "citations": [
             {
-              "quote": "In Taiwanese populations, this c.1935C>A variant represents 36–80% of mutations11·12, and occur in context of a specific haplotype with conserved polymorphic markers linked to Taiwanese Pompe IOPD patients comparing to normal individuals. This may suggest the existence of a founder effect stemming from a diaspora of Southern Han Chinese to Taiwan and other locations",
+              "quote": "GAA enzymatic activity was almost abolished in Gaa c.1935C>A KI cells relative to Gaawt cells; less than 2.3% of WT GAA activity was detected in the KI cell line",
               "bboxes": [
                 {
                   "page": 2,
-                  "top": 397,
-                  "left": 562,
-                  "bottom": 408,
-                  "right": 931
+                  "top": 810,
+                  "left": 544,
+                  "bottom": 822,
+                  "right": 930
                 },
                 {
                   "page": 2,
-                  "top": 409,
+                  "top": 824,
+                  "left": 262,
+                  "bottom": 835,
+                  "right": 828
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "paper_id": "Kan2022",
+          "text": "Homozygous Gaa em1935C>A knock-in mice have ~1% of WT GAA activity in heart, skeletal muscle, and brain with normal Gaa mRNA levels (no NMD), and display hypertrophic cardiomyopathy (increased IVSd, LVPWd, LVMI) and reduced forelimb grip strength (~19% reduction in males).",
+          "citations": [
+            {
+              "quote": "KI mice had normal Gaa mRNA levels with significantly reduced level of GAA hydrolysis activity (about 1% of WT) in heart and skeletal muscle, as well as brain tissue.",
+              "bboxes": [
+                {
+                  "page": 8,
+                  "top": 675,
+                  "left": 385,
+                  "bottom": 686,
+                  "right": 930
+                },
+                {
+                  "page": 8,
+                  "top": 688,
+                  "left": 262,
+                  "bottom": 699,
+                  "right": 734
+                }
+              ]
+            },
+            {
+              "quote": "Increases in interventricular septal diameter (IVSd), LV posterior wall diameter (LVPWd), and LV mass index (LVMI) were observed in KI mice, compared to WT and/or HET mice, indicating pronounced hypertrophic cardiomyopathy.",
+              "bboxes": [
+                {
+                  "page": 6,
+                  "top": 897,
+                  "left": 283,
+                  "bottom": 908,
+                  "right": 931
+                },
+                {
+                  "page": 6,
+                  "top": 909,
                   "left": 263,
+                  "bottom": 921,
+                  "right": 926
+                },
+                {
+                  "page": 6,
+                  "top": 922,
+                  "left": 262,
+                  "bottom": 933,
+                  "right": 406
+                }
+              ]
+            },
+            {
+              "quote": "the male Gaaem1935C>A KI mouse showed a significant reduction (~19%) in normalized peak tension force compared to WT mice, indicating decreased forelimb muscle strength in KI mice",
+              "bboxes": [
+                {
+                  "page": 7,
+                  "top": 808,
+                  "left": 411,
+                  "bottom": 820,
+                  "right": 931
+                },
+                {
+                  "page": 7,
+                  "top": 821,
+                  "left": 262,
+                  "bottom": 832,
+                  "right": 878
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "paper_id": "Kan2022",
+          "text": "A possible founder effect for c.1935C>A is suggested based on a specific conserved haplotype in Taiwanese Pompe IOPD patients, consistent with a diaspora of Southern Han Chinese.",
+          "citations": [
+            {
+              "quote": "occur in context of a specific haplotype with conserved polymorphic markers linked to Taiwanese Pompe IOPD patients comparing to normal individuals. This may suggest the existence of a founder effect stemming from a diaspora of Southern Han Chinese to Taiwan and other locations",
+              "bboxes": [
+                {
+                  "page": 2,
+                  "top": 410,
+                  "left": 451,
                   "bottom": 421,
                   "right": 931
                 },
@@ -324,7 +326,7 @@
         },
         {
           "paper_id": "Chan2023",
-          "text": "c.1935C>A p.(D645E) is the most common mutation in Malaysian IOPD, occurring in 8 patients (10 alleles, 33% allele frequency), including 2 unrelated homozygotes and 6 compound heterozygotes.",
+          "text": "c.1935C>A p.(D645E) is the most common mutation in Malaysian IOPD, occurring in 8 patients (10 alleles, 33% allele frequency), including 2 homozygotes and 6 compound heterozygotes.",
           "citations": [
             {
               "quote": "The most common mutation identified was c.1935C>A p.(D645E), occurring in eight patients (10 alleles) with allele frequency of (33%).",
@@ -389,10 +391,10 @@
         },
         {
           "paper_id": "Chan2023",
-          "text": "Patient 13 (Chinese, homozygous): GAA activity 2.0%, presentation age 4 months with HCM (LVEF 28%, LVMI 483 g/m²), heart failure; started ERT at 8 months; died at age 2 years. Patient 17 (Malay, homozygous): GAA activity 1.7%, presentation age 2 months with HCM (LVEF 29%); started ERT at 2.5 months; died at age 6 months.",
+          "text": "Patient 13 (Chinese, hom c.1935C>A, classic IOPD): GAA 2.0%, LVMI 483 g/m\u00b2, EF 28%, onset 4 months, deceased at 2 years. Patient 17 (Malay, hom, classic IOPD): GAA 1.7%, EF 29%, onset 2 months, deceased at 6 months.",
           "citations": [
             {
-              "quote": "|13|Chinese|c.1935C>A p.(D645E)|c.1935C>A p.(D645E)|2.0%|4|Yes|1, 2, 3, 4, 5|1100|Yes|28%|483|Yes|",
+              "quote": "13|Chinese|c.1935C>A p.(D645E)|c.1935C>A p.(D645E)|2.0%|4|Yes|1, 2, 3, 4, 5|1100|Yes|28%|483|Yes",
               "bboxes": [
                 {
                   "page": 4,
@@ -796,7 +798,7 @@
               ]
             },
             {
-              "quote": "|17|Malay|c.1935C>A p.(D645E)|c.1935C>A p.(D645E)|1.7%|2|Yes|1, 2, 3, 4, 5|930|Yes|29%|NA|Yes|",
+              "quote": "17|Malay|c.1935C>A p.(D645E)|c.1935C>A p.(D645E)|1.7%|2|Yes|1, 2, 3, 4, 5|930|Yes|29%|NA|Yes",
               "bboxes": [
                 {
                   "page": 4,
@@ -1175,10 +1177,10 @@
         },
         {
           "paper_id": "Chan2023",
-          "text": "Multiple compound heterozygous patients (Patients 5, 6, 7, 9, 12, 15) with c.1935C>A paired with different second alleles, all presenting with classic IOPD features (HCM, respiratory insufficiency, hypotonia, hepatomegaly) at age 2–6 months.",
+          "text": "Patient 7 (cHet c.1411_1414del/c.1935C>A, classic IOPD): GAA <0.1 umol/h/L, EF 9.9%, LVMI 485 g/m\u00b2, onset 3 months, deceased at 2 years. Patient 15 (cHet c.2662G>T/c.1935C>A, classic IOPD): GAA 0.6%, EF 33%, LVMI 461 g/m\u00b2, onset 4 months, deceased at 7 months.",
           "citations": [
             {
-              "quote": "|7|Chinese|c.1411_1414delGAGA p.(E471Pfs*5)|c.1935C>A p.(D645E)|<0.1†|3|No|1, 2, 3, 4|NA|Yes|9.9%|485|Yes|",
+              "quote": "7|Chinese|c.1411_1414delGAGA p.(E471Pfs*5)|c.1935C>A p.(D645E)|<0.1\u2020|3|No|1, 2, 3, 4|NA|Yes|9.9%|485|Yes",
               "bboxes": [
                 {
                   "page": 4,
@@ -1603,7 +1605,7 @@
               ]
             },
             {
-              "quote": "|15|Chinese|c.2662G>T p.(E888*)|c.1935C>A p.(D645E)|0.6%|4|No|1, 2, 3, 4, 5|847|Yes|33%|461|Yes|",
+              "quote": "15|Chinese|c.2662G>T p.(E888*)|c.1935C>A p.(D645E)|0.6%|4|No|1, 2, 3, 4, 5|847|Yes|33%|461|Yes",
               "bboxes": [
                 {
                   "page": 4,
@@ -1975,8 +1977,41 @@
         },
         {
           "paper_id": "Chan2023",
-          "text": "c.1935C>A has been reported to cause both IOPD and LOPD and is the most common mutation in Southern China (25%), Taiwan (36%), and Thailand (32.4%); poor outcomes in patients treated late versus early treatment in Taiwan NBS patients highlights early intervention importance.",
+          "text": "c.1935C>A established as a founder mutation in the Chinese population and has been reported to cause both IOPD and LOPD; it is the most common mutation in Southern China (25%), Taiwan (36%), and Thailand (32.4%).",
           "citations": [
+            {
+              "quote": "This is the first study that analyzes the genotype and phenotype of IOPD patients in Malaysia, and has established the c.1935C>A p.(D645E) mutation as the most common mutation, with an allele frequency of 33%.",
+              "bboxes": [
+                {
+                  "page": 9,
+                  "top": 747,
+                  "left": 513,
+                  "bottom": 759,
+                  "right": 898
+                },
+                {
+                  "page": 9,
+                  "top": 762,
+                  "left": 512,
+                  "bottom": 774,
+                  "right": 905
+                },
+                {
+                  "page": 9,
+                  "top": 777,
+                  "left": 512,
+                  "bottom": 789,
+                  "right": 898
+                },
+                {
+                  "page": 9,
+                  "top": 793,
+                  "left": 512,
+                  "bottom": 805,
+                  "right": 833
+                }
+              ]
+            },
             {
               "quote": "This mutation has been reported to cause both IOPD and LOPD [28, 29]. The Chinese patients in Malaysia share other common mutations with patients from China and Taiwan",
               "bboxes": [
@@ -2016,69 +2051,27 @@
                   "right": 123
                 }
               ]
-            },
-            {
-              "quote": "Four of our patients share similar molecular mutations [two patients were homozygous for c.1935C>A p.(D645E), two patients were compound heterozygous for c.1411_1414del p.(E471Pfs*5) and c.1935C>A p.(D645E)] with patients in a study in Taiwan who were diagnosed via newborn screening and given very early ERT prior to symptom onset",
-              "bboxes": [
-                {
-                  "page": 9,
-                  "top": 580,
-                  "left": 109,
-                  "bottom": 592,
-                  "right": 482
-                },
-                {
-                  "page": 9,
-                  "top": 596,
-                  "left": 96,
-                  "bottom": 607,
-                  "right": 488
-                },
-                {
-                  "page": 9,
-                  "top": 611,
-                  "left": 96,
-                  "bottom": 623,
-                  "right": 482
-                },
-                {
-                  "page": 9,
-                  "top": 626,
-                  "left": 96,
-                  "bottom": 638,
-                  "right": 488
-                },
-                {
-                  "page": 9,
-                  "top": 641,
-                  "left": 96,
-                  "bottom": 653,
-                  "right": 487
-                },
-                {
-                  "page": 9,
-                  "top": 656,
-                  "left": 95,
-                  "bottom": 668,
-                  "right": 488
-                },
-                {
-                  "page": 9,
-                  "top": 671,
-                  "left": 96,
-                  "bottom": 683,
-                  "right": 347
-                }
-              ]
             }
           ]
         },
         {
           "paper_id": "Reuser2019",
-          "text": "c.1935C>A (p.Asp645Glu) had 42 total occurrences in the Pompe Registry (NM_000152.5), was the second most common variant globally in Group A (classic IOPD, n=27) and the most common in Asia-Pacific Group A (n=26), accounting for nearly half of Group A variants in that region.",
+          "text": "c.1935C>A is reported 42 total times in the Pompe Registry across Groups A, B, and C (classic infantile through adult-onset phenotypes); it is the second most common globally and the most common in Asia-Pacific Group A (classic infantile Pompe disease, n=26 Asia-Pacific, n=27 globally).",
           "citations": [
             {
-              "quote": "The variant c.1935C>A was the second most common globally and the most common in Asia‐Pacific but was not frequently reported in any other region.",
+              "quote": "exon14 | c.1935C>A | p.(Asp645Glu) | 42 | A,B,C",
+              "bboxes": [
+                {
+                  "page": 26,
+                  "top": 792,
+                  "left": 136,
+                  "bottom": 805,
+                  "right": 843
+                }
+              ]
+            },
+            {
+              "quote": "The variant c.1935C>A was the second most common globally and the most common in Asia\u2010Pacific but was not frequently reported in any other region.",
               "bboxes": [
                 {
                   "page": 8,
@@ -2102,125 +2095,24 @@
                   "right": 450
                 }
               ]
-            },
-            {
-              "quote": "| exon14 | c.1935C>A | p.(Asp645Glu) | 42 | A,B,C |",
-              "bboxes": [
-                {
-                  "page": 26,
-                  "top": 792,
-                  "left": 136,
-                  "bottom": 805,
-                  "right": 843
-                }
-              ]
-            },
-            {
-              "quote": "In Asia‐Pacific, c.1935C>A was reported most often, but was not among the top five reported in other regions. Nevertheless, this variant was the fourth most common globally due to the input of patients from Asia‐Pacific where it accounted for nearly half of reported variants in Group A.",
-              "bboxes": [
-                {
-                  "page": 15,
-                  "top": 312,
-                  "left": 539,
-                  "bottom": 321,
-                  "right": 923
-                },
-                {
-                  "page": 15,
-                  "top": 328,
-                  "left": 516,
-                  "bottom": 338,
-                  "right": 923
-                },
-                {
-                  "page": 15,
-                  "top": 345,
-                  "left": 516,
-                  "bottom": 354,
-                  "right": 923
-                },
-                {
-                  "page": 15,
-                  "top": 362,
-                  "left": 517,
-                  "bottom": 371,
-                  "right": 923
-                },
-                {
-                  "page": 15,
-                  "top": 378,
-                  "left": 517,
-                  "bottom": 387,
-                  "right": 690
-                }
-              ]
             }
           ]
         },
         {
           "paper_id": "Reuser2019",
-          "text": "c.1935C>A is linked in cis with pseudodeficiency variant c.1726G>A in Asia-Pacific patients; c.1726G>A alone does not cause Pompe disease but reduces GAA activity substantially.",
+          "text": "c.1935C>A was found homozygous in 7 CRIM-positive Group A patients (classic infantile Pompe disease with cardiomyopathy onset \u226412 months); homozygosity for this variant is expected to lead to the classic infantile Pompe phenotype.",
           "citations": [
             {
-              "quote": "c1726G>A also was common in Group A in this region since c.1935C>A and c.1726G>A are linked in cis in patients in the Asia‐Pacific. The variant is a common pseudodeficiency variant that reduces the activity of GAA substantially if present but does not lead to Pompe disease.",
-              "bboxes": [
-                {
-                  "page": 15,
-                  "top": 378,
-                  "left": 806,
-                  "bottom": 386,
-                  "right": 923
-                },
-                {
-                  "page": 15,
-                  "top": 395,
-                  "left": 516,
-                  "bottom": 404,
-                  "right": 923
-                },
-                {
-                  "page": 15,
-                  "top": 411,
-                  "left": 516,
-                  "bottom": 420,
-                  "right": 923
-                },
-                {
-                  "page": 15,
-                  "top": 428,
-                  "left": 516,
-                  "bottom": 437,
-                  "right": 923
-                },
-                {
-                  "page": 15,
-                  "top": 444,
-                  "left": 516,
-                  "bottom": 454,
-                  "right": 894
-                }
-              ]
-            }
-          ]
-        },
-        {
-          "paper_id": "Reuser2019",
-          "text": "Homozygous c.1935C>A, typically found in classic IOPD, was also reported in Groups A and B; Group B patients carrying it homozygously are likely misclassified Group A patients (cardiomyopathy recorded after 12 months in the Registry).",
-          "citations": [
+              "quote": "c.1935C>A (*n*=7)",
+              "bboxes": []
+            },
             {
-              "quote": "homozygous variants c.1843G>A, c.1933G>A, and c.1935C>A, typically found in classic infantile Pompe disease, were reported in both Groups A and B (Table 6). Upon careful review, the patients in Group B appear to have had cardiomyopathy reported in the Registry after 12 months of age and are expected to be in Group A.",
+              "quote": "homozygous substitution (missense) variants c.1843G>A, c.1933G>A, and c.1935C>A, typically found in classic infantile Pompe disease patients, were reported in both Groups A and B (Table 6). Upon careful review, the patients in Group B appear to have had cardiomyopathy reported in the Registry after 12 months of age",
               "bboxes": [
-                {
-                  "page": 16,
-                  "top": 64,
-                  "left": 516,
-                  "bottom": 73,
-                  "right": 691
-                },
                 {
                   "page": 16,
                   "top": 858,
-                  "left": 369,
+                  "left": 235,
                   "bottom": 867,
                   "right": 484
                 },
@@ -2250,181 +2142,39 @@
                   "top": 924,
                   "left": 78,
                   "bottom": 934,
-                  "right": 483
+                  "right": 460
                 }
               ]
             }
           ]
         },
         {
-          "paper_id": "Chen2024",
-          "text": "7 of 8 Taiwanese Pompe disease patients (IOPD and LOPD) carry at least one allele with c.1935C>A (p.D645E), always in cis with c.1726G>A as the haplotype [c.1935C>A;c.1726G>A]; all are CRIM-positive.",
+          "paper_id": "Reuser2019",
+          "text": "c.1935C>A and the pseudodeficiency variant c.1726G>A are linked in cis in Asia-Pacific patients; this haplotypic linkage accounts for high Group A frequency in the region.",
           "citations": [
             {
-              "quote": "Apart from Subject A1, all carried at least one allele with the c.1935C>A (p.D645E) variant in the GAA gene.",
+              "quote": "c1935C>A also was common in Group A in this region since c.1935C>A and c.1726G>A are linked in cis in patients in the Asia\u2010Pacific.",
               "bboxes": [
                 {
-                  "page": 4,
-                  "top": 638,
-                  "left": 324,
-                  "bottom": 649,
-                  "right": 488
+                  "page": 15,
+                  "top": 378,
+                  "left": 806,
+                  "bottom": 386,
+                  "right": 923
                 },
                 {
-                  "page": 4,
-                  "top": 653,
-                  "left": 84,
-                  "bottom": 663,
-                  "right": 488
+                  "page": 15,
+                  "top": 395,
+                  "left": 516,
+                  "bottom": 404,
+                  "right": 923
                 },
                 {
-                  "page": 4,
-                  "top": 668,
-                  "left": 84,
-                  "bottom": 678,
-                  "right": 173
-                }
-              ]
-            },
-            {
-              "quote": "All IOPD patients were confirmed CRIM-positive through western blotting, described previously, or genotyping prediction",
-              "bboxes": [
-                {
-                  "page": 4,
-                  "top": 668,
-                  "left": 180,
-                  "bottom": 678,
-                  "right": 488
-                },
-                {
-                  "page": 4,
-                  "top": 683,
-                  "left": 84,
-                  "bottom": 693,
-                  "right": 488
-                },
-                {
-                  "page": 4,
-                  "top": 698,
-                  "left": 84,
-                  "bottom": 708,
-                  "right": 145
-                }
-              ]
-            }
-          ]
-        },
-        {
-          "paper_id": "Chen2024",
-          "text": "IOPD patients carrying c.1935C>A were diagnosed between 8 days and 3 months of age with significant cardiac complications; LOPD patients had muscle weakness noted at early adolescence, early infancy, and age 4 years, respectively.",
-          "citations": [
-            {
-              "quote": "The remaining five were diagnosed with classic IOPD between 8 days and three months of age, primarily presenting with significant cardiac complications. Apart from Subject A1, all carried at least one allele with the c.1935C>A (p.D645E) variant in the GAA gene. All IOPD patients were confirmed CRIM-positive",
-              "bboxes": [
-                {
-                  "page": 4,
-                  "top": 609,
-                  "left": 183,
-                  "bottom": 619,
-                  "right": 488
-                },
-                {
-                  "page": 4,
-                  "top": 623,
-                  "left": 84,
-                  "bottom": 634,
-                  "right": 488
-                },
-                {
-                  "page": 4,
-                  "top": 638,
-                  "left": 83,
-                  "bottom": 649,
-                  "right": 488
-                },
-                {
-                  "page": 4,
-                  "top": 653,
-                  "left": 84,
-                  "bottom": 663,
-                  "right": 488
-                },
-                {
-                  "page": 4,
-                  "top": 668,
-                  "left": 84,
-                  "bottom": 678,
-                  "right": 488
-                }
-              ]
-            },
-            {
-              "quote": "Three patients were diagnosed with LOPD (Subject A1-A3) with muscle weakness noted during early adolescence, early infancy, and four years of age, respectively.",
-              "bboxes": [
-                {
-                  "page": 4,
-                  "top": 564,
-                  "left": 107,
-                  "bottom": 574,
-                  "right": 487
-                },
-                {
-                  "page": 4,
-                  "top": 579,
-                  "left": 83,
-                  "bottom": 589,
-                  "right": 488
-                },
-                {
-                  "page": 4,
-                  "top": 594,
-                  "left": 84,
-                  "bottom": 604,
-                  "right": 305
-                }
-              ]
-            }
-          ]
-        },
-        {
-          "paper_id": "Zhu2022",
-          "text": "5 unrelated Chinese IOPD patients are compound heterozygous for c.1935C>A paired with distinct second alleles (c.2662G>T×2, c.1432G>A, c.1832G>A, c.1121G>A), all CRIM-positive, presenting at 4–7 months with markedly elevated LVMI (231–745 g/m²) and severely reduced GAA activity.",
-          "citations": [
-            {
-              "quote": "0103 | 5.8 | F | Han | 58 | 5.0 | 4 | No | c.1935C > A, p.Asp645Glu (het) c.2662G > T, p.Glu888*(het) | + | 1.05 (2.88–98.02 µmol/L/h) | 291.1 | 61.1 | No",
-              "bboxes": [
-                {
-                  "page": 4,
-                  "top": 397,
-                  "left": 89,
-                  "bottom": 407,
-                  "right": 898
-                },
-                {
-                  "page": 4,
-                  "top": 413,
-                  "left": 470,
-                  "bottom": 423,
-                  "right": 573
-                }
-              ]
-            },
-            {
-              "quote": "0104 | 7 | F | She | 64 | 6.2 | 6 | Yes | c.1432G > A, p.Gly478Arg(het) c.1935C > A, p.Asp645Glu(het) | + | 0.37 (2.88–98.02 µmol/L/h) | 745.5 | 49.2 | No",
-              "bboxes": [
-                {
-                  "page": 4,
-                  "top": 428,
-                  "left": 89,
-                  "bottom": 439,
-                  "right": 898
-                },
-                {
-                  "page": 4,
-                  "top": 444,
-                  "left": 470,
-                  "bottom": 455,
-                  "right": 591
+                  "page": 15,
+                  "top": 411,
+                  "left": 516,
+                  "bottom": 420,
+                  "right": 814
                 }
               ]
             }
@@ -2432,10 +2182,35 @@
         },
         {
           "paper_id": "Hsueh2021",
-          "text": "At least 6 Taiwan NBS IOPD patients (Patients 2, 5, 10, 11, 14, 19) are homozygous for both c.1935C>A and c.1726G>A, and multiple additional patients carry c.1935C>A as compound heterozygotes; all received ERT at mean age 11.05 days (range 6–23 days).",
+          "text": "All 19 Taiwanese IOPD patients in the cohort were identified by NBS and received ERT at a mean age of 11.05 days (range 6\u201323 days); multiple patients carry c.1935C>A in hom or cHet configurations.",
           "citations": [
             {
-              "quote": "2 | M | 38, 3.5 | 15 | 15 | 8.4 | c.1935 C→A, (p.D645E), homozygous; c.1726 G→A, (p.G576S), homozygous",
+              "quote": "The mean age of the initial time to ERT was 11.05\u00b14.31 days, and the HI rate was 31.6% (6/19).",
+              "bboxes": [
+                {
+                  "page": 1,
+                  "top": 519,
+                  "left": 630,
+                  "bottom": 531,
+                  "right": 889
+                },
+                {
+                  "page": 1,
+                  "top": 534,
+                  "left": 106,
+                  "bottom": 546,
+                  "right": 474
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "paper_id": "Hsueh2021",
+          "text": "Patient 2 (hom c.1935C>A;1726G>A, IOPD, ERT day 15): age 8.4y at follow-up, single-ear SNHL mild (right 25.0 dB, left 33.3 dB) at age 6.7y. Patient 5 (hom, ERT day 9, age 7.5y): normal hearing at 5.5y.",
+          "citations": [
+            {
+              "quote": "2 | M | 38, 3.5 | 15 | 15 | 8.4 | c.1935 C\u2192A, (p.D645E), homozygous; c.1726 G\u2192A, (p.G576S), homozygous",
               "bboxes": [
                 {
                   "page": 3,
@@ -2468,28 +2243,499 @@
               ]
             },
             {
-              "quote": "All the patients received their first ERT within 4 h of admission at a mean age of 11.05 days (range 6–23 days).",
+              "quote": "5 | F | 39, 3.0 | 9 | 9 | 7.5 | c.1935 C\u2192A, (p.D645E), homozygous; c.1726 G\u2192A, (p.G576S), homozygous",
+              "bboxes": [
+                {
+                  "page": 3,
+                  "top": 352,
+                  "left": 96,
+                  "bottom": 361,
+                  "right": 890
+                },
+                {
+                  "page": 3,
+                  "top": 365,
+                  "left": 734,
+                  "bottom": 372,
+                  "right": 758
+                },
+                {
+                  "page": 3,
+                  "top": 375,
+                  "left": 724,
+                  "bottom": 383,
+                  "right": 890
+                },
+                {
+                  "page": 3,
+                  "top": 388,
+                  "left": 734,
+                  "bottom": 395,
+                  "right": 758
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "paper_id": "Hsueh2021",
+          "text": "Patient 3 (male, cHet c.1935C>A/c.2303C>T, IOPD, ERT day 9): bilateral mixed HL moderate (right 41.7 dB, left 45.0 dB) at age 6.8y. Patient 4 (male, cHet c.1935C>A/c.1396G>T, IOPD, ERT day 12): normal hearing at 1.2y.",
+          "citations": [
+            {
+              "quote": "3 | M | 39, 3.3 | 9 | 9 | 8.4 | c.1935 C\u2192A, (p.D645E), heterozygous; c.2303 C\u2192T, (p.P768L), heterozygous",
+              "bboxes": [
+                {
+                  "page": 3,
+                  "top": 254,
+                  "left": 96,
+                  "bottom": 263,
+                  "right": 892
+                },
+                {
+                  "page": 3,
+                  "top": 267,
+                  "left": 734,
+                  "bottom": 274,
+                  "right": 758
+                },
+                {
+                  "page": 3,
+                  "top": 277,
+                  "left": 724,
+                  "bottom": 286,
+                  "right": 888
+                },
+                {
+                  "page": 3,
+                  "top": 290,
+                  "left": 734,
+                  "bottom": 297,
+                  "right": 758
+                }
+              ]
+            },
+            {
+              "quote": "4 | M | 38, 3.1 | 12 | 12 | 8 | c.1396 G\u2192T, (p.V466F), heterozygous; c.1935 C\u2192A, (pD645E), heterozygous",
+              "bboxes": [
+                {
+                  "page": 3,
+                  "top": 303,
+                  "left": 95,
+                  "bottom": 312,
+                  "right": 889
+                },
+                {
+                  "page": 3,
+                  "top": 316,
+                  "left": 734,
+                  "bottom": 323,
+                  "right": 758
+                },
+                {
+                  "page": 3,
+                  "top": 326,
+                  "left": 724,
+                  "bottom": 334,
+                  "right": 890
+                },
+                {
+                  "page": 3,
+                  "top": 339,
+                  "left": 734,
+                  "bottom": 346,
+                  "right": 758
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "paper_id": "Zhu2022",
+          "text": "4 of 10 Chinese IOPD patients carried c.1935C>A (all cHet); all had classic IOPD with onset 4\u20136 months, severely reduced GAA activity, and high LVMI (231\u2013745 g/m\u00b2), all CRIM-positive.",
+          "citations": [
+            {
+              "quote": "The most frequent mutation observed in our study was c.1935C > A, with four out of ten patients having this mutation.",
+              "bboxes": [
+                {
+                  "page": 3,
+                  "top": 315,
+                  "left": 671,
+                  "bottom": 326,
+                  "right": 924
+                },
+                {
+                  "page": 3,
+                  "top": 330,
+                  "left": 515,
+                  "bottom": 341,
+                  "right": 923
+                },
+                {
+                  "page": 3,
+                  "top": 344,
+                  "left": 515,
+                  "bottom": 356,
+                  "right": 665
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "paper_id": "Zhu2022",
+          "text": "Patient 0103 (female, cHet c.1935C>A/c.2662G>T p.Glu888*, IOPD): GAA 1.05 \u00b5mol/L/h, LVMI 291.1 g/m\u00b2, LVEF 61.1%, onset 4 months. Patient 0104 (female, cHet c.1432G>A/c.1935C>A, IOPD): GAA 0.37 \u00b5mol/L/h, LVMI 745.5 g/m\u00b2, LVEF 49.2%, onset 6 months.",
+          "citations": [
+            {
+              "quote": "0103 | 5.8 | F | Han | 58 | 5.0 | 4 | No | c.1935C > A, p.Asp645Glu (het) c.2662G > T, p.Glu888*(het) | + | 1.05 (2.88\u201398.02 \u03bcmol/L/h) | 291.1 | 61.1 | No",
               "bboxes": [
                 {
                   "page": 4,
-                  "top": 614,
-                  "left": 311,
-                  "bottom": 626,
+                  "top": 397,
+                  "left": 89,
+                  "bottom": 407,
+                  "right": 898
+                },
+                {
+                  "page": 4,
+                  "top": 413,
+                  "left": 470,
+                  "bottom": 423,
+                  "right": 573
+                }
+              ]
+            },
+            {
+              "quote": "0104 | 7 | F | She | 64 | 6.2 | 6 | Yes | c.1432G > A, p.Gly478Arg(het) c.1935C > A, p.Asp645Glu(het) | + | 0.37 (2.88\u201398.02 \u03bcmol/L/h) | 745.5 | 49.2 | No",
+              "bboxes": [
+                {
+                  "page": 4,
+                  "top": 428,
+                  "left": 89,
+                  "bottom": 439,
+                  "right": 898
+                },
+                {
+                  "page": 4,
+                  "top": 444,
+                  "left": 470,
+                  "bottom": 455,
+                  "right": 591
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "paper_id": "Zhu2022",
+          "text": "Patient 0302 (male, cHet c.1935C>A/c.2662G>T p.Glu888*, IOPD): GAA 6.8 nmol/g/min, LVMI 361.9 g/m\u00b2, LVEF 79.8%, onset 4 months. Patient 0401 (male, cHet c.1121G>A/c.1935C>A, IOPD): GAA 2.4 nmol/h/mgPr, LVMI 231.8 g/m\u00b2, LVEF 44.0%, onset 6 months.",
+          "citations": [
+            {
+              "quote": "0302 | 5.4 | M | Han | 65 | 6.3 | 4 | Yes | c.1935C > A, p.Asp645Glu(het) c.2662G > T, p.Glu888*(het) | + | 6.8 (24.8\u201393.0 nmol/g/min) | 361.9 | 79.8 | No",
+              "bboxes": [
+                {
+                  "page": 4,
+                  "top": 524,
+                  "left": 89,
+                  "bottom": 535,
+                  "right": 898
+                },
+                {
+                  "page": 4,
+                  "top": 540,
+                  "left": 470,
+                  "bottom": 551,
+                  "right": 579
+                }
+              ]
+            },
+            {
+              "quote": "0401 | 7.4 | M | Han | 70 | 6.5 | 6 | Yes | c.1121G > A, p.Cys374Tyr(het) c.1935C > A, p.Asp645Glu(het) | + | 2.4 (62.3\u2013301.7 nmol/h/mgPr) | 231.8 | 44.0 | No",
+              "bboxes": [
+                {
+                  "page": 4,
+                  "top": 587,
+                  "left": 89,
+                  "bottom": 598,
+                  "right": 898
+                },
+                {
+                  "page": 4,
+                  "top": 603,
+                  "left": 470,
+                  "bottom": 614,
+                  "right": 591
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "paper_id": "Chen2024",
+          "text": "7 of 8 patients carried c.1935C>A on at least one allele (all as c.[1935C>A;1726G>A] haplotype); 5 classic IOPD diagnosed 8 days\u20133 months with significant cardiac complications, 2 LOPD with muscle weakness onset age 4 or early adolescence and no cardiac manifestations.",
+          "citations": [
+            {
+              "quote": "Apart from Subject A1, all carried at least one allele with the c.1935C>A (p.D645E) variant in the GAA gene.",
+              "bboxes": [
+                {
+                  "page": 4,
+                  "top": 638,
+                  "left": 324,
+                  "bottom": 649,
                   "right": 488
                 },
                 {
                   "page": 4,
-                  "top": 629,
-                  "left": 96,
-                  "bottom": 641,
-                  "right": 489
+                  "top": 653,
+                  "left": 84,
+                  "bottom": 663,
+                  "right": 488
                 },
                 {
                   "page": 4,
-                  "top": 644,
-                  "left": 97,
-                  "bottom": 656,
-                  "right": 304
+                  "top": 668,
+                  "left": 84,
+                  "bottom": 678,
+                  "right": 173
+                }
+              ]
+            },
+            {
+              "quote": "The remaining five were diagnosed with classic IOPD between 8 days and three months of age, primarily presenting with significant cardiac complications.",
+              "bboxes": [
+                {
+                  "page": 4,
+                  "top": 609,
+                  "left": 183,
+                  "bottom": 619,
+                  "right": 488
+                },
+                {
+                  "page": 4,
+                  "top": 623,
+                  "left": 84,
+                  "bottom": 634,
+                  "right": 488
+                },
+                {
+                  "page": 4,
+                  "top": 638,
+                  "left": 83,
+                  "bottom": 649,
+                  "right": 318
+                }
+              ]
+            },
+            {
+              "quote": "Three patients were diagnosed with LOPD (Subject A1-A3) with muscle weakness noted during early adolescence, early infancy, and four years of age, respectively. None exhibited any cardiac manifestations.",
+              "bboxes": [
+                {
+                  "page": 4,
+                  "top": 564,
+                  "left": 107,
+                  "bottom": 574,
+                  "right": 487
+                },
+                {
+                  "page": 4,
+                  "top": 579,
+                  "left": 83,
+                  "bottom": 589,
+                  "right": 488
+                },
+                {
+                  "page": 4,
+                  "top": 594,
+                  "left": 84,
+                  "bottom": 604,
+                  "right": 488
+                },
+                {
+                  "page": 4,
+                  "top": 609,
+                  "left": 84,
+                  "bottom": 616,
+                  "right": 174
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "paper_id": "Chen2024",
+          "text": "Patient B4 (male, IOPD, NBS-diagnosed) is homozygous for c.[1935C>A;1726G>A] on both alleles; ERT started at age 0.1 years, developed high ADA titers at 1.6 years after 1.5 years of ERT. All IOPD patients confirmed CRIM-positive.",
+          "citations": [
+            {
+              "quote": "B4 | M | IOPD | NBS | c.[1935C>A;1726G>A] | c.[1935C>A;1726G>A] | 0.1 | 40 Q2W | 1.6 | 1.5",
+              "bboxes": [
+                {
+                  "page": 5,
+                  "top": 557,
+                  "left": 100,
+                  "bottom": 568,
+                  "right": 697
+                }
+              ]
+            },
+            {
+              "quote": "All IOPD patients were confirmed CRIM-positive through western blotting, described previously, or genotyping prediction",
+              "bboxes": [
+                {
+                  "page": 4,
+                  "top": 668,
+                  "left": 180,
+                  "bottom": 678,
+                  "right": 488
+                },
+                {
+                  "page": 4,
+                  "top": 683,
+                  "left": 84,
+                  "bottom": 693,
+                  "right": 488
+                },
+                {
+                  "page": 4,
+                  "top": 698,
+                  "left": 84,
+                  "bottom": 708,
+                  "right": 145
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "paper_id": "Ngiwsara2019",
+          "text": "Patient 2 (Thai, IOPD): cHet c.1935C>A (paternal, exon 14, catalytic GH31 domain) / c.1933G>C p.Asp645His (maternal), 0% GAA activity; onset 1\u20132 months with tachypnea, mild hepatomegaly, EF 30%; ERT since age 4 weeks, favorable outcome at 4 years (walks with support, attends preschool, weight/height 25\u201350th centile).",
+          "citations": [
+            {
+              "quote": "2 | 0 | c.1935C>A | 14 | p.Asp645Glu | Catalytic GH31 | FA | Hermans et al. [13]\n| | | c.1933G>C | 14 | p.Asp645His | Catalytic GH31 | MO | Lin&Shieh [15]",
+              "bboxes": [
+                {
+                  "page": 5,
+                  "top": 557,
+                  "left": 96,
+                  "bottom": 566,
+                  "right": 825
+                },
+                {
+                  "page": 5,
+                  "top": 575,
+                  "left": 280,
+                  "bottom": 584,
+                  "right": 801
+                }
+              ]
+            },
+            {
+              "quote": "2 | 1-2 m | 1-2 m | tachypnea, mild hepatomegaly | short PR interval, BVH, EF 30% | yes, since 4 wk./ favorable outcome at 4 y | no, but two previous deceased children with cardiomyopathy",
+              "bboxes": [
+                {
+                  "page": 4,
+                  "top": 530,
+                  "left": 96,
+                  "bottom": 540,
+                  "right": 877
+                },
+                {
+                  "page": 4,
+                  "top": 542,
+                  "left": 144,
+                  "bottom": 551,
+                  "right": 890
+                },
+                {
+                  "page": 4,
+                  "top": 553,
+                  "left": 765,
+                  "bottom": 563,
+                  "right": 852
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "paper_id": "Ngiwsara2019",
+          "text": "p.Asp645Glu/His prevalence is 32.4% (11/34 alleles) among Thai IOPD patients; exon 14 is the hotspot at 50% (17/34). p.Asp645Glu causes delayed intracellular transport, deficient phosphorylation and proteolytic processing; same-position variants p.Asp645Asn and p.Asp645His also cause severe enzyme activity loss.",
+          "citations": [
+            {
+              "quote": "Including the data from the present study, the prevalence of p.Asp645Glu/His is refined to 32.4% (11/34) and exon 14 was the hot spot for GAA mutation at 50% (17/34)",
+              "bboxes": [
+                {
+                  "page": 9,
+                  "top": 764,
+                  "left": 276,
+                  "bottom": 776,
+                  "right": 488
+                },
+                {
+                  "page": 9,
+                  "top": 779,
+                  "left": 96,
+                  "bottom": 791,
+                  "right": 482
+                },
+                {
+                  "page": 9,
+                  "top": 794,
+                  "left": 96,
+                  "bottom": 806,
+                  "right": 488
+                },
+                {
+                  "page": 9,
+                  "top": 809,
+                  "left": 96,
+                  "bottom": 821,
+                  "right": 328
+                }
+              ]
+            },
+            {
+              "quote": "The p.Asp645Glu variant has been shown to cause delayed intracellular transport, deficient phosphorylation and proteolytic processing [25]. Replacement in the equivalent position p.Asp645Asn and p.Asp645His also result in severe loss of the enzyme activity [23, 31].",
+              "bboxes": [
+                {
+                  "page": 9,
+                  "top": 491,
+                  "left": 879,
+                  "bottom": 500,
+                  "right": 904
+                },
+                {
+                  "page": 9,
+                  "top": 506,
+                  "left": 512,
+                  "bottom": 518,
+                  "right": 905
+                },
+                {
+                  "page": 9,
+                  "top": 521,
+                  "left": 512,
+                  "bottom": 533,
+                  "right": 899
+                },
+                {
+                  "page": 9,
+                  "top": 537,
+                  "left": 512,
+                  "bottom": 548,
+                  "right": 899
+                },
+                {
+                  "page": 9,
+                  "top": 552,
+                  "left": 512,
+                  "bottom": 563,
+                  "right": 904
+                },
+                {
+                  "page": 9,
+                  "top": 567,
+                  "left": 512,
+                  "bottom": 579,
+                  "right": 774
                 }
               ]
             }
@@ -2497,7 +2743,7 @@
         },
         {
           "paper_id": "Li2024",
-          "text": "2 Chinese IOPD patients carry c.1935C>A: Patient 1 (cHet with c.1669A>T) had LVEF 54%, MLVWT 22 mm, GLS 9%; Patient 8 (homozygous) had LVEF 48%, MLVWT 13 mm, GLS 7.6%; both with HCM. Cohort of 15 died at median 24.8 months from cardiorespiratory failure.",
+          "text": "Patient 1 (cHet c.1935C>A/c.1669A>T p.I557F, IOPD) and Patient 8 (hom c.1935C>A, IOPD); all 15 IOPD patients in the cohort died at median 24.80 months due to cardiorespiratory failure (range 3\u2013120 months), with universal myasthenia and severe hypertrophic cardiomyopathy.",
           "citations": [
             {
               "quote": "1 | exon12 | c.1669A > T | p.I557F | het | paternal | pathogenic |\n| | exon14 | c.1935C > A | p.D645E | het | maternal | pathogenic |",
@@ -2519,7 +2765,7 @@
               ]
             },
             {
-              "quote": "Fifteen patients died at a median age of 24.80 months due to cardiorespiratory failure (range 3–120 months). Myasthenia symptoms and severe hypertrophic cardiomyopathy were universally present (15/15 = 100%).",
+              "quote": "Fifteen patients died at a median age of 24.80 months due to cardiorespiratory failure (range 3\u2013120 months). Myasthenia symptoms and severe hypertrophic cardiomyopathy were universally present (15/15 = 100%).",
               "bboxes": [
                 {
                   "page": 1,
@@ -2554,11 +2800,76 @@
           ]
         },
         {
-          "paper_id": "Xu2019",
-          "text": "c.1935C>A is present in 5 patients across 4 unrelated families (P2 and P3 are siblings): P1 (cHet c.1082C>T), P2+P3 (cHet c.1216G>A), P5 (hom), P6 (cHet c.1822C>T); GAA activities near-absent (0.00–2.86 nmol/h/mg vs normal >14); phenotype spans infantile-onset (P5 age 1 month, P6 age 4 months) to juvenile-onset (P1–P3, age 15–47 months).",
+          "paper_id": "Li2024",
+          "text": "c.1935C>A accounts for 80% of mutant alleles in Thai IOPD patients and 20\u201325% of total mutant alleles in Southern China.",
           "citations": [
             {
-              "quote": "Genotypec | c.1082C>T, c.1935C>A (both potentially less severe) | c.1216G>A (unknow), c.1935C>A (potentially less severe) | c.1216G>A (unknow), c.1935C>A (potentially less severe) | c.1557G>A (unknown), c.1978C>T (potentially less severe) | homozygotic mutation of c.1935C>A (potentially less severe) | c.1822C>T (very severe), c.1935C>A (potentially less severe)",
+              "quote": "In Thai patients, Amarinthnukrowh et al. reported that mutation c.1935C > A accounted for 80% of the mutant alleles and is the most common mutation in the Thai population (7).",
+              "bboxes": [
+                {
+                  "page": 2,
+                  "top": 350,
+                  "left": 390,
+                  "bottom": 360,
+                  "right": 488
+                },
+                {
+                  "page": 2,
+                  "top": 365,
+                  "left": 84,
+                  "bottom": 375,
+                  "right": 488
+                },
+                {
+                  "page": 2,
+                  "top": 380,
+                  "left": 84,
+                  "bottom": 388,
+                  "right": 488
+                },
+                {
+                  "page": 2,
+                  "top": 394,
+                  "left": 84,
+                  "bottom": 405,
+                  "right": 309
+                }
+              ]
+            },
+            {
+              "quote": "The most common mutation in patients from southern China was c.1C > A (p.Asp 645Glu), accounting for 20%\u201325% of the total mutant alleles (20).",
+              "bboxes": [
+                {
+                  "page": 8,
+                  "top": 394,
+                  "left": 665,
+                  "bottom": 405,
+                  "right": 916
+                },
+                {
+                  "page": 8,
+                  "top": 409,
+                  "left": 512,
+                  "bottom": 420,
+                  "right": 917
+                },
+                {
+                  "page": 8,
+                  "top": 424,
+                  "left": 512,
+                  "bottom": 434,
+                  "right": 789
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "paper_id": "Xu2019",
+          "text": "5 of 6 GSD II patients carry c.1935C>A: P1 (cHet c.1082C>T/c.1935C>A), P2 and P3 siblings (cHet c.1216G>A/c.1935C>A), P5 (hom c.1935C>A, zero GAA activity), P6 (cHet c.1822C>T/c.1935C>A); 5 of 6 likely CRIM-positive attributed to the c.1935C>A allele.",
+          "citations": [
+            {
+              "quote": "c.1082C>T, c.1935C>A (both potentially less severe) | c.1216G>A (unknow), c.1935C>A (potentially less severe) | c.1216G>A (unknow), c.1935C>A (potentially less severe) | c.1557G>A (unknown), c.1978C>T (potentially less severe) | homozygotic mutation of c.1935C>A (potentially less severe) | c.1822C>T (very severe), c.1935C>A (potentially less severe)",
               "bboxes": [
                 {
                   "page": 4,
@@ -2839,370 +3150,234 @@
                   "left": 180,
                   "bottom": 756,
                   "right": 236
-                },
-                {
-                  "page": 4,
-                  "top": 882,
-                  "left": 179,
-                  "bottom": 885,
-                  "right": 183
-                },
-                {
-                  "page": 4,
-                  "top": 886,
-                  "left": 182,
-                  "bottom": 890,
-                  "right": 189
-                },
-                {
-                  "page": 4,
-                  "top": 890,
-                  "left": 182,
-                  "bottom": 895,
-                  "right": 192
-                },
-                {
-                  "page": 4,
-                  "top": 896,
-                  "left": 183,
-                  "bottom": 900,
-                  "right": 192
-                },
-                {
-                  "page": 4,
-                  "top": 900,
-                  "left": 181,
-                  "bottom": 903,
-                  "right": 189
-                },
-                {
-                  "page": 4,
-                  "top": 903,
-                  "left": 182,
-                  "bottom": 908,
-                  "right": 189
-                },
-                {
-                  "page": 4,
-                  "top": 909,
-                  "left": 182,
-                  "bottom": 913,
-                  "right": 189
-                },
-                {
-                  "page": 4,
-                  "top": 914,
-                  "left": 182,
-                  "bottom": 918,
-                  "right": 189
                 }
               ]
             },
             {
-              "quote": "GAA activity in PBLCb | 0.90 | 1.45 | 1.03 | 8.20 | 0.00 | 2.86",
+              "quote": "We believe five of our six patients may have had a CRIM-positive status as they had the c.1935 C > A mutation [31]; this may be a reason for their better clinical outcomes.",
               "bboxes": [
                 {
-                  "page": 4,
-                  "top": 172,
-                  "left": 141,
-                  "bottom": 176,
-                  "right": 151
+                  "page": 9,
+                  "top": 477,
+                  "left": 464,
+                  "bottom": 485,
+                  "right": 488
                 },
                 {
-                  "page": 4,
-                  "top": 177,
-                  "left": 141,
-                  "bottom": 181,
-                  "right": 151
+                  "page": 9,
+                  "top": 491,
+                  "left": 95,
+                  "bottom": 503,
+                  "right": 487
                 },
                 {
-                  "page": 4,
-                  "top": 182,
-                  "left": 149,
-                  "bottom": 183,
-                  "right": 151
+                  "page": 9,
+                  "top": 506,
+                  "left": 96,
+                  "bottom": 518,
+                  "right": 488
                 },
                 {
-                  "page": 4,
-                  "top": 184,
-                  "left": 141,
-                  "bottom": 187,
-                  "right": 150
+                  "page": 9,
+                  "top": 521,
+                  "left": 97,
+                  "bottom": 533,
+                  "right": 488
                 },
                 {
-                  "page": 4,
-                  "top": 268,
-                  "left": 141,
-                  "bottom": 273,
-                  "right": 151
-                },
-                {
-                  "page": 4,
-                  "top": 273,
-                  "left": 141,
-                  "bottom": 277,
-                  "right": 151
-                },
-                {
-                  "page": 4,
-                  "top": 278,
-                  "left": 149,
-                  "bottom": 279,
-                  "right": 151
-                },
-                {
-                  "page": 4,
-                  "top": 280,
-                  "left": 141,
-                  "bottom": 284,
-                  "right": 151
-                },
-                {
-                  "page": 4,
-                  "top": 393,
-                  "left": 141,
-                  "bottom": 397,
-                  "right": 151
-                },
-                {
-                  "page": 4,
-                  "top": 398,
-                  "left": 141,
-                  "bottom": 402,
-                  "right": 150
-                },
-                {
-                  "page": 4,
-                  "top": 403,
-                  "left": 149,
-                  "bottom": 404,
-                  "right": 151
-                },
-                {
-                  "page": 4,
-                  "top": 405,
-                  "left": 141,
-                  "bottom": 409,
-                  "right": 151
-                },
-                {
-                  "page": 4,
-                  "top": 505,
-                  "left": 141,
-                  "bottom": 508,
-                  "right": 151
-                },
-                {
-                  "page": 4,
-                  "top": 509,
-                  "left": 141,
-                  "bottom": 513,
-                  "right": 151
-                },
-                {
-                  "page": 4,
-                  "top": 514,
-                  "left": 149,
-                  "bottom": 515,
-                  "right": 151
-                },
-                {
-                  "page": 4,
-                  "top": 517,
-                  "left": 142,
-                  "bottom": 519,
-                  "right": 150
-                },
-                {
-                  "page": 4,
-                  "top": 625,
-                  "left": 142,
-                  "bottom": 629,
-                  "right": 151
-                },
-                {
-                  "page": 4,
-                  "top": 629,
-                  "left": 142,
-                  "bottom": 634,
-                  "right": 150
-                },
-                {
-                  "page": 4,
-                  "top": 634,
-                  "left": 149,
-                  "bottom": 635,
-                  "right": 151
-                },
-                {
-                  "page": 4,
-                  "top": 638,
-                  "left": 142,
-                  "bottom": 639,
-                  "right": 150
-                },
-                {
-                  "page": 4,
-                  "top": 740,
-                  "left": 141,
-                  "bottom": 744,
-                  "right": 151
-                },
-                {
-                  "page": 4,
-                  "top": 745,
-                  "left": 141,
-                  "bottom": 749,
-                  "right": 151
-                },
-                {
-                  "page": 4,
-                  "top": 750,
-                  "left": 149,
-                  "bottom": 751,
-                  "right": 151
-                },
-                {
-                  "page": 4,
-                  "top": 751,
-                  "left": 141,
-                  "bottom": 756,
-                  "right": 151
-                },
-                {
-                  "page": 4,
-                  "top": 866,
-                  "left": 144,
-                  "bottom": 870,
-                  "right": 150
-                },
-                {
-                  "page": 4,
-                  "top": 871,
-                  "left": 142,
-                  "bottom": 872,
-                  "right": 150
-                },
-                {
-                  "page": 4,
-                  "top": 876,
-                  "left": 144,
-                  "bottom": 880,
-                  "right": 153
-                },
-                {
-                  "page": 4,
-                  "top": 880,
-                  "left": 143,
-                  "bottom": 883,
-                  "right": 151
-                },
-                {
-                  "page": 4,
-                  "top": 884,
-                  "left": 142,
-                  "bottom": 884,
-                  "right": 150
-                },
-                {
-                  "page": 4,
-                  "top": 885,
-                  "left": 144,
-                  "bottom": 889,
-                  "right": 150
-                },
-                {
-                  "page": 4,
-                  "top": 890,
-                  "left": 142,
-                  "bottom": 891,
-                  "right": 150
-                },
-                {
-                  "page": 4,
-                  "top": 892,
-                  "left": 143,
-                  "bottom": 895,
-                  "right": 151
-                },
-                {
-                  "page": 4,
-                  "top": 895,
-                  "left": 144,
-                  "bottom": 907,
-                  "right": 166
-                },
-                {
-                  "page": 4,
-                  "top": 907,
-                  "left": 141,
-                  "bottom": 921,
-                  "right": 165
+                  "page": 9,
+                  "top": 538,
+                  "left": 96,
+                  "bottom": 546,
+                  "right": 164
                 }
               ]
             }
           ]
         },
         {
-          "paper_id": "Ngiwsara2019",
-          "text": "1 Thai IOPD patient (Patient 2) carries c.1935C>A (paternal) compound het with c.1933G>C (p.Asp645His, maternal), with 0% GAA activity, onset 1–2 months, biventricular hypertrophy EF 30%; p.Asp645Glu shown to cause delayed intracellular transport, deficient phosphorylation and proteolytic processing.",
+          "paper_id": "Xu2019",
+          "text": "Patient 5 (hom c.1935C>A, zero GAA activity) was successfully weaned from mechanical ventilation twice, demonstrating no obligate correlation between GAA activity level and respiratory severity.",
           "citations": [
             {
-              "quote": "2 | 0 | c.1935C>A | 14 | p.Asp645Glu | Catalytic GH31 | FA | Hermans et al. [13]",
+              "quote": "patient 5, who had zero GAA activity, was successfully weaned from mechanical ventilation twice. This shows that there maybe no significant correlation between severe clinical manifestations such as respiratory symptoms and GAA enzyme activity.",
               "bboxes": [
                 {
-                  "page": 5,
-                  "top": 557,
+                  "page": 9,
+                  "top": 203,
+                  "left": 422,
+                  "bottom": 214,
+                  "right": 488
+                },
+                {
+                  "page": 9,
+                  "top": 218,
+                  "left": 95,
+                  "bottom": 230,
+                  "right": 488
+                },
+                {
+                  "page": 9,
+                  "top": 233,
                   "left": 96,
-                  "bottom": 566,
-                  "right": 825
+                  "bottom": 245,
+                  "right": 488
+                },
+                {
+                  "page": 9,
+                  "top": 248,
+                  "left": 96,
+                  "bottom": 260,
+                  "right": 482
+                },
+                {
+                  "page": 9,
+                  "top": 263,
+                  "left": 96,
+                  "bottom": 275,
+                  "right": 488
+                },
+                {
+                  "page": 9,
+                  "top": 279,
+                  "left": 96,
+                  "bottom": 290,
+                  "right": 146
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "paper_id": "Sawada2021",
+          "text": "c.1935C>A is classified as disease-associated with 'Pathogenic' ClinVar status and 'Probably damaging (1.000)' by PolyPhen-2; 5 of 6 Taiwanese IOPD patients carry it; high IOPD prevalence in Taiwan attributed to high allele frequency.",
+          "citations": [
+            {
+              "quote": "55 | rs28940868 | c.1935C>A | p.D645E | Exon 14 | Potentially less severe | Pathogenic | Probably damaging (1.000)",
+              "bboxes": [
+                {
+                  "page": 4,
+                  "top": 855,
+                  "left": 185,
+                  "bottom": 864,
+                  "right": 894
+                },
+                {
+                  "page": 4,
+                  "top": 866,
+                  "left": 642,
+                  "bottom": 875,
+                  "right": 889
                 }
               ]
             },
             {
-              "quote": "The p.Asp645Glu variant has been shown to cause delayed intracellular transport, deficient phosphorylation and proteolytic processing [25]. Replacement in the equivalent position p.Asp645Asn and p.Asp645His also result in severe loss of the enzyme activity [23, 31]",
+              "quote": "In Taiwan, five of six IOPD patients are homozygous or heterozygous for the same variant c.1935C>A",
               "bboxes": [
                 {
-                  "page": 9,
-                  "top": 491,
-                  "left": 879,
-                  "bottom": 500,
+                  "page": 3,
+                  "top": 886,
+                  "left": 512,
+                  "bottom": 898,
                   "right": 904
                 },
                 {
-                  "page": 9,
-                  "top": 506,
-                  "left": 512,
-                  "bottom": 518,
-                  "right": 905
+                  "page": 3,
+                  "top": 901,
+                  "left": 513,
+                  "bottom": 913,
+                  "right": 877
+                }
+              ]
+            },
+            {
+              "quote": "The high frequency of IOPD patients in Taiwan is attributed to the high frequency of allele c.1935C>A, which was most commonly found in IOPD patients in Taiwan and southern China",
+              "bboxes": [
+                {
+                  "page": 7,
+                  "top": 394,
+                  "left": 221,
+                  "bottom": 406,
+                  "right": 488
                 },
                 {
-                  "page": 9,
-                  "top": 521,
-                  "left": 512,
-                  "bottom": 533,
-                  "right": 899
+                  "page": 7,
+                  "top": 409,
+                  "left": 96,
+                  "bottom": 421,
+                  "right": 488
                 },
                 {
-                  "page": 9,
-                  "top": 537,
-                  "left": 512,
-                  "bottom": 548,
-                  "right": 899
+                  "page": 7,
+                  "top": 424,
+                  "left": 96,
+                  "bottom": 436,
+                  "right": 487
                 },
                 {
-                  "page": 9,
-                  "top": 552,
-                  "left": 512,
-                  "bottom": 563,
-                  "right": 904
+                  "page": 7,
+                  "top": 439,
+                  "left": 96,
+                  "bottom": 451,
+                  "right": 370
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "paper_id": "Sawada2020",
+          "text": "c.1935C>A (p.D645E) was detected in all 5 IOPD cases confirmed by GAA gene analysis in a Taiwan NBS program of 191,786 newborns and is listed as a frequently detected pathogenic variant in a second Taiwan NBS program of 473,738 newborns.",
+          "citations": [
+            {
+              "quote": "GAA gene analysis demonstrated that c.1935C>A (p.D645E) was detected in all cases of IOPD, c.[752C>T; 761C>T] (p.[S251L; S254L]) was detected in 8 cases of LOPD, and the c.1726G>A (p.G576S) pseudodeficiency variant was detected in 2 cases of IOPD and 5 cases of LOPD.",
+              "bboxes": [
+                {
+                  "page": 7,
+                  "top": 864,
+                  "left": 597,
+                  "bottom": 876,
+                  "right": 871
                 },
                 {
-                  "page": 9,
-                  "top": 567,
-                  "left": 512,
-                  "bottom": 579,
-                  "right": 774
+                  "page": 7,
+                  "top": 880,
+                  "left": 129,
+                  "bottom": 892,
+                  "right": 871
+                },
+                {
+                  "page": 7,
+                  "top": 896,
+                  "left": 129,
+                  "bottom": 908,
+                  "right": 871
+                },
+                {
+                  "page": 8,
+                  "top": 68,
+                  "left": 129,
+                  "bottom": 77,
+                  "right": 871
+                },
+                {
+                  "page": 8,
+                  "top": 108,
+                  "left": 129,
+                  "bottom": 116,
+                  "right": 143
+                }
+              ]
+            },
+            {
+              "quote": "Taiwan (191,786) | 874 (0.46) | 5 (1/38,357) | 11 (1/17,435) | MS/MS | c.1935C>A, c.[752C>T; 761C>T] | Liao et al. (2014) [37]",
+              "bboxes": [
+                {
+                  "page": 6,
+                  "top": 372,
+                  "left": 170,
+                  "bottom": 390,
+                  "right": 826
                 }
               ]
             }
@@ -3210,27 +3385,8 @@
         },
         {
           "paper_id": "Ron2025",
-          "text": "Two heterozygous carriers of c.1935C>A (Subjects 16 and 38 in Pennsylvania NBS, with pseudodeficiency alleles on the other chromosome) are classified as unaffected carriers; the authors state no reports of affected heterozygous carriers are known.",
+          "text": "Two Pennsylvania NBS subjects (16 and 38) carry c.1935C>A paired with pseudodeficiency alleles (c.1726G>A/c.2065G>A or c.2065G>A alone) and are classified as Carriers \u2014 not affected with Pompe disease \u2014 consistent with the pseudodeficiency allele masking pathogenic c.1935C>A effect.",
           "citations": [
-            {
-              "quote": "Carriers have about 50% of the average normal enzyme activity [6]; to our knowledge, there are no reports of affected carriers.",
-              "bboxes": [
-                {
-                  "page": 2,
-                  "top": 469,
-                  "left": 280,
-                  "bottom": 481,
-                  "right": 941
-                },
-                {
-                  "page": 2,
-                  "top": 486,
-                  "left": 280,
-                  "bottom": 498,
-                  "right": 568
-                }
-              ]
-            },
             {
               "quote": "16 | F | 23 | 2.02 | 1.07 | c.1935C>A (p.Asp645Glu) | combined pseudodef alleles c.1726G>A(p.Gly576Ser)/c.2065G>A(p.Glu689Lys) | 2.3 | 5 | 108 | 103 | 40 | | | Carrier",
               "bboxes": [
@@ -3242,15 +3398,27 @@
                   "right": 933
                 }
               ]
+            },
+            {
+              "quote": "38 | M | 21 | 1.1 | 1.08 | c.1935C>A (p.Asp645Glu) | c.2065G>A (p.Glu689Lys) | 3.2 | 3.3 | 69 | 93 | 32 | | | Carrier",
+              "bboxes": [
+                {
+                  "page": 6,
+                  "top": 535,
+                  "left": 52,
+                  "bottom": 547,
+                  "right": 933
+                }
+              ]
             }
           ]
         },
         {
           "paper_id": "Liu2021",
-          "text": "A 4-month-old Taiwanese female infant with IOPD carries c.1935C>A (p.Asp645Glu) in compound heterozygosity with c.424_440del17 (p.Ser142Leufs*29); GAA activity 0.04 µM/h (normal >0.80 µM/h), LVMI 105.49 g/m², ERT initiated at 15 days of age.",
+          "text": "4-month-old Taiwanese female with IOPD, cHet c.1935C>A / c.424_440del17 (p.Ser142Leufs*29); GAA activity 0.04 \u00b5M/h (normal >0.80), LVMI 105.49 g/m\u00b2, CK 872 U/L; CRIM-positive linked to c.1935C>A allele; ERT started at day 15.",
           "citations": [
             {
-              "quote": "GAA gene sequencing was performed, and the patient had two pathogenic heterozygous mutations, c.424_440del17 (p.Ser142Leufs*29) and c.1935C>A (p.Asp645Glu). One heterogenous pseudodeficiency mutation, p.Gly576Ser, was also noticed.",
+              "quote": "GAA gene sequencing was performed, and the patient had two pathogenic heterozygous mutations, c.424_440del17 (p.Ser142Leufs*29) and c.1935C>A (p.Asp645Glu). One heterogenous pseudodeficiency mutation, p.Gly576Ser, was also noticed. Her cross-reactive immunological material (CRIM) status was positive linked to c.1935C>A (p.Asp645Glu). All above findings indicated the diagnosis of Pompe disease.",
               "bboxes": [
                 {
                   "page": 2,
@@ -3285,12 +3453,33 @@
                   "top": 729,
                   "left": 513,
                   "bottom": 741,
-                  "right": 793
+                  "right": 924
+                },
+                {
+                  "page": 2,
+                  "top": 743,
+                  "left": 513,
+                  "bottom": 755,
+                  "right": 925
+                },
+                {
+                  "page": 2,
+                  "top": 758,
+                  "left": 513,
+                  "bottom": 770,
+                  "right": 925
+                },
+                {
+                  "page": 2,
+                  "top": 773,
+                  "left": 513,
+                  "bottom": 785,
+                  "right": 736
                 }
               ]
             },
             {
-              "quote": "Laboratory data revealed abnormally high aspartate aminotransferase (AST), alanine aminotransferase (ALT), and creatinine kinase (CK), which were 125 U/L (normal range: <32 U/L), 48 U/L (normal range: <33 U/L), and 872 U/L (normal range: 26–192 U/L), respectively. The enzyme activity test of GAA was 0.04 µM/h (normal range: >0.80 µM/h).",
+              "quote": "Laboratory data revealed abnormally high aspartate aminotransferase (AST), alanine aminotransferase (ALT), and creatinine kinase (CK), which were 125 U/L (normal range: <32 U/L), 48 U/L (normal range: <33 U/L), and 872 U/L (normal range: 26\u2013192 U/L), respectively. The enzyme activity test of GAA was 0.04 \u03bcM/h (normal range: >0.80 \u03bcM/h).",
               "bboxes": [
                 {
                   "page": 2,
@@ -3340,7 +3529,7 @@
         },
         {
           "paper_id": "Moriyoshimura2025",
-          "text": "In the Japanese Mini-COMET trial, at least 4 IOPD patients carry c.1935C>A in cis with c.1726G>A (as haplotype [c.1935C>A;c.1726G>A]) in compound heterozygosity or homozygosity, all with prior alglucosidase alfa treatment with clinical decline or suboptimal response.",
+          "text": "Multiple patients with c.1935C>A (in cis with c.1726G>A) were enrolled in the Mini-COMET trial (Phase 2 IOPD patients previously on alglucosidase alfa with clinical decline or suboptimal response), confirming ongoing clinical relevance of the variant in IOPD management.",
           "citations": [
             {
               "quote": "NM_000152.5:c.1935C > A (p.Asp645Glu) (ClinVar ID VCV000004029)",
@@ -3369,235 +3558,63 @@
               ]
             },
             {
-              "quote": "c.[784G > A];[1935C > A;1726G > A], c.[1062C > G;1286 A > G];[1935C > A;1726G > A], c.[1222 A > G];[1927G > A], c.[236_246del];[655G > A], c.[1798C > T];[1798C > T], c.[1000G > T];[271G > A;307 T > G]",
+              "quote": "Mini-COMET is a Phase 2, multi-stage, randomized, open-label, multicenter, multinational, ascending-dose cohort trial primarily evaluating the safety of avalglucosidase alfa in patients with IOPD who previously treated with a stable dose of alglucosidase alfa. Patients who showed clinical decline with alglucosidase alfa treatment classified as stage 1 (Cohort 1 and 2), and patients who showed suboptimal clinical response with alglucosidase alfa treatment classified as stage 2 (Cohort 3)",
               "bboxes": [
                 {
-                  "page": 4,
-                  "top": 176,
-                  "left": 498,
-                  "bottom": 183,
-                  "right": 611
+                  "page": 2,
+                  "top": 689,
+                  "left": 780,
+                  "bottom": 699,
+                  "right": 936
                 },
                 {
-                  "page": 4,
-                  "top": 187,
-                  "left": 497,
-                  "bottom": 194,
-                  "right": 568
+                  "page": 2,
+                  "top": 703,
+                  "left": 515,
+                  "bottom": 712,
+                  "right": 936
                 },
                 {
-                  "page": 4,
-                  "top": 198,
-                  "left": 498,
-                  "bottom": 205,
-                  "right": 629
+                  "page": 2,
+                  "top": 716,
+                  "left": 516,
+                  "bottom": 726,
+                  "right": 932
                 },
                 {
-                  "page": 4,
-                  "top": 209,
-                  "left": 499,
-                  "bottom": 216,
-                  "right": 618
+                  "page": 2,
+                  "top": 729,
+                  "left": 516,
+                  "bottom": 739,
+                  "right": 936
                 },
                 {
-                  "page": 4,
-                  "top": 219,
-                  "left": 498,
-                  "bottom": 226,
-                  "right": 637
+                  "page": 2,
+                  "top": 742,
+                  "left": 516,
+                  "bottom": 752,
+                  "right": 936
                 },
                 {
-                  "page": 4,
-                  "top": 230,
-                  "left": 498,
-                  "bottom": 237,
-                  "right": 630
+                  "page": 2,
+                  "top": 755,
+                  "left": 516,
+                  "bottom": 765,
+                  "right": 936
                 },
                 {
-                  "page": 4,
-                  "top": 241,
-                  "left": 498,
-                  "bottom": 248,
-                  "right": 632
+                  "page": 2,
+                  "top": 768,
+                  "left": 515,
+                  "bottom": 778,
+                  "right": 936
                 },
                 {
-                  "page": 4,
-                  "top": 252,
-                  "left": 498,
-                  "bottom": 259,
-                  "right": 611
-                },
-                {
-                  "page": 4,
-                  "top": 263,
-                  "left": 497,
-                  "bottom": 270,
-                  "right": 560
-                }
-              ]
-            }
-          ]
-        },
-        {
-          "paper_id": "Sawada2021",
-          "text": "In a Japanese NBS program of 296,759 newborns, only 1 individual carried c.1935C>A (allele frequency 0.47% among 107 sequenced newborns), classified as a carrier; the variant is noted as common in IOPD patients in Taiwan and southern China (5 of 6 Taiwanese IOPD patients homozygous or heterozygous for it).",
-          "citations": [
-            {
-              "quote": "our study only detected one individual (No. 141) with the same variant among 107 newborns who underwent GAA sequencing analysis (allele frequency: 0.47%) (Table 2)",
-              "bboxes": [
-                {
-                  "page": 7,
-                  "top": 348,
-                  "left": 165,
-                  "bottom": 360,
-                  "right": 487
-                },
-                {
-                  "page": 7,
-                  "top": 363,
-                  "left": 97,
-                  "bottom": 375,
-                  "right": 487
-                },
-                {
-                  "page": 7,
-                  "top": 379,
-                  "left": 96,
-                  "bottom": 390,
-                  "right": 487
-                },
-                {
-                  "page": 7,
-                  "top": 394,
-                  "left": 96,
-                  "bottom": 405,
-                  "right": 214
-                }
-              ]
-            },
-            {
-              "quote": "In Taiwan, five of six IOPD patients are homozygous or heterozygous for the same variant c.1935C>A. In contrast, our study only detected one individual (No. 141) with the same variant among 107 newborns who underwent GAA sequencing analysis (allele frequency: 0.47%) (Table 2). The high frequency of IOPD patients in Taiwan is attributed to the high frequency of allele c.1935C>A, which was most commonly found in IOPD patients in Taiwan and southern China",
-              "bboxes": [
-                {
-                  "page": 6,
-                  "top": 900,
-                  "left": 372,
-                  "bottom": 909,
-                  "right": 826
-                },
-                {
-                  "page": 7,
-                  "top": 42,
-                  "left": 96,
-                  "bottom": 52,
-                  "right": 904
-                },
-                {
-                  "page": 7,
-                  "top": 348,
-                  "left": 96,
-                  "bottom": 360,
-                  "right": 487
-                },
-                {
-                  "page": 7,
-                  "top": 363,
-                  "left": 97,
-                  "bottom": 375,
-                  "right": 487
-                },
-                {
-                  "page": 7,
-                  "top": 379,
-                  "left": 96,
-                  "bottom": 390,
-                  "right": 487
-                },
-                {
-                  "page": 7,
-                  "top": 394,
-                  "left": 96,
-                  "bottom": 406,
-                  "right": 488
-                },
-                {
-                  "page": 7,
-                  "top": 409,
-                  "left": 96,
-                  "bottom": 421,
-                  "right": 488
-                },
-                {
-                  "page": 7,
-                  "top": 424,
-                  "left": 96,
-                  "bottom": 436,
-                  "right": 487
-                },
-                {
-                  "page": 7,
-                  "top": 439,
-                  "left": 96,
-                  "bottom": 451,
-                  "right": 370
-                }
-              ]
-            }
-          ]
-        },
-        {
-          "paper_id": "Sawada2020",
-          "text": "c.1935C>A (p.D645E) was detected in all 5 IOPD cases identified in the Taiwan NBS program (Liao et al. 2014, 191,786 newborns) and is listed as a frequently detected pathogenic variant in the larger Taiwan NBS program (Chiang et al. 2012, 473,738 newborns, 9 IOPD patients).",
-          "citations": [
-            {
-              "quote": "GAA gene analysis demonstrated that c.1935C>A (p.D645E) was detected in all cases of IOPD, c.[752C>T; 761C>T] (p.[S251L; S254L]) was detected in 8 cases of LOPD, and the c.1726G>A (p.G576S) pseudodeficiency variant was detected in 2 cases of IOPD and 5 cases of LOPD.",
-              "bboxes": [
-                {
-                  "page": 7,
-                  "top": 864,
-                  "left": 597,
-                  "bottom": 876,
-                  "right": 871
-                },
-                {
-                  "page": 7,
-                  "top": 880,
-                  "left": 129,
-                  "bottom": 892,
-                  "right": 871
-                },
-                {
-                  "page": 7,
-                  "top": 896,
-                  "left": 129,
-                  "bottom": 908,
-                  "right": 871
-                },
-                {
-                  "page": 8,
-                  "top": 68,
-                  "left": 129,
-                  "bottom": 77,
-                  "right": 871
-                },
-                {
-                  "page": 8,
-                  "top": 108,
-                  "left": 129,
-                  "bottom": 116,
-                  "right": 143
-                }
-              ]
-            },
-            {
-              "quote": "Taiwan (473,738) | 2210 (0.47) | 9 (1/52,638) | 19 (1/24,934) | fluorometric assay | c.1935C>A, c.2238G>C | Chiang et al. (2012) [36]",
-              "bboxes": [
-                {
-                  "page": 6,
-                  "top": 352,
-                  "left": 170,
-                  "bottom": 371,
-                  "right": 833
+                  "page": 2,
+                  "top": 782,
+                  "left": 516,
+                  "bottom": 791,
+                  "right": 801
                 }
               ]
             }
@@ -3605,55 +3622,8 @@
         },
         {
           "paper_id": "Huang2023",
-          "text": "iPSC-derived cardiomyocytes from IOPD patients carrying c.1935C>A showed massive glycogen accumulation with ultrastructural aberrances (swollen mitochondria, glycogen-filled vacuoles, autophagosome-like structures), alleviated by rhGAA; iPSC-derived neurons from patients including c.1935C>A carriers were used to screen drug candidates (Ebselen, Wortmannin, PX-866) increasing GAA activity.",
+          "text": "iPSC models from IOPD patients carrying c.1935C>A (hom and cHet with c.2040+1G>T) were used for cardiomyocyte and neural cell studies, confirming reduced GAA enzyme activity and glycogen accumulation in patient-derived cells.",
           "citations": [
-            {
-              "quote": "a mass of glycogen accumulated in PD-iCM, underlying the ultrastructural aberrances including swollen mitochondria, the formation of vacuoles containing glycogen particles, and the formation of autophagosome-like structures. The above major pathologic phenotypes of PD-iPSC-derived cardiomyocytes were alleviated by rhGAA",
-              "bboxes": [
-                {
-                  "page": 2,
-                  "top": 641,
-                  "left": 681,
-                  "bottom": 652,
-                  "right": 904
-                },
-                {
-                  "page": 2,
-                  "top": 656,
-                  "left": 520,
-                  "bottom": 666,
-                  "right": 905
-                },
-                {
-                  "page": 2,
-                  "top": 671,
-                  "left": 520,
-                  "bottom": 681,
-                  "right": 905
-                },
-                {
-                  "page": 2,
-                  "top": 686,
-                  "left": 519,
-                  "bottom": 696,
-                  "right": 904
-                },
-                {
-                  "page": 2,
-                  "top": 700,
-                  "left": 520,
-                  "bottom": 711,
-                  "right": 904
-                },
-                {
-                  "page": 2,
-                  "top": 715,
-                  "left": 520,
-                  "bottom": 726,
-                  "right": 822
-                }
-              ]
-            },
             {
               "quote": "IOPD | Retrovirus | Cardiomyocytes | Cellular glycogen content; Enzyme activity assay; Measurement of intact cellular respiration; Electron microscopy; Microarray analysis | Glycogen accumulation; GAA enzyme activity; Ultrastructural aberrances; Metabolomics changes | rhGAA L-carnitine | c.1935C>A c.1935C>A/c.2040+1G>T | (25)",
               "bboxes": [
@@ -3693,10 +3663,101 @@
                   "right": 361
                 }
               ]
+            },
+            {
+              "quote": "Patient 1: 1935 C>A; Patient 2: 1935C>A/2040+1G>T | (40)",
+              "bboxes": [
+                {
+                  "page": 4,
+                  "top": 158,
+                  "left": 329,
+                  "bottom": 159,
+                  "right": 339
+                },
+                {
+                  "page": 4,
+                  "top": 160,
+                  "left": 330,
+                  "bottom": 163,
+                  "right": 337
+                },
+                {
+                  "page": 4,
+                  "top": 164,
+                  "left": 330,
+                  "bottom": 167,
+                  "right": 337
+                },
+                {
+                  "page": 4,
+                  "top": 168,
+                  "left": 329,
+                  "bottom": 169,
+                  "right": 339
+                },
+                {
+                  "page": 4,
+                  "top": 199,
+                  "left": 332,
+                  "bottom": 200,
+                  "right": 338
+                },
+                {
+                  "page": 4,
+                  "top": 200,
+                  "left": 330,
+                  "bottom": 228,
+                  "right": 366
+                },
+                {
+                  "page": 4,
+                  "top": 228,
+                  "left": 330,
+                  "bottom": 232,
+                  "right": 365
+                },
+                {
+                  "page": 4,
+                  "top": 232,
+                  "left": 332,
+                  "bottom": 235,
+                  "right": 365
+                },
+                {
+                  "page": 4,
+                  "top": 235,
+                  "left": 330,
+                  "bottom": 239,
+                  "right": 365
+                },
+                {
+                  "page": 4,
+                  "top": 240,
+                  "left": 331,
+                  "bottom": 243,
+                  "right": 365
+                },
+                {
+                  "page": 4,
+                  "top": 243,
+                  "left": 330,
+                  "bottom": 252,
+                  "right": 366
+                },
+                {
+                  "page": 4,
+                  "top": 252,
+                  "left": 331,
+                  "bottom": 262,
+                  "right": 366
+                }
+              ]
             }
           ]
         }
-      ]
+      ],
+      "classification": "Pathogenic",
+      "classification_rationale": "ClinVar 3-star expert panel (ClinGen LSD VCEP) classification as Pathogenic with PM3_Very Strong + PM5 + PS3_Moderate + PP4_Moderate + PP3; >50 unrelated affected individuals documented across multiple independent cohorts including >30 homozygotes and multiple cHet cases confirmed in trans; consistent functional evidence of severely reduced GAA activity (<10% normal); and no refuting evidence from any source."
     }
   ],
   "paper_id_mapping": {

@@ -2,15 +2,15 @@
   "variant_discussed": true,
   "claims": [
     {
-      "text": "A 4-month-old full-term Taiwanese female infant with infantile-onset Pompe disease was found to carry the variant c.1935C>A (p.Asp645Glu) in compound heterozygosity with c.424_440del17 (p.Ser142Leufs*29), along with a pseudodeficiency mutation p.Gly576Ser; the variant is described as pathogenic.",
+      "text": "The patient, a 4-month-old Taiwanese female infant with infantile-onset Pompe disease, was found to carry c.1935C>A (p.Asp645Glu) as one of two pathogenic heterozygous mutations in the GAA gene (compound heterozygous with c.424_440del17 [p.Ser142Leufs*29]).",
       "citations": [
         {
-          "quote": "GAA gene sequencing was performed, and the patient had two pathogenic heterozygous mutations, c.424_440del17 (p.Ser142Leufs*29) and c.1935C>A (p.Asp645Glu). One heterogenous pseudodeficiency mutation, p.Gly576Ser, was also noticed."
+          "quote": "GAA gene sequencing was performed, and the patient had two pathogenic heterozygous mutations, c.424_440del17 (p.Ser142Leufs*29) and c.1935C>A (p.Asp645Glu)."
         }
       ]
     },
     {
-      "text": "The patient's CRIM (cross-reactive immunological material) status was positive, linked specifically to the c.1935C>A (p.Asp645Glu) allele.",
+      "text": "The patient's cross-reactive immunological material (CRIM) status was positive, linked specifically to the c.1935C>A (p.Asp645Glu) allele.",
       "citations": [
         {
           "quote": "Her cross-reactive immunological material (CRIM) status was positive linked to c.1935C>A (p.Asp645Glu). All above findings indicated the diagnosis of Pompe disease."
@@ -18,7 +18,15 @@
       ]
     },
     {
-      "text": "The infant presented at birth with mild hypotonia, occasional shortness of breath, elevated AST 125 U/L, ALT 48 U/L, CK 872 U/L, GAA enzyme activity of 0.04 \u03bcM/h (normal >0.80 \u03bcM/h), cardiomegaly on X-ray, and left ventricular mass index of 105.49 g/m\u00b2 (>95th percentile for age <6 months).",
+      "text": "A one heterozygous pseudodeficiency mutation, p.Gly576Ser, was also identified in this patient alongside the two pathogenic mutations.",
+      "citations": [
+        {
+          "quote": "One heterogenous pseudodeficiency mutation, p.Gly576Ser, was also noticed."
+        }
+      ]
+    },
+    {
+      "text": "The infant presented with infantile-onset Pompe disease features including mild hypotonia, occasional shortness of breath, cardiomegaly on X-ray, elevated AST (125 U/L), ALT (48 U/L), CK (872 U/L), and severely reduced GAA enzyme activity (0.04 \u03bcM/h; normal >0.80 \u03bcM/h), with LVMI of 105.49 g/m\u00b2 (above 95th percentile for age).",
       "citations": [
         {
           "quote": "Laboratory data revealed abnormally high aspartate aminotransferase (AST), alanine aminotransferase (ALT), and creatinine kinase (CK), which were 125 U/L (normal range: <32 U/L), 48 U/L (normal range: <33 U/L), and 872 U/L (normal range: 26\u2013192 U/L), respectively. The enzyme activity test of GAA was 0.04 \u03bcM/h (normal range: >0.80 \u03bcM/h)."
@@ -26,10 +34,18 @@
       ]
     },
     {
-      "text": "The infant was diagnosed with infantile-onset Pompe disease and started enzyme replacement therapy (ERT) at 15 days of age; this represents a single case of compound heterozygosity for c.1935C>A and c.424_440del17 from one unrelated family.",
+      "text": "The variant c.1935C>A (p.Asp645Glu) is described as pathogenic in the context of GAA gene sequencing establishing the diagnosis of Pompe disease.",
       "citations": [
         {
-          "quote": "She was diagnosed with infantile-onset Pompe disease after acidic \u03b1-glucosidase (GAA) gene sequencing. She also received enzyme replacement therapy (ERT) 15 days after birth and regular ERT every other week."
+          "quote": "GAA gene sequencing was performed, and the patient had two pathogenic heterozygous mutations, c.424_440del17 (p.Ser142Leufs*29) and c.1935C>A (p.Asp645Glu). One heterogenous pseudodeficiency mutation, p.Gly576Ser, was also noticed. Her cross-reactive immunological material (CRIM) status was positive linked to c.1935C>A (p.Asp645Glu). All above findings indicated the diagnosis of Pompe disease."
+        }
+      ]
+    },
+    {
+      "text": "The infant was diagnosed with Pompe disease at birth (ERT started at 15 days old), indicating neonatal/early infantile onset of disease.",
+      "citations": [
+        {
+          "quote": "She received regular ERT at an initial dosage of 20 mg/kg intravenous infusion every other week beginning at 15 days old until 2 days before surgery."
         }
       ]
     }
