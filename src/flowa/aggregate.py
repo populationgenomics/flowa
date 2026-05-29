@@ -17,7 +17,12 @@ from flowa.clinvar import format_clinvar_for_prompt, query_clinvar
 from flowa.content_validation import validate_aggregate_category
 from flowa.models import create_model, get_model_settings
 from flowa.prompts import load_prompt_and_schema
-from flowa.resolve import CitationQuery, load_pdf_index_from_storage, resolve_citations
+from flowa.resolve import (
+    CitationQuery,
+    load_markdown_from_storage,
+    load_pdf_index_from_storage,
+    resolve_citations,
+)
 from flowa.schema import AGGREGATION_SCHEMA_VERSION, with_schema_version
 from flowa.settings import ModelConfig, Settings
 from flowa.storage import (
@@ -162,11 +167,11 @@ def resolve_aggregate_citations(
     base: str,
     metadata_cache: dict[str, dict[str, Any]],
 ) -> None:
-    """Post-process aggregate output: resolve quotes to bboxes on claim citations.
+    """Post-process aggregate output: resolve quotes to bboxes + markdown anchors.
 
-    Loads each paper's pre-built `pdf_index.pkl.zst` via the same path the
-    gateway uses; the convert step that ran earlier in this pipeline wrote
-    the artifact, so it's guaranteed to be present.
+    Loads each paper's pre-built `pdf_index.pkl.zst` (PDF bboxes) and `markdown.md`
+    (markdown anchors) via the same path the gateway uses; the convert step
+    earlier in this pipeline wrote both, so they're present.
     """
     # Collect all (doi, quote) pairs, grouped by DOI.
     doi_quotes: dict[str, list[str]] = {}
@@ -179,19 +184,21 @@ def resolve_aggregate_citations(
     citations_input = [CitationQuery(doi=doi, quotes=quotes) for doi, quotes in doi_quotes.items()]
     result = resolve_citations(
         citations_input,
-        index_provider=lambda doi: load_pdf_index_from_storage(base, doi),
+        pdf_index_provider=lambda doi: load_pdf_index_from_storage(base, doi),
+        markdown_provider=lambda doi: load_markdown_from_storage(base, doi),
     )
 
-    # Attach resolved bboxes onto each claim's citations.
+    # Attach resolved bboxes + markdown anchor onto each claim's citations.
     for cat_result in aggregate_dict['results']:
         for claim in cat_result['claims']:
             doi = paper_id_to_doi[claim['paper_id']]
             for citation in claim['citations']:
                 quote = citation['quote']
-                bboxes = result.resolved.get(doi, {}).get(quote, [])
-                citation['bboxes'] = [b.model_dump() for b in bboxes]
-                if not bboxes:
-                    log.warning('No bboxes resolved for %s quote: %.80s...', doi, quote)
+                rq = result.resolved.get(doi, {}).get(quote)
+                citation['bboxes'] = [b.model_dump() for b in rq.bboxes] if rq else []
+                citation['markdown_anchor'] = rq.markdown_anchor.model_dump() if rq and rq.markdown_anchor else None
+                if not (rq and (rq.bboxes or rq.markdown_anchor)):
+                    log.warning('Quote unresolved (no bbox or anchor) for %s: %.80s...', doi, quote)
 
     # Add paper_id_mapping: {AuthorYear -> {doi, pmid}} for cross-referencing
     # prose citations with papers. Consumers build the reverse index on read.

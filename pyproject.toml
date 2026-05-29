@@ -14,7 +14,7 @@ classifiers = [
     "Development Status :: 4 - Beta",
 ]
 dependencies = [
-    "anchorite>=0.4.1",
+    "anchorite>=0.5.0",
     "boto3",
     "defusedxml",
     "fsspec",
@@ -22,6 +22,7 @@ dependencies = [
     "httpx",
     "jinja2",
     "logfire",
+    "markitdown[docx,xls,xlsx]>=0.1.5",
     "pydantic-settings",
     "pypdf",
     "s3fs",   # S3/MinIO support for fsspec

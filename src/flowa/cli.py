@@ -9,7 +9,7 @@ import typer
 from pydantic_ai import Agent
 from pydantic_ai.models.instrumented import InstrumentationSettings
 
-from flowa import __version__, aggregate, convert, download, extract, query, resolve, run
+from flowa import __version__, aggregate, assemble, convert, download, extract, query, resolve, run
 
 app = typer.Typer(
     name='flowa',
@@ -66,6 +66,7 @@ app.command(name='run')(run.run)
 app.command(name='query')(query.query_dois)
 app.command(name='download')(download.download_paper)
 app.command(name='convert')(convert.convert_paper)
+app.command(name='assemble')(assemble.assemble)
 app.command(name='extract')(extract.extract_paper)
 app.command(name='aggregate')(aggregate.aggregate_evidence)
 app.command(name='resolve')(resolve.resolve)

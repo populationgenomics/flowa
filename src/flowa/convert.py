@@ -16,6 +16,7 @@ from anchorite.document import chunks  # type: ignore[import-untyped]
 from pydantic_ai import Agent
 from pydantic_ai.messages import BinaryContent
 
+from flowa.assemble import assemble_paper
 from flowa.models import create_model, get_model_settings
 from flowa.pdf_index_cache import build as build_pdf_index_payload
 from flowa.pdf_index_cache import serialize as serialize_pdf_index_payload
@@ -122,23 +123,26 @@ async def transcribe(
 
 
 async def convert_paper_async(base: str, doi: str, model: ModelConfig, prompt_set: str = 'generic') -> None:
-    """Convert a single paper's PDF to Markdown and persist its `PdfIndex`.
+    """Transcribe `source.pdf`, persist its `PdfIndex`, and assemble `markdown.md`.
 
-    Reads PDF from papers/{encoded_doi}/source.pdf and writes
-    papers/{encoded_doi}/markdown.md plus papers/{encoded_doi}/pdf_index.pkl.zst
-    (consumed by the gateway's resolve endpoint).
+    Reads papers/{encoded_doi}/source.pdf and writes:
+      - source.md           — vision-LLM transcription of the PDF
+      - pdf_index.pkl.zst    — built from the PDF, consumed by the resolve endpoint
+      - markdown.md          — source.md + converted supplements (via flowa.assemble)
 
-    Either artifact can be missing independently — if a previous run failed
-    or pre-dates the pdf_index step, the next call fills in only what's
-    missing without re-transcribing or re-building work that's already done.
+    Each artifact is produced only when missing, so a previous partial run (or
+    one pre-dating an artifact) is filled in without redoing finished work.
     """
-    md_url = paper_url(base, doi, 'markdown.md')
+    source_md_url = paper_url(base, doi, 'source.md')
+    markdown_url = paper_url(base, doi, 'markdown.md')
     index_url = paper_url(base, doi, 'pdf_index.pkl.zst')
-    md_needed = not exists(md_url)
-    index_needed = not exists(index_url)
 
-    if not md_needed and not index_needed:
-        log.info('Already converted: %s', md_url)
+    source_md_needed = not exists(source_md_url)
+    index_needed = not exists(index_url)
+    markdown_needed = not exists(markdown_url)
+
+    if not (source_md_needed or index_needed or markdown_needed):
+        log.info('Already converted: %s', doi)
         return
 
     pdf_url = paper_url(base, doi, 'source.pdf')
@@ -148,8 +152,8 @@ async def convert_paper_async(base: str, doi: str, model: ModelConfig, prompt_se
         log.info('Skipping DOI %s: PDF not available', doi)
         return
 
-    markdown: str | None = None
-    if md_needed:
+    source_md: str | None = None
+    if source_md_needed:
         log.info(
             'Converting DOI %s (%d bytes, model: %s, chunk: %d pages)', doi, len(pdf_bytes), model.name, PAGES_PER_CHUNK
         )
@@ -158,10 +162,11 @@ async def convert_paper_async(base: str, doi: str, model: ModelConfig, prompt_se
         result = await transcribe(pdf_bytes, model=model, prompt=prompt, page_count=PAGES_PER_CHUNK)
         elapsed = time.monotonic() - t0
 
-        markdown = result.markdown
-        write_text(md_url, markdown)
+        source_md = result.markdown
+        write_text(source_md_url, source_md)
         write_bytes(paper_url(base, doi, 'convert_raw.json'), json.dumps(result.all_messages).encode())
-        log.info('Converted DOI %s: %d chars in %.1fs', doi, len(markdown), elapsed)
+        log.info('Transcribed DOI %s: %d chars in %.1fs', doi, len(source_md), elapsed)
+        markdown_needed = True  # a fresh source.md must flow into markdown.md
 
     if index_needed:
         # PdfIndex construction is CPU-bound (~8s on the deployed gateway
@@ -170,14 +175,19 @@ async def convert_paper_async(base: str, doi: str, model: ModelConfig, prompt_se
         # the result; see `flowa.pdf_index_cache` for the storage format.
         # `asyncio.to_thread` keeps the rest of the convert pipeline (other
         # papers being transcribed concurrently) unblocked.
-        if markdown is None:  # index missing but markdown already on disk
-            markdown = read_text(md_url)
+        if source_md is None:  # index missing but source.md already on disk
+            source_md = read_text(source_md_url)
         t0 = time.monotonic()
         blob = await asyncio.to_thread(
-            lambda: serialize_pdf_index_payload(build_pdf_index_payload(pdf_bytes, markdown))
+            lambda: serialize_pdf_index_payload(build_pdf_index_payload(pdf_bytes, source_md))
         )
         write_bytes(index_url, blob)
         log.info('Wrote pdf_index for DOI %s: %.1f MB in %.1fs', doi, len(blob) / 1e6, time.monotonic() - t0)
+
+    if markdown_needed:
+        # source.md + supplements -> markdown.md. markitdown is sync CPU-bound,
+        # so it runs off the event loop. No index is built here.
+        await asyncio.to_thread(assemble_paper, base, doi)
 
 
 def convert_paper(
@@ -185,8 +195,9 @@ def convert_paper(
 ) -> None:
     """Convert PDF to Markdown.
 
-    Reads PDF from papers/{encoded_doi}/source.pdf in object storage.
-    Stores result to papers/{encoded_doi}/markdown.md.
+    Reads PDF from papers/{encoded_doi}/source.pdf in object storage. Writes the
+    transcription to source.md, the pre-built index to pdf_index.pkl.zst, and the
+    assembled source.md + supplements to markdown.md.
     """
     s = Settings()  # type: ignore[call-arg]
     asyncio.run(convert_paper_async(s.flowa_storage_base, doi, s.flowa_convert_model, s.flowa_prompt_set))

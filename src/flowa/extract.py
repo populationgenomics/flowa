@@ -16,8 +16,10 @@ from flowa.storage import assessment_url, encode_doi, exists, paper_url, read_js
 
 log = logging.getLogger(__name__)
 
-# Maximum tokens per paper (heuristic: 1 token ≈ 4 chars)
-MAX_PAPER_TOKENS = 60000
+# Maximum tokens per paper (heuristic: 1 token ≈ 4 chars). Sized for markdown.md
+# = main paper + appended supplements; the build-time per-paper supplement budget
+# (flowa.assemble) is the primary gate, this is the safety net for oversized input.
+MAX_PAPER_TOKENS = 100000
 MAX_PAPER_CHARS = MAX_PAPER_TOKENS * 4
 
 # Cap for thinking + structured-output combined; matches Sonnet 4.6's max output.

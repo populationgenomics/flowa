@@ -3,6 +3,7 @@
 import asyncio
 import json
 import logging
+import re
 import tempfile
 from pathlib import Path
 
@@ -130,6 +131,33 @@ def _s3_url_to_key(s3_url: str) -> str:
     return path.split('?')[0]
 
 
+def _partition_media_urls(media_urls: list[str]) -> tuple[list[str], list[str]]:
+    """Split PMC ``media_urls`` into ``(pdf_urls, office_urls)`` by extension.
+
+    ``office`` is xlsx/xls/docx — the supplement types markitdown converts. ``.doc``
+    (legacy OLE Word, which markitdown's docx backend can't read) and all other
+    media (images, etc.) are dropped: absent from both lists.
+    """
+    pdf_urls: list[str] = []
+    office_urls: list[str] = []
+    for url in media_urls:
+        path = url.lower().split('?')[0]
+        if path.endswith('.pdf'):
+            pdf_urls.append(url)
+        elif path.endswith(('.xlsx', '.xls', '.docx')):
+            office_urls.append(url)
+    return pdf_urls, office_urls
+
+
+def _sanitize_supplement_filename(basename: str) -> str:
+    """Sanitise a supplement basename for safe use in a storage path.
+
+    PMC media basenames are ASCII-safe; user uploads vary. Collapses any
+    character outside ``[A-Za-z0-9._-]`` to ``_`` and caps the length at 128.
+    """
+    return re.sub(r'[^A-Za-z0-9._-]', '_', basename)[:128]
+
+
 @retry_transient_http
 async def _fetch_pmcid(client: httpx.AsyncClient, pmid: int, email: str, tool: str) -> str | None:
     """Resolve PMID -> PMCID via NCBI idconv; None when no PMCID is registered."""
@@ -145,23 +173,30 @@ async def _fetch_pmcid(client: httpx.AsyncClient, pmid: int, email: str, tool: s
     return records[0].get('pmcid')
 
 
-async def fetch_pmc_pdf(pmid: int, client: httpx.AsyncClient, email: str, tool: str) -> tuple[bytes | None, str]:
-    """Attempt to fetch PDF from PMC for a given PMID.
+async def fetch_pmc_paper(
+    pmid: int, client: httpx.AsyncClient, email: str, tool: str
+) -> tuple[bytes | None, list[tuple[str, bytes]], str]:
+    """Fetch a paper's source PDF and its xlsx/docx supplements from PMC.
+
+    The main PDF plus any PDF supplements are concatenated into a single PDF.
+    xlsx/xls/docx supplements are returned as raw ``(basename, bytes)`` pairs in
+    PMC ``media_urls`` order for the caller to store; ``.doc`` (legacy OLE Word)
+    and other media (images, etc.) are ignored.
 
     Returns:
-        Tuple of (pdf_bytes or None, message)
+        ``(pdf_bytes_or_None, supplements, message)``.
     """
     # Step 1: Get PMCID from idconv API
     pmcid = await _fetch_pmcid(client, pmid, email, tool)
     if pmcid is None:
-        return None, 'No PMCID found (not in PMC)'
+        return None, [], 'No PMCID found (not in PMC)'
     log.debug('Found PMCID: %s', pmcid)
 
     # Step 2: Find latest version in S3 bucket
     s3 = _make_s3_client()
     version = await asyncio.to_thread(_resolve_latest_version, s3, pmcid)
     if version is None:
-        return None, f'{pmcid} not in PMC OA bucket'
+        return None, [], f'{pmcid} not in PMC OA bucket'
 
     # Step 3: Fetch per-article metadata JSON
     metadata_key = f'metadata/{pmcid}.{version}.json'
@@ -169,34 +204,40 @@ async def fetch_pmc_pdf(pmid: int, client: httpx.AsyncClient, email: str, tool: 
     metadata_bytes = await asyncio.to_thread(_download_s3_object, s3, metadata_key)
     metadata = json.loads(metadata_bytes)
 
-    # Step 4: Identify main PDF and supplement PDFs
+    # Step 4: Identify the main PDF, PDF supplements, and xlsx/docx supplements
     pdf_url = metadata.get('pdf_url')
     if not pdf_url:
-        return None, f'No pdf_url in metadata for {pmcid}.{version}'
+        return None, [], f'No pdf_url in metadata for {pmcid}.{version}'
 
     main_pdf_key = _s3_url_to_key(pdf_url)
-    supplement_keys = [
-        _s3_url_to_key(url) for url in metadata.get('media_urls', []) if url.lower().split('?')[0].endswith('.pdf')
-    ]
+    pdf_supplement_urls, office_supplement_urls = _partition_media_urls(metadata.get('media_urls', []))
+    pdf_supplement_keys = [_s3_url_to_key(u) for u in pdf_supplement_urls]
+    office_keys = [_s3_url_to_key(u) for u in office_supplement_urls]
 
-    log.debug('Main PDF: %s, %d supplement PDFs', main_pdf_key, len(supplement_keys))
+    log.debug(
+        'Main PDF: %s, %d PDF supplements, %d xlsx/docx supplements',
+        main_pdf_key,
+        len(pdf_supplement_keys),
+        len(office_keys),
+    )
 
-    # Step 5: Download all PDFs
     async def download(key: str) -> bytes:
         return await asyncio.to_thread(_download_s3_object, s3, key)
 
-    all_keys = [main_pdf_key, *supplement_keys]
-    all_contents = await asyncio.gather(*[download(key) for key in all_keys])
+    # Step 5: Download PDFs (main + PDF supplements) and the office supplements.
+    pdf_keys = [main_pdf_key, *pdf_supplement_keys]
+    pdf_contents = await asyncio.gather(*[download(key) for key in pdf_keys])
+    office_contents = await asyncio.gather(*[download(key) for key in office_keys])
 
-    # Step 6: Write to temp files, filter supplements, concatenate
+    # Step 6: Write PDFs to temp files, filter by page count, concatenate.
     with tempfile.TemporaryDirectory() as tmpdir:
         tmpdir_path = Path(tmpdir)
 
         main_path = tmpdir_path / 'main.pdf'
-        main_path.write_bytes(all_contents[0])
+        main_path.write_bytes(pdf_contents[0])
 
         supplement_paths: list[Path] = []
-        for i, content in enumerate(all_contents[1:]):
+        for i, content in enumerate(pdf_contents[1:]):
             path = tmpdir_path / f'supplement_{i:03d}.pdf'
             path.write_bytes(content)
             supplement_paths.append(path)
@@ -208,8 +249,14 @@ async def fetch_pmc_pdf(pmid: int, client: httpx.AsyncClient, email: str, tool: 
         concatenate_pdfs(all_pdfs, output_path)
         result_bytes = output_path.read_bytes()
 
-    message = f'Downloaded from PMC ({pmcid}.{version}) - {len(all_pdfs)} PDFs ({len(supplement_paths)} supplements)'
-    return result_bytes, message
+    # Office supplements keep PMC media order; the caller assigns ord prefixes.
+    supplements = [(key.rsplit('/', 1)[-1], data) for key, data in zip(office_keys, office_contents, strict=True)]
+
+    message = (
+        f'Downloaded from PMC ({pmcid}.{version}) - {len(all_pdfs)} PDFs '
+        f'({len(supplement_paths)} PDF supplements), {len(supplements)} xlsx/docx supplements'
+    )
+    return result_bytes, supplements, message
 
 
 async def download_paper_async(
@@ -236,14 +283,19 @@ async def download_paper_async(
     log.info('Downloading %s (PMID %s)', doi, pmid)
 
     async with httpx.AsyncClient(timeout=timeout) as client:
-        pdf_bytes, message = await fetch_pmc_pdf(pmid, client, email, tool)
+        pdf_bytes, supplements, message = await fetch_pmc_paper(pmid, client, email, tool)
 
     if pdf_bytes is None:
         log.info('%s not available in PMC: %s', doi, message)
         return
 
     write_bytes(pdf_url, pdf_bytes)
-    log.info('Downloaded %s: %s (%d bytes)', doi, message, len(pdf_bytes))
+    # Store xlsx/docx supplements under papers/{doi}/supplements/. The ord
+    # prefix freezes PMC media order so assemble has a deterministic sequence.
+    for ord_i, (basename, data) in enumerate(supplements):
+        safe = _sanitize_supplement_filename(basename)
+        write_bytes(paper_url(base, doi, f'supplements/{ord_i:03d}_{safe}'), data)
+    log.info('Downloaded %s: %s (%d bytes, %d supplements)', doi, message, len(pdf_bytes), len(supplements))
 
 
 def download_paper(

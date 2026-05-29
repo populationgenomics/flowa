@@ -104,3 +104,18 @@ def write_text(url: str, text: str) -> None:
     """Write text to a storage URL."""
     with fsspec.open(url, 'w') as f:
         f.write(text)
+
+
+def list_paper_supplements(base: str, doi: str) -> list[str]:
+    """List supplement filenames under ``papers/{doi}/supplements/``, sorted.
+
+    Returns basenames (e.g. ``'000_table_s1.xlsx'``); the ``ord`` prefix makes
+    the sort the ingestion order. Empty list when the directory is absent. Read
+    a supplement's bytes back via
+    ``read_bytes(paper_url(base, doi, f'supplements/{name}'))``.
+    """
+    url = paper_url(base, doi, 'supplements')
+    fs, path = fsspec.core.url_to_fs(url)
+    if not fs.exists(path):
+        return []
+    return sorted(entry.rstrip('/').rsplit('/', 1)[-1] for entry in fs.ls(path, detail=False))
