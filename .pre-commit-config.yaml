@@ -3,7 +3,7 @@
 # automatically runs it locally and in CI.
 repos:
   - repo: https://github.com/pre-commit/pre-commit-hooks
-    rev: v4.5.0
+    rev: v6.0.0
     hooks:
       - id: check-yaml
         exclude: '\.*conda/.*'
@@ -70,6 +70,19 @@ repos:
       # so `pass_filenames: false`; the `files:` regex only decides *whether*
       # to fire (any staged TS change → run the full workspace gate), so a
       # docs-only commit skips them. `--all-files` in CI fires every hook.
+      #
+      # ts-build MUST come first: @flowajs/chat-service + @flowajs/react-viewer
+      # are consumed via their exports maps (→ dist/), which is gitignored and
+      # not built on `pnpm install` (ignore-scripts, no prepare script). Without
+      # this, the workspace typecheck/test can't resolve `@flowajs/*` from
+      # examples/demo + prompts/ on a fresh checkout (e.g. CI). pre-commit runs
+      # hooks in listed order, so this builds dist/ before tsc/vitest see it.
+      - id: ts-build
+        name: build workspace packages
+        entry: pnpm --filter @flowajs/chat-service --filter @flowajs/react-viewer build
+        language: system
+        pass_filenames: false
+        files: \.(ts|tsx)$
       - id: ts-typecheck
         name: tsc --noEmit (workspace)
         entry: pnpm -r typecheck
