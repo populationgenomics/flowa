@@ -191,6 +191,51 @@ describe("EvidenceViewerShell", () => {
     expect(screen.getByTestId("version-select")).toBeDefined();
   });
 
+  it("does not clobber a paper the curator selected while the snapshot load was in flight", async () => {
+    // Defer the load so we can interleave a user click before it resolves.
+    let resolveLoad!: () => void;
+    const backend = makeBackend({ claims: [], papers: [], comments: [] });
+    backend.load = (key) => {
+      backend.loadCalls.push(key);
+      return new Promise<TriageSnapshotPayload>((resolve) => {
+        resolveLoad = () => resolve({ claims: [], papers: [], comments: [] });
+      });
+    };
+
+    render(
+      wrap(
+        <EvidenceViewerShell
+          {...baseProps}
+          artifact={ARTIFACT}
+          backend={backend}
+          chatSessionFactory={NEVER_SESSION}
+          onVersionChange={vi.fn()}
+        />,
+      ),
+    );
+
+    // The paper rail is driven by the artifact, not the triage snapshot, so
+    // it is interactive while the load is still pending. Select the *second*
+    // paper — the one the default initial-focus logic would never pick.
+    fireEvent.click(screen.getByTestId("paper-row-Jones2023"));
+    await waitFor(() =>
+      expect(
+        screen.getByTestId("focus-card").getAttribute("data-paper-id"),
+      ).toBe("Jones2023"),
+    );
+
+    // Let the load resolve. `loadFromServer` populates the store
+    // (workspaceKey set = load processed); the default focus (Smith2024, 1)
+    // must not override the curator's Jones2023 selection.
+    resolveLoad();
+    await waitFor(() =>
+      expect(useTriageStore.getState().workspaceKey).not.toBeNull(),
+    );
+    expect(screen.getByTestId("focus-card").getAttribute("data-paper-id")).toBe(
+      "Jones2023",
+    );
+  });
+
   it("accepting a claim updates the store optimistically and fires backend.setClaimState", async () => {
     const backend = makeBackend({ claims: [], papers: [], comments: [] });
     render(

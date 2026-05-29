@@ -200,6 +200,13 @@ export function EvidenceViewerShell({
           comments: snap.comments,
         });
         if (!artifact) return;
+        // The snapshot load is async; the curator may have clicked a paper
+        // or claim while it was in flight. Their explicit selection wins —
+        // computing an initial focus here would yank the cursor back to the
+        // first unreviewed claim, and because the Accept/Reject buttons are
+        // gated on `triageReady`, a pending click would then land on the
+        // wrong claim.
+        if (useTriageStore.getState().focusedPaperId != null) return;
         let initialPaper: string | null = null;
         let initialClaim: number | null = null;
         if (initialFocusTarget) {
