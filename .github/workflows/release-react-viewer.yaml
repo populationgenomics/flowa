@@ -39,13 +39,14 @@ jobs:
 
       - uses: actions/setup-node@v5
         with:
-          node-version: "22"
+          node-version-file: .nvmrc
           registry-url: "https://registry.npmjs.org"
           cache: "pnpm"
 
-      # Trusted publishing requires npm >= 11.5.1; Node 22.x ships npm 10.9.x.
-      # Install to a fresh prefix to sidestep `npm install -g npm@X` clobbering
-      # its own node_modules mid-upgrade.
+      # Trusted publishing requires npm >= 11.5.1, newer than the npm bundled
+      # with Node, so pin a known-good version. Install to a fresh prefix to
+      # sidestep `npm install -g npm@X` clobbering its own node_modules
+      # mid-upgrade.
       - name: Pin npm
         run: |
           mkdir -p "$RUNNER_TEMP/npm-pin"
