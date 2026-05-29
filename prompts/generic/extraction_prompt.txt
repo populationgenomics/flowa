@@ -43,14 +43,8 @@ Emit SEPARATE claims only when the facts come from DIFFERENT passages (e.g. pati
 
 Use multiple citations on a single claim ONLY when several quotes jointly establish one synthesis fact (e.g. pedigree figure + patient identification + measurement value together establishing segregation).
 
-Counter-example — patient-row "31 | M | 28 | 10 | Syncope | 14174a>g | Y4725C | CT | Trio | de novo | none | none":
+Example — a single patient row establishes several facts (sex, age at analysis, onset age, zygosity, de novo status). Synthesise them into ONE claim and cite the full row once:
 
-  WRONG (row split across claims with the same quote):
-    {"text": "Patient 31 is male", "citations": [{"quote": "31 | M | 28 | 10 | ..."}]}
-    {"text": "Patient 31 had onset age 10", "citations": [{"quote": "31 | M | 28 | 10 | ..."}]}
-    {"text": "Patient 31 was confirmed de novo", "citations": [{"quote": "31 | M | 28 | 10 | ..."}]}
-
-  RIGHT (one claim per passage, row cited once):
     {"text": "Patient 31 (male, onset age 10, syncope, age 28 at analysis) carries the variant in the C-terminal domain, confirmed de novo by trio testing with both parents phenotypically unaffected.", "citations": [{"quote": "31 | M | 28 | 10 | Syncope | 14174a>g | Y4725C | CT | Trio | de novo | none | none"}]}
 
 Example claim format:
