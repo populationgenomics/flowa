@@ -79,9 +79,13 @@ describe("loadAggregate", () => {
       dataDir,
     });
     expect(loaded).not.toBeNull();
-    expect(loaded!.artifact.code).toBe("Pathogenic");
-    expect(loaded!.artifact.codeRationale).toBe("Strong evidence.");
-    expect(loaded!.artifact.descriptionShort).toBe("Description text.");
+    expect(loaded!.artifact.category).toBe("acmg_classification");
+    expect(loaded!.artifact.description).toBe("Description text.");
+    // Classification stays on the raw category, not the rendered artifact.
+    expect(loaded!.rawCategory.classification).toBe("Pathogenic");
+    expect(loaded!.rawCategory.classification_rationale).toBe(
+      "Strong evidence.",
+    );
     expect(loaded!.artifact.papers).toEqual([
       { paperId: "Smith2024", rankRationale: "Functional." },
       { paperId: "Jones2023", rankRationale: "Clinical." },
@@ -224,8 +228,9 @@ describe("loadEditDraft", () => {
       dataDir,
     });
     expect(loaded).not.toBeNull();
-    expect(loaded!.artifact.code).toBe("Likely Pathogenic");
-    expect(loaded!.artifact.descriptionShort).toBe("Updated description.");
+    expect(loaded!.artifact.category).toBe("acmg_classification");
+    expect(loaded!.artifact.description).toBe("Updated description.");
+    expect(loaded!.rawCategory.classification).toBe("Likely Pathogenic");
     expect(loaded!.paperIdMapping.byDoi["10.1234/smith.2024"]).toBe(
       "Smith2024",
     );

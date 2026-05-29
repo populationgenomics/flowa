@@ -86,9 +86,8 @@ function toRankedPaper(raw: RawRankedPaper): RankedPaper {
 
 function toCategorySuggestion(raw: RawCategoryResult): CategorySuggestion {
   return {
-    code: raw.classification,
-    codeRationale: raw.classification_rationale,
-    descriptionShort: raw.description,
+    category: raw.category,
+    description: raw.description,
     notes: raw.notes,
     papers: raw.papers.map(toRankedPaper),
     claims: raw.claims.map(toClaim),

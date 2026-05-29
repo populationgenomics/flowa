@@ -31,6 +31,9 @@ eggs/
 # unrelated `lib/` directories nested under packages or examples.
 /lib/
 /lib64/
+# Local dev/spike scripts live in the root /scripts/ dir. Anchored to the
+# repo root so it doesn't shadow the tracked examples/demo/scripts/ entry.
+/scripts/
 parts/
 sdist/
 var/

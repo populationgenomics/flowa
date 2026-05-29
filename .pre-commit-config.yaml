@@ -62,3 +62,35 @@ repos:
         language: system
         files: \.(ts|tsx|js|jsx|mjs|cjs|json|yaml|yml)$
         exclude: ^pnpm-lock\.yaml$
+
+      # Type + test gates. tsc and vitest run nowhere on push/PR otherwise
+      # (the TS packages are only typechecked/tested in their release
+      # workflows), which let the demo's CategorySuggestion consumer rot
+      # silently through the schema rename. These are whole-project checks,
+      # so `pass_filenames: false`; the `files:` regex only decides *whether*
+      # to fire (any staged TS change → run the full workspace gate), so a
+      # docs-only commit skips them. `--all-files` in CI fires every hook.
+      - id: ts-typecheck
+        name: tsc --noEmit (workspace)
+        entry: pnpm -r typecheck
+        language: system
+        pass_filenames: false
+        files: \.(ts|tsx)$
+      - id: ts-test
+        name: vitest (workspace)
+        entry: pnpm -r test
+        language: system
+        pass_filenames: false
+        files: \.(ts|tsx)$
+      - id: pytest
+        name: pytest (flowa)
+        entry: uv run --no-sync pytest tests/
+        language: system
+        pass_filenames: false
+        files: ^(src/flowa/|tests/).*\.py$
+      - id: pytest-demo-gateway
+        name: pytest (demo-gateway)
+        entry: bash -c 'cd examples/demo-gateway && uv run --no-sync pytest tests/'
+        language: system
+        pass_filenames: false
+        files: ^examples/demo-gateway/.*\.py$

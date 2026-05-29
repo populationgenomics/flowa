@@ -6,6 +6,23 @@ Variant literature assessment pipeline with AI extraction.
 
 *Each citation in the aggregated assessment links back to the exact highlighted quote in the source paper's PDF.*
 
+## Quickstart
+
+Run the whole stack locally against a captured example variant. The demo ships pre-seeded with a real assessment, so the evidence viewer is populated the moment it boots — you don't have to run the pipeline yourself to explore it.
+
+```bash
+git clone https://github.com/populationgenomics/flowa.git
+cd flowa
+pnpm install                                       # repo root — this is a pnpm workspace
+cp examples/demo/.env.example examples/demo/.env   # the demo's only config file
+# Edit examples/demo/.env: uncomment exactly one provider block and fill in your key.
+pnpm demo
+```
+
+Then open <http://localhost:7700>. `pnpm demo` builds the workspace packages and boots three services — Next.js (UI + triage API), chat-service, and a Python pipeline gateway.
+
+**Prerequisites:** [Node 24+](https://nodejs.org) (the demo uses the built-in `node:sqlite`) and [uv](https://docs.astral.sh/uv/getting-started/installation/) on your `PATH`. For the full walkthrough, demo simplifications, and how to run a live pipeline, see [`examples/demo/README.md`](examples/demo/README.md).
+
 ## Architecture
 
 Flowa is a single async pipeline that processes genetic variant literature:
@@ -24,15 +41,15 @@ Papers are processed in parallel. LLM concurrency is controlled via `--llm-concu
 
 ## Installation
 
-Install from PyPI, opting into the provider extras you need (one of `anthropic`, `bedrock`, `google`, `openai`):
+The [Quickstart](#quickstart) above needs no separate install. To use the pipeline as a library or CLI in your own project, install `flowapy` from PyPI, opting into the provider extras you need (one or more of `anthropic`, `bedrock`, `google`, `openai`):
 
 ```bash
-pip install 'flowapy[bedrock]==0.1.0'
+pip install 'flowapy[bedrock]'
 # or
-uv pip install 'flowapy[bedrock,anthropic]==0.1.0'
+uv pip install 'flowapy[bedrock,anthropic]'
 ```
 
-The `flowa` CLI is exposed as a console script. See [Configuration](#configuration) for credentials and storage setup.
+The PyPI distribution is named `flowapy` (the `flowa` name was already taken), but the import, module, and CLI are all `flowa`. The CLI is exposed as a console script — see [Configuration](#configuration) for credentials and storage setup.
 
 ## Usage
 
@@ -52,11 +69,22 @@ flowa aggregate --variant-id VAR123
 
 ### Environment Variables
 
-| Variable                | Description                                                       | Example                                            |
-| ----------------------- | ----------------------------------------------------------------- | -------------------------------------------------- |
-| `FLOWA_STORAGE_BASE`    | Storage path for PDFs, extractions, results                       | `s3://bucket`, `gs://bucket`, `file:///path`        |
-| `FLOWA_CONVERT_MODEL`   | LLM for PDF→Markdown conversion (anchorite)                     | `bedrock:au.anthropic.claude-sonnet-4-6`        |
-| `FLOWA_EXTRACTION_MODEL`| LLM for extraction and aggregation                               | `bedrock:au.anthropic.claude-opus-4-6`          |
+The model settings are nested config objects: set their sub-fields with the `__` delimiter — `__NAME` selects the model. These three are required:
+
+| Variable                       | Description                                                                  | Example                                      |
+| ------------------------------ | ---------------------------------------------------------------------------- | -------------------------------------------- |
+| `FLOWA_STORAGE_BASE`           | Storage path for PDFs, extractions, results                                  | `s3://bucket`, `gs://bucket`, `file:///path` |
+| `FLOWA_CONVERT_MODEL__NAME`    | LLM for PDF→Markdown conversion (anchorite), in `<provider>:<model>` form   | `bedrock:au.anthropic.claude-sonnet-4-6`     |
+| `FLOWA_EXTRACTION_MODEL__NAME` | LLM for extraction and aggregation                                           | `bedrock:au.anthropic.claude-opus-4-6`       |
+
+Optional:
+
+| Variable                                            | Description                                                                                                                  |
+| --------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------- |
+| `FLOWA_CONVERT_MODEL__BEDROCK_INFERENCE_PROFILE`    | Bedrock application inference profile ARN for cost attribution. When set, `__NAME` must point at the underlying foundation model. |
+| `FLOWA_EXTRACTION_MODEL__BEDROCK_INFERENCE_PROFILE` | Same, for the extraction/aggregation model.                                                                                 |
+| `MASTERMIND_API_TOKEN`                              | Required when querying with `--source mastermind`; use `--source litvar` (free, no token) otherwise.                        |
+| `NCBI_API_KEY`                                      | Optional NCBI key for higher PubMed rate limits.                                                                            |
 
 ### LLM Providers
 
@@ -198,10 +226,12 @@ The tag-driven workflow (`.github/workflows/release-flowapy.yaml`) builds the pa
 
 ### Local Development
 
+Run the pipeline directly from a checkout (the [Quickstart](#quickstart) demo wraps this with a UI):
+
 ```bash
 export FLOWA_STORAGE_BASE=file:///tmp/flowa
-export FLOWA_CONVERT_MODEL=bedrock:au.anthropic.claude-sonnet-4-6
-export FLOWA_EXTRACTION_MODEL=bedrock:au.anthropic.claude-opus-4-6
+export FLOWA_CONVERT_MODEL__NAME=bedrock:au.anthropic.claude-sonnet-4-6
+export FLOWA_EXTRACTION_MODEL__NAME=bedrock:au.anthropic.claude-opus-4-6
 uv run flowa run --variant-id test --gene GAA --hgvs-c "NM_000152.5:c.2238G>C" --source litvar
 ```
 
@@ -211,8 +241,8 @@ uv run flowa run --variant-id test --gene GAA --hgvs-c "NM_000152.5:c.2238G>C" -
 docker build --build-arg LLM_EXTRA=bedrock -t flowa .
 docker run \
   -e FLOWA_STORAGE_BASE=s3://bucket \
-  -e FLOWA_CONVERT_MODEL=bedrock:au.anthropic.claude-sonnet-4-6 \
-  -e FLOWA_EXTRACTION_MODEL=bedrock:au.anthropic.claude-opus-4-6 \
+  -e FLOWA_CONVERT_MODEL__NAME=bedrock:au.anthropic.claude-sonnet-4-6 \
+  -e FLOWA_EXTRACTION_MODEL__NAME=bedrock:au.anthropic.claude-opus-4-6 \
   -e AWS_REGION=ap-southeast-2 \
   flowa run --variant-id VAR123 --gene GAA --hgvs-c "NM_000152.5:c.2238G>C" --source litvar
 ```
@@ -233,8 +263,8 @@ aws batch register-job-definition \
     ],
     "environment": [
       {"name": "FLOWA_STORAGE_BASE", "value": "s3://flowa-data"},
-      {"name": "FLOWA_CONVERT_MODEL", "value": "bedrock:au.anthropic.claude-sonnet-4-6"},
-      {"name": "FLOWA_EXTRACTION_MODEL", "value": "bedrock:au.anthropic.claude-opus-4-6"}
+      {"name": "FLOWA_CONVERT_MODEL__NAME", "value": "bedrock:au.anthropic.claude-sonnet-4-6"},
+      {"name": "FLOWA_EXTRACTION_MODEL__NAME", "value": "bedrock:au.anthropic.claude-opus-4-6"}
     ]
   }' \
   --retry-strategy '{"attempts": 2}' \

@@ -86,6 +86,32 @@ if (pdfjsCopy.status !== 0) {
   process.exit(1);
 }
 
+// `@flowajs/chat-service` and `@flowajs/react-viewer` are consumed via their
+// `exports` maps, which resolve to `dist/`. On a cold clone `dist/` doesn't
+// exist yet, and the workspace's `ignore-scripts=true` policy means no
+// `prepare`/`postinstall` builds it. The `chat` process below imports
+// chat-service's `dist/server.js` at startup and has no watcher, so without a
+// prebuild it crashes with ERR_MODULE_NOT_FOUND and `killOthersOn:["failure"]`
+// tears the whole demo down. Build both once up front; react-viewer's watchers
+// (below) keep its `dist/` fresh after this initial build.
+const prebuild = spawnSync(
+  "pnpm",
+  [
+    "--filter",
+    "@flowajs/chat-service",
+    "--filter",
+    "@flowajs/react-viewer",
+    "build",
+  ],
+  { cwd: demoRoot, stdio: "inherit" },
+);
+if (prebuild.status !== 0) {
+  console.error(
+    "failed to build @flowajs/chat-service / @flowajs/react-viewer",
+  );
+  process.exit(1);
+}
+
 // Translate LLM_MODEL + BEDROCK_INFERENCE_PROFILE into the FLOWA_* shape
 // pydantic-settings expects on the Python side. Provider creds (AWS_*,
 // ANTHROPIC_API_KEY, GOOGLE_*, OPENAI_API_KEY) are read by each SDK

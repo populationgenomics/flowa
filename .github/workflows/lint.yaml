@@ -24,26 +24,19 @@ jobs:
 
       - run: uv sync --all-extras --group dev --frozen
 
+      # demo-gateway is a separate uv project; sync its venv so the
+      # `pytest-demo-gateway` pre-commit hook (which runs --no-sync) works.
+      - run: uv sync --frozen --group dev
+        working-directory: examples/demo-gateway
+
       - run: pnpm install --frozen-lockfile
 
-      # All lint checks (ruff, mypy, prettier, …) live in
-      # .pre-commit-config.yaml so local pre-commit and CI stay in lockstep.
+      # Every check — ruff, mypy, prettier, tsc, vitest, pytest — lives in
+      # .pre-commit-config.yaml, so this single `pre-commit run --all-files`
+      # is the whole gate and local pre-commit and CI stay in lockstep.
       - uses: actions/cache@v5
         with:
           path: ~/.cache/pre-commit
           key: pre-commit-${{ hashFiles('.pre-commit-config.yaml') }}
 
       - run: uv run pre-commit run --all-files --show-diff-on-failure
-
-  test:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v6
-
-      - uses: astral-sh/setup-uv@v7
-        with:
-          python-version: "3.13"
-
-      - run: uv sync --all-extras --group dev --frozen
-
-      - run: uv run pytest tests/
