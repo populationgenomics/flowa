@@ -8,6 +8,7 @@ real markitdown; the size-policy / ordering / failure paths monkeypatch
 import io
 
 import openpyxl
+from openpyxl.worksheet.worksheet import Worksheet
 
 from flowa.assemble import PER_SUPPLEMENT_TOKEN_CAP, assemble_paper
 from flowa.storage import paper_url, read_text, write_bytes, write_text
@@ -18,6 +19,7 @@ DOI = '10.1234/test.paper'
 def _xlsx_bytes(rows: list[list[str]]) -> bytes:
     wb = openpyxl.Workbook()
     ws = wb.active
+    assert isinstance(ws, Worksheet)  # a fresh Workbook's active sheet is always a Worksheet
     ws.title = 'Variants'
     for row in rows:
         ws.append(row)

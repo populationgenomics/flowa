@@ -19,7 +19,8 @@ session has no extraction input to compare against.
 """
 
 import re
-from typing import Protocol
+
+from flowa.artifact import CategoryResult
 
 # Mirrors chat.ts CITE_LINK_RE: [link text](#cite:paper_id "verbatim quote").
 # Group 1 = paper_id; group 2 = quote (absent when the title attribute is
@@ -27,28 +28,8 @@ from typing import Protocol
 _CITE_LINK_RE = re.compile(r'\[[^\]]*\]\(#cite:([^ )"]+)(?:\s+"([^"]*)")?\)')
 
 
-class _RankedPaper(Protocol):
-    paper_id: str
-
-
-class _Citation(Protocol):
-    quote: str
-
-
-class _Claim(Protocol):
-    paper_id: str
-    citations: list[_Citation]
-
-
-class _CategoryResult(Protocol):
-    description: str
-    notes: str
-    papers: list[_RankedPaper]
-    claims: list[_Claim]
-
-
 def validate_aggregate_category(
-    cat_result: _CategoryResult,
+    cat_result: CategoryResult,
     valid_paper_ids: set[str],
     extraction_quotes_by_paper: dict[str, set[str]],
 ) -> list[tuple[str, str]]:

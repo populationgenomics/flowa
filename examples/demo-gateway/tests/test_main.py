@@ -44,13 +44,16 @@ def test_get_runs_active_returns_404_when_no_run(client: TestClient) -> None:
 
 
 def test_get_runs_active_returns_record_after_post(client: TestClient) -> None:
-    client.post('/runs', json={
+    client.post(
+        '/runs',
+        json={
             'variant_id': 'X',
             'variant_spec': {
                 'schema_version': 1,
                 'variants': [{'kind': 'hgvs_c', 'transcript': 'NM_000001.1', 'hgvs_c': 'c.1A>T'}],
             },
-        })
+        },
+    )
     response = client.get('/runs/active', params={'variant_id': 'X'})
     assert response.status_code == 200
     assert response.json()['variant_id'] == 'X'
@@ -77,20 +80,26 @@ def test_post_runs_returns_409_when_in_flight(client: TestClient, app) -> None:
         pipeline=hangs,
     )
 
-    first = client.post('/runs', json={
+    first = client.post(
+        '/runs',
+        json={
             'variant_id': 'V',
             'variant_spec': {
                 'schema_version': 1,
                 'variants': [{'kind': 'hgvs_c', 'transcript': 'NM_000001.1', 'hgvs_c': 'c.1A>T'}],
             },
-        })
+        },
+    )
     assert first.status_code == 200
 
-    second = client.post('/runs', json={
+    second = client.post(
+        '/runs',
+        json={
             'variant_id': 'V',
             'variant_spec': {
                 'schema_version': 1,
                 'variants': [{'kind': 'hgvs_c', 'transcript': 'NM_000001.1', 'hgvs_c': 'c.1A>T'}],
             },
-        })
+        },
+    )
     assert second.status_code == 409

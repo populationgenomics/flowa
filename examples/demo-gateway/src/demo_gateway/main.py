@@ -3,7 +3,7 @@
 Endpoints:
   POST /runs                — kick off a pipeline run for a variant
   GET  /runs/active         — most recent run record for a variant (status == running while in flight)
-  POST /resolve-citations   — align verbatim quotes to PDF bboxes
+  POST /resolve-citations   — align verbatim quotes to PDF bboxes and markdown.md anchors
   GET  /health              — liveness probe
 
 The Next.js demo connects to all of these directly from the browser. It only
@@ -21,6 +21,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from flowa.resolve import (
     ResolvedCitations,
     ResolveRequest,
+    load_markdown_from_storage,
     load_pdf_index_from_storage,
     resolve_citations,
 )
@@ -113,16 +114,17 @@ def resolve_citations_route(
     body: ResolveRequest,
     settings: Annotated[Settings, Depends(_settings)],
 ) -> ResolvedCitations:
-    """Align verbatim quotes to PDF bboxes.
+    """Align verbatim quotes to PDF bboxes and markdown.md anchors.
 
     Sync `def` so FastAPI auto-runs it in the threadpool — deserialising the
-    PdfIndex pickle and aligning quotes is CPU-bound and would block the
-    asyncio loop otherwise.
+    PdfIndex pickle, aligning quotes, and locating markdown spans is CPU-bound
+    and would block the asyncio loop otherwise.
     """
     base = str(settings.demo_data_dir)
     return resolve_citations(
         body.citations,
-        index_provider=lambda doi: load_pdf_index_from_storage(base, doi),
+        pdf_index_provider=lambda doi: load_pdf_index_from_storage(base, doi),
+        markdown_provider=lambda doi: load_markdown_from_storage(base, doi),
     )
 
 
