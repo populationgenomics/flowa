@@ -14,7 +14,11 @@ import {
 import { schemaForPrompt, type Artifact } from "./artifact.js";
 import { loadEditPromptTemplate } from "./prompts.js";
 import type { Storage } from "./storage/interface.js";
-import { type BboxCache, buildBboxCache, artifactToYaml } from "./yaml.js";
+import {
+  type LocationCache,
+  buildLocationCache,
+  artifactToYaml,
+} from "./yaml.js";
 import { addLineNumbers } from "./text.js";
 
 export interface SessionContext {
@@ -35,8 +39,8 @@ export interface SessionContext {
   category: string;
   /** All categories present in the aggregate (for rename-conflict detection). */
   aggregateCategories: string[];
-  /** Cached bboxes from the initial artifact, keyed by (paperId, quote). */
-  bboxCache: BboxCache;
+  /** Cached citation locations from the initial artifact, keyed by (paperId, quote). */
+  locationCache: LocationCache;
   /** Paper ID → full markdown text, lazy-populated by paper tools. */
   paperMarkdownCache: Map<string, string>;
 }
@@ -154,7 +158,7 @@ export async function rebuildSession(
     artifactVersion = 0;
   }
 
-  const bboxCache = buildBboxCache(artifactJson);
+  const locationCache = buildLocationCache(artifactJson);
   const artifactYaml = artifactToYaml(artifactJson);
 
   const session: SessionContext = {
@@ -175,7 +179,7 @@ export async function rebuildSession(
     artifactDirty: false,
     category,
     aggregateCategories: extractAggregateCategories(aggregate),
-    bboxCache,
+    locationCache,
     paperMarkdownCache: new Map(),
   };
   sessions.set(session.id, session);
@@ -237,7 +241,7 @@ export async function createEditSession(
   const paperIds = buildPaperIds(aggregate);
   const aggregateCategories = extractAggregateCategories(aggregate);
 
-  const bboxCache = buildBboxCache(input.initialArtifact);
+  const locationCache = buildLocationCache(input.initialArtifact);
   const artifactYaml = artifactToYaml(input.initialArtifact);
 
   const systemPrompt = buildEditSystemPrompt({
@@ -272,7 +276,7 @@ export async function createEditSession(
     artifactDirty: false,
     category: input.category,
     aggregateCategories,
-    bboxCache,
+    locationCache,
     paperMarkdownCache: new Map(),
   };
   sessions.set(sessionId, session);

@@ -83,7 +83,7 @@ function makeSession(overrides: Partial<SessionContext> = {}): SessionContext {
     artifactDirty: false,
     category: "cat-A",
     aggregateCategories: ["cat-A"],
-    bboxCache: new Map(),
+    locationCache: new Map(),
     paperMarkdownCache: new Map(),
     ...overrides,
   };

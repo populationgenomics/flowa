@@ -1,6 +1,6 @@
 {
   "name": "@flowajs/chat-service",
-  "version": "0.0.4",
+  "version": "0.1.0",
   "description": "Stateless service that orchestrates LLM conversations over flowa artifacts.",
   "license": "MIT",
   "type": "module",

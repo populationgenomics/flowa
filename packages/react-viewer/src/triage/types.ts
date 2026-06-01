@@ -8,12 +8,19 @@
  * never reads its fields — it only forwards the key to the backend.
  */
 
-import type { HighlightBbox } from "../pdf-viewer/types";
+import type { ResolvedQuote } from "./citation-resolver";
 
 /** Citation inside a claim. DOI is derived from the claim's paperId. */
 export interface ClaimCitation {
   quote: string;
-  bboxes?: HighlightBbox[];
+  /**
+   * Where the quote resolved in the paper's sources — PDF bboxes and the
+   * `markdown.md` anchor, as one `ResolvedQuote`. Absent on citations added
+   * during editing (and on legacy aggregates); present on pipeline citations,
+   * possibly with empty `bboxes` / null `markdownAnchor` when the quote was
+   * found in only one source.
+   */
+  location?: ResolvedQuote | null;
 }
 
 /** A single factual statement extracted from a paper. The unit of triage. */

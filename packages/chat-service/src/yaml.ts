@@ -4,7 +4,10 @@ import yaml from "yaml";
 import type { Artifact } from "./artifact.js";
 
 // ---------------------------------------------------------------------------
-// Bbox cache — preserves pipeline-precomputed bboxes across edits
+// Location cache — preserves a citation's pipeline-precomputed resolution
+// (PDF bboxes + markdown.md anchor) across edits. The model never sees this
+// derived `location` field (it's stripped to YAML below); we reattach it to
+// any citation whose (paperId, quote) survives the edit.
 // ---------------------------------------------------------------------------
 
 type Bbox = {
@@ -15,39 +18,47 @@ type Bbox = {
   right: number;
 };
 
-export type BboxCache = Map<string, Bbox[]>;
+type MarkdownAnchor = { start: number; end: number };
+
+type CitationLocation = {
+  bboxes: Bbox[];
+  markdown_anchor: MarkdownAnchor | null;
+};
+
+export type LocationCache = Map<string, CitationLocation>;
 
 function cacheKey(paperId: string, quote: string): string {
   return `${paperId}\n${quote}`;
 }
 
-/** Extract (paperId, quote) → bboxes lookup from an artifact JSON string. */
-export function buildBboxCache(jsonStr: string): BboxCache {
-  const cache: BboxCache = new Map();
+/** Extract (paperId, quote) → location lookup from an artifact JSON string. */
+export function buildLocationCache(jsonStr: string): LocationCache {
+  const cache: LocationCache = new Map();
   const art = JSON.parse(jsonStr) as Artifact;
   for (const claim of art.claims ?? []) {
     for (const citation of claim.citations ?? []) {
-      if (citation.bboxes?.length) {
-        cache.set(cacheKey(claim.paper_id, citation.quote), citation.bboxes);
+      if (citation.location) {
+        cache.set(cacheKey(claim.paper_id, citation.quote), citation.location);
       }
     }
   }
   return cache;
 }
 
-/** Reattach cached bboxes to citations with matching (paperId, quote). Generic
- *  over the artifact type so deployment-specific fields survive the rebuild. */
-export function reattachBboxes<T extends Artifact>(
+/** Reattach cached locations to citations with matching (paperId, quote).
+ *  Generic over the artifact type so deployment-specific fields survive the
+ *  rebuild. */
+export function reattachLocations<T extends Artifact>(
   artifact: T,
-  cache: BboxCache,
+  cache: LocationCache,
 ): T {
   return {
     ...artifact,
     claims: artifact.claims.map((claim) => ({
       ...claim,
       citations: claim.citations.map((citation) => {
-        const bboxes = cache.get(cacheKey(claim.paper_id, citation.quote));
-        return bboxes ? { ...citation, bboxes } : citation;
+        const location = cache.get(cacheKey(claim.paper_id, citation.quote));
+        return location ? { ...citation, location } : citation;
       }),
     })),
   };
@@ -57,14 +68,15 @@ export function reattachBboxes<T extends Artifact>(
 // YAML serialization
 // ---------------------------------------------------------------------------
 
-/** Convert an artifact JSON string to YAML, stripping bboxes from claim citations. */
+/** Convert an artifact JSON string to YAML, stripping each citation's derived
+ *  `location` (bboxes + markdown anchor) so the model edits only quotes. */
 export function artifactToYaml(jsonStr: string): string {
   const art = JSON.parse(jsonStr) as Record<string, unknown>;
   if (Array.isArray(art.claims)) {
     art.claims = (art.claims as Record<string, unknown>[]).map((claim) => {
       const citations = Array.isArray(claim.citations)
         ? (claim.citations as Record<string, unknown>[]).map(
-            ({ bboxes: _bboxes, ...rest }) => rest,
+            ({ location: _location, ...rest }) => rest,
           )
         : claim.citations;
       return { ...claim, citations };

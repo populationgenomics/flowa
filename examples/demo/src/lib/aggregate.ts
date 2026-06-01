@@ -18,13 +18,21 @@ import { getDemoDataDir } from "./demoConfig";
 
 interface RawCitation {
   quote: string;
-  bboxes?: Array<{
-    page: number;
-    top: number;
-    left: number;
-    bottom: number;
-    right: number;
-  }>;
+  /**
+   * The quote's resolved location: PDF bboxes + markdown.md anchor. Null when
+   * the paper's artifacts were unavailable; absent on citations added during
+   * editing.
+   */
+  location?: {
+    bboxes: Array<{
+      page: number;
+      top: number;
+      left: number;
+      bottom: number;
+      right: number;
+    }>;
+    markdown_anchor: { start: number; end: number } | null;
+  } | null;
 }
 
 interface RawClaim {
@@ -72,7 +80,12 @@ function toClaim(raw: RawClaim): Claim {
     text: raw.text,
     citations: raw.citations.map((c) => ({
       quote: c.quote,
-      bboxes: c.bboxes,
+      location: c.location
+        ? {
+            bboxes: c.location.bboxes,
+            markdownAnchor: c.location.markdown_anchor,
+          }
+        : undefined,
     })),
   };
 }

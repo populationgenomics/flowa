@@ -6,11 +6,20 @@ import {
   useRef,
   useState,
 } from "react";
-import { Alert, Loader, Select, Stack, Text, Button } from "@mantine/core";
+import {
+  Alert,
+  Button,
+  Loader,
+  SegmentedControl,
+  Select,
+  Stack,
+  Text,
+} from "@mantine/core";
 import { IconAlertCircle } from "@tabler/icons-react";
 import type { PaperIdMapping } from "../citations/types";
 import { PdfHighlightViewer } from "../pdf-viewer/PdfHighlightViewer";
-import type { HighlightBbox, PdfHighlight } from "../pdf-viewer/types";
+import type { PdfHighlight } from "../pdf-viewer/types";
+import { MarkdownHighlightViewer } from "../markdown-viewer/MarkdownHighlightViewer";
 import { groupClaimsByPaper, resolveClaimForCitation } from "./claim-refs";
 import { flattenClaimCitations, type FlatCitation } from "./citation-utils";
 import { ChatSection, type SessionInfo } from "./ChatSection";
@@ -23,7 +32,7 @@ import { PaperRail } from "./PaperRail";
 import { jumpToNextUnreviewed, useTriageKeyboard } from "./keyboard";
 import { claimKey, useTriageStore, type TriageStore } from "./store";
 import type { TriageBackend } from "./backend";
-import type { CitationResolver } from "./citation-resolver";
+import type { CitationResolver, ResolvedQuote } from "./citation-resolver";
 import type {
   CategorySuggestion,
   Claim,
@@ -76,6 +85,13 @@ export interface EvidenceViewerShellProps {
   pdfUrlForDoi(doi: string): string;
   pdfWorkerSrc: string;
   pdfCMapUrl: string;
+  /**
+   * Markdown rendering input. Optional: Markdown viewing is additive over the
+   * required PDF baseline, so omitting it keeps the evidence panel PDF-only and
+   * hides the PDF/MD toggle. When provided, a citation that resolved a
+   * `markdown.md` anchor can be highlighted in the assembled Markdown.
+   */
+  markdownUrlForDoi?(doi: string): string;
 
   /** Optional consumer-supplied footer slot (e.g. download / accept / reject). */
   commitSlot?: ReactNode;
@@ -101,19 +117,6 @@ function resolutionKey(doi: string, quote: string): string {
   return `${doi}\n${quote}`;
 }
 
-function citationToHighlight(
-  citation: FlatCitation,
-  resolvedBboxes: Record<string, Record<string, HighlightBbox[]>>,
-  pendingResolutions: Set<string>,
-): PdfHighlight {
-  const resolved = resolvedBboxes[citation.doi]?.[citation.quote];
-  const bboxes = resolved ?? citation.bboxes ?? [];
-  const pending =
-    bboxes.length === 0 &&
-    pendingResolutions.has(resolutionKey(citation.doi, citation.quote));
-  return { bboxes, label: citation.quote, pending };
-}
-
 const REWRITE_DEFAULT_PROMPT =
   "Apply my triage decisions and rewrite the notes and description using only the accepted claims. Re-rank papers and claims accordingly.";
 
@@ -133,6 +136,7 @@ export function EvidenceViewerShell({
   pdfUrlForDoi,
   pdfWorkerSrc,
   pdfCMapUrl,
+  markdownUrlForDoi,
   commitSlot,
   initialFocusTarget = null,
   onCitationClick,
@@ -259,13 +263,13 @@ export function EvidenceViewerShell({
 
   const [quoteIndex, setQuoteIndex] = useState(0);
 
-  // ── Resolved bboxes for chat-introduced citations ─────────────────
-  const [resolvedBboxes, setResolvedBboxes] = useState<
-    Record<string, Record<string, HighlightBbox[]>>
+  // ── Resolved bboxes + anchors for chat-introduced citations ───────
+  const [resolvedQuotes, setResolvedQuotes] = useState<
+    Record<string, Record<string, ResolvedQuote>>
   >({});
   // Quotes whose resolution round-trip is in flight, keyed `${doi}\n${quote}`.
-  // Lets the PDF panel show "locating…" instead of "could not locate" while
-  // we wait for the resolver.
+  // Lets the evidence panel show "locating…" instead of "could not locate"
+  // while we wait for the resolver.
   const [pendingResolutions, setPendingResolutions] = useState<Set<string>>(
     () => new Set(),
   );
@@ -275,8 +279,10 @@ export function EvidenceViewerShell({
     resolvedForVersion.current = selectedVersion;
     const toResolve = new Map<string, Set<string>>();
     for (const citation of flatCitations) {
-      if ((citation.bboxes?.length ?? 0) > 0) continue;
-      if (resolvedBboxes[citation.doi]?.[citation.quote]) continue;
+      // Skip citations the pipeline already resolved; only chat-introduced
+      // quotes (no location) need the resolver.
+      if (citation.location) continue;
+      if (resolvedQuotes[citation.doi]?.[citation.quote]) continue;
       const existing = toResolve.get(citation.doi) ?? new Set();
       existing.add(citation.quote);
       toResolve.set(citation.doi, existing);
@@ -293,7 +299,7 @@ export function EvidenceViewerShell({
     void (async () => {
       try {
         const result = await resolveCitations(citationsToResolve);
-        setResolvedBboxes((prev) => {
+        setResolvedQuotes((prev) => {
           const next = { ...prev };
           for (const [doi, quotes] of Object.entries(result.resolved)) {
             next[doi] = { ...next[doi], ...quotes };
@@ -313,61 +319,88 @@ export function EvidenceViewerShell({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [artifact, selectedVersion]);
 
-  // ── PDF state ─────────────────────────────────────────────────────
+  // ── Evidence panel state ──────────────────────────────────────────
   const [chatOverrideCitation, setChatOverrideCitation] = useState<{
     doi: string;
     quote: string;
   } | null>(null);
   const [pdfZoom, setPdfZoom] = useState(1);
+  // The user's explicit PDF/MD choice, tagged with the citation it applies to;
+  // navigating to another citation falls back to that citation's default mode.
+  const [modeOverride, setModeOverride] = useState<{
+    key: string;
+    mode: "pdf" | "markdown";
+  } | null>(null);
 
   const focusedDoi = focusedPaperId
     ? (paperIdMapping.byAuthorYear[focusedPaperId]?.doi ?? null)
     : null;
-  const activeDoi = chatOverrideCitation?.doi ?? focusedDoi ?? "";
-  const activePdfUrl = activeDoi ? pdfUrlForDoi(activeDoi) : "";
 
-  const pdfHighlights: PdfHighlight[] = useMemo(() => {
+  // The active (doi, quote) plus its resolved bboxes and markdown anchor — from
+  // the focused pipeline citation, or the resolver cache for a chat-introduced
+  // override.
+  const active = useMemo(() => {
     if (chatOverrideCitation) {
-      const bboxes =
-        resolvedBboxes[chatOverrideCitation.doi]?.[
-          chatOverrideCitation.quote
-        ] ?? [];
-      const pending =
-        bboxes.length === 0 &&
-        pendingResolutions.has(
-          resolutionKey(chatOverrideCitation.doi, chatOverrideCitation.quote),
-        );
-      return [{ bboxes, label: chatOverrideCitation.quote, pending }];
+      const rq =
+        resolvedQuotes[chatOverrideCitation.doi]?.[chatOverrideCitation.quote];
+      return {
+        doi: chatOverrideCitation.doi,
+        quote: chatOverrideCitation.quote,
+        bboxes: rq?.bboxes ?? [],
+        anchor: rq?.markdownAnchor ?? null,
+      };
     }
-    if (!focusedClaim) return [];
-    const active =
+    if (!focusedClaim) return null;
+    const citation =
       focusedClaim.citations[quoteIndex] ?? focusedClaim.citations[0];
-    if (!active) return [];
+    if (!citation) return null;
     const doi = focusedDoi ?? "";
-    return [
-      citationToHighlight(
-        {
-          doi,
-          paperId: focusedPaperId ?? "",
-          quote: active.quote,
-          bboxes: active.bboxes ?? [],
-          claimIndex: focusedClaimIndex ?? 0,
-          claimText: focusedClaim.text,
-        },
-        resolvedBboxes,
-        pendingResolutions,
-      ),
-    ];
+    // The pipeline citation's own location, else the resolver cache — both are
+    // ResolvedQuote-shaped, so this is a single merge.
+    const loc = citation.location ?? resolvedQuotes[doi]?.[citation.quote];
+    return {
+      doi,
+      quote: citation.quote,
+      bboxes: loc?.bboxes ?? [],
+      anchor: loc?.markdownAnchor ?? null,
+    };
   }, [
     chatOverrideCitation,
     focusedClaim,
-    focusedDoi,
-    focusedPaperId,
-    focusedClaimIndex,
     quoteIndex,
-    resolvedBboxes,
-    pendingResolutions,
+    focusedDoi,
+    resolvedQuotes,
   ]);
+
+  const activeDoi = active?.doi ?? "";
+  const activePdfUrl = activeDoi ? pdfUrlForDoi(activeDoi) : "";
+
+  const pdfHighlights: PdfHighlight[] = useMemo(() => {
+    if (!active) return [];
+    const pending =
+      active.bboxes.length === 0 &&
+      pendingResolutions.has(resolutionKey(active.doi, active.quote));
+    return [{ bboxes: active.bboxes, label: active.quote, pending }];
+  }, [active, pendingResolutions]);
+
+  // PDF vs Markdown for the evidence panel. The toggle appears only when the
+  // active citation resolved *both* a bbox and an anchor and a markdown URL is
+  // available; otherwise the panel shows whichever source the citation has.
+  const canMarkdown = !!markdownUrlForDoi;
+  const hasBboxes = (active?.bboxes.length ?? 0) > 0;
+  const hasAnchor = active?.anchor != null;
+  const activeKey = active ? resolutionKey(active.doi, active.quote) : "";
+  const defaultMode: "pdf" | "markdown" =
+    !hasBboxes && hasAnchor && canMarkdown ? "markdown" : "pdf";
+  const evidenceMode: "pdf" | "markdown" =
+    canMarkdown && modeOverride?.key === activeKey
+      ? modeOverride.mode
+      : defaultMode;
+  const canToggleMode = hasBboxes && hasAnchor && canMarkdown;
+  const markdownPending =
+    active != null &&
+    active.anchor == null &&
+    pendingResolutions.has(resolutionKey(active.doi, active.quote));
 
   // ── Triage actions ────────────────────────────────────────────────
   /**
@@ -878,20 +911,50 @@ export function EvidenceViewerShell({
 
         <div className="flex w-1/2 flex-col">
           {activeDoi ? (
-            activePdfUrl ? (
-              <PdfHighlightViewer
-                pdfUrl={activePdfUrl}
-                highlights={pdfHighlights}
-                zoom={pdfZoom}
-                onZoomChange={setPdfZoom}
-                workerSrc={pdfWorkerSrc}
-                cMapUrl={pdfCMapUrl}
-              />
-            ) : (
-              <div className="flex h-full items-center justify-center text-gray-500">
-                Loading PDF…
+            <>
+              {canToggleMode && (
+                <div className="flex justify-center border-b border-gray-200 bg-gray-50 px-2 py-1">
+                  <SegmentedControl
+                    size="xs"
+                    value={evidenceMode}
+                    onChange={(value) =>
+                      setModeOverride({
+                        key: activeKey,
+                        mode: value === "markdown" ? "markdown" : "pdf",
+                      })
+                    }
+                    data={[
+                      { label: "PDF", value: "pdf" },
+                      { label: "Markdown", value: "markdown" },
+                    ]}
+                    data-testid="evidence-mode-toggle"
+                  />
+                </div>
+              )}
+              <div className="min-h-0 flex-1">
+                {evidenceMode === "markdown" && markdownUrlForDoi ? (
+                  <MarkdownHighlightViewer
+                    markdownUrl={markdownUrlForDoi(activeDoi)}
+                    anchor={active?.anchor ?? null}
+                    label={active?.quote}
+                    pending={markdownPending}
+                  />
+                ) : activePdfUrl ? (
+                  <PdfHighlightViewer
+                    pdfUrl={activePdfUrl}
+                    highlights={pdfHighlights}
+                    zoom={pdfZoom}
+                    onZoomChange={setPdfZoom}
+                    workerSrc={pdfWorkerSrc}
+                    cMapUrl={pdfCMapUrl}
+                  />
+                ) : (
+                  <div className="flex h-full items-center justify-center text-gray-500">
+                    Loading PDF…
+                  </div>
+                )}
               </div>
-            )
+            </>
           ) : (
             <div className="flex h-full items-center justify-center text-gray-400">
               Select a claim to view the source PDF

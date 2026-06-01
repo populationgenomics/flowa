@@ -33,7 +33,10 @@ const SUGGESTION: CategorySuggestion = {
       citations: [
         {
           quote: "first quote",
-          bboxes: [{ page: 1, top: 0, left: 0, bottom: 100, right: 100 }],
+          location: {
+            bboxes: [{ page: 1, top: 0, left: 0, bottom: 100, right: 100 }],
+            markdownAnchor: null,
+          },
         },
         { quote: "second quote" },
       ],
@@ -62,7 +65,7 @@ describe("flattenClaimCitations", () => {
       claimIndex: 1,
       claimText: "Claim 1",
     });
-    expect(flat[0]?.bboxes).toHaveLength(1);
+    expect(flat[0]?.location?.bboxes).toHaveLength(1);
     expect(flat[1]).toMatchObject({
       paperId: "Smith2024",
       claimIndex: 1,
@@ -89,9 +92,9 @@ describe("flattenClaimCitations", () => {
     expect(flat).toHaveLength(3);
   });
 
-  it("treats undefined bboxes as an empty array", () => {
+  it("carries an undefined location for a citation with no resolution", () => {
     const flat = flattenClaimCitations(SUGGESTION, MAPPING);
-    expect(flat[1]?.bboxes).toEqual([]);
+    expect(flat[1]?.location).toBeUndefined();
   });
 
   it("returns an empty array when the mapping is undefined", () => {

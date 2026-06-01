@@ -16,7 +16,9 @@ export interface FlatCitation {
   doi: string;
   paperId: string;
   quote: string;
-  bboxes: NonNullable<ClaimCitation["bboxes"]>;
+  /** Resolved location (PDF bboxes + markdown anchor); undefined/null for
+   *  chat-added citations and legacy aggregates. */
+  location: ClaimCitation["location"];
   /** The owning claim's position within its paper's claims run (1-based). */
   claimIndex: number;
   /** The owning claim's text, for tooltips / search. */
@@ -49,7 +51,7 @@ export function flattenClaimCitations(
         doi,
         paperId: claim.paperId,
         quote: citation.quote,
-        bboxes: citation.bboxes ?? [],
+        location: citation.location,
         claimIndex: runIndex,
         claimText: claim.text,
       });

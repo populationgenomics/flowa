@@ -1,10 +1,10 @@
 import { describe, expect, test } from "vitest";
 import {
   artifactToYaml,
-  buildBboxCache,
+  buildLocationCache,
   insertAtLine,
   parseArtifactYaml,
-  reattachBboxes,
+  reattachLocations,
 } from "../src/yaml.js";
 import type { Artifact } from "../src/artifact.js";
 
@@ -39,7 +39,7 @@ describe("insertAtLine", () => {
 // ---------------------------------------------------------------------------
 
 describe("artifactToYaml", () => {
-  test("strips bboxes from claim citations", () => {
+  test("strips the citation location from claim citations", () => {
     const json = JSON.stringify({
       category: "cat-A",
       description: "summary",
@@ -52,18 +52,23 @@ describe("artifactToYaml", () => {
           citations: [
             {
               quote: "complete loss",
-              bboxes: [{ page: 1, top: 2, left: 3, bottom: 4, right: 5 }],
+              location: {
+                bboxes: [{ page: 1, top: 2, left: 3, bottom: 4, right: 5 }],
+                markdown_anchor: { start: 10, end: 22 },
+              },
             },
           ],
         },
       ],
     });
     const yamlOut = artifactToYaml(json);
+    expect(yamlOut).not.toContain("location");
     expect(yamlOut).not.toContain("bboxes");
+    expect(yamlOut).not.toContain("markdown_anchor");
     expect(yamlOut).toContain("complete loss");
     const parsed = parseArtifactYaml(yamlOut) as Artifact;
     expect(parsed.claims[0]?.citations[0]?.quote).toBe("complete loss");
-    expect(parsed.claims[0]?.citations[0]?.bboxes).toBeUndefined();
+    expect(parsed.claims[0]?.citations[0]?.location).toBeUndefined();
   });
 
   test("preserves top-level fields", () => {
@@ -85,12 +90,15 @@ describe("artifactToYaml", () => {
 });
 
 // ---------------------------------------------------------------------------
-// buildBboxCache + reattachBboxes
+// buildLocationCache + reattachLocations
 // ---------------------------------------------------------------------------
 
-describe("buildBboxCache + reattachBboxes", () => {
-  test("roundtrip preserves bboxes by (paper_id, quote)", () => {
-    const bbox = { page: 7, top: 10, left: 20, bottom: 30, right: 40 };
+describe("buildLocationCache + reattachLocations", () => {
+  test("roundtrip preserves the location by (paper_id, quote)", () => {
+    const location = {
+      bboxes: [{ page: 7, top: 10, left: 20, bottom: 30, right: 40 }],
+      markdown_anchor: { start: 5, end: 17 },
+    };
     const original: Artifact = {
       category: "cat-A",
       description: "d",
@@ -103,7 +111,7 @@ describe("buildBboxCache + reattachBboxes", () => {
         {
           paper_id: "Smith2024",
           text: "c1",
-          citations: [{ quote: "q1", bboxes: [bbox] }],
+          citations: [{ quote: "q1", location }],
         },
         {
           paper_id: "Jones2023",
@@ -112,21 +120,23 @@ describe("buildBboxCache + reattachBboxes", () => {
         },
       ],
     };
-    const cache = buildBboxCache(JSON.stringify(original));
+    const cache = buildLocationCache(JSON.stringify(original));
     const stripped: Artifact = {
       ...original,
       claims: original.claims.map((claim) => ({
         ...claim,
-        citations: claim.citations.map(({ bboxes: _bboxes, ...rest }) => rest),
+        citations: claim.citations.map(
+          ({ location: _location, ...rest }) => rest,
+        ),
       })),
     };
-    const reattached = reattachBboxes(stripped, cache);
-    expect(reattached.claims[0]?.citations[0]?.bboxes).toEqual([bbox]);
-    expect(reattached.claims[1]?.citations[0]?.bboxes).toBeUndefined();
+    const reattached = reattachLocations(stripped, cache);
+    expect(reattached.claims[0]?.citations[0]?.location).toEqual(location);
+    expect(reattached.claims[1]?.citations[0]?.location).toBeUndefined();
   });
 
-  test("citation with unknown (paper_id, quote) keeps no bboxes", () => {
-    const cache = buildBboxCache(
+  test("citation with unknown (paper_id, quote) keeps no location", () => {
+    const cache = buildLocationCache(
       JSON.stringify({
         category: "cat-A",
         description: "d",
@@ -139,7 +149,10 @@ describe("buildBboxCache + reattachBboxes", () => {
             citations: [
               {
                 quote: "q1",
-                bboxes: [{ page: 1, top: 1, left: 1, bottom: 1, right: 1 }],
+                location: {
+                  bboxes: [{ page: 1, top: 1, left: 1, bottom: 1, right: 1 }],
+                  markdown_anchor: null,
+                },
               },
             ],
           },
@@ -159,7 +172,7 @@ describe("buildBboxCache + reattachBboxes", () => {
         },
       ],
     };
-    const out = reattachBboxes(artifact, cache);
-    expect(out.claims[0]?.citations[0]?.bboxes).toBeUndefined();
+    const out = reattachLocations(artifact, cache);
+    expect(out.claims[0]?.citations[0]?.location).toBeUndefined();
   });
 });

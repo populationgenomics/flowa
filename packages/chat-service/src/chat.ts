@@ -42,7 +42,7 @@ import type { LlmProvider } from "./llm/interface.js";
 import type { Storage } from "./storage/interface.js";
 import {
   parseArtifactYaml,
-  reattachBboxes,
+  reattachLocations,
   insertAtLine,
   artifactToYaml,
 } from "./yaml.js";
@@ -887,16 +887,16 @@ export async function handleChat(
                 const parsedArtifact = parseArtifactYaml(
                   session.artifactYaml,
                 ) as Artifact;
-                const withBboxes = reattachBboxes(
+                const withLocations = reattachLocations(
                   parsedArtifact,
-                  session.bboxCache,
+                  session.locationCache,
                 );
                 const parentVersion = session.artifactVersion;
                 const writtenVersion = await writeEditDraft(
                   storage,
                   session.variantId,
                   session.category,
-                  JSON.stringify(withBboxes),
+                  JSON.stringify(withLocations),
                   parentVersion + 1,
                 );
                 session.artifactVersion = writtenVersion;

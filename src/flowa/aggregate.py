@@ -188,15 +188,18 @@ def resolve_aggregate_citations(
         markdown_provider=lambda doi: load_markdown_from_storage(base, doi),
     )
 
-    # Attach resolved bboxes + markdown anchor onto each claim's citations.
+    # Attach the resolved location (PDF bboxes + markdown.md anchor) onto each
+    # claim's citation, as a single `location` object mirroring ResolvedQuote.
+    # `None` when the paper's artifacts were unavailable (the DOI errored); a
+    # present-but-empty location (no bboxes, null anchor) when the quote simply
+    # couldn't be aligned.
     for cat_result in aggregate_dict['results']:
         for claim in cat_result['claims']:
             doi = paper_id_to_doi[claim['paper_id']]
             for citation in claim['citations']:
                 quote = citation['quote']
                 rq = result.resolved.get(doi, {}).get(quote)
-                citation['bboxes'] = [b.model_dump() for b in rq.bboxes] if rq else []
-                citation['markdown_anchor'] = rq.markdown_anchor.model_dump() if rq and rq.markdown_anchor else None
+                citation['location'] = rq.model_dump() if rq else None
                 if not (rq and (rq.bboxes or rq.markdown_anchor)):
                     log.warning('Quote unresolved (no bbox or anchor) for %s: %.80s...', doi, quote)
 

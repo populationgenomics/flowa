@@ -1,6 +1,6 @@
 {
   "name": "@flowajs/react-viewer",
-  "version": "0.0.12",
+  "version": "0.1.0",
   "description": "React components for rendering flowa pipeline outputs: citation-grounded Markdown, PDF viewer with bbox highlights, triage workspace.",
   "license": "MIT",
   "repository": {
@@ -48,10 +48,10 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
-    "dompurify": "3.4.3",
-    "html-react-parser": "5.2.2",
-    "marked": "16.4.2",
-    "react-pdf": "9.2.1"
+    "react-markdown": "10.1.0",
+    "react-pdf": "9.2.1",
+    "remark-gfm": "4.0.1",
+    "unist-util-visit": "5.0.0"
   },
   "peerDependencies": {
     "@ai-sdk/react": "^3.0.0",
@@ -69,6 +69,8 @@
     "@mantine/hooks": "8.3.18",
     "@tabler/icons-react": "3.44.0",
     "@testing-library/react": "16.3.2",
+    "@types/hast": "3.0.4",
+    "@types/mdast": "4.0.4",
     "@types/react": "18.3.18",
     "@types/react-dom": "18.3.5",
     "ai": "6.0.182",

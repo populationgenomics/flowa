@@ -26,6 +26,8 @@ class ResizeObserverStub {
 beforeEach(() => {
   globalThis.ResizeObserver =
     ResizeObserverStub as unknown as typeof ResizeObserver;
+  // happy-dom lacks scrollIntoView; the Markdown viewer calls it post-render.
+  Element.prototype.scrollIntoView = vi.fn();
   vi.doMock("react-pdf", () => ({
     pdfjs: { GlobalWorkerOptions: {} },
     Document: () => null,
@@ -36,7 +38,12 @@ beforeEach(() => {
 afterEach(() => {
   useTriageStore.getState().reset();
   vi.clearAllMocks();
+  vi.unstubAllGlobals();
 });
+
+/** `/api/papers/{doi}/markdown`-style resolver for the markdown viewer. */
+const mdUrl = (doi: string) =>
+  `https://example.test/${encodeURIComponent(doi)}.md`;
 
 const MAPPING: PaperIdMapping = {
   byAuthorYear: {
@@ -64,7 +71,10 @@ const ARTIFACT: CategorySuggestion = {
       citations: [
         {
           quote: "func quote",
-          bboxes: [{ page: 1, top: 100, left: 100, bottom: 200, right: 200 }],
+          location: {
+            bboxes: [{ page: 1, top: 100, left: 100, bottom: 200, right: 200 }],
+            markdownAnchor: null,
+          },
         },
       ],
     },
@@ -78,6 +88,28 @@ const ARTIFACT: CategorySuggestion = {
       text: "Clinical claim",
       citations: [{ quote: "clin quote" }],
     },
+  ],
+};
+
+// Same as ARTIFACT but the first (default-focused) citation resolved BOTH a PDF
+// bbox and a markdown.md anchor — the case that earns the PDF/MD toggle.
+const TOGGLE_ARTIFACT: CategorySuggestion = {
+  ...ARTIFACT,
+  claims: [
+    {
+      paperId: "Smith2024",
+      text: "Functional claim 1",
+      citations: [
+        {
+          quote: "func quote",
+          location: {
+            bboxes: [{ page: 1, top: 100, left: 100, bottom: 200, right: 200 }],
+            markdownAnchor: { start: 5, end: 15 },
+          },
+        },
+      ],
+    },
+    ...ARTIFACT.claims.slice(1),
   ],
 };
 
@@ -418,6 +450,99 @@ describe("EvidenceViewerShell", () => {
     );
     await waitFor(() =>
       expect(screen.getByTestId("commit-slot-btn")).toBeDefined(),
+    );
+  });
+
+  it("shows the PDF/MD toggle when the active citation has both a bbox and an anchor", async () => {
+    const backend = makeBackend({ claims: [], papers: [], comments: [] });
+    render(
+      wrap(
+        <EvidenceViewerShell
+          {...baseProps}
+          artifact={TOGGLE_ARTIFACT}
+          markdownUrlForDoi={mdUrl}
+          backend={backend}
+          chatSessionFactory={NEVER_SESSION}
+          onVersionChange={vi.fn()}
+        />,
+      ),
+    );
+    await waitFor(() => expect(screen.getByTestId("focus-card")).toBeDefined());
+    await waitFor(() =>
+      expect(screen.getByTestId("evidence-mode-toggle")).toBeDefined(),
+    );
+  });
+
+  it("hides the toggle when no markdownUrlForDoi is provided", async () => {
+    const backend = makeBackend({ claims: [], papers: [], comments: [] });
+    render(
+      wrap(
+        <EvidenceViewerShell
+          {...baseProps}
+          artifact={TOGGLE_ARTIFACT}
+          backend={backend}
+          chatSessionFactory={NEVER_SESSION}
+          onVersionChange={vi.fn()}
+        />,
+      ),
+    );
+    await waitFor(() => expect(screen.getByTestId("focus-card")).toBeDefined());
+    expect(screen.queryByTestId("evidence-mode-toggle")).toBeNull();
+  });
+
+  it("hides the toggle for a PDF-only citation (no markdown anchor)", async () => {
+    const backend = makeBackend({ claims: [], papers: [], comments: [] });
+    render(
+      wrap(
+        <EvidenceViewerShell
+          {...baseProps}
+          artifact={ARTIFACT}
+          markdownUrlForDoi={mdUrl}
+          backend={backend}
+          chatSessionFactory={NEVER_SESSION}
+          onVersionChange={vi.fn()}
+        />,
+      ),
+    );
+    await waitFor(() => expect(screen.getByTestId("focus-card")).toBeDefined());
+    expect(screen.queryByTestId("evidence-mode-toggle")).toBeNull();
+  });
+
+  it("switches the evidence panel to the Markdown viewer when toggled", async () => {
+    vi.stubGlobal(
+      "fetch",
+      vi.fn(
+        async () =>
+          ({
+            ok: true,
+            status: 200,
+            text: async () => "intro func quote in source text",
+          }) as unknown as Response,
+      ),
+    );
+    const backend = makeBackend({ claims: [], papers: [], comments: [] });
+    const { container } = render(
+      wrap(
+        <EvidenceViewerShell
+          {...baseProps}
+          artifact={TOGGLE_ARTIFACT}
+          markdownUrlForDoi={mdUrl}
+          backend={backend}
+          chatSessionFactory={NEVER_SESSION}
+          onVersionChange={vi.fn()}
+        />,
+      ),
+    );
+    await waitFor(() =>
+      expect(screen.getByTestId("evidence-mode-toggle")).toBeDefined(),
+    );
+
+    // Defaults to PDF (the citation has bboxes); switch to Markdown.
+    fireEvent.click(screen.getByText("Markdown"));
+
+    // The Markdown viewer fetches the source and highlights the anchored span.
+    await waitFor(() =>
+      expect(container.querySelector("mark.anchor-highlight")).not.toBeNull(),
     );
   });
 });

@@ -3,8 +3,6 @@ export {
   isCitationHref,
   parseCiteHref,
   parseCitationsFromMarkdown,
-  stripInvalidLinks,
-  sanitizeLlmMarkdown,
 } from "./citations/sanitize";
 export type { PaperIdEntry, PaperIdMapping } from "./citations/types";
 
@@ -17,6 +15,13 @@ export {
   type PdfHighlightViewerProps,
 } from "./pdf-viewer/PdfHighlightViewer";
 export type { HighlightBbox, PdfHighlight } from "./pdf-viewer/types";
+
+// Markdown viewer with anchor highlights
+export {
+  MarkdownHighlightViewer,
+  type MarkdownHighlightViewerProps,
+} from "./markdown-viewer/MarkdownHighlightViewer";
+export type { CodePointAnchor } from "./markdown-viewer/types";
 
 // Triage workspace — types and helpers
 export type {
@@ -76,6 +81,7 @@ export type {
   CitationQuery,
   CitationResolver,
   ResolvedCitations,
+  ResolvedQuote,
 } from "./triage/citation-resolver";
 
 // Evidence viewer shell — composes the triage workspace
