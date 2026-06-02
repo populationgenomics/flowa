@@ -115,7 +115,7 @@
     "@aws-sdk/client-s3": "3.1046.0",
     "@aws-sdk/credential-providers": "3.1046.0",
     "@google-cloud/storage": "7.19.0",
-    "@types/node": "22.19.17",
+    "@types/node": "25.9.1",
     "@types/nunjucks": "3.2.6",
     "typescript": "5.7.3",
     "vite": "8.0.13",
