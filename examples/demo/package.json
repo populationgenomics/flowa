@@ -32,7 +32,7 @@
     "@flowajs/react-viewer": "workspace:*",
     "@hono/node-server": "1.19.14",
     "@mantine/core": "8.3.18",
-    "@mantine/hooks": "8.3.18",
+    "@mantine/hooks": "9.2.1",
     "@tabler/icons-react": "3.44.0",
     "ai": "6.0.182",
     "formidable": "3.5.4",
