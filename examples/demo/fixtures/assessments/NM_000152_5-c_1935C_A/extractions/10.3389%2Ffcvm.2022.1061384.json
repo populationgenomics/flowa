@@ -2,31 +2,26 @@
   "variant_discussed": true,
   "claims": [
     {
-      "text": "The GAA variant c.1935C>A is listed in Table 1 as a mutation associated with IOPD iPSC models used for cardiomyocyte studies (reference 25), where it appears both as a homozygous entry and in compound heterozygosity with c.2040+1G>T.",
+      "text": "The GAA variant c.1935C>A is listed in Table 1 as a mutation found in IOPD patients used for iPSC modeling in two separate studies (references 25 and 40), with one study showing the variant alone and another showing it in compound heterozygosity with c.2040+1G>T.",
       "citations": [
         {
           "quote": "IOPD | Retrovirus | Cardiomyocytes | Cellular glycogen content; Enzyme activity assay; Measurement of intact cellular respiration; Electron microscopy; Microarray analysis | Glycogen accumulation; GAA enzyme activity; Ultrastructural aberrances; Metabolomics changes | rhGAA L-carnitine | c.1935C>A c.1935C>A/c.2040+1G>T | (25)"
+        },
+        {
+          "quote": "IOPD | Retrovirus | Neural cells | Cellular glycogen content; Enzyme activity assay; PAS staining | Glycogen accumulation; GAA Enzyme activity; Neural cells apoptosis | Ebselen, Wortmannin, and PX-866 | Patient 1: 1935 C>A; Patient 2: 1935C>A/2040+1G>T | (40)"
         }
       ]
     },
     {
-      "text": "The GAA variant c.1935C>A is also listed in Table 1 as a mutation in IOPD patients whose iPSC-derived neural cells were used for drug screening studies (reference 40), appearing in Patient 1 as the sole listed variant and in Patient 2 in compound heterozygosity with c.2040+1G>T.",
+      "text": "In the iPSC study summarized as reference (25), IOPD patients carrying c.1935C>A (alone or compound heterozygous with c.2040+1G>T) showed glycogen accumulation, GAA enzyme activity deficiency, and ultrastructural aberrances in iPSC-derived cardiomyocytes, and these phenotypes were alleviated by rhGAA treatment.",
       "citations": [
         {
-          "quote": "Patient 1: 1935 C>A; Patient 2: 1935C>A/2040+1G>T | (40)"
+          "quote": "Huang et al. (25) established iPSCs from two patients with late-onset Pompe disease (LOPD-iPSCs) carrying GAA mutations and derived cardiomyocytes (PD-iCM) from PD-iPSC. It was shown that a mass of glycogen accumulated in PD-iCM, underlying the ultrastructural aberrances including swollen mitochondria, the formation of vacuoles containing glycogen particles, and the formation of autophagosome-like structures. The above major pathologic phenotypes of PD-iPSC-derived cardiomyocytes were alleviated by rhGAA (25)."
         }
       ]
     },
     {
-      "text": "iPSC models carrying c.1935C>A (reference 25) were derived from IOPD patients and used to study glycogen accumulation, GAA enzyme activity, ultrastructural aberrances, and metabolomics changes in cardiomyocytes, with rhGAA and L-carnitine as potential therapeutics.",
-      "citations": [
-        {
-          "quote": "Huang et al. (25) established iPSCs from two patients with late-onset Pompe disease (LOPD-iPSCs) carrying GAA mutations and derived cardiomyocytes (PD-iCM) from PD-iPSC. It was shown that a mass of glycogen accumulated in PD-iCM, underlying the ultrastructural aberrances including swollen mitochondria, the formation of vacuoles containing glycogen particles, and the formation of autophagosome-like structures."
-        }
-      ]
-    },
-    {
-      "text": "iPSC-derived neural cells from IOPD patients carrying c.1935C>A (reference 40) were used to screen three potential therapeutic compounds (Ebselen, Wortmannin, and PX-866), all of which increased GAA activity in PD-iPSC-derived neurons.",
+      "text": "In the iPSC study summarized as reference (40), two IOPD patients (Patient 1 with c.1935C>A; Patient 2 with c.1935C>A/c.2040+1G>T) had iPSCs differentiated into neural cells, and three small molecules (Ebselen, Wortmannin, PX-866) were identified as increasing GAA activity in PD-iPSC-derived neurons.",
       "citations": [
         {
           "quote": "Using the IOPD-iPSC-derived neurons, Huang et al. (40) successfully screened three potential compound candidates for PD treatment, Ebselen (antioxidant), Wortmannin (GSK3 activator), and PX-866 (PI-3K inhibitor). All these small molecules could increase the GAA activity of Pom-iPSC-derived neurons."

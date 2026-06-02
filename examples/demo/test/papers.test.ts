@@ -79,6 +79,13 @@ function writeExtraction(variantId: string, doi: string): void {
   writeFileSync(join(dir, `${encoded}.json`), JSON.stringify({ stub: true }));
 }
 
+function writeSupplement(doi: string, filename: string): void {
+  const encoded = encodeDoi(doi);
+  const dir = join(dataRoot, "papers", encoded, "supplements");
+  mkdirSync(dir, { recursive: true });
+  writeFileSync(join(dir, filename), "stub");
+}
+
 describe("listPapersForVariant", () => {
   test("returns empty when query.json is absent (pre-query state)", async () => {
     const result = await listPapersForVariant("never-ran", {
@@ -164,6 +171,21 @@ describe("listPapersForVariant", () => {
       "acmg_classification",
       "phenotype_summary",
     ]);
+  });
+
+  test("lists attached supplements in ord order, [] when none", async () => {
+    writeQuery("V1", ["10.1234/foo", "10.1234/bar"]);
+    writePaperPdf("10.1234/foo");
+    writeSupplement("10.1234/foo", "001_table_s2.docx");
+    writeSupplement("10.1234/foo", "000_table_s1.xlsx");
+    const result = await listPapersForVariant("V1", { dataDir: dataRoot });
+    const foo = result.papers.find((p) => p.doi === "10.1234/foo");
+    const bar = result.papers.find((p) => p.doi === "10.1234/bar");
+    expect(foo?.supplements).toEqual([
+      "000_table_s1.xlsx",
+      "001_table_s2.docx",
+    ]);
+    expect(bar?.supplements).toEqual([]);
   });
 
   test("preserves DOI ordering from query.json", async () => {

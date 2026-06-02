@@ -2,42 +2,66 @@
   "variant_discussed": true,
   "claims": [
     {
-      "text": "Five of six GSD II patients in this case series carry the c.1935C>A variant: P1 (compound het with c.1082C>T, both 'potentially less severe'), P2 and P3 (compound het with c.1216G>A, 'potentially less severe'), P5 (homozygous, 'potentially less severe'), and P6 (compound het with c.1822C>T 'very severe', c.1935C>A 'potentially less severe').",
+      "text": "Patient 1 (juvenile-onset GSD II, female, onset 15 months) carries c.1935C>A compound heterozygous with c.1082C>T; both variants described as 'potentially less severe'. She required invasive ventilation at age 30 months and had six weaning failures, ultimately requiring tracheostomy at 46 months.",
       "citations": [
         {
-          "quote": "c.1082C>T, c.1935C>A (both potentially less severe) | c.1216G>A (unknow), c.1935C>A (potentially less severe) | c.1216G>A (unknow), c.1935C>A (potentially less severe) | c.1557G>A (unknown), c.1978C>T (potentially less severe) | homozygotic mutation of c.1935C>A (potentially less severe) | c.1822C>T (very severe), c.1935C>A (potentially less severe)"
+          "quote": "c.1082C>T, c.1935C>A (both potentially less severe)"
         }
       ]
     },
     {
-      "text": "Patient 2 (juvenile-onset, male) and Patient 3 (juvenile-onset, female) are siblings sharing the same genotype (compound heterozygous c.1216G>A / c.1935C>A), but the younger brother presented with more severe respiratory involvement and more difficult weaning than his older sister.",
+      "text": "Patients 2 and 3 (siblings, juvenile-onset GSD II) carry c.1935C>A compound heterozygous with c.1216G>A (unknown significance); c.1935C>A described as 'potentially less severe'. Patient 2 (male, onset 20 months) and Patient 3 (female, onset 47 months) were both successfully weaned from ventilation.",
       "citations": [
         {
-          "quote": "Patient 2, the younger brother of Patient 3, presented with severe respiratory involvement and weaning from mechanical ventilation proved more difficult than in his older sister. Patients 2 and 3 had the same genotype, but the younger brother who had higher GAA activity levels presented with severe respiratory involvement leading to more severe weaning difficulties."
+          "quote": "c.1216G>A (unknow), c.1935C>A (potentially less severe)"
         }
       ]
     },
     {
-      "text": "The paper asserts that five of six patients likely had CRIM-positive status because they carried the c.1935C>A mutation, which may explain their relatively better clinical outcomes.",
+      "text": "Patient 5 (infantile-onset GSD II, male, onset 1 month) is homozygous for c.1935C>A, described as 'potentially less severe', with zero GAA activity in peripheral blood leukocytes (0.00 nmol/h/mg), and was successfully weaned from mechanical ventilation twice.",
       "citations": [
         {
-          "quote": "We believe five of our six patients may have had a CRIM-positive status as they had the c.1935 C > A mutation [31]; this may be a reason for their better clinical outcomes."
+          "quote": "homozygotic mutation of c.1935C>A (potentially less severe)"
         }
       ]
     },
     {
-      "text": "Patient 5, homozygous for c.1935C>A with zero GAA activity, was successfully weaned from mechanical ventilation twice, demonstrating no obligate correlation between GAA enzyme activity level and severity of respiratory symptoms.",
+      "text": "Patient 6 (infantile-onset GSD II, male, onset 4 months) carries c.1935C>A compound heterozygous with c.1822C>T (described as 'very severe'); Patient 6 died after treatment was abandoned.",
       "citations": [
         {
-          "quote": "patient 5, who had zero GAA activity, was successfully weaned from mechanical ventilation twice. This shows that there maybe no significant correlation between severe clinical manifestations such as respiratory symptoms and GAA enzyme activity."
+          "quote": "c.1822C>T (very severe), c.1935C>A (potentially less severe)"
         }
       ]
     },
     {
-      "text": "Yang et al. (reference 31) reported that 12 of 14 CRIM-positive infantile-onset Pompe disease patients carried the c.1935C>A variant, identifying it as the most commonly found mutation in that cohort.",
+      "text": "The c.1935C>A variant is reported as the most commonly found mutation in CRIM-positive infantile-onset Pompe disease patients, identified in 12 of 14 such patients in Yang et al.",
       "citations": [
         {
-          "quote": "Yang et al. [31] who reported on 14 infantile-onset patients who were CRIM-positive showed that 12/14 patients had the most commonly found mutation--c.1935 C > A."
+          "quote": "Yang et al. [31] who reported on 14 infantile-onset patients who were CRIM-positive showed that 12/14 patients had the most commonly found mutation--c.1935 C > A"
+        }
+      ]
+    },
+    {
+      "text": "The authors believe five of their six patients likely had CRIM-positive status because they carried the c.1935C>A mutation, which they suggest may contribute to better clinical outcomes.",
+      "citations": [
+        {
+          "quote": "We believe five of our six patients may have had a CRIM-positive status as they had the c.1935 C > A mutation [31]; this may be a reason for their better clinical outcomes"
+        }
+      ]
+    },
+    {
+      "text": "Patient 2 (carrying c.1935C>A compound heterozygous with c.1216G>A) had higher GAA activity than his sister Patient 3 (same genotype) yet presented with more severe respiratory involvement and greater weaning difficulties, demonstrating no significant correlation between GAA residual activity and clinical severity.",
+      "citations": [
+        {
+          "quote": "Patients 2 and 3 had the same genotype, but the younger brother who had higher GAA activity levels presented with severe respiratory involvement leading to more severe weaning difficulties"
+        }
+      ]
+    },
+    {
+      "text": "Patient 5, who had zero GAA activity and was homozygous for c.1935C>A, was successfully weaned from mechanical ventilation twice, further illustrating no significant correlation between severe respiratory symptoms and GAA enzyme activity.",
+      "citations": [
+        {
+          "quote": "patient 5, who had zero GAA activity, was successfully weaned from mechanical ventilation twice. This shows that there maybe no significant correlation between severe clinical manifestations such as respiratory symptoms and GAA enzyme activity"
         }
       ]
     }

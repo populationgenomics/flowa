@@ -185,6 +185,44 @@ export function LiteratureView({ variantId }: LiteratureViewProps) {
     [fetchPapers],
   );
 
+  const handleSupplementUpload = useCallback(
+    async (paper: PaperRow, file: File) => {
+      const res = await uploadPaperSupplement(paper, file, variantId);
+      if (!res.ok) {
+        const body = (await res.json().catch(() => ({}))) as {
+          error?: string;
+        };
+        setError(
+          `Supplement upload failed (${res.status}): ${body.error ?? "unknown error"}`,
+        );
+        return;
+      }
+      setError(null);
+      // Uploading invalidates the paper's extraction server-side, so its
+      // status reverts to "downloaded" until the curator re-analyzes.
+      await fetchPapers();
+    },
+    [variantId, fetchPapers],
+  );
+
+  const handleSupplementDelete = useCallback(
+    async (paper: PaperRow, filename: string) => {
+      const res = await deletePaperSupplement(paper, filename, variantId);
+      if (!res.ok) {
+        const body = (await res.json().catch(() => ({}))) as {
+          error?: string;
+        };
+        setError(
+          `Supplement delete failed (${res.status}): ${body.error ?? "unknown error"}`,
+        );
+        return;
+      }
+      setError(null);
+      await fetchPapers();
+    },
+    [variantId, fetchPapers],
+  );
+
   const handleBulkUpload = useCallback(
     async (files: File[]) => {
       if (!papersResp) return;
@@ -322,6 +360,16 @@ export function LiteratureView({ variantId }: LiteratureViewProps) {
                   papers={groupedPapers.get(status) ?? []}
                   onUpload={
                     status === "needs_manual" ? handleSingleUpload : undefined
+                  }
+                  onAddSupplement={
+                    status === "downloaded" || status === "extracted"
+                      ? handleSupplementUpload
+                      : undefined
+                  }
+                  onDeleteSupplement={
+                    status === "downloaded" || status === "extracted"
+                      ? handleSupplementDelete
+                      : undefined
                   }
                 />
               ))}
@@ -470,4 +518,31 @@ async function uploadPaperPdf(paper: PaperRow, file: File): Promise<void> {
     method: "POST",
     body: formData,
   });
+}
+
+async function uploadPaperSupplement(
+  paper: PaperRow,
+  file: File,
+  variantId: string,
+): Promise<Response> {
+  const formData = new FormData();
+  formData.append("file", file);
+  // variantId lets the route invalidate this assessment's stale extraction.
+  formData.append("variantId", variantId);
+  return fetch(`/api/papers/${encodeURIComponent(paper.doi)}/supplements`, {
+    method: "POST",
+    body: formData,
+  });
+}
+
+async function deletePaperSupplement(
+  paper: PaperRow,
+  filename: string,
+  variantId: string,
+): Promise<Response> {
+  const params = new URLSearchParams({ filename, variantId });
+  return fetch(
+    `/api/papers/${encodeURIComponent(paper.doi)}/supplements?${params.toString()}`,
+    { method: "DELETE" },
+  );
 }

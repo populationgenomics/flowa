@@ -55,6 +55,7 @@ function papersResp(
         authors: "Chan, M-Y",
         pmid: 37542277,
         url: "https://doi.org/10.1186/s13023-023-02848-6",
+        supplements: [],
       },
     ],
     aggregateExists: false,

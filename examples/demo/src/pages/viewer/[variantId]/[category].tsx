@@ -196,6 +196,13 @@ export default function ViewerPage() {
     [],
   );
 
+  // Lets the shell offer a PDF/Markdown toggle and paint markdown_anchor
+  // highlights (e.g. a quote that lives in a converted xlsx/docx supplement).
+  const markdownUrlForDoi = useCallback(
+    (doi: string) => `/api/papers/${encodeDoi(doi)}/markdown`,
+    [],
+  );
+
   const workspaceKey = useMemo(
     () => ({
       variantId: variantId ?? "",
@@ -288,6 +295,7 @@ export default function ViewerPage() {
         rewritePrompt="Apply my triage decisions and rewrite the notes and description using only the accepted claims. Re-rank papers and claims accordingly."
         resolveCitations={resolveCitations}
         pdfUrlForDoi={pdfUrlForDoi}
+        markdownUrlForDoi={markdownUrlForDoi}
         pdfWorkerSrc="/pdfjs/pdf.worker.min.mjs"
         pdfCMapUrl="/pdfjs/cmaps/"
         commitSlot={commitSlot}

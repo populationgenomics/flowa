@@ -2,40 +2,18 @@
   "variant_discussed": true,
   "claims": [
     {
-      "text": "Patient 2 (male, IOPD, ERT at day 15, age 8.4y at study end) carries c.1935C>A (p.D645E) and c.1726G>A (p.G576S) in homozygous form; newborn hearing screen was not performed (NA); post-ERT hearing at age 6.7 years showed single-ear SNHL, mild (right 25.0 dB, left 33.3 dB).",
+      "text": "Patient 2 (male, GA 38w, ERT started day 15, study-end age 8.4 years) carries GAA c.1935C>A (p.D645E) homozygously together with c.1726G>A (p.G576S) homozygously, and developed mild single-ear SNHL post-ERT.",
       "citations": [
         {
           "quote": "2 | M | 38, 3.5 | 15 | 15 | 8.4 | c.1935 C\u2192A, (p.D645E), homozygous; c.1726 G\u2192A, (p.G576S), homozygous"
         },
         {
-          "quote": "2 | NA | + | 6.7 | 25.0 | 33.3 | A | A | Single ear SNHL, Mild"
+          "quote": "2 | Pass | + | 6.7 | 25.0 | 33.3 | A | A | Single ear SNHL, Mild"
         }
       ]
     },
     {
-      "text": "Patient 3 (male, IOPD, ERT at day 9, age 8.4y at study end) carries c.1935C>A (p.D645E) heterozygous in compound heterozygosity with c.2303C>T (p.P768L) heterozygous (no co-occurring G576S); passed newborn hearing screen but OAE absent; post-ERT hearing at age 6.8 years showed bilateral mixed HL, moderate (right 41.7 dB, left 45.0 dB, tympanogram C bilaterally).",
-      "citations": [
-        {
-          "quote": "3 | M | 39, 3.3 | 9 | 9 | 8.4 | c.1935 C\u2192A, (p.D645E), heterozygous; c.2303 C\u2192T, (p.P768L), heterozygous"
-        },
-        {
-          "quote": "3 | Pass | \u2212 | 6.8 | 41.7 | 45.0 | C | C | Bil. mixed HL, Moderate"
-        }
-      ]
-    },
-    {
-      "text": "Patient 4 (male, IOPD, ERT at day 12, age 8y at study end) carries c.1935C>A (p.D645E) heterozygous in compound heterozygosity with c.1396G>T (p.V466F) heterozygous (no co-occurring G576S); hearing at age 1.2 years was normal.",
-      "citations": [
-        {
-          "quote": "4 | M | 38, 3.1 | 12 | 12 | 8 | c.1396 G\u2192T, (p.V466F), heterozygous; c.1935 C\u2192A, (pD645E), heterozygous"
-        },
-        {
-          "quote": "4 | Pass | + | 1.2 | 21.7 | 21.7 | A | A | Normal"
-        }
-      ]
-    },
-    {
-      "text": "Patient 5 (female, IOPD, ERT at day 9, age 7.5y at study end) carries c.1935C>A (p.D645E) and c.1726G>A (p.G576S) in homozygous form; hearing at age 5.5 years was normal (right 16.7 dB, left 15.0 dB).",
+      "text": "Patient 5 (female, GA 39w, ERT started day 9, study-end age 7.5 years) carries GAA c.1935C>A (p.D645E) homozygously with c.1726G>A (p.G576S) homozygously, and had normal hearing at last assessment (age 5.5 years).",
       "citations": [
         {
           "quote": "5 | F | 39, 3.0 | 9 | 9 | 7.5 | c.1935 C\u2192A, (p.D645E), homozygous; c.1726 G\u2192A, (p.G576S), homozygous"
@@ -46,29 +24,7 @@
       ]
     },
     {
-      "text": "Patients 7 (female) and 8 (male), both with IOPD, each carry c.1935C>A (p.D645E) heterozygous alongside c.1726G>A (p.G576S) heterozygous and IVS7+2T\u2192C heterozygous, consistent with D645E and G576S in cis on one allele; both had normal hearing at ages 4.7 and 4.8 years respectively.",
-      "citations": [
-        {
-          "quote": "7 | F | 34, 2.2 | 12 | 12 | 6.5 | c.1935 C\u2192A, (pD645E), heterozygous; IVS7+2T\u2192C, heterozygous; c.1726 G\u2192A, (p.G576S), heterozygous"
-        },
-        {
-          "quote": "8 | M | 39, 3.7 | 7 | 7 | 6.4 | IVS7+2T\u2192C, heterozygous; c.1935 C\u2192A, (p.D645E), heterozygous; c.1726 G\u2192A, (p.G576S), heterozygous"
-        }
-      ]
-    },
-    {
-      "text": "Patient 9 (female, IOPD, ERT at day 13) carries c.1935C>A (p.D645E) heterozygous alongside c.1726G>A (p.G576S) heterozygous and c.1082C>T (p.P361L) heterozygous; hearing at age 4.9 years was normal.",
-      "citations": [
-        {
-          "quote": "9 | F | 39, 2.9 | 13 | 13 | 6 | c.1082 C\u2192T, (p.P361L), heterozygous; c.1935 C\u2192A, (p.D645E), heterozygous; c.1726 G\u2192A, (p.G576S), heterozygous"
-        },
-        {
-          "quote": "9 | Pass | + | 4.9 | 25.0 | 23.3 | A | A | Normal"
-        }
-      ]
-    },
-    {
-      "text": "Patient 10 (female, IOPD, ERT at day 10, age 5.7y at study end) carries c.1935C>A (p.D645E) and c.1726G>A (p.G576S) in homozygous form; hearing at age 4.3 years showed bilateral conductive HL, mild (right 26.7 dB, left 28.3 dB, tympanogram B bilaterally).",
+      "text": "Patient 10 (female, GA 39w, ERT started day 10, study-end age 5.7 years) carries GAA c.1935C>A (p.D645E) homozygously with c.1726G>A (p.G576S) homozygously, and had mild bilateral conductive HL at last assessment (age 4.3 years).",
       "citations": [
         {
           "quote": "10 | F | 39, 2.9 | 10 | 10 | 5.7 | c.1935 C\u2192A, (p.D645E), homozygous; c.1726 G\u2192A, (p.G576S), homozygous"
@@ -79,7 +35,7 @@
       ]
     },
     {
-      "text": "Patient 11 (female, IOPD, ERT at day 6, age 5.6y at study end) carries c.1935C>A (p.D645E) and c.1726G>A (p.G576S) in homozygous form; hearing at age 4.7 years showed bilateral SNHL, mild (right 26.7 dB, left 26.7 dB).",
+      "text": "Patient 11 (female, GA 41w, ERT started day 6, study-end age 5.6 years) carries GAA c.1935C>A (p.D645E) homozygously with c.1726G>A (p.G576S) homozygously, and had mild bilateral SNHL at last assessment (age 4.7 years).",
       "citations": [
         {
           "quote": "11 | F | 41, 2.6 | 6 | 6 | 5.6 | c.1935 C\u2192A, (p.D645E), homozygous; c.1726 G\u2192A, (p.G576S), homozygous"
@@ -90,29 +46,7 @@
       ]
     },
     {
-      "text": "Patient 12 (female, IOPD, ERT at day 8) carries c.1935C>A (p.D645E) heterozygous alongside c.1726G>A (p.G576S) heterozygous and c.1411_1414del (E471fsX5) heterozygous; hearing at age 3.1 years was normal.",
-      "citations": [
-        {
-          "quote": "12 | F | 36, 3.3 | 8 | 8 | 4.8 | c.1411_1414del, (E471fsX5), heterozygous; c.1935 C\u2192A, (pD645E), heterozygous; c.1726 G\u2192A, (p.G576S), heterozygous"
-        },
-        {
-          "quote": "12 | Pass | + | 3.1 | 15.0 | 15.0 | A | A | Normal"
-        }
-      ]
-    },
-    {
-      "text": "Patient 13 (male, IOPD, ERT at day 13) carries c.1935C>A (p.D645E) heterozygous alongside c.1726G>A (p.G576S) heterozygous and c.2274insC (p.G759fs) heterozygous; hearing at age 2.8 years was normal.",
-      "citations": [
-        {
-          "quote": "13 | M | 39, 2.5 | 13 | 13 | 4.6 | c.1726 G\u2192A, (p.G576S), heterozygous; c.1935C\u2192A, (pD645E), heterozygous; c.2274insC, (p.G759fs), heterozygous"
-        },
-        {
-          "quote": "13 | Pass | + | 2.8 | 20.0 | 20.0 | A | A | Normal"
-        }
-      ]
-    },
-    {
-      "text": "Patient 14 (female, IOPD, ERT at day 8, age 2.4y at study end) carries c.1935C>A (p.D645E) and c.1726G>A (p.G576S) in homozygous form; hearing at age 1.1 years was normal (right 25.0 dB, left 25.0 dB).",
+      "text": "Patient 14 (female, GA 39w, ERT started day 8, study-end age 2.4 years) carries GAA c.1935C>A (p.D645E) homozygously with c.1726G>A (p.G576S) homozygously, and had normal hearing at last assessment (age 1.1 years).",
       "citations": [
         {
           "quote": "14 | F | 39, 3.1 | 7 | 8 | 2.4 | c.1935 C\u2192A, (p.D645E), homozygous; c.1726 G\u2192A, (p.G576S), homozygous"
@@ -123,29 +57,7 @@
       ]
     },
     {
-      "text": "Patient 17 (female, IOPD, ERT at day 14) carries c.1935C>A (p.D645E) heterozygous alongside c.1726G>A (p.G576S) heterozygous and c.2228A>C (p.Q743P); hearing at age 1.5 years was normal.",
-      "citations": [
-        {
-          "quote": "17 | F | 38, 3.6 | 14 | 14 | 2.8 | c.2228 A>C,p.Q743P; c.1726 G\u2192A, (p.G576S), heterozygous; c.1935C\u2192A, (pD645E), heterozygous"
-        },
-        {
-          "quote": "17 | Pass | + | 1.5 | 20.0 | 20.0 | A | A | Normal"
-        }
-      ]
-    },
-    {
-      "text": "Patient 18 (male, IOPD, ERT at day 6) carries c.1935C>A (p.D645E) heterozygous alongside c.1726G>A (p.G576S) heterozygous and c.2238G>C (p.W746C) heterozygous; hearing at age 0.8 years was normal.",
-      "citations": [
-        {
-          "quote": "18 | M | 39, 3.1 | 6 | 6 | 2.5 | c.2238 G\u2192C, (p.W746C), heterozygous; c.1726 G\u2192A, (p.G576S), heterozygous; c.1935C\u2192A, (pD645E), heterozygous"
-        },
-        {
-          "quote": "18 | Pass | + | 0.8 | 20.0 | 20.0 | A | A | Normal"
-        }
-      ]
-    },
-    {
-      "text": "Patient 19 (male, IOPD, ERT at day 8, age 2y at study end) carries c.1935C>A (p.D645E) and c.1726G>A (p.G576S) in homozygous form; failed newborn hearing screening; hearing at age 0.3 years showed bilateral SNHL, mild (40 dB bilaterally).",
+      "text": "Patient 19 (male, GA 38w, ERT started day 8, study-end age 2 years) carries GAA c.1935C>A (p.D645E) homozygously with c.1726G>A (p.G576S) homozygously, and had mild bilateral SNHL at last assessment (age 0.3 years); patient 19 failed newborn hearing screening.",
       "citations": [
         {
           "quote": "19 | M | 38, 3.8 | 7 | 8 | 2 | c.1935 C\u2192A, (p.D645E), homozygous; c.1726 G\u2192A, (p.G576S), homozygous"
@@ -156,13 +68,109 @@
       ]
     },
     {
-      "text": "All 19 IOPD patients in this cohort were identified by newborn screening and received early ERT at a mean age of 11.05 days (range 6\u201323 days), with IOPD confirmed by rapid diagnostic criteria including hypotonia, elevated CK, extremely low GAA activity, and high left ventricular mass index.",
+      "text": "Patient 3 (male, GA 39w, ERT started day 9, study-end age 8.4 years) carries GAA c.1935C>A (p.D645E) heterozygously and c.2303C>T (p.P768L) heterozygously (compound heterozygous), and developed moderate bilateral mixed hearing loss (thresholds 41.7/45.0 dB, tympanogram type C bilaterally).",
+      "citations": [
+        {
+          "quote": "3 | M | 39, 3.3 | 9 | 9 | 8.4 | c.1935 C\u2192A, (p.D645E), heterozygous; c.2303 C\u2192T, (p.P768L), heterozygous"
+        },
+        {
+          "quote": "3 | Pass | \u2212 | 6.8 | 41.7 | 45.0 | C | C | Bil. mixed HL, Moderate"
+        }
+      ]
+    },
+    {
+      "text": "Patient 4 (male, GA 38w, ERT started day 12) carries GAA c.1396G>T (p.V466F) heterozygously and c.1935C>A (p.D645E) heterozygously, and had normal hearing at last assessment (age 1.2 years).",
+      "citations": [
+        {
+          "quote": "4 | M | 38, 3.1 | 12 | 12 | 8 | c.1396 G\u2192T, (p.V466F), heterozygous; c.1935 C\u2192A, (pD645E), heterozygous"
+        },
+        {
+          "quote": "4 | Pass | + | 1.2 | 21.7 | 21.7 | A | A | Normal"
+        }
+      ]
+    },
+    {
+      "text": "Patients 7 and 8 each carry GAA c.1935C>A (p.D645E) heterozygously together with IVS7+2T>C heterozygously and c.1726G>A (p.G576S) heterozygously, and both had normal hearing outcomes post-ERT.",
+      "citations": [
+        {
+          "quote": "7 | F | 34, 2.2 | 12 | 12 | 6.5 | c.1935 C\u2192A, (pD645E), heterozygous; IVS7+2T\u2192C, heterozygous; c.1726 G\u2192A, (p.G576S), heterozygous"
+        },
+        {
+          "quote": "8 | M | 39, 3.7 | 7 | 7 | 6.4 | IVS7+2T\u2192C, heterozygous; c.1935 C\u2192A, (p.D645E), heterozygous; c.1726 G\u2192A, (p.G576S), heterozygous"
+        }
+      ]
+    },
+    {
+      "text": "Patient 9 (female, GA 39w, ERT started day 13) carries GAA c.1082C>T (p.P361L) heterozygously, c.1935C>A (p.D645E) heterozygously, and c.1726G>A (p.G576S) heterozygously, and had normal hearing at last assessment (age 4.9 years).",
+      "citations": [
+        {
+          "quote": "9 | F | 39, 2.9 | 13 | 13 | 6 | c.1082 C\u2192T, (p.P361L), heterozygous; c.1935 C\u2192A, (p.D645E), heterozygous; c.1726 G\u2192A, (p.G576S), heterozygous"
+        },
+        {
+          "quote": "9 | Pass | + | 4.9 | 25.0 | 23.3 | A | A | Normal"
+        }
+      ]
+    },
+    {
+      "text": "Patient 12 (female, GA 36w, ERT started day 8) carries GAA c.1411_1414del (E471fsX5) heterozygously, c.1935C>A (p.D645E) heterozygously, and c.1726G>A (p.G576S) heterozygously, and had normal hearing at last assessment (age 3.1 years).",
+      "citations": [
+        {
+          "quote": "12 | F | 36, 3.3 | 8 | 8 | 4.8 | c.1411_1414del, (E471fsX5), heterozygous; c.1935 C\u2192A, (pD645E), heterozygous; c.1726 G\u2192A, (p.G576S), heterozygous"
+        },
+        {
+          "quote": "12 | Pass | + | 3.1 | 15.0 | 15.0 | A | A | Normal"
+        }
+      ]
+    },
+    {
+      "text": "Patient 13 (male, GA 39w, ERT started day 13) carries GAA c.1726G>A (p.G576S) heterozygously, c.1935C>A (p.D645E) heterozygously, and c.2274insC (p.G759fs) heterozygously, and had normal hearing at last assessment (age 2.8 years).",
+      "citations": [
+        {
+          "quote": "13 | M | 39, 2.5 | 13 | 13 | 4.6 | c.1726 G\u2192A, (p.G576S), heterozygous; c.1935C\u2192A, (pD645E), heterozygous; c.2274insC, (p.G759fs), heterozygous"
+        },
+        {
+          "quote": "13 | Pass | + | 2.8 | 20.0 | 20.0 | A | A | Normal"
+        }
+      ]
+    },
+    {
+      "text": "Patient 17 (female, GA 38w, ERT started day 14) carries GAA c.2228A>C (p.Q743P), c.1726G>A (p.G576S) heterozygously, and c.1935C>A (p.D645E) heterozygously, and had normal hearing at last assessment (age 1.5 years).",
+      "citations": [
+        {
+          "quote": "17 | F | 38, 3.6 | 14 | 14 | 2.8 | c.2228 A>C,p.Q743P; c.1726 G\u2192A, (p.G576S), heterozygous; c.1935C\u2192A, (pD645E), heterozygous"
+        },
+        {
+          "quote": "17 | Pass | + | 1.5 | 20.0 | 20.0 | A | A | Normal"
+        }
+      ]
+    },
+    {
+      "text": "Patient 18 (male, GA 39w, ERT started day 6) carries GAA c.2238G>C (p.W746C) heterozygously, c.1726G>A (p.G576S) heterozygously, and c.1935C>A (p.D645E) heterozygously, and had normal hearing at last assessment (age 0.8 years).",
+      "citations": [
+        {
+          "quote": "18 | M | 39, 3.1 | 6 | 6 | 2.5 | c.2238 G\u2192C, (p.W746C), heterozygous; c.1726 G\u2192A, (p.G576S), heterozygous; c.1935C\u2192A, (pD645E), heterozygous"
+        },
+        {
+          "quote": "18 | Pass | + | 0.8 | 20.0 | 20.0 | A | A | Normal"
+        }
+      ]
+    },
+    {
+      "text": "All 19 patients in this study had IOPD confirmed by newborn screening and GAA gene sequencing, with ERT initiated at a mean age of 11.05\u00b14.31 days (range 6\u201323 days).",
       "citations": [
         {
           "quote": "The mean age of the initial time to ERT was 11.05\u00b14.31 days, and the HI rate was 31.6% (6/19)."
         },
         {
-          "quote": "all the referred newborns were given ERT starting within 4 h of admission if they had the following manifestations: 1. general hypotonia; 2. an elevated creatine kinase level (> 250 m/L); 3. extremely low GAA activity upon initial dried blood spot analysis (< 0.50 mmol/L/h); and 4. a high left ventricular mass index (> 80 g/m2)"
+          "quote": "confirmatory diagnoses using GAA gene sequencing was usually performed in 5 days passing their newborn hearing screenings"
+        }
+      ]
+    },
+    {
+      "text": "The overall hearing impairment rate in this IOPD cohort (which includes patients carrying c.1935C>A p.D645E) was 31.6% (6/19) after early ERT initiated at mean age 11.05 days.",
+      "citations": [
+        {
+          "quote": "the patients in our cohort had early ERT initiation time and a lower hearing impairment rate (with an average ERT initiation time of 11.05 days and 31.6% hearing impairment in the last evaluation after treatment)"
         }
       ]
     }

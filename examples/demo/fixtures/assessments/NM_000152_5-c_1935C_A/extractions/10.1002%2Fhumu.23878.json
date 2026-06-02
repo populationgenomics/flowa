@@ -2,21 +2,21 @@
   "variant_discussed": true,
   "claims": [
     {
-      "text": "GAA c.1935C>A (p.Asp645Glu) was the second most common variant globally in Group A (classic infantile Pompe disease, onset \u226412 months with cardiomyopathy; n=27) and the most common variant in Asia-Pacific Group A (n=26), but was not frequently reported in other geographic regions.",
+      "text": "c.1935C>A (p.Asp645Glu) was the second most common variant globally in Group A (symptom onset \u226412 months with cardiomyopathy) with n=27 occurrences, and was the most common variant in the Asia-Pacific region for Group A (n=26), but was not frequently reported in any other region.",
       "citations": [
         {
-          "quote": "The variant c.1935C>A was the second most common globally and the most common in Asia\u2010Pacific but was not frequently reported in any other region."
+          "quote": "c.1935C>A (*n* = 27) | p.(Asp645Glu) | c.2481+102_2646+31del (*n* = 20) | p.(Gly828_Asn882del) | c.2481+102_2646+31del (*n* = 46) | p.(Gly828_Asn882del)"
         },
         {
-          "quote": "c.1935C>A (*n* = 27) | p.(Asp645Glu)"
+          "quote": "c.1935C>A (*n* = 26) | p.(Asp645Glu) | c.2662G>T (*n* = 5) | p.(Glu888Ter) | c.1935C>A (*n* = 7) | p.(Asp645Glu)"
         },
         {
-          "quote": "c.1935C>A (*n* = 26) | p.(Asp645Glu)"
+          "quote": "c.1935C>A was the second most common globally and the most common in Asia\u2010Pacific but was not frequently reported in any other region."
         }
       ]
     },
     {
-      "text": "In the Pompe Registry, c.1935C>A (p.Asp645Glu) was reported a total of 42 times across Groups A, B, and C (spanning classic infantile through adult-onset phenotypes).",
+      "text": "c.1935C>A (p.Asp645Glu) was reported a total of 42 times across all phenotypic subgroups (Groups A, B, and C) in the Pompe Registry dataset of 1,079 patients.",
       "citations": [
         {
           "quote": "exon14 | c.1935C>A | p.(Asp645Glu) | 42 | A,B,C"
@@ -24,18 +24,7 @@
       ]
     },
     {
-      "text": "c.1935C>A was also reported in Asia-Pacific patients in Group B (n<5; onset \u226412 years without early cardiomyopathy) and Group C (n=7; onset >12 years).",
-      "citations": [
-        {
-          "quote": "c.1935C>A (*n*<5) | p.(Asp645Glu)"
-        },
-        {
-          "quote": "c.1935C>A (*n* = 7) | p.(Asp645Glu)"
-        }
-      ]
-    },
-    {
-      "text": "c.1935C>A is listed in Table 5 as one of the Group A (classic infantile Pompe disease) variants in exon 14, indicating it is a variant associated with the most severe disease phenotype.",
+      "text": "c.1935C>A is listed as a known (previously published) variant present in Group A patients in Table 5, which enumerates all variants found in classic infantile Pompe disease patients (onset \u226412 months with cardiomyopathy).",
       "citations": [
         {
           "quote": "exon14 | c.1912G>T; c.1913G>A; c.1927G>A; c.1933G>A; c.1933G>C; c.1933G>T; c.1935C>A; c.1941C>G; c.1942G>A; c.1962_1964del; c.1979G>A; **c.2004C>A**; c.2015G>A; c.2023_2025del; c.2024_2026del; c.2040G>A"
@@ -43,40 +32,50 @@
       ]
     },
     {
-      "text": "c.1935C>A was found in homozygosity in 7 CRIM-positive Group A patients (classic infantile Pompe disease with cardiomyopathy onset \u226412 months).",
+      "text": "c.1935C>A was found in homozygosity in 7 CRIM-positive Group A patients (classic infantile Pompe disease with onset \u226412 months and cardiomyopathy), and also in homozygosity in Group B patients.",
       "citations": [
         {
-          "quote": "c.1935C>A (*n*=7)"
+          "quote": "c.1935C>A (*n*=7) | | | c.1935C>A |"
         }
       ]
     },
     {
-      "text": "c.1935C>A was also found in homozygosity in Group B patients (onset \u226412 years without cardiomyopathy in first year of life); upon careful review, these patients appear to have had cardiomyopathy reported in the Registry after 12 months of age, suggesting misclassification.",
+      "text": "The homozygous variant c.1935C>A, typically associated with classic infantile Pompe disease (Group A), was also reported in Group B patients; upon review, these Group B patients appear to have had cardiomyopathy reported in the Registry after 12 months of age, suggesting misclassification.",
       "citations": [
         {
-          "quote": "homozygous substitution (missense) variants c.1843G>A, c.1933G>A, and c.1935C>A, typically found in classic infantile Pompe disease patients, were reported in both Groups A and B (Table 6). Upon careful review, the patients in Group B appear to have had cardiomyopathy reported in the Registry after 12 months of age"
+          "quote": "homozygous substitution (missense) variants c.1843G>A, c.1933G>A, and c.1935C>A, typically found in classic infantile Pompe disease patients, were reported in both Groups A and B (Table 6). Upon careful review, the patients in Group B appear to have had cardiomyopathy reported in the Registry after 12 months of age and are expected to be in Group A."
         }
       ]
     },
     {
-      "text": "In Asia-Pacific patients, c.1935C>A and the pseudodeficiency variant c.1726G>A are linked in cis on the same chromosome.",
+      "text": "In Asia-Pacific Group A, c.1935C>A accounted for nearly half of reported variants and was the fourth most common variant globally; it is linked in cis with the pseudodeficiency variant c.1726G>A in Asia-Pacific patients.",
       "citations": [
         {
-          "quote": "c1935C>A also was common in Group A in this region since c.1935C>A and c.1726G>A are linked in cis in patients in the Asia\u2010Pacific."
+          "quote": "In Asia\u2010Pacific, c.1935C>A was reported most often, but was not among the top five reported in other regions. Nevertheless, this variant was the fourth most common globally due to the input of patients from Asia\u2010Pacific where it accounted for nearly half of reported variants in Group A. Not unexpectedly, c1726G>A also was common in Group A in this region since c.1935C>A and c.1726G>A are linked in cis in patients in the Asia\u2010Pacific."
         }
       ]
     },
     {
-      "text": "c.1935C>A is a known (previously published) variant, not classified as novel; variants found in Group A are considered 'very severe' as they are associated with classic infantile Pompe disease (cardiomyopathy, early symptom onset), and homozygosity for Group A variants is expected to lead to this phenotype.",
+      "text": "Homozygosity for c.1935C>A in Group A is expected to lead to the classic infantile Pompe disease phenotype (onset \u226412 months with cardiomyopathy), consistent with the severity rating of variants found in Group A patients.",
       "citations": [
         {
-          "quote": "those identified in Group A (Table 5) are "
-        },
+          "quote": "With regard to the severity of *GAA* variants, those identified in Group A (Table 5) are \"very severe\" as they were found in patients with very early onset of first symptoms (The Human Phenotype Ontology (HPO), 2019) and cardiomyopathy (HP:0001638), that is, patients with classic infantile Pompe disease. Homozygosity for any of these variants is expected to lead to this phenotype, and this expectation is largely confirmed by the data on homozygous genotypes presented in Table 6."
+        }
+      ]
+    },
+    {
+      "text": "Three homozygous variants including c.1935C>A were reported in both Groups A and B, while all other homozygous variants in Groups B and C were group-specific.",
+      "citations": [
         {
-          "quote": "very severe"
-        },
+          "quote": "three homozygous variants (c.1843G>A, c.1933G>A, and c.1935C>A) were reported in both Groups A and B, and one (c.2481+102_2646+31del) in both Groups A and C."
+        }
+      ]
+    },
+    {
+      "text": "The reference sequences used for GAA variant nomenclature in this paper include NM_000152.5 for the coding region based on GRCh38 (NC_000017.10 for intronic/genomic coordinates in Supporting Tables).",
+      "citations": [
         {
-          "quote": "they were found in patients with very early onset of first symptoms and cardiomyopathy (HP:0001638), that is, patients with classic infantile Pompe disease. Homozygosity for any of these variants is expected to lead to this phenotype"
+          "quote": "The following reference sequences were used to specify GAA variants: NM_000152.5 for the coding region conform the Ensembl sequence of the forward strand on Chromosome 17: 80,101,556\u201080,119,879 [GRCh38:CM000679.2]; protein id [NP_000143.2]"
         }
       ]
     }

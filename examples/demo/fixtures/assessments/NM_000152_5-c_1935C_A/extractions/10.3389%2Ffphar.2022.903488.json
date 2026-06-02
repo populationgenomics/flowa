@@ -2,7 +2,7 @@
   "variant_discussed": true,
   "claims": [
     {
-      "text": "The GAA c.1935C>A variant was the most frequent mutation observed in the study cohort, present in four out of ten Chinese patients with infantile-onset Pompe disease.",
+      "text": "The c.1935C>A (p.Asp645Glu) variant was the most frequent GAA mutation observed in the study cohort, present in 4 out of 10 Chinese patients with infantile-onset Pompe disease.",
       "citations": [
         {
           "quote": "The most frequent mutation observed in our study was c.1935C > A, with four out of ten patients having this mutation."
@@ -10,7 +10,7 @@
       ]
     },
     {
-      "text": "Patient 0103 (female, Han, onset age 4 months, age at first infusion 5.8 months) carried c.1935C>A p.Asp645Glu (het) compound heterozygous with c.2662G>T p.Glu888* (het), was CRIM-positive, with GAA activity 1.05 \u03bcmol/L/h, LVMI 291.1 g/m2, LVEF 61.1%, and no ventilator use at baseline.",
+      "text": "Patient 0103 (female, Han, age 5.8 months at first infusion, onset age 4 months) carried c.1935C>A p.Asp645Glu (het) in compound heterozygosity with c.2662G>T p.Glu888* (het), was CRIM-positive, had GAA activity 1.05 \u03bcmol/L/h (normal 2.88\u201398.02), LVMI 291.1 g/m\u00b2, LVEF 61.1%, no ventilator use at baseline.",
       "citations": [
         {
           "quote": "0103 | 5.8 | F | Han | 58 | 5.0 | 4 | No | c.1935C > A, p.Asp645Glu (het) c.2662G > T, p.Glu888*(het) | + | 1.05 (2.88\u201398.02 \u03bcmol/L/h) | 291.1 | 61.1 | No"
@@ -18,7 +18,7 @@
       ]
     },
     {
-      "text": "Patient 0104 (female, She ethnicity, onset age 6 months, age at first infusion 7 months) carried c.1432G>A p.Gly478Arg (het) compound heterozygous with c.1935C>A p.Asp645Glu (het), was CRIM-positive, with GAA activity 0.37 \u03bcmol/L/h, LVMI 745.5 g/m2, LVEF 49.2%, and no ventilator use at baseline.",
+      "text": "Patient 0104 (female, She ethnicity, age 7 months at first infusion, onset age 6 months) carried c.1935C>A p.Asp645Glu (het) in compound heterozygosity with c.1432G>A p.Gly478Arg (het), was CRIM-positive, had GAA activity 0.37 \u03bcmol/L/h (normal 2.88\u201398.02), LVMI 745.5 g/m\u00b2, LVEF 49.2%, no ventilator use at baseline.",
       "citations": [
         {
           "quote": "0104 | 7 | F | She | 64 | 6.2 | 6 | Yes | c.1432G > A, p.Gly478Arg(het) c.1935C > A, p.Asp645Glu(het) | + | 0.37 (2.88\u201398.02 \u03bcmol/L/h) | 745.5 | 49.2 | No"
@@ -26,7 +26,7 @@
       ]
     },
     {
-      "text": "Patient 0105 (female, Han, onset age 5 months, age at first infusion 5.9 months) carried c.1832G>A p.Gly611Asp (het) compound heterozygous with c.1935C>A p.Asp645Glu (het), was CRIM-positive, with GAA activity 1.10 \u03bcmol/L/h, LVMI 298.8 g/m2, LVEF 41.1%, and no ventilator use at baseline.",
+      "text": "Patient 0105 (female, Han, age 5.9 months at first infusion, onset age 5 months) carried c.1935C>A p.Asp645Glu (het) in compound heterozygosity with c.1832G>A p.Gly611Asp (het), was CRIM-positive, had GAA activity 1.10 \u03bcmol/L/h (normal 2.88\u201398.02), LVMI 298.8 g/m\u00b2, LVEF 41.1%, no ventilator use at baseline.",
       "citations": [
         {
           "quote": "0105 | 5.9 | F | Han | 65.6 | 4.6 | 5 | Yes | c.1832G > A, p.Gly611Asp(het) c.1935C > A, p.Asp645Glu(het) | + | 1.10 (2.88\u201398.02 \u03bcmol/L/h) | 298.8 | 41.1 | No"
@@ -34,7 +34,7 @@
       ]
     },
     {
-      "text": "Patient 0302 (male, Han, onset age 4 months, age at first infusion 5.4 months) carried c.1935C>A p.Asp645Glu (het) compound heterozygous with c.2662G>T p.Glu888* (het), was CRIM-positive, with GAA activity 6.8 nmol/g/min, LVMI 361.9 g/m2, LVEF 79.8%, and no ventilator use at baseline.",
+      "text": "Patient 0302 (male, Han, age 5.4 months at first infusion, onset age 4 months) carried c.1935C>A p.Asp645Glu (het) in compound heterozygosity with c.2662G>T p.Glu888* (het), was CRIM-positive, had GAA activity 6.8 nmol/g/min (normal 24.8\u201393.0), LVMI 361.9 g/m\u00b2, LVEF 79.8%, no ventilator use at baseline.",
       "citations": [
         {
           "quote": "0302 | 5.4 | M | Han | 65 | 6.3 | 4 | Yes | c.1935C > A, p.Asp645Glu(het) c.2662G > T, p.Glu888*(het) | + | 6.8 (24.8\u201393.0 nmol/g/min) | 361.9 | 79.8 | No"
@@ -42,7 +42,7 @@
       ]
     },
     {
-      "text": "Patient 0401 (male, Han, onset age 6 months, age at first infusion 7.4 months) carried c.1121G>A p.Cys374Tyr (het) compound heterozygous with c.1935C>A p.Asp645Glu (het), was CRIM-positive, with GAA activity 2.4 nmol/h/mgPr, LVMI 231.8 g/m2, LVEF 44.0%, and no ventilator use at baseline.",
+      "text": "Patient 0401 (male, Han, age 7.4 months at first infusion, onset age 6 months) carried c.1935C>A p.Asp645Glu (het) in compound heterozygosity with c.1121G>A p.Cys374Tyr (het), was CRIM-positive, had GAA activity 2.4 nmol/h/mgPr (normal 62.3\u2013301.7), LVMI 231.8 g/m\u00b2, LVEF 44.0%, no ventilator use at baseline.",
       "citations": [
         {
           "quote": "0401 | 7.4 | M | Han | 70 | 6.5 | 6 | Yes | c.1121G > A, p.Cys374Tyr(het) c.1935C > A, p.Asp645Glu(het) | + | 2.4 (62.3\u2013301.7 nmol/h/mgPr) | 231.8 | 44.0 | No"
@@ -50,7 +50,7 @@
       ]
     },
     {
-      "text": "All patients carrying c.1935C>A were CRIM-positive (each had at least one missense mutation), as the study protocol designated CRIM-positive status to any patient carrying at least one missense mutation.",
+      "text": "All four patients carrying c.1935C>A (p.Asp645Glu) were compound heterozygous with a second pathogenic variant and were CRIM-positive, consistent with having at least one missense allele.",
       "citations": [
         {
           "quote": "If a patient had at least one missense mutation, he or she was considered CRIM-positive."
@@ -58,18 +58,10 @@
       ]
     },
     {
-      "text": "All 10 patients in the study, including those carrying c.1935C>A, had classic infantile-onset Pompe disease characterized by onset before 12 months of age, left ventricular hypertrophy (LVM Z scores >10 at baseline), and GAA enzyme activity below the lower limit of normal.",
+      "text": "All 10 patients including those carrying c.1935C>A had GAA enzyme activity below the lower limit of the normal reference range, confirming pathogenicity in the context of infantile-onset Pompe disease.",
       "citations": [
         {
-          "quote": "All subjects had left ventricular mass (LVM) Z scores >10 at baseline, and eight subjects (80%) achieved Z scores <5 at week 52."
-        }
-      ]
-    },
-    {
-      "text": "The pathogenicity of GAA mutations in this study, including c.1935C>A, was determined according to the Pompe disease GAA variant database.",
-      "citations": [
-        {
-          "quote": "The pathogenicity of mutations was determined according to the Pompe disease GAA variant database (https://www.pompevariantdatabase.nl)."
+          "quote": "All patients had GAA enzyme test results below the lower limit of the normal reference range."
         }
       ]
     }

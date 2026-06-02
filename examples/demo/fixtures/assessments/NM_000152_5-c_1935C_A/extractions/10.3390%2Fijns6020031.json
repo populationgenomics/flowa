@@ -10,23 +10,18 @@
       ]
     },
     {
-      "text": "c.1935C>A is listed as one of the frequently detected pathogenic variants in the Taiwan NBS program of 473,738 newborns (9 IOPD, 19 LOPD identified).",
+      "text": "c.1935C>A (p.D645E) is listed as a frequently detected pathogenic variant in two large Taiwan NBS programs (473,738 and 191,786 newborns screened).",
       "citations": [
         {
           "quote": "Taiwan (473,738) | 2210 (0.47) | 9 (1/52,638) | 19 (1/24,934) | fluorometric assay | c.1935C>A, c.2238G>C | Chiang et al. (2012) [36]"
-        }
-      ]
-    },
-    {
-      "text": "c.1935C>A is listed as one of the frequently detected pathogenic variants in the Taiwan NBS program of 191,786 newborns (5 IOPD, 11 LOPD identified).",
-      "citations": [
+        },
         {
           "quote": "Taiwan (191,786) | 874 (0.46) | 5 (1/38,357) | 11 (1/17,435) | MS/MS | c.1935C>A, c.[752C>T; 761C>T] | Liao et al. (2014) [37]"
         }
       ]
     },
     {
-      "text": "c.1935C>A (p.D645E) is described as a common missense variant in Taiwan associated with IOPD.",
+      "text": "c.1935C>A (p.D645E) is classified as a variant associated with IOPD and described as a common missense variant in Taiwan.",
       "citations": [
         {
           "quote": "c.1935C>A (p.D645E), a common missense variant in Taiwan [6], and c.2560C>T (p.R854*), a common nonsense variant in Africa [57], are considered variants for IOPD."

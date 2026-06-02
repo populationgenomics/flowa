@@ -15,6 +15,7 @@ function row(overrides: Partial<PaperRow> = {}): PaperRow {
     authors: "Ohno, S",
     pmid: 26114861,
     url: "https://doi.org/10.1371/journal.pone.0131517",
+    supplements: [],
     ...overrides,
   };
 }

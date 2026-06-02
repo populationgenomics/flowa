@@ -2,7 +2,7 @@
   "variant_discussed": true,
   "claims": [
     {
-      "text": "The c.1935C>A p.(D645E) mutation is the most common mutation identified in the Malaysian IOPD cohort, occurring in 8 patients (10 alleles) with an allele frequency of 33%.",
+      "text": "The c.1935C>A p.(D645E) variant is the most common mutation in this Malaysian IOPD cohort, occurring in 8 patients (10 alleles) with an allele frequency of 33%.",
       "citations": [
         {
           "quote": "The most common mutation identified was c.1935C>A p.(D645E), occurring in eight patients (10 alleles) with allele frequency of (33%)."
@@ -10,7 +10,7 @@
       ]
     },
     {
-      "text": "Two unrelated patients (patients 13 and 17) were homozygous for c.1935C>A p.(D645E), and six other patients carried it as compound heterozygotes.",
+      "text": "Two unrelated patients were homozygous for c.1935C>A p.(D645E), and the remaining patients carrying this variant were compound heterozygotes.",
       "citations": [
         {
           "quote": "Two unrelated patients were homozygous for the c.1935C>A p.(D645E) mutation. The other 13 were compound heterozygotes."
@@ -18,71 +18,71 @@
       ]
     },
     {
-      "text": "Patient 5 (Chinese, classic IOPD) carried c.1935C>A p.(D645E) in compound heterozygosity with c.2024_2026delACA p.(N675del); presented at age 4 months with hypertrophic cardiomyopathy, respiratory insufficiency, hypotonia, feeding difficulties, and hepatomegaly; GAA activity not available; deceased at 8 months.",
+      "text": "Patient 13 (Chinese, homozygous c.1935C>A p.(D645E)) had GAA activity 2.0%, age at presentation 4 months, failure to thrive, hypertrophic cardiomyopathy, respiratory insufficiency, hypotonia, feeding difficulties, hepatomegaly, CK 1100 U/L, cardiomegaly, EF 28%, LVMI 483 g/m2, heart failure; deceased at age 2 years.",
       "citations": [
         {
-          "quote": "5|Chinese|c.2024_2026delACA p.(N675del)|c.1935C>A p.(D645E)|NA|4|Yes|1, 2, 3, 4, 5|NA|Yes|NA|NA|Yes"
+          "quote": "|13|Chinese|c.1935C>A p.(D645E)|c.1935C>A p.(D645E)|2.0%|4|Yes|1, 2, 3, 4, 5|1100|Yes|28%|483|Yes|"
         }
       ]
     },
     {
-      "text": "Patient 6 (Chinese, classic IOPD) carried c.1935C>A p.(D645E) compound heterozygous with c.1843G>A p.(G615R); presented at age 6 months with hypertrophic cardiomyopathy, respiratory insufficiency, hypotonia, feeding difficulties, and hepatomegaly; deceased at 10 months.",
+      "text": "Patient 17 (Malay, homozygous c.1935C>A p.(D645E)) had GAA activity 1.7%, age at presentation 2 months, failure to thrive, all classic IOPD features (cardiomyopathy, respiratory insufficiency, hypotonia, feeding difficulties, hepatomegaly), CK 930 U/L, cardiomegaly, EF 29%, heart failure; deceased at age 6 months.",
       "citations": [
         {
-          "quote": "6|Chinese|c.1843G>A p.(G615R)|c.1935C>A p.(D645E)|NA|6|Yes|1, 2, 3, 4, 5|NA|Yes|NA|NA|Yes"
+          "quote": "|17|Malay|c.1935C>A p.(D645E)|c.1935C>A p.(D645E)|1.7%|2|Yes|1, 2, 3, 4, 5|930|Yes|29%|NA|Yes|"
         }
       ]
     },
     {
-      "text": "Patient 7 (Chinese, classic IOPD) carried c.1935C>A p.(D645E) compound heterozygous with c.1411_1414delGAGA p.(E471Pfs*5); presented at age 3 months with hypertrophic cardiomyopathy, respiratory insufficiency, hypotonia, and feeding difficulties; GAA activity <0.1 umol/h/L; LVMI 485 g/m2; ejection fraction 9.9%; deceased at 2 years.",
+      "text": "Patient 5 (Chinese, compound heterozygous c.2024_2026delACA p.(N675del) / c.1935C>A p.(D645E)) had all classic IOPD features, age at presentation 4 months, failure to thrive, heart failure; ERT started at 7 months, deceased at 8 months.",
       "citations": [
         {
-          "quote": "7|Chinese|c.1411_1414delGAGA p.(E471Pfs*5)|c.1935C>A p.(D645E)|<0.1\u2020|3|No|1, 2, 3, 4|NA|Yes|9.9%|485|Yes"
+          "quote": "|5|Chinese|c.2024_2026delACA p.(N675del)|c.1935C>A p.(D645E)|NA|4|Yes|1, 2, 3, 4, 5|NA|Yes|NA|NA|Yes|"
         }
       ]
     },
     {
-      "text": "Patient 9 (Chinese, classic IOPD) carried c.1935C>A p.(D645E) compound heterozygous with c.1411_1414delGAGA p.(E471Pfs*5); presented at age 3 months with hypertrophic cardiomyopathy, respiratory insufficiency, hypotonia, feeding difficulties, and hepatomegaly; deceased at 3 years.",
+      "text": "Patient 6 (Chinese, compound heterozygous c.1843G>A p.(G615R) / c.1935C>A p.(D645E)) had all classic IOPD features, age at presentation 6 months, failure to thrive, heart failure; deceased at 10 months.",
       "citations": [
         {
-          "quote": "9|Chinese|c.1411_1414delGAGA p.(E471Pfs*5)|c.1935C>A p.(D645E)|NA|3|Yes|1, 2, 3, 4, 5|NA|Yes|NA|NA|Yes"
+          "quote": "|6|Chinese|c.1843G>A p.(G615R)|c.1935C>A p.(D645E)|NA|6|Yes|1, 2, 3, 4, 5|NA|Yes|NA|NA|Yes|"
         }
       ]
     },
     {
-      "text": "Patient 12 (Chinese, classic IOPD) carried c.1935C>A p.(D645E) compound heterozygous with c.2024_2026delACA p.(N675del); presented at age 2 months with hypertrophic cardiomyopathy, respiratory insufficiency, hypotonia, and feeding difficulties; GAA activity 5.3%; LVMI 159 g/m2; ejection fraction 81.6%; alive at age 5 years 10 months.",
+      "text": "Patient 7 (Chinese, compound heterozygous c.1411_1414delGAGA p.(E471Pfs*5) / c.1935C>A p.(D645E)) had GAA activity <0.1\u2020, age at presentation 3 months, classic IOPD features (cardiomyopathy, respiratory insufficiency, hypotonia, feeding difficulties), CK NA, EF 9.9%, LVMI 485 g/m2, heart failure; deceased at 2 years.",
       "citations": [
         {
-          "quote": "12|Chinese|c.2024_2026delACA p.(N675del)|c.1935C>A p.(D645E)|5.3%|2|No|1, 2, 3, 4|909|Yes|81.6%|159|No"
+          "quote": "|7|Chinese|c.1411_1414delGAGA p.(E471Pfs*5)|c.1935C>A p.(D645E)|<0.1\u2020|3|No|1, 2, 3, 4|NA|Yes|9.9%|485|Yes|"
         }
       ]
     },
     {
-      "text": "Patient 13 (Chinese, classic IOPD) was homozygous for c.1935C>A p.(D645E); presented at age 4 months with hypertrophic cardiomyopathy, respiratory insufficiency, hypotonia, feeding difficulties, and hepatomegaly; GAA activity 2.0%; LVMI 483 g/m2; ejection fraction 28%; deceased at 2 years.",
+      "text": "Patient 9 (Chinese, compound heterozygous c.1411_1414delGAGA p.(E471Pfs*5) / c.1935C>A p.(D645E)) had all classic IOPD features, age at presentation 3 months, failure to thrive, heart failure; deceased at 3 years.",
       "citations": [
         {
-          "quote": "13|Chinese|c.1935C>A p.(D645E)|c.1935C>A p.(D645E)|2.0%|4|Yes|1, 2, 3, 4, 5|1100|Yes|28%|483|Yes"
+          "quote": "|9|Chinese|c.1411_1414delGAGA p.(E471Pfs*5)|c.1935C>A p.(D645E)|NA|3|Yes|1, 2, 3, 4, 5|NA|Yes|NA|NA|Yes|"
         }
       ]
     },
     {
-      "text": "Patient 15 (Chinese, classic IOPD) carried c.1935C>A p.(D645E) compound heterozygous with c.2662G>T p.(E888*); presented at age 4 months; GAA activity 0.6%; LVMI 461 g/m2; ejection fraction 33%; deceased at 7 months.",
+      "text": "Patient 12 (Chinese, compound heterozygous c.2024_2026delACA p.(N675del) / c.1935C>A p.(D645E)) had GAA activity 5.3%, age at presentation 2 months, classic IOPD features, CK 909, EF 81.6%, LVMI 159 g/m2, no heart failure; ERT started at age 2 months, alive at 5 years 10 months.",
       "citations": [
         {
-          "quote": "15|Chinese|c.2662G>T p.(E888*)|c.1935C>A p.(D645E)|0.6%|4|No|1, 2, 3, 4, 5|847|Yes|33%|461|Yes"
+          "quote": "|12|Chinese|c.2024_2026delACA p.(N675del)|c.1935C>A p.(D645E)|5.3%|2|No|1, 2, 3, 4|909|Yes|81.6%|159|No|"
         }
       ]
     },
     {
-      "text": "Patient 17 (Malay, classic IOPD) was homozygous for c.1935C>A p.(D645E); presented at age 2 months with hypertrophic cardiomyopathy, respiratory insufficiency, hypotonia, feeding difficulties, and hepatomegaly; GAA activity 1.7%; ejection fraction 29%; deceased at 6 months.",
+      "text": "Patient 15 (Chinese, compound heterozygous c.2662G>T p.(E888*) / c.1935C>A p.(D645E)) had GAA activity 0.6%, age at presentation 4 months, all classic IOPD features, CK 847, EF 33%, LVMI 461 g/m2, heart failure; deceased at 7 months.",
       "citations": [
         {
-          "quote": "17|Malay|c.1935C>A p.(D645E)|c.1935C>A p.(D645E)|1.7%|2|Yes|1, 2, 3, 4, 5|930|Yes|29%|NA|Yes"
+          "quote": "|15|Chinese|c.2662G>T p.(E888*)|c.1935C>A p.(D645E)|0.6%|4|No|1, 2, 3, 4, 5|847|Yes|33%|461|Yes|"
         }
       ]
     },
     {
-      "text": "The c.1935C>A p.(D645E) mutation has been reported to cause both IOPD and LOPD, and is the most common mutation in Southern China (25%), Taiwan (36%), and Thailand (32.4%).",
+      "text": "The c.1935C>A p.(D645E) mutation has been reported to cause both IOPD and LOPD, and is the most common mutation in Southern China (25%), Taiwan (36%) and Thailand (32.4%).",
       "citations": [
         {
           "quote": "This mutation has been reported to cause both IOPD and LOPD [28, 29]. The Chinese patients in Malaysia share other common mutations with patients from China and Taiwan"
@@ -90,15 +90,15 @@
       ]
     },
     {
-      "text": "The c.1935C>A p.(D645E) mutation was identified as the most common mutation in this Malaysian IOPD cohort and is established as a founder effect mutation in the Chinese population.",
+      "text": "The most frequently identified mutation in the cohort is c.1935C>A p.(D645E), with an allele frequency of 33%, consistent with reports from Southern China, Taiwan, and Thailand.",
       "citations": [
         {
-          "quote": "This is the first study that analyzes the genotype and phenotype of IOPD patients in Malaysia, and has established the c.1935C>A p.(D645E) mutation as the most common mutation, with an allele frequency of 33%."
+          "quote": "The most frequently identified mutation in our cohort is c.1935C>A p.(D645E), with an allele frequency of 33%. This has also been reported to be the most common mutation in Southern China (25%), Taiwan (36%) and Thailand (32.4%)"
         }
       ]
     },
     {
-      "text": "Four patients in the cohort sharing c.1935C>A p.(D645E) (two homozygous, two compound heterozygous with c.1411_1414del p.(E471Pfs*5)) all died between 6 months and 3 years without achieving motor milestones, in contrast to similarly genotyped Taiwanese patients diagnosed by newborn screening who achieved independent walking.",
+      "text": "Four patients in the cohort share the molecular mutations homozygous c.1935C>A p.(D645E) or compound heterozygous c.1411_1414del p.(E471Pfs*5) / c.1935C>A p.(D645E); all four deceased between ages 6 months and 3 years without achieving any motor milestone, contrasting with Taiwanese newborn-screened patients with the same mutations who achieved independent walking.",
       "citations": [
         {
           "quote": "Four of our patients share similar molecular mutations [two patients were homozygous for c.1935C>A p.(D645E), two patients were compound heterozygous for c.1411_1414del p.(E471Pfs*5) and c.1935C>A p.(D645E)] with patients in a study in Taiwan who were diagnosed via newborn screening and given very early ERT prior to symptom onset"
@@ -106,10 +106,18 @@
       ]
     },
     {
-      "text": "The c.1935C>A p.(D645E) mutation is predicted to be CRIM positive based on the Erasmus Pompe database.",
+      "text": "The c.1935C>A p.(D645E) variant is described as a mutation (implicitly classified as disease-causing/pathogenic) in the context of IOPD; its CRIM status for affected patients is predicted as Positive from the Erasmus Pompe database.",
       "citations": [
         {
           "quote": "CRIM status predicted based on Erasmus Pompe database (http://www.pompevariantdatabase.nl/ updated in Dec 2020)"
+        }
+      ]
+    },
+    {
+      "text": "The cohort's presenting features included hypertrophic cardiomyopathy (100%), respiratory insufficiency (94%), hypotonia (88%), failure to thrive (82%), feeding difficulties (76%), and hepatomegaly (76%), with a median age at presentation of 3 months and median age of diagnosis of 6 months.",
+      "citations": [
+        {
+          "quote": "Clinical features documented at presentation were hypertrophic cardiomyopathy (100%), respiratory weakness (94%), hypotonia (88%), failure to thrive (82%), feeding difficulties (76%) and hepatomegaly (76%). Our cohort had a median age at presentation of 3 months. The median age of diagnosis was 6 months"
         }
       ]
     }

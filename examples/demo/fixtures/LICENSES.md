@@ -2,7 +2,7 @@
 
 The fixture under `examples/demo/fixtures/papers/` ships three kinds of entries, all keyed by the encoded DOI:
 
-1. **Full-content papers** (15) — `source.pdf` + `markdown.md` + `metadata.json`. The pipeline downloaded the PDF from PMC, converted it to Markdown, and ran extraction. All are CC-BY (any version) or CC0, so both the PDF and the derivative Markdown are redistributable provided attribution is preserved (entries below).
+1. **Full-content papers** (15) — `source.pdf` + `markdown.md` + `metadata.json`. The pipeline downloaded the PDF from PMC, converted it to Markdown, and ran extraction. Three also carry `source.md` (the PDF transcription) and a `supplements/` directory of xlsx/docx supplements, which are converted and appended into `markdown.md`. All are CC-BY (any version) or CC0, so the PDF, the derivative Markdown, and the supplements are redistributable provided attribution is preserved (entries below).
 2. **Metadata-only, license-restricted** (5) — only `metadata.json`; the source paper is paywalled or under a no-derivatives / non-commercial licence (e.g. CC-BY-NC-ND). The `abstract` field is replaced with a sentinel string explaining the omission, since the abstract is the author's prose and is subject to publisher copyright. Bibliographic facts (DOI, PMID, title, authors, journal, date) are not copyrightable and ship as-is.
 3. **Metadata-only, CC-BY not in PMC** (1) — only `metadata.json`; the source paper IS CC-BY-licensed but PMC's OA subset doesn't carry it, so flowa's PMC-only download path silently skipped it. Abstract is preserved (CC-BY permits redistribution); PDF/Markdown are absent. A curator running the demo locally can fetch the PDF from the journal site.
 
@@ -54,6 +54,7 @@ For all three kinds, the demo's literature page renders the row from `metadata.j
 - **DOI:** [10.1038/s41598-022-25914-8](https://doi.org/10.1038/s41598-022-25914-8)
 - **PMID:** 36517654
 - **License:** [CC-BY 4.0](https://creativecommons.org/licenses/by/4.0/)
+- **Supplement:** `supplements/000_41598_2022_25914_MOESM1_ESM.docx` (electronic supplementary material; inherits the article's CC-BY 4.0).
 
 ### `10.3389%2Ffcvm.2022.1061384/`
 
@@ -81,6 +82,7 @@ For all three kinds, the demo's literature page renders the row from `metadata.j
 - **DOI:** [10.3389/fcvm.2023.1261172](https://doi.org/10.3389/fcvm.2023.1261172)
 - **PMID:** 38162137
 - **License:** [CC-BY 4.0](https://creativecommons.org/licenses/by/4.0/)
+- **Supplement:** `supplements/000_Table1.docx` (supplementary tables of patient demographics + biochemical indicators; inherits the article's CC-BY 4.0).
 
 ### `10.1186%2Fs13023-021-02146-z/`
 
@@ -117,6 +119,7 @@ For all three kinds, the demo's literature page renders the row from `metadata.j
 - **DOI:** [10.1016/j.ymgmr.2024.101163](https://doi.org/10.1016/j.ymgmr.2024.101163)
 - **PMID:** 39835171
 - **License:** [CC-BY 4.0](https://creativecommons.org/licenses/by/4.0/)
+- **Supplement:** `supplements/000_mmc1.docx` (electronic supplementary material; inherits the article's CC-BY 4.0).
 
 ### `10.1186%2Fs13052-019-0692-0/`
 

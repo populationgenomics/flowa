@@ -18,7 +18,7 @@
  */
 
 import { existsSync } from "node:fs";
-import { readFile } from "node:fs/promises";
+import { readFile, readdir } from "node:fs/promises";
 import { join } from "node:path";
 import { encodeDoi } from "@flowajs/react-viewer";
 import { getDemoDataDir } from "./demoConfig";
@@ -39,6 +39,12 @@ export interface PaperRow {
   pmid: number | null;
   /** DOI-resolved URL. Always present (DOI is mandatory in `query.json`). */
   url: string;
+  /**
+   * Stored supplement filenames (with their `NNN_` ingestion-order prefix),
+   * sorted. Empty when the paper has no `supplements/` dir. The UI strips the
+   * prefix for display.
+   */
+  supplements: string[];
 }
 
 export interface PapersForVariant {
@@ -137,6 +143,11 @@ export async function listPapersForVariant(
       pmid = m.pmid ?? null;
     }
 
+    const supplementsDir = join(dataDir, "papers", encoded, "supplements");
+    const supplements = existsSync(supplementsDir)
+      ? (await readdir(supplementsDir)).sort()
+      : [];
+
     papers.push({
       doi,
       encodedDoi: encoded,
@@ -145,6 +156,7 @@ export async function listPapersForVariant(
       authors,
       pmid,
       url: `https://doi.org/${doi}`,
+      supplements,
     });
   }
 

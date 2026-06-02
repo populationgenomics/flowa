@@ -2,7 +2,7 @@
   "variant_discussed": true,
   "claims": [
     {
-      "text": "The GAA variant c.1935C>A (p.D645E), rs28940868, is classified in Table 1 as a disease-associated variant, annotated as 'Potentially less severe' in the Pompe disease GAA variant database, 'Pathogenic' in ClinVar Miner, and 'Probably damaging (1.000)' by PolyPhen-2, located in Exon 14.",
+      "text": "The variant c.1935C>A (p.D645E), rs28940868, located in Exon 14 of GAA, is classified as 'Potentially less severe' in the Pompe disease GAA variant database and as 'Pathogenic' in ClinVar Miner, with PolyPhen-2 predicting it 'Probably damaging (1.000)'.",
       "citations": [
         {
           "quote": "55 | rs28940868 | c.1935C>A | p.D645E | Exon 14 | Potentially less severe | Pathogenic | Probably damaging (1.000)"
@@ -10,7 +10,7 @@
       ]
     },
     {
-      "text": "In a Japanese newborn screening cohort of 107 newborns who underwent GAA sequencing, only one individual (No. 141) was detected with variant c.1935C>A, corresponding to an allele frequency of 0.47% (1/214 alleles).",
+      "text": "In the Japanese NBS cohort, only one individual (No. 141) carried the c.1935C>A variant among 107 newborns who underwent GAA sequencing, giving an allele frequency of 0.47% (1/214).",
       "citations": [
         {
           "quote": "our study only detected one individual (No. 141) with the same variant among 107 newborns who underwent GAA sequencing analysis (allele frequency: 0.47%) (Table 2)"
@@ -18,21 +18,21 @@
       ]
     },
     {
-      "text": "In Taiwan, five of six IOPD patients are homozygous or heterozygous for c.1935C>A, and the high frequency of IOPD in Taiwan is attributed to the high frequency of this allele, which is the most common variant in IOPD patients in Taiwan and southern China.",
+      "text": "In Taiwan, five of six IOPD patients were homozygous or heterozygous for c.1935C>A, and this variant is described as most commonly found in IOPD patients in Taiwan and southern China.",
       "citations": [
         {
-          "quote": "In Taiwan, five of six IOPD patients are homozygous or heterozygous for the same variant c.1935C>A"
+          "quote": "In Taiwan, five of six IOPD patients are homozygous or heterozygous for the same variant c.1935C>A."
         },
         {
-          "quote": "The high frequency of IOPD patients in Taiwan is attributed to the high frequency of allele c.1935C>A, which was most commonly found in IOPD patients in Taiwan and southern China"
+          "quote": "The high frequency of IOPD patients in Taiwan is attributed to the high frequency of allele c.1935C>A, which was most commonly found in IOPD patients in Taiwan and southern China [22\u201324]."
         }
       ]
     },
     {
-      "text": "In Table 2, subject 76 carries variant 55 (c.1935C>A, p.D645E) as a heterozygote (\u25cb), and is categorized in the 'Carrier or potential carrier' diagnosis group with a DBS GAA activity of 1.8 pmol/h/disk.",
+      "text": "The c.1935C>A variant is listed among the 29 disease-associated variants identified in the NBS program and is classified as a disease-associated (pathogenic or predicted pathogenic) variant.",
       "citations": [
         {
-          "quote": "55 | c.1935C>A | p.D645E | | | | | | | | | | | | | | | | \u25cb | | | | | | | | | | | | | | | | | | | | |"
+          "quote": "Of the 78 variants, 29 were classified as disease-associated (pathogenic or predicted pathogenic variants), and the other 49 were classified as non-pathogenic (polymorphisms or predicted nonpathogenic variants) (Table 1)."
         }
       ]
     }

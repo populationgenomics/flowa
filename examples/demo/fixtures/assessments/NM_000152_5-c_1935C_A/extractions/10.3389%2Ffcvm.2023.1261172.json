@@ -2,23 +2,29 @@
   "variant_discussed": true,
   "claims": [
     {
-      "text": "The variant c.1935C>A (p.D645E) is listed in Table 3 for Patient 1 (heterozygous, maternal origin, classified as pathogenic) in compound heterozygosity with c.1669A>T (p.I557F, paternal, pathogenic) in exon 12.",
+      "text": "In Patient 1 (female), c.1935C>A (p.D645E) in exon 14 was identified as a heterozygous maternal allele classified pathogenic, in compound heterozygosity with c.1669A>T (p.I557F) from the paternal allele; she had symptom onset at 4 months, genetic diagnosis at 10 months, and died at 11 months with muscle weakness and cardiomegaly.",
       "citations": [
         {
           "quote": "1 | exon12 | c.1669A > T | p.I557F | het | paternal | pathogenic |\n| | exon14 | c.1935C > A | p.D645E | het | maternal | pathogenic |"
+        },
+        {
+          "quote": "1 | F | 4 | 10 | 11 | N | Muscle weakness, cardiomegaly"
         }
       ]
     },
     {
-      "text": "Patient 8 carries c.1935C>A (p.D645E) in homozygous form (parental origin), classified as pathogenic.",
+      "text": "Patient 8 (male) carried a homozygous c.1935C>A (p.D645E) mutation classified as pathogenic, with symptom onset at 1 month, diagnosed at 3 months, and died at 3 months with recurrent airway infections, cardiomegaly, and heart failure.",
       "citations": [
         {
           "quote": "8 | exon14 | c.1935C > A | p.D645E | hom | parental | pathogenic |"
+        },
+        {
+          "quote": "8 | M | 1 | 3 | 3 | N | Recurrent airway infections, cardiomegaly, heart failure"
         }
       ]
     },
     {
-      "text": "The variant c.1935C>A is noted to account for 80% of mutant alleles in Thai patients with infantile-onset Pompe disease, making it the most common mutation in the Thai population.",
+      "text": "The paper reports that c.1935C>A is the most common mutation in Thai patients with infantile-onset Pompe disease, accounting for 80% of the mutant alleles in that population.",
       "citations": [
         {
           "quote": "In Thai patients, Amarinthnukrowh et al. reported that mutation c.1935C > A accounted for 80% of the mutant alleles and is the most common mutation in the Thai population (7)."
@@ -26,7 +32,7 @@
       ]
     },
     {
-      "text": "The paper references p.D645E (c.1935C>A) as the most common mutation in southern Chinese patients, accounting for 20\u201325% of total mutant alleles.",
+      "text": "The paper states that the most common mutation in patients from southern China is c.1C>A (p.Asp645Glu), accounting for 20\u201325% of total mutant alleles, which by amino acid notation corresponds to p.D645E (likely a typographic error for c.1935C>A).",
       "citations": [
         {
           "quote": "The most common mutation in patients from southern China was c.1C > A (p.Asp 645Glu), accounting for 20%\u201325% of the total mutant alleles (20)."
@@ -34,10 +40,10 @@
       ]
     },
     {
-      "text": "Both patients with this variant (Patients 1 and 8) had infantile-onset Pompe disease and died at a median age of 24.80 months due to cardiorespiratory failure; all 15 patients in the cohort presented with myasthenia symptoms and severe hypertrophic cardiomyopathy.",
+      "text": "Reference 7 cited in the paper is specifically about p.D645E of acid \u03b1-glucosidase being the most common mutation in Thai patients with infantile-onset Pompe disease, confirming the identity of the c.1935C>A variant as p.D645E.",
       "citations": [
         {
-          "quote": "Fifteen patients died at a median age of 24.80 months due to cardiorespiratory failure (range 3\u2013120 months). Myasthenia symptoms and severe hypertrophic cardiomyopathy were universally present (15/15 = 100%)."
+          "quote": "Amarinthnukrowh P, Tongkobpetch S, Kongpatanayothin A, Suphapeetiporn K, Shotelersuk V. P.D645E of acid \u03b1-glucosidase is the most common mutation in Thai patients with infantile-onset pompe disease. Genet Test Mol Biomarkers. (2010) 14(6):835\u20137."
         }
       ]
     }

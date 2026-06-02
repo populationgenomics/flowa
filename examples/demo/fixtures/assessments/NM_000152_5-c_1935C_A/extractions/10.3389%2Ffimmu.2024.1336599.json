@@ -2,7 +2,7 @@
   "variant_discussed": true,
   "claims": [
     {
-      "text": "The c.1935C>A (p.D645E) variant in the GAA gene was present in 7 of the 8 patients enrolled (all except Subject A1), always on Allele 1 and typically in cis with c.1726G>A.",
+      "text": "Seven of eight Pompe disease patients in this study (all except Subject A1) carried at least one allele with the c.1935C>A (p.D645E) variant in the GAA gene.",
       "citations": [
         {
           "quote": "Apart from Subject A1, all carried at least one allele with the c.1935C>A (p.D645E) variant in the GAA gene."
@@ -10,31 +10,41 @@
       ]
     },
     {
-      "text": "In Table 1, subjects A2, A3, B1, B2, B3, B4, and B5 each carry c.[1935C>A;1726G>A] on Allele 1, indicating the c.1935C>A variant is present in cis with c.1726G>A across all these patients.",
+      "text": "In all carriers, c.1935C>A is found in cis with c.1726G>A, listed as c.[1935C>A;1726G>A] on the same allele; the variant combinations per subject are: A2 (c.[1935C>A;1726G>A] / c.1781G>A, LOPD), A3 (c.[1935C>A;1726G>A] / c.[842G>T;1726G>A], LOPD), B1 (c.[1935C>A;1726G>A] / c.[1411_1414del;752C>T;761C>T], IOPD), B2 (c.[1935C>A;1726G>A] / c.2024_2026del, IOPD), B3 (c.[1935C>A;1726G>A] / c.1340_1350del, IOPD), B4 (c.[1935C>A;1726G>A] / c.[1935C>A;1726G>A], IOPD), B5 (c.[1935C>A;1726G>A] / c.[1001G>A;1726G>A], IOPD).",
       "citations": [
         {
-          "quote": "A2 | M | LOPD | Clinical | c.[1935C>A;1726G>A] | c.1781G>A | 3.2 | 20 Q2W | 9.8 | 6.6\nA3 | M | LOPD | Clinical | c.[1935C>A;1726G>A] | c.[842G>T;1726G>A] | 7 | 40 QW | 7.3 | 0.3\nB1 | F | IOPD | NBS | c.[1935C>A;1726G>A] | c.[1411_1414del;752C>T;761C>T] | 0.1 | 20 Q2W | 7.9 | 7.8\nB2 | F | IOPD | NBS | c.[1935C>A;1726G>A] | c.2024_2026del | 0.02 | 40 Q2W | 1.4 | 1.4\nB3 | F | IOPD | Clinical | c.[1935C>A;1726G>A] | c.1340_1350del | 0.3 | 40 Q2W | 0.5 | 0.2\nB4 | M | IOPD | NBS | c.[1935C>A;1726G>A] | c.[1935C>A;1726G>A] | 0.1 | 40 Q2W | 1.6 | 1.5\nB5 | F | IOPD | Clinical | c.[1935C>A;1726G>A] | c.[1001G>A;1726G>A] | 0.3 | 40 QW | 0.4 | 0.1"
-        }
-      ]
-    },
-    {
-      "text": "Subject B4 (male, IOPD, NBS-diagnosed) is homozygous for c.[1935C>A;1726G>A] on both alleles, started ERT at age 0.1 years at 40 mg/kg Q2W, and developed high ADA titers at age 1.6 years after 1.5 years of ERT.",
-      "citations": [
+          "quote": "A2 | M | LOPD | Clinical | c.[1935C>A;1726G>A] | c.1781G>A | 3.2 | 20 Q2W | 9.8 | 6.6"
+        },
+        {
+          "quote": "A3 | M | LOPD | Clinical | c.[1935C>A;1726G>A] | c.[842G>T;1726G>A] | 7 | 40 QW | 7.3 | 0.3"
+        },
+        {
+          "quote": "B1 | F | IOPD | NBS | c.[1935C>A;1726G>A] | c.[1411_1414del;752C>T;761C>T] | 0.1 | 20 Q2W | 7.9 | 7.8"
+        },
+        {
+          "quote": "B2 | F | IOPD | NBS | c.[1935C>A;1726G>A] | c.2024_2026del | 0.02 | 40 Q2W | 1.4 | 1.4"
+        },
+        {
+          "quote": "B3 | F | IOPD | Clinical | c.[1935C>A;1726G>A] | c.1340_1350del | 0.3 | 40 Q2W | 0.5 | 0.2"
+        },
         {
           "quote": "B4 | M | IOPD | NBS | c.[1935C>A;1726G>A] | c.[1935C>A;1726G>A] | 0.1 | 40 Q2W | 1.6 | 1.5"
+        },
+        {
+          "quote": "B5 | F | IOPD | Clinical | c.[1935C>A;1726G>A] | c.[1001G>A;1726G>A] | 0.3 | 40 QW | 0.4 | 0.1"
         }
       ]
     },
     {
-      "text": "All patients carrying the c.1935C>A variant were confirmed CRIM-positive through western blotting or genotyping prediction.",
+      "text": "All eight patients in the study, including the seven carrying c.1935C>A, were confirmed CRIM-positive.",
       "citations": [
         {
-          "quote": "All IOPD patients were confirmed CRIM-positive through western blotting, described previously, or genotyping prediction"
+          "quote": "All patients were CRIM+."
         }
       ]
     },
     {
-      "text": "The three LOPD patients with the c.1935C>A variant (A2, A3) had muscle weakness noted during early adolescence or at four years of age, with no cardiac manifestations.",
+      "text": "The three LOPD patients (A2, A3, A3) carrying c.[1935C>A;1726G>A] presented with muscle weakness noted during early adolescence, early infancy, and four years of age respectively, with none exhibiting cardiac manifestations.",
       "citations": [
         {
           "quote": "Three patients were diagnosed with LOPD (Subject A1-A3) with muscle weakness noted during early adolescence, early infancy, and four years of age, respectively. None exhibited any cardiac manifestations."
@@ -42,10 +52,18 @@
       ]
     },
     {
-      "text": "The five IOPD patients carrying c.1935C>A (B1\u2013B5) were diagnosed between 8 days and three months of age, primarily presenting with significant cardiac complications.",
+      "text": "The five IOPD patients (B1\u2013B5), the majority of whom carry c.[1935C>A;1726G>A], were diagnosed between 8 days and three months of age, primarily presenting with significant cardiac complications.",
       "citations": [
         {
           "quote": "The remaining five were diagnosed with classic IOPD between 8 days and three months of age, primarily presenting with significant cardiac complications."
+        }
+      ]
+    },
+    {
+      "text": "Subject B4 (IOPD, NBS) is homozygous for the c.[1935C>A;1726G>A] allele combination and developed high ADA titers at 1.6 years after 1.5 years of ERT at 40 mg/kg Q2W; he was independently ambulatory on room air at baseline.",
+      "citations": [
+        {
+          "quote": "B4 | M | IOPD | NBS | c.[1935C>A;1726G>A] | c.[1935C>A;1726G>A] | 0.1 | 40 Q2W | 1.6 | 1.5"
         }
       ]
     }
