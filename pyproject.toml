@@ -1,6 +1,6 @@
 [project]
 name = "flowapy"
-version = "0.2.2"
+version = "0.3.0"
 description = "Variant literature assessment pipeline with AI extraction"
 readme = "README.md"
 requires-python = "==3.13.*"
@@ -26,6 +26,7 @@ dependencies = [
     "pydantic-settings",
     "pypdf",
     "s3fs",   # S3/MinIO support for fsspec
+    "socksio>=1.0.0",  # httpx SOCKS-proxy support (proxied networks); not imported directly
     "tenacity",
     "typer",
     "zstandard",
