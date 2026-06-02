@@ -8,8 +8,15 @@ repos:
       - id: check-yaml
         exclude: '\.*conda/.*'
       - id: end-of-file-fixer
+        # Demo fixtures are generated artifacts (markdown.md, extractions,
+        # aggregation.json) — normalising them is noise, not authored style.
+        exclude: ^examples/demo/fixtures/
       - id: trailing-whitespace
-        exclude: '\.txt$|\.tsv$'
+        # …and stripping trailing whitespace inside a generated markdown.md
+        # would shift the code-point offsets its markdown_anchor citations
+        # index into, misaligning highlights. Fixtures stay out (cf. the
+        # markdownlint exclude below).
+        exclude: '\.txt$|\.tsv$|^examples/demo/fixtures/'
       - id: check-case-conflict
       - id: check-merge-conflict
       - id: detect-private-key
@@ -61,7 +68,9 @@ repos:
         entry: pnpm exec prettier --check
         language: system
         files: \.(ts|tsx|js|jsx|mjs|cjs|json|yaml|yml)$
-        exclude: ^pnpm-lock\.yaml$
+        # pnpm-lock + generated demo fixtures (JSON whose format the pipeline
+        # owns via json.dump, not prettier).
+        exclude: '^pnpm-lock\.yaml$|^examples/demo/fixtures/'
 
       # Type + test gates. tsc and vitest run nowhere on push/PR otherwise
       # (the TS packages are only typechecked/tested in their release
