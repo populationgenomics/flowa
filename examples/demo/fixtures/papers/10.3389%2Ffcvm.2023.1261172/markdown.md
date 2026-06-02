@@ -1,5 +1,3 @@
-I can provide a structured markdown transcription of this academic paper. Here it is:
-
 <!--page-->
 
 # Pompe disease in China: clinical and molecular characteristics

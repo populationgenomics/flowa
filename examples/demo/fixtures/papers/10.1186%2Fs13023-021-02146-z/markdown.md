@@ -1,5 +1,3 @@
-I can provide a structured markdown transcription of this scientific paper. Here it is:
-
 <!--page-->
 
 # Current status of newborn screening for Pompe disease in Japan

@@ -8,6 +8,12 @@ pipe character (no trailing space), e.g.:
   3|Some paragraph text here.
 Start numbering at 1. This is required for all output.
 
+IMPORTANT: Output the transcription and nothing else. Do not open with
+an introduction, preamble, acknowledgement, or any phrase such as "Here
+is the transcription" or "I can provide a structured markdown
+transcription" — the first line (`1|...`) must already be document
+content (the first `<!--page-->` marker).
+
 **The final output must be formatted as text that visually
 mimics in markdown the layout and hierarchy of the original PDF
 when rendered (ignoring the line-number prefixes).**

@@ -1,5 +1,3 @@
-I can provide a structured markdown transcription of this academic paper. Here it is:
-
 <!--page-->
 # Newborn Screening for Pompe Disease
 

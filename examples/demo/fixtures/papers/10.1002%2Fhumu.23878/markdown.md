@@ -1,5 +1,3 @@
-I can provide a structured markdown transcription of this scientific article. However, given the length and detail of the document, I'll provide a faithful transcription of the key content.
-
 <!--page-->
 
 # GAA variants and phenotypes among 1,079 patients with Pompe disease: Data from the Pompe Registry
@@ -361,10 +359,6 @@ There were 94 (4.5%) novel variants reported (18 in Group A, 17 in Group B, and 
 In addition, the impact of the novel variants was preliminarily predicted using the validated programs (Richards et al., 2015; Vihinen et al., 2012), SIFT, PolyPhen, or FATHMM for 47 of the 80 unique novel variants for which impact was not evident from their nature (Table 3; Supporting Information). The predicted pathogenicity based on the ACMG criteria for severity and impact (where available) for the 80 unique novel variants are reported in Table 3. Overall, 51.3% (*n* = 41) of the 80 variants were classified as pathogenic, 13.8% (*n* = 11) as likely pathogenic, and 35% (*n* = 28) as VUS. Of the 17 unique novel variants reported for Group A, 11 were classified as pathogenic, one as likely pathogenic, and five as VUS (Table 3). Among these 17 unique novel variants reported for Group A, frameshift variants were the most common type (35.3%; *n* = 6). Of these variants, two (c.541_545del and c.982_908del), present in exons 2 and 6, respectively, mapped to the N Terminal Beta Sheet domain; one (c.1507del) mapped to the catalytic GH31 domain; and two (c.2740dup and c.2742dup) mapped to the Distal Beta Sheet domain. Only one (c.1311_1312ins26), present at exon 8, mapped to the catalytic GH31 domain just before the start of insert 1 in the translated protein. No predictions of impact were available for these frameshift variants using bioinformatics algorithms. However, all were classified as pathogenic based on the ACMG's severity scores. Other variant types were reported in < 5 patients in Group A.
 
 Deletion (small) variants mapped to the N terminal Beta Sheet domain (c.930_932del), the catalytic GH31 domain (c.2056_2057del), and the Proximal Beta Sheet (c.2459_2461del, also present in Group C). All three variants were classified as VUS based on the ACMG guidelines. Splicing variants mapped to the N Terminal GH31 domain (c.693‐2A>C), the catalytic GH31 domain (c.2041–2A>G), and the Distal Beta Sheet (c.2800–1G>C). Substitution (missense) variants mapping to the N terminal Beta Sheet domain were predicted to be damaging by SIFT and FATHMM and probably damaging by Polyphen (c.665T>G). Three of these four variants (c.693–2A>C, c.2041–2A>G, and c.2800–1G>C) were predicted to be pathogenic; the fourth, c.665T>G was classified as VUS per the ACMG severity scoring.
-
-<!--page-->
-
-I can provide a structured markdown transcription of this scientific paper. Here it is:
 
 <!--page-->
 

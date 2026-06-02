@@ -100,16 +100,16 @@ wheels = [
 
 [[package]]
 name = "anchorite"
-version = "0.5.0"
+version = "0.5.1"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "fsspec" },
     { name = "pypdfium2" },
     { name = "seq-smith" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/84/15/5e59ba79757f2573c7f108617cd34deed7edbea54ac3eaf7511dc6c50e6d/anchorite-0.5.0.tar.gz", hash = "sha256:4eab65a7df8c5402122a84afc740ccdcfb1c63ec395ae2857d0dbb8a4c8f0d41", size = 4325756, upload-time = "2026-05-29T05:59:11.765Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/75/64/77d43489f5fb3f9c10ba9a0dd6ea1e9c46713bdd7e24c33cac1d3a1955dc/anchorite-0.5.1.tar.gz", hash = "sha256:50e12ba4a96f7a116b9f54afbe5ecd90f9ecbc275aa78a0a1576390b9735d6d6", size = 4326525, upload-time = "2026-06-02T06:44:29.565Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/59/ec/f432127983c40312a3e644ba0028965100c3446e871e93494bc5102d1563/anchorite-0.5.0-py3-none-any.whl", hash = "sha256:e4ca441d9f9fd5258883262f816ba0b392b65a40b29b280b34aed42ab63131e2", size = 60773, upload-time = "2026-05-29T05:59:10.438Z" },
+    { url = "https://files.pythonhosted.org/packages/ec/e7/7e1ea5a13a7b38fefb65ff7b0069da836f83a0d00149ff5139e0377bb23f/anchorite-0.5.1-py3-none-any.whl", hash = "sha256:af2ae20b77361c6e912d1c2adaf0b2cf8ea7d8f7a3183e97212957265e79109f", size = 61234, upload-time = "2026-06-02T06:44:27.686Z" },
 ]
 
 [[package]]
@@ -518,7 +518,7 @@ dev = [
 
 [package.metadata]
 requires-dist = [
-    { name = "anchorite", specifier = ">=0.5.0" },
+    { name = "anchorite", specifier = ">=0.5.1" },
     { name = "boto3" },
     { name = "defusedxml" },
     { name = "fsspec" },

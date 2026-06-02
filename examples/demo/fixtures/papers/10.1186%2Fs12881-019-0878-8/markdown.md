@@ -1,5 +1,3 @@
-I can provide a structured markdown transcription of this academic paper. Here it is:
-
 <!--page-->
 
 # Clinical course, mutations and its functional characteristics of infantile-onset Pompe disease in Thailand

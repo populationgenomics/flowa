@@ -162,3 +162,8 @@ node_modules/
 demo-data/
 *.tsbuildinfo
 pnpm-debug.log*
+
+# Raw LLM-call traces emitted by the demo pipeline (convert/extract/aggregate).
+# Debug artifacts only — never consumed by the running demo; just the parsed
+# .json outputs are tracked. Keep them out of git and out of `git status`.
+examples/demo/fixtures/**/*_raw.json

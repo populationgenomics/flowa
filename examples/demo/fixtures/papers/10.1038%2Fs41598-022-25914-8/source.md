@@ -1,5 +1,3 @@
-I can provide a structured markdown transcription of this scientific paper. Here it is:
-
 <!--page-->
 
 # CRISPR‐mediated generation and characterization of a *Gaa* homozygous c.1935C>A (p.D645E) Pompe disease knock‐in mouse model recapitulating human infantile onset‐Pompe disease

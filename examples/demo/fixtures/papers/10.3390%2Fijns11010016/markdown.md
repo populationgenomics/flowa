@@ -1,5 +1,3 @@
-I can help summarize and transcribe the structure of this academic paper. Here is the markdown transcription:
-
 <!--page-->
 
 # Five-Year Outcomes of Patients with Pompe Disease Identified by the Pennsylvania Newborn Screen

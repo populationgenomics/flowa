@@ -1,5 +1,3 @@
-I can help transcribe this scientific article. Here is the markdown transcription:
-
 <!--page-->
 
 # Genotype, phenotype and treatment outcomes of 17 Malaysian patients with infantile-onset Pompe disease and the identification of 3 novel *GAA* variants
