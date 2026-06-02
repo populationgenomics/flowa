@@ -113,6 +113,26 @@ const TOGGLE_ARTIFACT: CategorySuggestion = {
   ],
 };
 
+// The first citation resolved ONLY a markdown.md anchor, no PDF bbox (a
+// supplement-only quote, or a PDF text layer the anchor couldn't match). It
+// defaults to Markdown but still offers the toggle so the PDF stays reachable.
+const ANCHOR_ONLY_ARTIFACT: CategorySuggestion = {
+  ...ARTIFACT,
+  claims: [
+    {
+      paperId: "Smith2024",
+      text: "Functional claim 1",
+      citations: [
+        {
+          quote: "func quote in source text",
+          location: { bboxes: [], markdownAnchor: { start: 6, end: 10 } },
+        },
+      ],
+    },
+    ...ARTIFACT.claims.slice(1),
+  ],
+};
+
 const VERSIONS: VersionEntry[] = [
   {
     version: 0,
@@ -490,7 +510,10 @@ describe("EvidenceViewerShell", () => {
     expect(screen.queryByTestId("evidence-mode-toggle")).toBeNull();
   });
 
-  it("hides the toggle for a PDF-only citation (no markdown anchor)", async () => {
+  it("still offers the toggle for a one-sided (PDF-only) citation", async () => {
+    // A bbox but no anchor: the toggle stays available so the curator can switch
+    // to Markdown (where the off-source viewer shows a "could not locate" note)
+    // rather than being trapped in the PDF.
     const backend = makeBackend({ claims: [], papers: [], comments: [] });
     render(
       wrap(
@@ -505,7 +528,45 @@ describe("EvidenceViewerShell", () => {
       ),
     );
     await waitFor(() => expect(screen.getByTestId("focus-card")).toBeDefined());
-    expect(screen.queryByTestId("evidence-mode-toggle")).toBeNull();
+    await waitFor(() =>
+      expect(screen.getByTestId("evidence-mode-toggle")).toBeDefined(),
+    );
+  });
+
+  it("defaults an anchor-only citation to Markdown but keeps the toggle", async () => {
+    vi.stubGlobal(
+      "fetch",
+      vi.fn(
+        async () =>
+          ({
+            ok: true,
+            status: 200,
+            text: async () => "intro func quote in source text",
+          }) as unknown as Response,
+      ),
+    );
+    const backend = makeBackend({ claims: [], papers: [], comments: [] });
+    const { container } = render(
+      wrap(
+        <EvidenceViewerShell
+          {...baseProps}
+          artifact={ANCHOR_ONLY_ARTIFACT}
+          markdownUrlForDoi={mdUrl}
+          backend={backend}
+          chatSessionFactory={NEVER_SESSION}
+          onVersionChange={vi.fn()}
+        />,
+      ),
+    );
+    // The toggle is offered even though there's no bbox…
+    await waitFor(() =>
+      expect(screen.getByTestId("evidence-mode-toggle")).toBeDefined(),
+    );
+    // …and the panel defaults to Markdown, highlighting the anchored span
+    // without the curator having to toggle.
+    await waitFor(() =>
+      expect(container.querySelector("mark.anchor-highlight")).not.toBeNull(),
+    );
   });
 
   it("switches the evidence panel to the Markdown viewer when toggled", async () => {

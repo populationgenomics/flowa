@@ -6,6 +6,7 @@ import remarkGfm from "remark-gfm";
 import {
   ANCHOR_MARK_CLASS,
   rehypeAnchorMark,
+  remarkStripComments,
   remarkSupplementMarkers,
 } from "./plugins";
 import { codePointAnchorToUtf16 } from "./offsets";
@@ -26,10 +27,13 @@ export interface MarkdownHighlightViewerProps {
 }
 
 // GFM tables on, single-tilde strikethrough off (so a lone tilde in data renders
-// literally), plus the supplement-marker → heading transform.
+// literally), the supplement-marker → heading transform, then a strip of the
+// remaining structural comments (page/table/figure/end) so none leak as literal
+// `<!--…-->` text. Order matters: the supplement transform runs before the strip.
 const REMARK_PLUGINS: Options["remarkPlugins"] = [
   [remarkGfm, { singleTilde: false }],
   remarkSupplementMarkers,
+  remarkStripComments,
 ];
 
 /**

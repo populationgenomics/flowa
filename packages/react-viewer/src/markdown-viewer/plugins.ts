@@ -50,6 +50,32 @@ export function remarkSupplementMarkers() {
   };
 }
 
+const COMMENT_RE = /^<!--[\s\S]*-->$/;
+
+/**
+ * remark plugin: drop the transcription's structural HTML-comment markers —
+ * `<!--page-->`, `<!--table: N-->`, `<!--figure: N-->`, `<!--end-->` — so they
+ * don't render. react-markdown, which we deliberately run without `rehype-raw`,
+ * *escapes* a raw comment and shows it as literal `<!--…-->` text rather than
+ * dropping it, so these leak into the rendered Markdown unless removed.
+ *
+ * Runs AFTER {@link remarkSupplementMarkers}, which has already turned the one
+ * marker we surface (`<!--supplement: …-->`) into a heading; every comment node
+ * still present is removed. Removing a node leaves the other nodes' source
+ * `position.offset` untouched, so {@link rehypeAnchorMark} offsets — and the
+ * citation anchors that index into them — are unaffected (no re-resolve).
+ */
+export function remarkStripComments() {
+  return (tree: MdastRoot) => {
+    visit(tree, "html", (node, index, parent) => {
+      if (index === undefined || !parent) return;
+      if (!COMMENT_RE.test(node.value.trim())) return;
+      parent.children.splice(index, 1);
+      return [SKIP, index];
+    });
+  };
+}
+
 export interface AnchorMarkOptions {
   anchor: Utf16Anchor | null | undefined;
 }

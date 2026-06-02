@@ -383,9 +383,13 @@ export function EvidenceViewerShell({
     return [{ bboxes: active.bboxes, label: active.quote, pending }];
   }, [active, pendingResolutions]);
 
-  // PDF vs Markdown for the evidence panel. The toggle appears only when the
-  // active citation resolved *both* a bbox and an anchor and a markdown URL is
-  // available; otherwise the panel shows whichever source the citation has.
+  // PDF vs Markdown for the evidence panel. The toggle is offered whenever a
+  // markdown URL is available and the citation resolved at least one locator —
+  // so a quote found in only one source (e.g. supplement-only, or a PDF text
+  // layer the anchor couldn't match) can still be viewed in the other, with
+  // that viewer showing the document plus a "could not locate here" warning
+  // instead of trapping the curator in one view. The default mode prefers PDF,
+  // falling back to Markdown when only an anchor resolved.
   const canMarkdown = !!markdownUrlForDoi;
   const hasBboxes = (active?.bboxes.length ?? 0) > 0;
   const hasAnchor = active?.anchor != null;
@@ -396,7 +400,7 @@ export function EvidenceViewerShell({
     canMarkdown && modeOverride?.key === activeKey
       ? modeOverride.mode
       : defaultMode;
-  const canToggleMode = hasBboxes && hasAnchor && canMarkdown;
+  const canToggleMode = canMarkdown && (hasBboxes || hasAnchor);
   const markdownPending =
     active != null &&
     active.anchor == null &&

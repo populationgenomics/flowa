@@ -9,6 +9,7 @@ import {
   SUPPLEMENT_HEADING_CLASS,
   prettifySupplementName,
   rehypeAnchorMark,
+  remarkStripComments,
   remarkSupplementMarkers,
 } from "./plugins";
 import { codePointAnchorToUtf16 } from "./offsets";
@@ -17,7 +18,7 @@ import type { Utf16Anchor } from "./types";
 function renderMd(md: string, anchor: Utf16Anchor | null) {
   return render(
     <ReactMarkdown
-      remarkPlugins={[remarkGfm, remarkSupplementMarkers]}
+      remarkPlugins={[remarkGfm, remarkSupplementMarkers, remarkStripComments]}
       rehypePlugins={anchor ? [[rehypeAnchorMark, { anchor }]] : []}
     >
       {md}
@@ -104,6 +105,79 @@ describe("remarkSupplementMarkers", () => {
     // The raw comment is gone, not shown literally.
     expect(container.textContent).not.toContain("supplement:");
     expect(container.textContent).not.toContain("<!--");
+  });
+});
+
+describe("remarkStripComments", () => {
+  it("hides page/table/figure/end markers instead of leaking them as text", () => {
+    const md = [
+      "Intro.",
+      "",
+      "<!--page-->",
+      "",
+      "<!--table: 2-->",
+      "",
+      "| A | B |",
+      "|---|---|",
+      "| 1 | 2 |",
+      "",
+      "<!--end-->",
+      "",
+      "<!--figure: 1-->",
+      "",
+      "A caption.",
+      "",
+      "<!--end-->",
+      "",
+      "Outro.",
+    ].join("\n");
+    const { container } = renderMd(md, null);
+
+    // No structural comment leaks (react-markdown would otherwise escape and
+    // show them as literal `<!--…-->` text).
+    expect(container.textContent).not.toContain("<!--");
+    expect(container.textContent).not.toContain("table:");
+    expect(container.textContent).not.toContain("figure:");
+    // Real content (including the table) still renders.
+    expect(container.querySelector("table")).not.toBeNull();
+    expect(container.textContent).toContain("Intro.");
+    expect(container.textContent).toContain("A caption.");
+    expect(container.textContent).toContain("Outro.");
+  });
+
+  it("leaves supplement headings intact (strip runs after the transform)", () => {
+    const md = [
+      "Main text.",
+      "",
+      "<!--supplement: 000_t.docx-->",
+      "",
+      "Supp body.",
+    ].join("\n");
+    const { container } = renderMd(md, null);
+
+    expect(
+      [...container.querySelectorAll("h3")].some(
+        (h) => h.textContent === "from t.docx",
+      ),
+    ).toBe(true);
+    expect(container.textContent).not.toContain("<!--");
+  });
+
+  it("removing a marker leaves anchor offsets intact", () => {
+    // Removing the comment node doesn't shift other nodes' source offsets, so a
+    // quote past the marker still resolves.
+    const md = [
+      "First.",
+      "",
+      "<!--page-->",
+      "",
+      "The variant p.Arg175His is here.",
+    ].join("\n");
+    const { container } = renderMd(md, anchorFor(md, "p.Arg175His"));
+
+    const marks = container.querySelectorAll(`mark.${ANCHOR_MARK_CLASS}`);
+    expect(marks).toHaveLength(1);
+    expect(marks[0]!.textContent).toBe("p.Arg175His");
   });
 });
 
