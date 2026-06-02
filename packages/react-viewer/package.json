@@ -49,7 +49,7 @@
   },
   "dependencies": {
     "react-markdown": "10.1.0",
-    "react-pdf": "9.2.1",
+    "react-pdf": "10.4.1",
     "remark-gfm": "4.0.1",
     "unist-util-visit": "5.0.0"
   },
