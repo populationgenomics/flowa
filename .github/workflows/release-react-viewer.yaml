@@ -72,8 +72,34 @@ jobs:
         working-directory: packages/react-viewer
         run: pnpm pack --dry-run
 
+      # `npm publish --provenance` occasionally exits non-zero with a spurious
+      # `E401 … Failed to generate Web Auth URLs` from its post-publish web-auth
+      # step *after* the registry has already accepted the tarball + provenance.
+      # Verify the registry state on failure and treat a present version as
+      # success — this also makes a re-run over an already-published version pass.
       - name: Publish
         working-directory: packages/react-viewer
-        run: npm publish --provenance --access=public
         env:
           NPM_CONFIG_PROVENANCE: true
+        run: |
+          name=$(node -p "require('./package.json').name")
+          version=$(node -p "require('./package.json').version")
+          set +e
+          npm publish --provenance --access=public
+          code=$?
+          set -e
+          if [ "$code" -eq 0 ]; then
+            echo "Published $name@$version."
+            exit 0
+          fi
+          echo "npm publish exited $code; verifying whether $name@$version reached the registry."
+          for attempt in 1 2 3; do
+            if npm view "$name@$version" version >/dev/null 2>&1; then
+              echo "$name@$version is present on the registry; treating as published."
+              exit 0
+            fi
+            echo "Not visible yet (attempt $attempt/3); waiting for registry propagation."
+            sleep 10
+          done
+          echo "Publish failed: $name@$version is not on the registry."
+          exit "$code"

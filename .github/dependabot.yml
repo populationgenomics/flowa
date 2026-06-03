@@ -12,8 +12,10 @@
 #   (`min-release-age=7d` in pnpm's global config, `exclude-newer = "7 days"`
 #   in each uv project). Without it Dependabot would happily open PRs that CI
 #   then rejects because the new version is too fresh.
-# - The reviewer assignment notifies @lgruen-vcgs on each PR; the weekly
-#   cadence keeps the inbox manageable.
+# - Review requests come from .github/CODEOWNERS. Dependabot's `reviewers:`
+#   option was retired by GitHub in 2025 (it is now silently ignored), so the
+#   code owner is what gets a review request on each PR. The weekly cadence
+#   keeps the inbox manageable.
 
 version: 2
 
@@ -26,8 +28,6 @@ updates:
     schedule:
       interval: "weekly"
     open-pull-requests-limit: 10
-    reviewers:
-      - "lgruen-vcgs"
     labels:
       - "dependencies"
       - "npm"
@@ -49,8 +49,6 @@ updates:
     schedule:
       interval: "weekly"
     open-pull-requests-limit: 10
-    reviewers:
-      - "lgruen-vcgs"
     labels:
       - "dependencies"
       - "python"
@@ -73,8 +71,6 @@ updates:
     schedule:
       interval: "weekly"
     open-pull-requests-limit: 10
-    reviewers:
-      - "lgruen-vcgs"
     labels:
       - "dependencies"
       - "python"

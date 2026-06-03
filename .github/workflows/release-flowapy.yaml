@@ -92,3 +92,7 @@ jobs:
 
       - name: Publish to PyPI
         uses: pypa/gh-action-pypi-publish@release/v1
+        # Treat an already-present version as success so a re-run (e.g. after a
+        # transient registry error) doesn't fail on "file already exists".
+        with:
+          skip-existing: true
