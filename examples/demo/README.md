@@ -166,10 +166,12 @@ VARIANT=NM_001035_3-c_14174A_G
 rm -f assessments/$VARIANT/aggregation.json \
       assessments/$VARIANT/aggregation_raw.json
 rm -rf assessments/$VARIANT/extractions/ assessments/$VARIANT/runs/
-# Re-runs flowa.convert (which uses anchorite for PDF chunking and
-# builds pdf_index.pkl.zst). Drop this line to reuse the cached markdown
-# + index and only redo extract + aggregate.
-rm -f papers/*/markdown.md papers/*/convert_raw.json papers/*/pdf_index.pkl.zst
+# Re-runs flowa.convert (which transcribes each PDF, builds merged.pdf when
+# there are PDF supplements, and builds pdf_index.pkl.zst). Drop this line to
+# reuse the cached transcriptions + index and only redo extract + aggregate.
+rm -f papers/*/main.md papers/*/merged.md papers/*/merged.pdf \
+      papers/*/convert_raw.json papers/*/pdf_index.pkl.zst \
+      papers/*/supplements/*.pdf.md
 ```
 
 Then drive the pipeline. The demo's `scripts/start.ts` translates the
@@ -207,11 +209,11 @@ and not needed by anything downstream.
 
 For papers whose source license blocks redistribution (CC-BY-NC-ND,
 paywalled; see `fixtures/LICENSES.md` for the rule), do **not** delete
-the whole `papers/{encodedDoi}/` directory — only delete `source.pdf`,
-`markdown.md`, `convert_raw.json`, and `pdf_index.pkl.zst`. The
-`pdf_index.pkl.zst` embeds the PDF's extracted text (anchorite's char
-index), so it carries the same copyright as `source.pdf` and must not
-ship in the open-source repo. Keep `metadata.json` (the bibliographic
+the whole `papers/{encodedDoi}/` directory — only delete `main.pdf`,
+`merged.pdf`, `main.md`, `merged.md`, `convert_raw.json`, `pdf_index.pkl.zst`,
+and the `supplements/` directory. The `pdf_index.pkl.zst` embeds the PDF's
+extracted text (anchorite's char index), so it carries the same copyright as
+`main.pdf` and must not ship in the open-source repo. Keep `metadata.json` (the bibliographic
 fields are factual data, not copyrightable) but replace its `abstract`
 field with a sentinel string, so the omission reads as deliberate (not
 a missing-data bug) when the literature view renders the row:

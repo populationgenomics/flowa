@@ -4,8 +4,6 @@ import asyncio
 import json
 import logging
 import re
-import tempfile
-from pathlib import Path
 
 import boto3
 import httpx
@@ -13,7 +11,6 @@ import typer
 from botocore import UNSIGNED
 from botocore.config import Config
 from botocore.exceptions import ClientError
-from pypdf import PdfReader, PdfWriter
 from tenacity import retry, retry_if_exception_type, stop_after_attempt, wait_exponential
 
 from flowa.http_retry import retry_transient_http
@@ -29,54 +26,6 @@ _S3_CONFIG = Config(signature_version=UNSIGNED, region_name='us-east-1')
 def _make_s3_client():  # type: ignore[no-untyped-def]
     """Create an anonymous S3 client for the PMC OA bucket."""
     return boto3.client('s3', config=_S3_CONFIG)
-
-
-def concatenate_pdfs(pdf_paths: list[Path], output_path: Path) -> None:
-    """Concatenate multiple PDFs into a single file."""
-    writer = PdfWriter()
-
-    for pdf_path in pdf_paths:
-        writer.append(str(pdf_path))
-
-    with open(output_path, 'wb') as output_file:
-        writer.write(output_file)
-
-
-def _filter_supplements_by_page_count(
-    supplement_pdfs: list[Path],
-    *,
-    max_pages_per_supplement: int = 20,
-    max_total_supplement_pages: int = 50,
-) -> list[Path]:
-    """Filter supplement PDFs by page count to avoid timeouts on huge table dumps."""
-    accepted: list[Path] = []
-    total_pages = 0
-
-    for pdf_path in supplement_pdfs:
-        try:
-            pages = len(PdfReader(pdf_path).pages)
-        except Exception as e:
-            log.warning('Cannot read page count for %s, skipping: %s', pdf_path.name, e)
-            continue
-
-        if pages > max_pages_per_supplement:
-            log.info('Skipping supplement %s: %d pages (limit %d)', pdf_path.name, pages, max_pages_per_supplement)
-            continue
-
-        if total_pages + pages > max_total_supplement_pages:
-            log.info(
-                'Skipping supplement %s: %d pages would exceed total budget (%d/%d)',
-                pdf_path.name,
-                pages,
-                total_pages,
-                max_total_supplement_pages,
-            )
-            continue
-
-        accepted.append(pdf_path)
-        total_pages += pages
-
-    return accepted
 
 
 def _resolve_latest_version(s3, pmcid: str) -> int | None:  # type: ignore[no-untyped-def]
@@ -176,15 +125,18 @@ async def _fetch_pmcid(client: httpx.AsyncClient, pmid: int, email: str, tool: s
 async def fetch_pmc_paper(
     pmid: int, client: httpx.AsyncClient, email: str, tool: str
 ) -> tuple[bytes | None, list[tuple[str, bytes]], str]:
-    """Fetch a paper's source PDF and its xlsx/docx supplements from PMC.
+    """Fetch a paper's main PDF and its supplements (PDF + xlsx/docx) from PMC.
 
-    The main PDF plus any PDF supplements are concatenated into a single PDF.
-    xlsx/xls/docx supplements are returned as raw ``(basename, bytes)`` pairs in
-    PMC ``media_urls`` order for the caller to store; ``.doc`` (legacy OLE Word)
-    and other media (images, etc.) are ignored.
+    The main article PDF is returned on its own — PDF supplements are no longer
+    concatenated into it. Every supplement (PDF and office) is returned as a raw
+    ``(basename, bytes)`` pair, PDF supplements first then office, each in PMC
+    ``media_urls`` order, for the caller to store under ``supplements/``.
+    ``flowa.convert`` later page-caps, transcribes, and merges the PDF supplements;
+    ``flowa.assemble`` converts the office ones. ``.doc`` (legacy OLE Word) and
+    other media (images, etc.) are ignored.
 
     Returns:
-        ``(pdf_bytes_or_None, supplements, message)``.
+        ``(main_pdf_bytes_or_None, supplements, message)``.
     """
     # Step 1: Get PMCID from idconv API
     pmcid = await _fetch_pmcid(client, pmid, email, tool)
@@ -211,52 +163,32 @@ async def fetch_pmc_paper(
 
     main_pdf_key = _s3_url_to_key(pdf_url)
     pdf_supplement_urls, office_supplement_urls = _partition_media_urls(metadata.get('media_urls', []))
-    pdf_supplement_keys = [_s3_url_to_key(u) for u in pdf_supplement_urls]
-    office_keys = [_s3_url_to_key(u) for u in office_supplement_urls]
+    supplement_keys = [_s3_url_to_key(u) for u in (*pdf_supplement_urls, *office_supplement_urls)]
 
     log.debug(
         'Main PDF: %s, %d PDF supplements, %d xlsx/docx supplements',
         main_pdf_key,
-        len(pdf_supplement_keys),
-        len(office_keys),
+        len(pdf_supplement_urls),
+        len(office_supplement_urls),
     )
 
     async def download(key: str) -> bytes:
         return await asyncio.to_thread(_download_s3_object, s3, key)
 
-    # Step 5: Download PDFs (main + PDF supplements) and the office supplements.
-    pdf_keys = [main_pdf_key, *pdf_supplement_keys]
-    pdf_contents = await asyncio.gather(*[download(key) for key in pdf_keys])
-    office_contents = await asyncio.gather(*[download(key) for key in office_keys])
-
-    # Step 6: Write PDFs to temp files, filter by page count, concatenate.
-    with tempfile.TemporaryDirectory() as tmpdir:
-        tmpdir_path = Path(tmpdir)
-
-        main_path = tmpdir_path / 'main.pdf'
-        main_path.write_bytes(pdf_contents[0])
-
-        supplement_paths: list[Path] = []
-        for i, content in enumerate(pdf_contents[1:]):
-            path = tmpdir_path / f'supplement_{i:03d}.pdf'
-            path.write_bytes(content)
-            supplement_paths.append(path)
-
-        supplement_paths = _filter_supplements_by_page_count(supplement_paths)
-        all_pdfs = [main_path, *supplement_paths]
-
-        output_path = tmpdir_path / 'output.pdf'
-        concatenate_pdfs(all_pdfs, output_path)
-        result_bytes = output_path.read_bytes()
-
-    # Office supplements keep PMC media order; the caller assigns ord prefixes.
-    supplements = [(key.rsplit('/', 1)[-1], data) for key, data in zip(office_keys, office_contents, strict=True)]
+    # Step 5: Download the main PDF and every supplement (PDF + office) as raw bytes.
+    main_bytes = await download(main_pdf_key)
+    supplement_contents = await asyncio.gather(*[download(key) for key in supplement_keys])
+    # PDF supplements first, then office — each in PMC media order. The caller
+    # assigns ord prefixes; convert/assemble dispatch by extension.
+    supplements = [
+        (key.rsplit('/', 1)[-1], data) for key, data in zip(supplement_keys, supplement_contents, strict=True)
+    ]
 
     message = (
-        f'Downloaded from PMC ({pmcid}.{version}) - {len(all_pdfs)} PDFs '
-        f'({len(supplement_paths)} PDF supplements), {len(supplements)} xlsx/docx supplements'
+        f'Downloaded from PMC ({pmcid}.{version}) - main PDF + '
+        f'{len(pdf_supplement_urls)} PDF + {len(office_supplement_urls)} xlsx/docx supplements'
     )
-    return result_bytes, supplements, message
+    return main_bytes, supplements, message
 
 
 async def download_paper_async(
@@ -266,11 +198,11 @@ async def download_paper_async(
     tool: str = 'flowa',
     timeout: float = 60.0,
 ) -> None:
-    """Download PDF from PMC for a single paper."""
-    pdf_url = paper_url(base, doi, 'source.pdf')
+    """Download the main PDF and supplements from PMC for a single paper."""
+    main_pdf_url = paper_url(base, doi, 'main.pdf')
 
-    if exists(pdf_url):
-        log.info('PDF already exists: %s', doi)
+    if exists(main_pdf_url):
+        log.info('Main PDF already exists: %s', doi)
         return
 
     metadata = read_json(paper_url(base, doi, 'metadata.json'))
@@ -283,19 +215,20 @@ async def download_paper_async(
     log.info('Downloading %s (PMID %s)', doi, pmid)
 
     async with httpx.AsyncClient(timeout=timeout) as client:
-        pdf_bytes, supplements, message = await fetch_pmc_paper(pmid, client, email, tool)
+        main_bytes, supplements, message = await fetch_pmc_paper(pmid, client, email, tool)
 
-    if pdf_bytes is None:
+    if main_bytes is None:
         log.info('%s not available in PMC: %s', doi, message)
         return
 
-    write_bytes(pdf_url, pdf_bytes)
-    # Store xlsx/docx supplements under papers/{doi}/supplements/. The ord
-    # prefix freezes PMC media order so assemble has a deterministic sequence.
+    write_bytes(main_pdf_url, main_bytes)
+    # Store every supplement under papers/{doi}/supplements/. The ord prefix
+    # freezes ingestion order; convert/assemble dispatch by extension (PDF
+    # supplements are page-capped + merged in convert, office in assemble).
     for ord_i, (basename, data) in enumerate(supplements):
         safe = _sanitize_supplement_filename(basename)
         write_bytes(paper_url(base, doi, f'supplements/{ord_i:03d}_{safe}'), data)
-    log.info('Downloaded %s: %s (%d bytes, %d supplements)', doi, message, len(pdf_bytes), len(supplements))
+    log.info('Downloaded %s: %s (%d bytes main, %d supplements)', doi, message, len(main_bytes), len(supplements))
 
 
 def download_paper(
@@ -304,13 +237,14 @@ def download_paper(
     tool: str = typer.Option('flowa', '--tool', help='Tool name for NCBI API'),
     timeout: float = typer.Option(60.0, '--timeout', help='HTTP timeout in seconds'),
 ) -> None:
-    """Download PDF from PMC for a single paper.
+    """Download the main PDF and supplements from PMC for a single paper.
 
     Reads papers/{encoded_doi}/metadata.json (written by query step) to get the PMID
-    for PMC lookup. Stores PDF to papers/{encoded_doi}/source.pdf.
+    for PMC lookup. Stores the main PDF to papers/{encoded_doi}/main.pdf and each
+    supplement to papers/{encoded_doi}/supplements/{ord}_{name}.
 
     Skip logic:
-    - PDF exists -> already have it (downloaded or manually added)
+    - main.pdf exists -> already have it (downloaded or manually added)
     - No metadata.json -> paper not resolved by query step
     - No PMID in metadata -> not a PubMed-indexed paper
     """

@@ -112,7 +112,7 @@
   font-size: 1.1em;
 }
 
-/* Source-paper Markdown (markdown.md = source.md + converted xlsx/docx
+/* Source-paper Markdown (the assembled transcription + converted xlsx/docx
  * supplements), rendered by MarkdownHighlightViewer with per-citation <mark>
  * highlights. Separate from .flowa-llm-content: this content is table-heavy
  * (converted spreadsheets) and carries highlight marks the LLM content never has. */

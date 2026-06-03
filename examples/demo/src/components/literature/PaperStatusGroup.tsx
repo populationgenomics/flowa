@@ -162,7 +162,7 @@ function PaperRowItem({
               <input
                 ref={supplementInputRef}
                 type="file"
-                accept=".xlsx,.xls,.docx"
+                accept=".xlsx,.xls,.docx,.pdf"
                 style={{ display: "none" }}
                 data-testid={`paper-supplement-input-${paper.encodedDoi}`}
                 onChange={(e) => {

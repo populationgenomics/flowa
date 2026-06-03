@@ -113,6 +113,14 @@ repos:
       # demo-gateway is its own uv project (separate venv + ruff/mypy config),
       # so these cd in and run that project's pinned tools, mirroring the pytest
       # hook below.
+      #
+      # demo-gateway installs flowapy as an editable path dep (`path = "../.."`),
+      # so a change to `src/flowa/` can break its mypy/pytest gates even when no
+      # demo-gateway file is touched. The type+behaviour gates therefore also
+      # fire on `src/flowa/**.py`; the formatters don't, since ruff only inspects
+      # demo-gateway's own files. (Without this, a flowapy-only commit skips these
+      # locally — pre-commit runs hooks against staged files — and the break only
+      # surfaces in CI's `--all-files` run.)
       - id: ruff-format-demo-gateway
         name: ruff format (demo-gateway)
         entry: bash -c 'cd examples/demo-gateway && uv run --no-sync ruff format --check src/ tests/'
@@ -130,10 +138,10 @@ repos:
         entry: bash -c 'cd examples/demo-gateway && uv run --no-sync mypy src/ tests/'
         language: system
         pass_filenames: false
-        files: ^examples/demo-gateway/.*\.py$
+        files: ^(examples/demo-gateway/.*|src/flowa/.*)\.py$
       - id: pytest-demo-gateway
         name: pytest (demo-gateway)
         entry: bash -c 'cd examples/demo-gateway && uv run --no-sync pytest tests/'
         language: system
         pass_filenames: false
-        files: ^examples/demo-gateway/.*\.py$
+        files: ^(examples/demo-gateway/.*|src/flowa/.*)\.py$

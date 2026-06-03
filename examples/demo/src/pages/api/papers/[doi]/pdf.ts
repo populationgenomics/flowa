@@ -6,6 +6,7 @@ import formidable from "formidable";
 import type { Fields, File as FormidableFile, Files } from "formidable";
 import { encodeDoi } from "@flowajs/react-viewer";
 import { getDemoDataDir } from "@/lib/demoConfig";
+import { invalidateMainPdfChange } from "@/lib/paperInvalidation";
 
 const MAX_UPLOAD_BYTES = 50 * 1024 * 1024;
 
@@ -24,11 +25,28 @@ export default async function handler(
   res.status(405).json({ error: "Method not allowed" });
 }
 
-function resolvePdfPath(doi: string): string {
-  // The route param arrives URL-decoded; re-encode via RFC 3986 strict
-  // to land on the on-disk directory name.
-  const encoded = encodeDoi(doi);
-  return join(getDemoDataDir(), "papers", encoded, "source.pdf");
+function paperDir(doi: string): string {
+  // The route param arrives URL-decoded; re-encode via RFC 3986 strict to
+  // land on the on-disk directory name.
+  return join(getDemoDataDir(), "papers", encodeDoi(doi));
+}
+
+/** The full PDF the viewer renders: merged.pdf (main + PDF supplements) if present,
+ *  else main.pdf — mirrors flowa.storage.full_pdf_url. */
+function fullPdfPath(doi: string): string {
+  const merged = join(paperDir(doi), "merged.pdf");
+  return existsSync(merged) ? merged : join(paperDir(doi), "main.pdf");
+}
+
+/** The raw main-paper PDF an upload writes. */
+function mainPdfPath(doi: string): string {
+  return join(paperDir(doi), "main.pdf");
+}
+
+function firstField(fields: Fields, name: string): string | undefined {
+  const v = fields[name];
+  if (Array.isArray(v)) return v[0];
+  return typeof v === "string" ? v : undefined;
 }
 
 async function handleGet(req: NextApiRequest, res: NextApiResponse) {
@@ -37,8 +55,9 @@ async function handleGet(req: NextApiRequest, res: NextApiResponse) {
     res.status(400).json({ error: "Invalid path parameters" });
     return;
   }
-  const path = resolvePdfPath(doi);
+  const path = fullPdfPath(doi);
   if (!existsSync(path)) {
+    // No main.pdf yet (e.g. uploaded but not converted, or never provided).
     res.status(404).json({ error: "PDF not found" });
     return;
   }
@@ -56,7 +75,7 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse) {
     return;
   }
 
-  const destPath = resolvePdfPath(doi);
+  const destPath = mainPdfPath(doi);
   await mkdir(dirname(destPath), { recursive: true });
 
   const form = formidable({
@@ -69,9 +88,10 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse) {
     keepExtensions: false,
   });
 
+  let fields: Fields;
   let files: Files;
   try {
-    [, files] = await new Promise<[Fields, Files]>((resolve, reject) => {
+    [fields, files] = await new Promise<[Fields, Files]>((resolve, reject) => {
       form.parse(req, (err, parsedFields, parsedFiles) => {
         if (err) reject(err);
         else resolve([parsedFields, parsedFiles]);
@@ -104,6 +124,15 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse) {
     res.status(500).json({ error: "Failed to store PDF" });
     return;
   }
+
+  // A new main PDF makes every derived artifact (main.md, merged.pdf, pdf_index,
+  // merged.md) stale; the curator's next Re-analyze regenerates them. No-op for
+  // a brand-new paper that has no derived data yet.
+  await invalidateMainPdfChange(
+    getDemoDataDir(),
+    doi,
+    firstField(fields, "variantId"),
+  );
 
   const s = await stat(destPath);
   res.status(200).json({ ok: true, doi, size: s.size });

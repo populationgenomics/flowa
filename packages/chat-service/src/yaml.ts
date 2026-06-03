@@ -5,7 +5,7 @@ import type { Artifact } from "./artifact.js";
 
 // ---------------------------------------------------------------------------
 // Location cache — preserves a citation's pipeline-precomputed resolution
-// (PDF bboxes + markdown.md anchor) across edits. The model never sees this
+// (PDF bboxes + assembled markdown anchor) across edits. The model never sees this
 // derived `location` field (it's stripped to YAML below); we reattach it to
 // any citation whose (paperId, quote) survives the edit.
 // ---------------------------------------------------------------------------

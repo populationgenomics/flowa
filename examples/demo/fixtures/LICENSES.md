@@ -2,7 +2,7 @@
 
 The fixture under `examples/demo/fixtures/papers/` ships three kinds of entries, all keyed by the encoded DOI:
 
-1. **Full-content papers** (15) — `source.pdf` + `markdown.md` + `metadata.json`. The pipeline downloaded the PDF from PMC, converted it to Markdown, and ran extraction. Three also carry `source.md` (the PDF transcription) and a `supplements/` directory of xlsx/docx supplements, which are converted and appended into `markdown.md`. All are CC-BY (any version) or CC0, so the PDF, the derivative Markdown, and the supplements are redistributable provided attribution is preserved (entries below).
+1. **Full-content papers** (15) — `main.pdf` + `main.md` + `metadata.json` + `pdf_index.pkl.zst`. The pipeline downloaded the main PDF from PMC, transcribed it to Markdown (`main.md`), and ran extraction. Papers with supplements also carry a `supplements/` directory and an assembled `merged.md` (`main.md` + the supplement transcriptions/conversions): **3** carry an xlsx/docx (office) supplement, and **2** carry a separate PDF supplement (which is additionally concatenated into a derived `merged.pdf` and transcribed). All are CC-BY (any version) or CC0, so the PDFs, the derivative Markdown, and the supplements are redistributable provided attribution is preserved (entries below).
 2. **Metadata-only, license-restricted** (5) — only `metadata.json`; the source paper is paywalled or under a no-derivatives / non-commercial licence (e.g. CC-BY-NC-ND). The `abstract` field is replaced with a sentinel string explaining the omission, since the abstract is the author's prose and is subject to publisher copyright. Bibliographic facts (DOI, PMID, title, authors, journal, date) are not copyrightable and ship as-is.
 3. **Metadata-only, CC-BY not in PMC** (1) — only `metadata.json`; the source paper IS CC-BY-licensed but PMC's OA subset doesn't carry it, so flowa's PMC-only download path silently skipped it. Abstract is preserved (CC-BY permits redistribution); PDF/Markdown are absent. A curator running the demo locally can fetch the PDF from the journal site.
 
@@ -101,6 +101,7 @@ For all three kinds, the demo's literature page renders the row from `metadata.j
 - **DOI:** [10.1002/humu.23878](https://doi.org/10.1002/humu.23878)
 - **PMID:** 31342611
 - **License:** [CC-BY 4.0](https://creativecommons.org/licenses/by/4.0/)
+- **Supplement:** `supplements/000_HUMU-40-2146-s001.pdf` (supplementary data PDF; inherits the article's CC-BY 4.0).
 
 ### `10.1186%2Fs12881-019-0878-8/`
 
@@ -147,12 +148,18 @@ For all three kinds, the demo's literature page renders the row from `metadata.j
 - **DOI:** [10.3389/fped.2021.729824](https://doi.org/10.3389/fped.2021.729824)
 - **PMID:** 34966699
 - **License:** [CC-BY 4.0](https://creativecommons.org/licenses/by/4.0/)
+- **Supplement:** `supplements/000_Image_1.PDF` (supplementary figure PDF; inherits the article's CC-BY 4.0).
 
 ### Derivative artifacts
 
 For each full-content paper the fixture also ships the pipeline's derivatives:
 
-- `markdown.md` — Markdown extracted from the PDF by the conversion stage.
+- `main.md` — the main PDF transcribed to Markdown by the conversion stage.
+- `merged.md` — present only for papers with supplements: `main.md` + the
+  PDF-supplement transcriptions + the converted office supplements.
+- `merged.pdf` — present only for the two papers with a PDF supplement: `main.pdf`
+  concatenated with the supplement PDF (what the viewer renders + the index is built from).
+- `pdf_index.pkl.zst` — the anchorite PDF index (embeds the PDF's extracted text).
 - `metadata.json` — bibliographic metadata (DOI, PMID, title, authors, etc.).
 
 These derivatives are released under the same CC-BY licence as the underlying PDFs.

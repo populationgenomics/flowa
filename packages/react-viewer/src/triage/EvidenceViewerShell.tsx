@@ -89,7 +89,7 @@ export interface EvidenceViewerShellProps {
    * Markdown rendering input. Optional: Markdown viewing is additive over the
    * required PDF baseline, so omitting it keeps the evidence panel PDF-only and
    * hides the PDF/MD toggle. When provided, a citation that resolved a
-   * `markdown.md` anchor can be highlighted in the assembled Markdown.
+   * the assembled markdown anchor can be highlighted in the assembled Markdown.
    */
   markdownUrlForDoi?(doi: string): string;
 

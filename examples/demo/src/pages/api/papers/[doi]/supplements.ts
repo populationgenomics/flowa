@@ -6,16 +6,22 @@ import formidable from "formidable";
 import type { Fields, File as FormidableFile, Files } from "formidable";
 import { encodeDoi } from "@flowajs/react-viewer";
 import { getDemoDataDir } from "@/lib/demoConfig";
-import { invalidatePaperDerivedData } from "@/lib/paperInvalidation";
+import {
+  invalidatePaperDerivedData,
+  invalidatePdfSupplementChange,
+} from "@/lib/paperInvalidation";
 
 const MAX_UPLOAD_BYTES = 50 * 1024 * 1024;
 
 // xlsx/docx are Office Open XML — zip archives whose first bytes are the
-// local-file-header signature. Legacy .xls is an OLE2 compound document.
-// We check magic bytes so a mis-renamed or corrupt upload is rejected here
-// rather than silently dropped later by assemble's markitdown conversion.
+// local-file-header signature. Legacy .xls is an OLE2 compound document. PDF
+// supplements start with "%PDF". We check magic bytes so a mis-renamed or
+// corrupt upload is rejected here rather than mishandled later by the pipeline
+// (office supplements go through markitdown in assemble; PDF supplements are
+// transcribed + merged in convert).
 const ZIP_MAGIC = Buffer.from([0x50, 0x4b, 0x03, 0x04]); // "PK\x03\x04"
 const OLE_MAGIC = Buffer.from([0xd0, 0xcf, 0x11, 0xe0, 0xa1, 0xb1, 0x1a, 0xe1]);
+const PDF_MAGIC = Buffer.from([0x25, 0x50, 0x44, 0x46]); // "%PDF"
 
 // formidable streams the body directly off req; Next must not parse it.
 export const config = {
@@ -97,9 +103,15 @@ function validateSupplement(originalFilename: string, header: Buffer): Verdict {
     }
     return { ok: true };
   }
+  if (ext === ".pdf") {
+    if (!header.subarray(0, 4).equals(PDF_MAGIC)) {
+      return { ok: false, error: "File content is not a valid PDF document." };
+    }
+    return { ok: true };
+  }
   return {
     ok: false,
-    error: "Only .xlsx, .xls, and .docx supplements are supported.",
+    error: "Only .xlsx, .xls, .docx, and .pdf supplements are supported.",
   };
 }
 
@@ -138,7 +150,11 @@ async function handleGet(doi: string, res: NextApiResponse) {
     res.status(200).json({ supplements: [] });
     return;
   }
-  const names = (await readdir(dir)).sort();
+  // Hide the convert-written `*.pdf.md` transcription sidecars — they're derived
+  // artifacts, not user-managed supplements.
+  const names = (await readdir(dir))
+    .sort()
+    .filter((n) => !n.endsWith(".pdf.md"));
   const supplements: Array<{ filename: string; size: number }> = [];
   for (const filename of names) {
     const s = await stat(join(dir, filename));
@@ -214,14 +230,16 @@ async function handlePost(
     return;
   }
 
-  // The supplement set changed: markdown.md and this assessment's extraction
-  // are stale. Delete them so the curator's next Re-analyze re-assembles and
-  // re-extracts (the vision-LLM is skipped — source.md survives).
-  await invalidatePaperDerivedData(
-    getDemoDataDir(),
-    doi,
-    firstField(fields, "variantId"),
-  );
+  // The supplement set changed: invalidate the derived data the curator's next
+  // Re-analyze must regenerate. An office supplement only restales merged.md
+  // (cheap re-assemble, transcriptions survive); a PDF supplement also restales
+  // merged.pdf + the index (convert re-transcribes just the new file, re-merges,
+  // re-indexes).
+  const isPdf = original.toLowerCase().endsWith(".pdf");
+  const invalidate = isPdf
+    ? invalidatePdfSupplementChange
+    : invalidatePaperDerivedData;
+  await invalidate(getDemoDataDir(), doi, firstField(fields, "variantId"));
 
   const s = await stat(destPath);
   res.status(200).json({ ok: true, doi, filename: finalName, size: s.size });
@@ -250,11 +268,17 @@ async function handleDelete(
   }
   await unlink(path);
 
-  await invalidatePaperDerivedData(
-    getDemoDataDir(),
-    doi,
-    firstQuery(req.query.variantId),
-  );
+  const isPdf = filename.toLowerCase().endsWith(".pdf");
+  if (isPdf) {
+    // Drop the convert-written transcription sidecar alongside the raw PDF.
+    await unlink(join(supplementsDir(doi), `${filename}.md`)).catch(
+      () => undefined,
+    );
+  }
+  const invalidate = isPdf
+    ? invalidatePdfSupplementChange
+    : invalidatePaperDerivedData;
+  await invalidate(getDemoDataDir(), doi, firstQuery(req.query.variantId));
 
   res.status(200).json({ ok: true, doi, filename });
 }

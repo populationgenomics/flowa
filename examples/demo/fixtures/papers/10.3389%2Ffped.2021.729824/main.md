@@ -2,7 +2,7 @@
 
 # Case Report: Anesthetic Management and Electrical Cardiometry as Intensive Hemodynamic Monitoring During Cheiloplasty in an Infant With Enzyme-Replaced Pompe Disease and Preserved Preoperative Cardiac Function
 
-*Meng-Chen Liu1, Ming-Tse Wang1, Philip Kuo-Ting Chen2, Dau-Ming Niu3·4, Yu-Hsuan Fan Chiang1, Ming-Hui Hsieh1 and Hsiao-Chien Tsai1·5·6**
+*Meng-Chen Liu1, Ming-Tse Wang1, Philip Kuo-Ting Chen2, Dau-Ming Niu3,4, Yu-Hsuan Fan Chiang1, Ming-Hui Hsieh1 and Hsiao-Chien Tsai1,5,6**
 
 1 Department of Anesthesiology, Taipei Medical University Hospital, Taipei Medical University, Taipei, Taiwan, 2 Department of Plastic and Reconstructive Surgery, Taipei Medical University Hospital, Taipei, Taiwan, 3 Department of Pediatrics, Taipei Veterans General Hospital, Taipei, Taiwan, 4 School of Medicine, National Yang Ming Chiao Tung University, Taipei, Taiwan, 5 Graduate Institute of Medical Sciences, College of Medicine, Taipei Medical University, Taipei, Taiwan, 6 Dianthus MFM Clinic Taoyuan, Dianthus MFM Center, Taipei, Taiwan
 
@@ -26,7 +26,7 @@ This case report describes a 4-month-old full-term Taiwanese female infant weigh
 
 <!--figure: 1-->
 
-**FIGURE 1 \| (A)** The patient presented with left complete cleft lip and palate. Hypotonia and macroglossia were not observed, which may be related to regular ERT beginning at 15 days old. **(B)** Electrical Cardiometry Technology (ICON®) calculated and provided instant SV, SI, SVR, CO, ICON, and CI during the operation. **(C)** ICON® sensors were located at the left side of the neck and thorax. Arrows represent the sites of electrode patches. ERT, enzyme replacement therapy; SV, stroke volume; SI, stroke volume index; SVR, systemic vascular resistance; CO, cardiac output; ICON, index of contractility; CI, cardiac index.
+**FIGURE 1 | (A)** The patient presented with left complete cleft lip and palate. Hypotonia and macroglossia were not observed, which may be related to regular ERT beginning at 15 days old. **(B)** Electrical Cardiometry Technology (ICON®) calculated and provided instant SV, SI, SVR, CO, ICON, and CI during the operation. **(C)** ICON® sensors were located at the left side of the neck and thorax. Arrows represent the sites of electrode patches. ERT, enzyme replacement therapy; SV, stroke volume; SI, stroke volume index; SVR, systemic vascular resistance; CO, cardiac output; ICON, index of contractility; CI, cardiac index.
 
 <!--end-->
 
@@ -34,21 +34,11 @@ X-ray showed cardiomegaly (**Supplementary Figure 1A**). Left ventricular mass i
 
 <!--page-->
 
-The patient was admitted for scheduled cheiloplasty due to left complete unilateral cleft lip and palate. Upon arriving in the operating room, pulse oximetry, and electrical cardiometry technology (ICON®; Osypka Medical GmbH, Berlin, Germany) (**Figures 1B,C**) were applied before induction. Intravenous induction was performed with thiamylal 30 mg (5.4 mg/kg), cisatracurium 1 mg (0.18 mg/kg), dexamethasone 1 mg (0.18 mg/kg), and atropine 0.05 mg (0.01 mg/kg). Subsequently, a non-invasive blood pressure cuff and electrocardiography were applied. Intubation was successfully performed with Pentax AWS-s100 (PENTAX Medical, Hamburg, Germany; video-assisted laryngoscope) on the first attempt. Additionally, we placed a radial arterial line and FloTrac system (Edwards Lifesciences, Irvine, CA, USA) for hemodynamic monitoring. Peripheral nerve blocks with 0.4125% ropivacaine was performed as a part of combined anesthesia and for perioperative analgesia, including bilateral infraorbital nerve block (1.4 mL on each side), bilateral external nasal nerve block (0.5 mL on each side), and nasopalatine nerve block (0.1 mL). Anesthesia was maintained with sevoflurane 1.8–3.1% and 49–65% oxygen concentration in the air. The initial ventilator setting was inspiratory pressure (P~Insp~): 13 cm H2O, positive end-expiratory pressure (PEEP): 0 cm H2O, respiratory rate (RR): 30 breaths per minute, and inspiratory-to-expiratory time (I:E ratio): 1:1.5. Our goal was to maintain mean arterial pressure (MAP) above 45 mmHg and heart rate (HR) between 90 and 160 bpm. We focused on five parameters of ICON®: index of contractility (ICON), systolic time ratio (STR), thoracic fluid content (TFC), stroke volume variation (SVV), and systemic vascular resistance (SVR). We focused on three parameters of FloTrac: cardiac output (CO), SVV, and SVR. We compared CO, SVV, and SVR between these two hemodynamic monitors (**Table 1**). Due to the age limitation (8), the data from FloTrac deviated from the physiological range and were too inaccurate to reflect the clinical condition.
-
-During early maintenance, we titrated the inhalational gas concentration from 0.7 to 1.0 minimal alveolar concentration (MAC) before the skin incision, and we observed that the hemodynamic parameters on ICON® changed accordingly. ICON and SVR dropped gradually in 1 min, whereas CO increased. However, 3 min later, the decline in ICON and SVR was significant. CO remained at the same level, causing a decrease in arterial blood pressure. Therefore, we cautiously decreased the inhalational gas concentration. Detailed changes in ICON, SVR, and CO are displayed in **Supplementary Figure 2**.
-
-Fifty minutes after anesthesia induction, we changed the ventilator setting and increased P~Insp~ from 13 to 15 cm H2O. Arterial blood pressure dropped soon after. This combined with the observation that SVV was occasionally above the normal range suggested fluid deficiency; therefore, we prescribed bolus normal saline (3 mL) with no apparent improvement. The ventilator setting was adjusted back to the initial setting, and the inhalational gas concentration was slowly titrated to 0.6 MAC. Eighty minutes after anesthesia induction, we also increased the normal saline infusion rate, as SVV was above the normal range and TFC was low; however, MAP was stable and in the normal range. No additional analgesic agent was prescribed during maintenance. At the end of surgery, we prescribed neostigmine 0.125 mg and glycopyrrolate 0.025 mg as neuromuscular blocking agent reverse medication before extubation. Extubation was uneventful with normal respiratory function. She was discharged 4 days later without adverse events.
-
-After 3 months of follow-up, the patient was able to roll over, lie prone on the forearms, and reach out for objects, and she had a social smile. However, she could not maintain a sitting position unassisted, indicating slower development potentially than other infants of the same age. In addition, mild hypotonia was still observed compared with other infants. The girl infant also underwent another surgery in our hospital several months later. Unlike the previous surgery, she was more tolerant of inhalational gas concentration titration, which may represent improved cardiac function under regular ERT. After receiving ERT treatment for half a year, her anti-alglucosidase-α antibody revealed positive. Therefore, hydrocortisone was added in the following ERT courses. Her anti-alglucosidase alfa antibody will be followed in the next few months to see if additional immunosuppressive agents are needed.
-
-<!--page-->
-
 <!--table: 1-->
 
-**TABLE 1 \|** Comparison of hemodynamic parameters between electrical cardiometry technology (ICON) and pulse contour analysis (FloTrac).
+**TABLE 1 |** Comparison of hemodynamic parameters between electrical cardiometry technology (ICON) and pulse contour analysis (FloTrac).
 
-| Time after anesthesia started (min) | NIBP (mmHg) | ABP (mmHg) | \*ICON CO(L/min) | \*ICON SVR (dyn·s/cm5) | \*ICON SVV (%) | \*\*FloTrac CO (L/min) | \*\*FloTrac SVR (dyn·s/cm5) | \*\*FloTrac SVV (%) |
+| Time after anesthesia started (min) | NIBP (mmHg) | ABP (mmHg) | *ICON CO (L/min) | *ICON SVR (dyn·s/cm5) | *ICON SVV (%) | **FloTrac CO (L/min) | **FloTrac SVR (dyn·s/cm5) | **FloTrac SVV (%) |
 |---|---|---|---|---|---|---|---|---|
 | 45 | 58/30 (42) | 59/28 (39) | 0.79 | 3,842 | 10 | 14.9 | 152 | 10.3 |
 | 75 | 63/34 (47) | 66/33 (46) | 0.8 | 3,838 | 8 | 15.7 | 180 | 21.1 |
@@ -59,11 +49,21 @@ After 3 months of follow-up, the patient was able to roll over, lie prone on the
 
 NIBP, non-invasive blood pressure; ABP, arterial blood pressure; CO, cardiac output (normal range: 0.82–1.52 L/min); SVR, systemic vascular resistance (normal range: 2,870–5,331 dyn·s/cm5), SVV, stroke volume variation (normal range: 5–15%). NIBP and ABP are manifested as systolic blood pressure/diastolic blood pressure (mean arterial pressure).
 
-\*ICON: electrical cardiometry technology.
+*ICON: electrical cardiometry technology.
 
-\*\*FloTrac: pulse contour analysis.
+**FloTrac: pulse contour analysis.
 
 <!--end-->
+
+The patient was admitted for scheduled cheiloplasty due to left complete unilateral cleft lip and palate. Upon arriving in the operating room, pulse oximetry, and electrical cardiometry technology (ICON®; Osypka Medical GmbH, Berlin, Germany) (**Figures 1B,C**) were applied before induction. Intravenous induction was performed with thiamylal 30 mg (5.4 mg/kg), cisatracurium 1 mg (0.18 mg/kg), dexamethasone 1 mg (0.18 mg/kg), and atropine 0.05 mg (0.01 mg/kg). Subsequently, a non-invasive blood pressure cuff and electrocardiography were applied. Intubation was successfully performed with Pentax AWS-s100 (PENTAX Medical, Hamburg, Germany; video-assisted laryngoscope) on the first attempt. Additionally, we placed a radial arterial line and FloTrac system (Edwards Lifesciences, Irvine, CA, USA) for hemodynamic monitoring. Peripheral nerve blocks with 0.4125% ropivacaine was performed as a part of combined anesthesia and for perioperative analgesia, including bilateral infraorbital nerve block (1.4 mL on each side), bilateral external nasal nerve block (0.5 mL on each side), and nasopalatine nerve block (0.1 mL). Anesthesia was maintained with sevoflurane 1.8–3.1% and 49–65% oxygen concentration in the air. The initial ventilator setting was inspiratory pressure (PInsp): 13 cm H2O, positive end-expiratory pressure (PEEP): 0 cm H2O, respiratory rate (RR): 30 breaths per minute, and inspiratory-to-expiratory time (I:E ratio): 1:1.5. Our goal was to maintain mean arterial pressure (MAP) above 45 mmHg and heart rate (HR) between 90 and 160 bpm. We focused on five parameters of ICON®: index of contractility (ICON), systolic time ratio (STR), thoracic fluid content (TFC), stroke volume variation (SVV), and systemic vascular resistance (SVR). We focused on three parameters of FloTrac: cardiac output (CO), SVV, and SVR. We compared CO, SVV, and SVR between these two hemodynamic monitors (**Table 1**). Due to the age limitation (8), the data from FloTrac deviated from the physiological range and were too inaccurate to reflect the clinical condition.
+
+During early maintenance, we titrated the inhalational gas concentration from 0.7 to 1.0 minimal alveolar concentration (MAC) before the skin incision, and we observed that the hemodynamic parameters on ICON® changed accordingly. ICON and SVR dropped gradually in 1 min, whereas CO increased. However, 3 min later, the decline in ICON and SVR was significant. CO remained at the same level, causing a decrease in arterial blood pressure. Therefore, we cautiously decreased the inhalational gas concentration. Detailed changes in ICON, SVR, and CO are displayed in **Supplementary Figure 2**.
+
+Fifty minutes after anesthesia induction, we changed the ventilator setting and increased PInsp from 13 to 15 cm H2O. Arterial blood pressure dropped soon after. This combined with the observation that SVV was occasionally above the normal range suggested fluid deficiency; therefore, we prescribed bolus normal saline (3 mL) with no apparent improvement. The ventilator setting was adjusted back to the initial setting, and the inhalational gas concentration was slowly titrated to 0.6 MAC. Eighty minutes after anesthesia induction, we also increased the normal saline infusion rate, as SVV was above the normal range and TFC was low; however, MAP was stable and in the normal range. No additional analgesic agent was prescribed during maintenance. At the end of surgery, we prescribed neostigmine 0.125 mg and glycopyrrolate 0.025 mg as neuromuscular blocking agent reverse medication before extubation. Extubation was uneventful with normal respiratory function. She was discharged 4 days later without adverse events.
+
+After 3 months of follow-up, the patient was able to roll over, lie prone on the forearms, and reach out for objects, and she had a social smile. However, she could not maintain a sitting position unassisted, indicating slower development potentially than other infants of the same age. In addition, mild hypotonia was still observed compared with other infants. The girl infant also underwent another surgery in our hospital several months later. Unlike the previous surgery, she was more tolerant of inhalational gas concentration titration, which may represent improved cardiac function under regular ERT. After receiving ERT treatment for half a year, her anti-alglucosidase-α antibody revealed positive. Therefore, hydrocortisone was added in the following ERT courses. Her anti-alglucosidase alfa antibody will be followed in the next few months to see if additional immunosuppressive agents are needed.
+
+<!--page-->
 
 ## DISCUSSION
 
@@ -93,7 +93,7 @@ Our study has some limitations. First, we lacked strong evidence to clarify and 
 
 <!--table: 2-->
 
-**TABLE 2 \|** Summary of reported cases of infantile-onset Pompe disease patients who underwent general anesthesia.
+**TABLE 2 |** Summary of reported cases of infantile-onset Pompe disease patients who underwent general anesthesia.
 
 | References | Age | LV mass index (g/m2) | ERT (+/——) | Procedure | Agents | Complications |
 |---|---|---|---|---|---|---|
@@ -122,13 +122,15 @@ LV, left ventricular; ERT, enzyme replacement therapy; N/A, data not found in th
 
 <!--figure: 2-->
 
-**FIGURE 2 \|** The changes of ICON, STR, MAP, TFC, and SVV during the operation. **(A)** During maintenance, ICON was mainly affected by the setting of inhalational agent concentration and inspiratory pressure in the ventilator. The arrowhead indicates the increased sevoflurane concentration before incision; the arrow indicates the alteration of ventilator setting: P~Insp~ from 11 to 13 cm H2O, respiratory rate from 30 to 28 breaths per minute (normal range of ICON: 45.0–75.0). **(B)** Changes in STR and 1/ICON were compatible, and STR seemed to react earlier, providing anesthesiologists a faster reference to adjust the anesthesia. **(C)** Fluid is another factor influencing perfusion. Regardless of the trend of change in TFC and SVV, MAP was able to compensate in a relatively stable range (Normal range of TFC: 25–35, SVV: 5−15%). ICON, index of contractility; STR, systolic time ratio; TFC, thoracic fluid content; MAP, mean arterial pressure; P~Insp~, inspiratory pressure.
+**FIGURE 2 |** The changes of ICON, STR, MAP, TFC, and SVV during the operation. **(A)** During maintenance, ICON was mainly affected by the setting of inhalational agent concentration and inspiratory pressure in the ventilator. The arrowhead indicates the increased sevoflurane concentration before incision; the arrow indicates the alteration of ventilator setting: PInsp from 11 to 13 cm H2O, respiratory rate from 30 to 28 breaths per minute (normal range of ICON: 45.0–75.0). **(B)** Changes in STR and 1/ICON were compatible, and STR seemed to react earlier, providing anesthesiologists a faster reference to adjust the anesthesia. **(C)** Fluid is another factor influencing perfusion. Regardless of the trend of change in TFC and SVV, MAP was able to compensate in a relatively stable range (Normal range of TFC: 25–35, SVV: 5−15%). ICON, index of contractility; STR, systolic time ratio; TFC, thoracic fluid content; MAP, mean arterial pressure; PInsp, inspiratory pressure.
 
 <!--end-->
 
 ## CONCLUSION
 
 The recent consensus suggests that early diagnosis and treatment with ERT can improve hemodynamic stability. However, with regular ERT, lower tolerance to anesthetic agents was still noted in this case. Peripheral nerve blocks can reduce the required dose of analgesic agents and make the processes of surgery and emergence safer and faster. For infants with existing cardiac pathophysiologic changes, ICON® may be considered, as the trend of hemodynamic parameters can facilitate the advanced identification of potential problems, especially STR. Future studies should focus on ICON® in infant perioperative monitoring to validate the safety and multiple parameters in this non-invasive hemodynamic monitoring method.
+
+<!--page-->
 
 ## DATA AVAILABILITY STATEMENT
 
@@ -150,82 +152,82 @@ The authors wish to acknowledge the help of Dr. Ting-Hao Wang and Dr. Ting-An Hs
 
 The Supplementary Material for this article can be found online at: https://www.frontiersin.org/articles/10.3389/fped.2021.729824/full#supplementary-material
 
-**Supplementary Figure 1 \| (A)** The girl infant's X-ray at 16 days old, which revealed cardiomegaly. **(B)** The electrocardiography of the girl infant at 15 days old, which revealed sinus tachycardia compared with other infants at the same age. Heart rate: 188 beats per minute; RR interval: 339 milliseconds (ms); PR interval: 56 ms; QRS duration: 99 ms; QT interval: 255 ms.
+**Supplementary Figure 1 | (A)** The girl infant's X-ray at 16 days old, which revealed cardiomegaly. **(B)** The electrocardiography of the girl infant at 15 days old, which revealed sinus tachycardia compared with other infants at the same age. Heart rate: 188 beats per minute; RR interval: 339 milliseconds (ms); PR interval: 56 ms; QRS duration: 99 ms; QT interval: 255 ms.
 
-**Supplementary Figure 2 \|** Inhalational gas concentration was titrated from 0.7 to 1.0 MAC before skin incision (red arrows indicate the time of titration). ICON and SVR dropped gradually in 1 min, and CO increased. However, ICON and SVR dropped significantly 3 min later. By contrast, CO remained at the same level. MAC, minimal alveolar concentration; ICON, index of contractility; SVR, systemic vascular resistance; CO, cardiac output.
+**Supplementary Figure 2 |** Inhalational gas concentration was titrated from 0.7 to 1.0 MAC before skin incision (red arrows indicate the time of titration). ICON and SVR dropped gradually in 1 min, and CO increased. However, ICON and SVR dropped significantly 3 min later. By contrast, CO remained at the same level. MAC, minimal alveolar concentration; ICON, index of contractility; SVR, systemic vascular resistance; CO, cardiac output.
 
 ## REFERENCES
 
-1. Yeoh C, Teng H, Jackson J, Hingula L, Irie T, Legler A, et al. Metabolic disorders and anesthesia. *Curr Anesthesiol Rep*. (2019) 9:340–59. doi: 10.1007/s40140-019-00345-w
+1. Yeoh C, Teng H, Jackson J, Hingula L, Irie T, Legler A, et al. Metabolic disorders and anesthesia. *Curr Anesthesiol Rep.* (2019) 9:340–59. doi: 10.1007/s40140-019-00345-w
 
-2. Bosman L, Hoeks SE, González Candel A, van den Hout HJM, van der Ploeg AT, Staals LM. Perioperative management of children with glycogen storage disease type II—Pompe disease. *Pediatric Anesthesia*. (2018) 28:428–35. doi: 10.1111/pan.13361
+2. Bosman L, Hoeks SE, González Candel A, van den Hout HJM, van der Ploeg AT, Staals LM. Perioperative management of children with glycogen storage disease type II—Pompe disease. *Pediatric Anesthesia.* (2018) 28:428–35. doi: 10.1111/pan.13361
 
-3. Stuart G, Ahmad N. Perioperative care of children with inherited metabolic disorders. Continuing education in anaesthesia. *Crit Care Pain*. (2011) 11:62–8. doi: 10.1093/bjaceaccp/mkq055
+3. Stuart G, Ahmad N. Perioperative care of children with inherited metabolic disorders. Continuing education in anaesthesia. *Crit Care Pain.* (2011) 11:62–8. doi: 10.1093/bjaceaccp/mkq055
 
-4. McFarlane H, Soni N. Pompe's disease and anaesthesia. *Anaesthesia*. (1986) 41:1219–24. doi: 10.1111/j.1365-2044.1986.tb13007.x
+4. McFarlane H, Soni N. Pompe's disease and anaesthesia. *Anaesthesia.* (1986) 41:1219–24. doi: 10.1111/j.1365-2044.1986.tb13007.x
 
-5. Byrne BJ, Colan SD, Kishnani PS, Foster MC, Sparks SE, Gibson JB, et al. Cardiac responses in paediatric Pompe disease in the ADVANCE patient cohort. *Cardiol Young*. (2021) 23:1–10. doi: 10.1017/S1047951121002079
+5. Byrne BJ, Colan SD, Kishnani PS, Foster MC, Sparks SE, Gibson JB, et al. Cardiac responses in paediatric Pompe disease in the ADVANCE patient cohort. *Cardiol Young.* (2021) 23:1–10. doi: 10.1017/S1047951121002079
 
-6. Khoury PR, Mitsnefes M, Daniels SR, Kimball TR. Age-specific reference intervals for indexed left ventricular mass in children. *J Am Soc Echocardiogr*. (2009) 22:709–14. doi: 10.1016/j.echo.2009.03.003
+6. Khoury PR, Mitsnefes M, Daniels SR, Kimball TR. Age-specific reference intervals for indexed left ventricular mass in children. *J Am Soc Echocardiogr.* (2009) 22:709–14. doi: 10.1016/j.echo.2009.03.003
 
-7. Chinali M, Emma F, Esposito C, Rinelli G, Franceschini A, Doyon A, et al. Left ventricular mass indexing in infants, children, and adolescents: a simplified approach for the identification of left ventricular hypertrophy in clinical practice. *J Pediatr*. (2016) 170:193–8. doi: 10.1016/j.jpeds.2015.10.085
+7. Chinali M, Emma F, Esposito C, Rinelli G, Franceschini A, Doyon A, et al. Left ventricular mass indexing in infants, children, and adolescents: a simplified approach for the identification of left ventricular hypertrophy in clinical practice. *J Pediatr.* (2016) 170:193–8. doi: 10.1016/j.jpeds.2015.10.085
 
-8. Teng S, Kaufman J, Pan Z, Czaja A, Shockley H, Da Cruz E. Continuous arterial pressure waveform monitoring in pediatric cardiac transplant, cardiomyopathy and pulmonary hypertension patients. *Intensive Care Med*. (2011) 37:1297–301. doi: 10.1007/s00134-011-2252-y
+8. Teng S, Kaufman J, Pan Z, Czaja A, Shockley H, Da Cruz E. Continuous arterial pressure waveform monitoring in pediatric cardiac transplant, cardiomyopathy and pulmonary hypertension patients. *Intensive Care Med.* (2011) 37:1297–301. doi: 10.1007/s00134-011-2252-y
 
-9. Sanders M, Servaas S, Slagt C. Accuracy and precision of noninvasive cardiac output monitoring by electrical cardiometry: a systematic review and meta-analysis. *J Clin Monit Comput*. (2020) 34:433–60. doi: 10.1007/s10877-019-00330-y
+9. Sanders M, Servaas S, Slagt C. Accuracy and precision of noninvasive cardiac output monitoring by electrical cardiometry: a systematic review and meta-analysis. *J Clin Monit Comput.* (2020) 34:433–60. doi: 10.1007/s10877-019-00330-y
 
-10. Lotfy M, Yassen K, El Sharkawy O, Elshoney R, Moustafa A. Electrical cardiometry compared to transesophageal Doppler for hemodynamics monitoring and fluid management in pediatrics undergoing kasai operation. A randomized controlled trial. *Pediatric Anesthesia Crit Care J*. (2018) 6:1.
+10. Lotfy M, Yassen K, El Sharkawy O, Elshoney R, Moustafa A. Electrical cardiometry compared to transesophageal Doppler for hemodynamics monitoring and fluid management in pediatrics undergoing kasai operation. A randomized controlled trial. *Pediatric Anesthesia Crit Care J.* (2018) 6:1.
 
-11. Echaniz G, De Miguel M, Merritt G, Sierra P, Bora P, Borah N, et al. Bilateral suprazygomatic maxillary nerve blocks vs. infraorbital and palatine nerve blocks in cleft lip and palate repair: a double-blind, randomised study. *Eur J Anaesthesiol*. (2019) 36:40–7. doi: 10.1097/EJA.0000000000000900
+11. Echaniz G, De Miguel M, Merritt G, Sierra P, Bora P, Borah N, et al. Bilateral suprazygomatic maxillary nerve blocks vs. infraorbital and palatine nerve blocks in cleft lip and palate repair: a double-blind, randomised study. *Eur J Anaesthesiol.* (2019) 36:40–7. doi: 10.1097/EJA.0000000000000900
 
-12. Barbero GE, de Miguel M, Sierra P, Merritt G, Bora P, Borah N, et al. Clonidine as an adjuvant to bupivacaine for suprazygomatic maxillary nerve blocks in cleft lip and palate repair: a randomized, prospective, double-blind study. *Cleft Palate Craniofac J*. (2021) 58:755–62. doi: 10.1177/1055665620964141
+12. Barbero GE, de Miguel M, Sierra P, Merritt G, Bora P, Borah N, et al. Clonidine as an adjuvant to bupivacaine for suprazygomatic maxillary nerve blocks in cleft lip and palate repair: a randomized, prospective, double-blind study. *Cleft Palate Craniofac J.* (2021) 58:755–62. doi: 10.1177/1055665620964141
 
-13. Rajan S, Mathew J, Kumar L. Effect of bilateral infraorbital nerve block on intraoperative anesthetic requirements, hemodynamics, glycemic levels, and extubation in infants undergoing cheiloplasty under general anesthesia. *J Dent Anesth Pain Med*. (2021) 21:129–37. doi: 10.17245/jdapm.2021.21.2.129
+13. Rajan S, Mathew J, Kumar L. Effect of bilateral infraorbital nerve block on intraoperative anesthetic requirements, hemodynamics, glycemic levels, and extubation in infants undergoing cheiloplasty under general anesthesia. *J Dent Anesth Pain Med.* (2021) 21:129–37. doi: 10.17245/jdapm.2021.21.2.129
 
-14. Kumar Raja D, Anantanarayanan P, Christabel A, Manikandhan R, Elavazhagan N, Naveen Kumar J. Donor site analgesia after anterior iliac bone grafting in paediatric population: a prospective, triple-blind, randomized clinical trial. *Int J Oral Maxillofac Surg*. (2014) 43:422–7. doi: 10.1016/j.ijom.2013.11.010
+14. Kumar Raja D, Anantanarayanan P, Christabel A, Manikandhan R, Elavazhagan N, Naveen Kumar J. Donor site analgesia after anterior iliac bone grafting in paediatric population: a prospective, triple-blind, randomized clinical trial. *Int J Oral Maxillofac Surg.* (2014) 43:422–7. doi: 10.1016/j.ijom.2013.11.010
 
-15. Racca F, Mongini T, Wolfler A, Vianello A, Cutrera R, Del Sorbo L, et al. Recommendations for anesthesia and perioperative management of patients with neuromuscular disorders. *Minerva Anestesiol*. (2013) 79:419–33.
+15. Racca F, Mongini T, Wolfler A, Vianello A, Cutrera R, Del Sorbo L, et al. Recommendations for anesthesia and perioperative management of patients with neuromuscular disorders. *Minerva Anestesiol.* (2013) 79:419–33.
 
-16. Rosen KR, Broadman LM. Anaesthesia for diagnostic muscle biopsy in an infant with Pompe's disease. *Can Anaesth Soc J*. (1986) 33:790–4. doi: 10.1007/BF03027132
+16. Rosen KR, Broadman LM. Anaesthesia for diagnostic muscle biopsy in an infant with Pompe's disease. *Can Anaesth Soc J.* (1986) 33:790–4. doi: 10.1007/BF03027132
 
-17. DeSena HC, Brumund MR, Superneau D, Snyder CS. Ventricular fibrillation in a patient with pompe disease: a cautionary tale. *Congenit Heart Dis*. (2011) 6:397–401. doi: 10.1111/j.1747-0803.2010.00471.x
+17. DeSena HC, Brumund MR, Superneau D, Snyder CS. Ventricular fibrillation in a patient with pompe disease: a cautionary tale. *Congenit Heart Dis.* (2011) 6:397–401. doi: 10.1111/j.1747-0803.2010.00471.x
 
-18. Wang LYJ, Ross AK Li JS, Dearmey SM, Mackey JF, Worden M, et al. Cardiac arrhythmias following anesthesia induction in infantile-onset pompe disease: a case series. *Pediatric Anesthesia*. (2007) 17:738–48. doi: 10.1111/j.1460-9592.2007.02215.x
+18. Wang LYJ, Ross AK Li JS, Dearmey SM, Mackey JF, Worden M, et al. Cardiac arrhythmias following anesthesia induction in infantile-onset pompe disease: a case series. *Pediatric Anesthesia.* (2007) 17:738–48. doi: 10.1111/j.1460-9592.2007.02215.x
 
-19. Ing RJ, Ryan Cook D, Bengur RA, Williams EA, Eck J. Dear GdL, et al. Anaesthetic management of infants with glycogen storage disease type II: a physiological approach. *Pediatric Anesthesia*. (2004) 14:514–9. doi: 10.1111/j.1460-9592.2004.01242.x
+19. Ing RJ, Ryan Cook D, Bengur RA, Williams EA, Eck J. Dear GdL, et al. Anaesthetic management of infants with glycogen storage disease type II: a physiological approach. *Pediatric Anesthesia.* (2004) 14:514–9. doi: 10.1111/j.1460-9592.2004.01242.x
 
 <!--page-->
 
-20. Ziak P, Fedeles J Jr, Fekiacova D, Hulin I Jr, Fedeles J. Timing of primary lip repair in cleft patients according to surgical treatment protocol. *Bratisl Lek Listy*. (2010) 111:160–2.
+20. Ziak P, Fedeles J Jr, Fekiacova D, Hulin I Jr, Fedeles J. Timing of primary lip repair in cleft patients according to surgical treatment protocol. *Bratisl Lek Listy.* (2010) 111:160–2.
 
-21. Yates D, Allareddy V, Caplin J, Yadav S, Markiewicz MR. An overview of timeline of interventions in the continuum of cleft lip and palate care. *Oral Maxillofac Surg Clin North Am*. (2020) 32:177–86. doi: 10.1016/j.coms.2020.01.001
+21. Yates D, Allareddy V, Caplin J, Yadav S, Markiewicz MR. An overview of timeline of interventions in the continuum of cleft lip and palate care. *Oral Maxillofac Surg Clin North Am.* (2020) 32:177–86. doi: 10.1016/j.coms.2020.01.001
 
-22. Trevisan CP, Accorsi A, Morandi LO, Mongini T, Savoia G, Gravino E, et al. Undiagnosed myopathy before surgery and safe anaesthesia table. *Acta Myol*. (2013) 32:100–5.
+22. Trevisan CP, Accorsi A, Morandi LO, Mongini T, Savoia G, Gravino E, et al. Undiagnosed myopathy before surgery and safe anaesthesia table. *Acta Myol.* (2013) 32:100–5.
 
-23. Kumbar V, Simha J, Gundappa P. Anaesthetic management of a patient with Pompe disease for kyphoscoliosis correction. *Indian J Anaesth*. (2016) 60:349. doi: 10.4103/0019-5049.181597
+23. Kumbar V, Simha J, Gundappa P. Anaesthetic management of a patient with Pompe disease for kyphoscoliosis correction. *Indian J Anaesth.* (2016) 60:349. doi: 10.4103/0019-5049.181597
 
-24. Walker RW, Briggs G, Bruce J, Fletcher J, Wraith E. Regional anesthetic techniques are an alternative to general anesthesia for infants with Pompe's disease. *Pediatric Anesthesia*. (2007) 17:697–702. doi: 10.1111/j.1460-9592.2007.02196.x
+24. Walker RW, Briggs G, Bruce J, Fletcher J, Wraith E. Regional anesthetic techniques are an alternative to general anesthesia for infants with Pompe's disease. *Pediatric Anesthesia.* (2007) 17:697–702. doi: 10.1111/j.1460-9592.2007.02196.x
 
-25. Shekerdemian L, Bohn D. Cardiovascular effects of mechanical ventilation. *Arch Dis Child*. (1999) 80:475–80. doi: 10.1136/adc.80.5.475
+25. Shekerdemian L, Bohn D. Cardiovascular effects of mechanical ventilation. *Arch Dis Child.* (1999) 80:475–80. doi: 10.1136/adc.80.5.475
 
-26. Gullberg N, Winberg P, Selldén H. Pressure support ventilation increases cardiac output in neonates and infants. *Paediatr Anaesth*. (1996) 6:311–5. doi: 10.1111/j.1460-9592.1996.tb00455.x
+26. Gullberg N, Winberg P, Selldén H. Pressure support ventilation increases cardiac output in neonates and infants. *Paediatr Anaesth.* (1996) 6:311–5. doi: 10.1111/j.1460-9592.1996.tb00455.x
 
-27. Gullberg N, Winberg P, Selldén H. Changes in stroke volume cause change in cardiac output in neonates and infants when mean airway pressure is altered. *Acta Anaesthesiol Scand*. (1999) 43:999–1004. doi: 10.1034/j.1399-6576.1999.431005.x
+27. Gullberg N, Winberg P, Selldén H. Changes in stroke volume cause change in cardiac output in neonates and infants when mean airway pressure is altered. *Acta Anaesthesiol Scand.* (1999) 43:999–1004. doi: 10.1034/j.1399-6576.1999.431005.x
 
-28. Claessens NHP, Noorlag L, Weeke LC, Toet MC, Breur JMPJ, Algra SO, et al. Amplitude-integrated electroencephalography for early recognition of brain injury in neonates with critical congenital heart disease. *J Pediatr*. (2018) 202:199–205.e1. doi: 10.1016/j.jpeds.2018.06.048
+28. Claessens NHP, Noorlag L, Weeke LC, Toet MC, Breur JMPJ, Algra SO, et al. Amplitude-integrated electroencephalography for early recognition of brain injury in neonates with critical congenital heart disease. *J Pediatr.* (2018) 202:199–205.e1. doi: 10.1016/j.jpeds.2018.06.048
 
-29. Mahmoud KH, Mokhtar MS, Soliman RA, Khaled MM. Non invasive adjustment of fluid status in critically ill patients on renal replacement therapy. Role of electrical cardiometry. *Egypt J Crit Care Med*. (2016) 4:57–65. doi: 10.1016/j.ejccm.2016.06.001
+29. Mahmoud KH, Mokhtar MS, Soliman RA, Khaled MM. Non invasive adjustment of fluid status in critically ill patients on renal replacement therapy. Role of electrical cardiometry. *Egypt J Crit Care Med.* (2016) 4:57–65. doi: 10.1016/j.ejccm.2016.06.001
 
-30. Hahn A, Schänzer A. Long-term outcome and unmet needs in infantile-onset pompe disease. *Ann Transl Med*. (2019) 7:283. doi: 10.21037/atm.2019.04.70
+30. Hahn A, Schänzer A. Long-term outcome and unmet needs in infantile-onset pompe disease. *Ann Transl Med.* (2019) 7:283. doi: 10.21037/atm.2019.04.70
 
-31. Richard E, Douillard-Guilloux G, Caillaud C. New insights into therapeutic options for Pompe disease. *IUBMB Life*. (2011) 63:979–86. doi: 10.1002/iub.529
+31. Richard E, Douillard-Guilloux G, Caillaud C. New insights into therapeutic options for Pompe disease. *IUBMB Life.* (2011) 63:979–86. doi: 10.1002/iub.529
 
-32. Paoletti M, Pichiecchio A, Colafati GS, Conte G, Deodato F, Gasperini S, et al. Multicentric retrospective evaluation of five classic infantile pompe disease subjects under enzyme replacement therapy with early infratentorial involvement. *Front Neurol*. (2020) 11:569153. doi: 10.3389/fneur.2020.569153
+32. Paoletti M, Pichiecchio A, Colafati GS, Conte G, Deodato F, Gasperini S, et al. Multicentric retrospective evaluation of five classic infantile pompe disease subjects under enzyme replacement therapy with early infratentorial involvement. *Front Neurol.* (2020) 11:569153. doi: 10.3389/fneur.2020.569153
 
-33. Piras G, Montiel-Equihua C, Chan YA, Wantuch S, Stuckey D, Burke D, et al. Lentiviral hematopoietic stem cell gene therapy rescues clinical phenotypes in a murine model of Pompe disease. *Mol Ther Methods Clin Dev*. (2020) 18:558–70. doi: 10.1016/j.omtm.2020.07.001
+33. Piras G, Montiel-Equihua C, Chan YA, Wantuch S, Stuckey D, Burke D, et al. Lentiviral hematopoietic stem cell gene therapy rescues clinical phenotypes in a murine model of Pompe disease. *Mol Ther Methods Clin Dev.* (2020) 18:558–70. doi: 10.1016/j.omtm.2020.07.001
 
-34. Colella P, Mingozzi F. Gene therapy for Pompe disease: the time is now. *Hum Gene Ther*. (2019) 30:1245–62. doi: 10.1089/hum.2019.109
+34. Colella P, Mingozzi F. Gene therapy for Pompe disease: the time is now. *Hum Gene Ther.* (2019) 30:1245–62. doi: 10.1089/hum.2019.109
 
-35. Liguori L, Monticelli M, Allocca M, Hay Mele B, Lukas J, Cubellis MV, et al. Pharmacological chaperones: a therapeutic approach for diseases caused by destabilizing missense mutations. *Int J Mol Sci*. (2020) 21:489. doi: 10.3390/ijms21020489
+35. Liguori L, Monticelli M, Allocca M, Hay Mele B, Lukas J, Cubellis MV, et al. Pharmacological chaperones: a therapeutic approach for diseases caused by destabilizing missense mutations. *Int J Mol Sci.* (2020) 21:489. doi: 10.3390/ijms21020489
 
-36. Clayton NP, Nelson CA, Weeden T, Taylor KM, Moreland RJ, Scheule RK, et al. Antisense oligonucleotide-mediated suppression of muscle glycogen synthase 1 synthesis as an approach for substrate reduction therapy of Pompe disease. *Mol Ther Nucleic Acids*. (2014) 3:E206. doi: 10.1038/mtna.2014.57
+36. Clayton NP, Nelson CA, Weeden T, Taylor KM, Moreland RJ, Scheule RK, et al. Antisense oligonucleotide-mediated suppression of muscle glycogen synthase 1 synthesis as an approach for substrate reduction therapy of Pompe disease. *Mol Ther Nucleic Acids.* (2014) 3:E206. doi: 10.1038/mtna.2014.57

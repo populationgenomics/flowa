@@ -19,7 +19,7 @@ import { getDemoDataDir } from "./demoConfig";
 interface RawCitation {
   quote: string;
   /**
-   * The quote's resolved location: PDF bboxes + markdown.md anchor. Null when
+   * The quote's resolved location: PDF bboxes + merged.md anchor. Null when
    * the paper's artifacts were unavailable; absent on citations added during
    * editing.
    */

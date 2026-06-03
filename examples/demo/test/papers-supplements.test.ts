@@ -26,6 +26,7 @@ const VARIANT = "NM_000152_5-c_1935C_A";
 
 // Office Open XML (xlsx/docx) starts with the zip local-file-header magic.
 const ZIP_MAGIC = Buffer.from([0x50, 0x4b, 0x03, 0x04]);
+const PDF_MAGIC = Buffer.from([0x25, 0x50, 0x44, 0x46]); // "%PDF"
 
 let dataRoot: string;
 let originalDemoDataDir: string | undefined;
@@ -156,6 +157,19 @@ describe("GET /api/papers/[doi]/supplements", () => {
       ],
     });
   });
+
+  test("lists PDF supplements but hides their .pdf.md transcription sidecars", async () => {
+    const dir = join(makePaperDir(), "supplements");
+    mkdirSync(dir, { recursive: true });
+    writeFileSync(join(dir, "000_fig.pdf"), Buffer.from("%PDF"));
+    writeFileSync(join(dir, "000_fig.pdf.md"), Buffer.from("transcript"));
+    const handler = await importHandler();
+    const { res, captured } = makeRes();
+    await handler(req("GET"), res);
+    expect(captured.body).toEqual({
+      supplements: [{ filename: "000_fig.pdf", size: 4 }],
+    });
+  });
 });
 
 describe("POST /api/papers/[doi]/supplements", () => {
@@ -233,10 +247,61 @@ describe("POST /api/papers/[doi]/supplements", () => {
     expect(captured.statusCode).toBe(400);
   });
 
-  test("invalidates markdown.md + the variant's extractions, keeps aggregation", async () => {
+  test("stores a valid .pdf supplement under the 000_ prefix", async () => {
+    const paperDir = makePaperDir();
+    const bytes = Buffer.concat([PDF_MAGIC, Buffer.from("-1.7 body")]);
+    arrangeUpload({ originalFilename: "Figure S1.pdf", bytes, paperDir });
+    const handler = await importHandler();
+    const { res, captured } = makeRes();
+    await handler(req("POST"), res);
+    expect(captured.statusCode).toBe(200);
+    expect(captured.body).toMatchObject({ filename: "000_Figure_S1.pdf" });
+    expect(existsSync(join(paperDir, "supplements", "000_Figure_S1.pdf"))).toBe(
+      true,
+    );
+  });
+
+  test("rejects a .pdf whose content is not a PDF (magic-byte mismatch)", async () => {
+    const paperDir = makePaperDir();
+    arrangeUpload({
+      originalFilename: "fig.pdf",
+      bytes: Buffer.from("not a pdf"),
+      paperDir,
+    });
+    const handler = await importHandler();
+    const { res, captured } = makeRes();
+    await handler(req("POST"), res);
+    expect(captured.statusCode).toBe(400);
+  });
+
+  test("a PDF supplement invalidates merged.pdf + index + merged.md (not just merged.md)", async () => {
+    const paperDir = makePaperDir();
+    writeFileSync(join(paperDir, "main.md"), "transcription");
+    writeFileSync(join(paperDir, "merged.pdf"), "merged");
+    writeFileSync(join(paperDir, "pdf_index.pkl.zst"), "index");
+    writeFileSync(join(paperDir, "merged.md"), "stale");
+
+    arrangeUpload({
+      originalFilename: "s.pdf",
+      bytes: Buffer.concat([PDF_MAGIC, Buffer.from(" body")]),
+      variantId: VARIANT,
+      paperDir,
+    });
+    const handler = await importHandler();
+    const { res, captured } = makeRes();
+    await handler(req("POST"), res);
+
+    expect(captured.statusCode).toBe(200);
+    expect(existsSync(join(paperDir, "merged.pdf"))).toBe(false);
+    expect(existsSync(join(paperDir, "pdf_index.pkl.zst"))).toBe(false);
+    expect(existsSync(join(paperDir, "merged.md"))).toBe(false);
+    expect(existsSync(join(paperDir, "main.md"))).toBe(true); // transcription survives
+  });
+
+  test("invalidates merged.md + the variant's extractions, keeps aggregation", async () => {
     const paperDir = makePaperDir();
     const encoded = encodeDoi(DOI);
-    writeFileSync(join(paperDir, "markdown.md"), "stale");
+    writeFileSync(join(paperDir, "merged.md"), "stale");
     const assessmentDir = join(dataRoot, "assessments", VARIANT);
     const extractionsDir = join(assessmentDir, "extractions");
     mkdirSync(extractionsDir, { recursive: true });
@@ -255,7 +320,7 @@ describe("POST /api/papers/[doi]/supplements", () => {
     await handler(req("POST"), res);
 
     expect(captured.statusCode).toBe(200);
-    expect(existsSync(join(paperDir, "markdown.md"))).toBe(false);
+    expect(existsSync(join(paperDir, "merged.md"))).toBe(false);
     expect(existsSync(join(extractionsDir, `${encoded}.json`))).toBe(false);
     expect(existsSync(join(extractionsDir, `${encoded}_raw.json`))).toBe(false);
     expect(existsSync(join(assessmentDir, "aggregation.json"))).toBe(true);
@@ -268,7 +333,7 @@ describe("DELETE /api/papers/[doi]/supplements", () => {
     const supplementsDir = join(paperDir, "supplements");
     mkdirSync(supplementsDir, { recursive: true });
     writeFileSync(join(supplementsDir, "000_a.docx"), Buffer.from("a"));
-    writeFileSync(join(paperDir, "markdown.md"), "stale");
+    writeFileSync(join(paperDir, "merged.md"), "stale");
 
     const handler = await importHandler();
     const { res, captured } = makeRes();
@@ -279,7 +344,29 @@ describe("DELETE /api/papers/[doi]/supplements", () => {
 
     expect(captured.statusCode).toBe(200);
     expect(existsSync(join(supplementsDir, "000_a.docx"))).toBe(false);
-    expect(existsSync(join(paperDir, "markdown.md"))).toBe(false);
+    expect(existsSync(join(paperDir, "merged.md"))).toBe(false);
+  });
+
+  test("deleting a .pdf supplement also removes its .pdf.md sidecar", async () => {
+    const paperDir = makePaperDir();
+    const supplementsDir = join(paperDir, "supplements");
+    mkdirSync(supplementsDir, { recursive: true });
+    writeFileSync(join(supplementsDir, "000_fig.pdf"), Buffer.from("%PDF"));
+    writeFileSync(
+      join(supplementsDir, "000_fig.pdf.md"),
+      Buffer.from("transcript"),
+    );
+
+    const handler = await importHandler();
+    const { res, captured } = makeRes();
+    await handler(
+      req("DELETE", { filename: "000_fig.pdf", variantId: VARIANT }),
+      res,
+    );
+
+    expect(captured.statusCode).toBe(200);
+    expect(existsSync(join(supplementsDir, "000_fig.pdf"))).toBe(false);
+    expect(existsSync(join(supplementsDir, "000_fig.pdf.md"))).toBe(false);
   });
 
   test("400 on a traversal filename", async () => {

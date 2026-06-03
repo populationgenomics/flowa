@@ -21,11 +21,14 @@ export default async function handler(
     return;
   }
 
-  // The route param arrives URL-decoded; re-encode via RFC 3986 strict
-  // to land on the on-disk directory name. markdown.md is the assembled,
-  // consumer-facing Markdown (source.md + converted supplements) the
-  // viewer renders and markdown_anchor offsets index into.
-  const path = join(getDemoDataDir(), "papers", encodeDoi(doi), "markdown.md");
+  // The route param arrives URL-decoded; re-encode via RFC 3986 strict to land
+  // on the on-disk directory name. The assembled, consumer-facing Markdown is
+  // merged.md (main.md + PDF-supplement transcriptions + converted office
+  // supplements) when the paper has supplements, else main.md — mirroring
+  // flowa.storage.full_md_url. markdown_anchor offsets index into it.
+  const dir = join(getDemoDataDir(), "papers", encodeDoi(doi));
+  const merged = join(dir, "merged.md");
+  const path = existsSync(merged) ? merged : join(dir, "main.md");
   if (!existsSync(path)) {
     res.status(404).json({ error: "Markdown not found" });
     return;

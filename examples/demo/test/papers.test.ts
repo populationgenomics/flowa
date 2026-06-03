@@ -59,7 +59,7 @@ function writePaperPdf(doi: string): void {
   const encoded = encodeDoi(doi);
   const dir = join(dataRoot, "papers", encoded);
   mkdirSync(dir, { recursive: true });
-  writeFileSync(join(dir, "source.pdf"), "%PDF-1.7 stub");
+  writeFileSync(join(dir, "main.pdf"), "%PDF-1.7 stub");
 }
 
 function writePaperMetadata(
@@ -186,6 +186,17 @@ describe("listPapersForVariant", () => {
       "001_table_s2.docx",
     ]);
     expect(bar?.supplements).toEqual([]);
+  });
+
+  test("lists PDF supplements but hides their .pdf.md transcription sidecars", async () => {
+    writeQuery("V1", ["10.1234/foo"]);
+    writePaperPdf("10.1234/foo");
+    writeSupplement("10.1234/foo", "000_fig.pdf");
+    writeSupplement("10.1234/foo", "000_fig.pdf.md");
+    writeSupplement("10.1234/foo", "001_data.xlsx");
+    const result = await listPapersForVariant("V1", { dataDir: dataRoot });
+    const foo = result.papers.find((p) => p.doi === "10.1234/foo");
+    expect(foo?.supplements).toEqual(["000_fig.pdf", "001_data.xlsx"]);
   });
 
   test("preserves DOI ordering from query.json", async () => {

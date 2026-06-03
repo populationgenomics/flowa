@@ -181,7 +181,7 @@ def test_resolve_citations_errors_only_when_both_sources_unavailable(fake_index)
 
     assert '10.1/a' in result.resolved
     assert '10.missing/x' not in result.resolved
-    assert result.errors == {'10.missing/x': 'pdf_index and markdown.md not available'}
+    assert result.errors == {'10.missing/x': 'pdf_index and markdown not available'}
 
 
 def test_resolve_citations_no_error_when_only_markdown_available(fake_index):
@@ -221,7 +221,7 @@ def test_markdown_anchor_model_round_trips():
 def test_cli_smoke_returns_errors_for_missing_artifacts(tmp_path: Path):
     """Subprocess `flowa resolve` against an empty --base.
 
-    Both loaders return None for every DOI (no pdf_index.pkl.zst, no markdown.md),
+    Both loaders return None for every DOI (no pdf_index.pkl.zst, no assembled markdown),
     so each requested DOI lands in `errors` without crashing — exercising the full
     stdin → JSON out plumbing without a fixture in the repo.
     """
@@ -235,4 +235,4 @@ def test_cli_smoke_returns_errors_for_missing_artifacts(tmp_path: Path):
     )
     output = json.loads(proc.stdout)
     assert output['resolved'] == {}
-    assert output['errors'] == {'10.1/missing': 'pdf_index and markdown.md not available'}
+    assert output['errors'] == {'10.1/missing': 'pdf_index and markdown not available'}

@@ -1,5 +1,5 @@
 /**
- * A half-open `[start, end)` range into a paper's `markdown.md`, measured in
+ * A half-open `[start, end)` range into a paper's the assembled markdown, measured in
  * Unicode **code points** — Python `str` indices, exactly what
  * `anchorite.locate_quote_span` returns (mirrors `flowa.resolve.MarkdownAnchor`;
  * wire key `markdown_anchor`).
