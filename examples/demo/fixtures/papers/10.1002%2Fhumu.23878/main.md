@@ -29,7 +29,8 @@ Arnold J. J. Reuser1 | Ans T. van der Ploeg2 | Yin‐Hsiu Chien3 | Juan Llerena,
 12 Division of Medical Genetics, Department of Pediatrics, Duke University Medical Center, Durham, North Carolina
 
 **Correspondence**
-Arnold J. J. Reuser, PhD, Department of Clinical Genetics, Center for Lysosomal and Metabolic Diseases, Erasmus MC University Medical Center, Dr. Molewaterplein 40, 3015 GE Rotterdam, The Netherlands. Email: a.reuser@erasmusmc.nl
+Arnold J. J. Reuser, PhD, Department of Clinical Genetics, Center for Lysosomal and Metabolic Diseases, Erasmus MC University Medical Center, Dr. Molewaterplein 40, 3015 GE Rotterdam, The Netherlands.
+Email: a.reuser@erasmusmc.nl
 
 **Funding information**
 Sanofi Genzyme
@@ -39,8 +40,15 @@ Sanofi Genzyme
 Identification of variants in the acid α‐glucosidase (GAA) gene in Pompe disease provides valuable insights and systematic overviews are needed. We report on the number, nature, frequency, and geographic distribution of GAA sequence variants listed in the Pompe Registry, a long‐term, observational program and the largest global repository of Pompe disease data. Variant information was reviewed and compared with publicly available GAA databases/resources. Among 1,079 eligible patients, 2,075 GAA variants (80 unique novel) were reported. Variants were listed by groups representing Pompe disease phenotypes. Patients were classified as Group A: Symptom onset ≤ 12 months of age with cardiomyopathy; Group B: Symptom onset ≤ 12 years of age (includes patients with symptom onset ≤ 12 months of age without cardiomyopathy); or Group C: Symptom onset > 12 years of age. Likely impact of novel variants was predicted using bioinformatics algorithms. Variants were classified by pathogenicity using ACMG guidelines. Data reported from the Pompe Registry provide new information about the distribution of GAA variants globally and across the clinical spectrum, add to the number and diversity of GAA variants registered in public databases through published data sharing, provide a first indication of the severity of novel variants, and assist in diagnostic practice and outcome prediction.
 
 **KEYWORDS**
-
 acid α‐glucosidase, GAA genotypes, GAA variants, Pompe disease; Pompe Registry
+
+---
+
+*Affiliation at the time of the analysis was Sanofi Genzyme; current affiliation is Boehringer Ingelheim Pharmaceuticals.*
+
+†*Affiliation at the time of the analysis was Sanofi Genzyme; current affiliation is Kiadis Pharma, Amsterdam, The Netherlands.*
+
+<!--page-->
 
 # 1 | INTRODUCTION
 
@@ -59,6 +67,8 @@ Identification of variants in the GAA gene provides valuable information for con
 The Pompe Registry is a long‐term, multinational, and observational program (NCT002314000) designed to improve understanding of the natural history and outcomes of patients with Pompe disease. It started in 2004 and is sponsored and administered by Sanofi Genzyme (Cambridge, MA). Patients with a confirmed diagnosis of Pompe disease can be enrolled by physician investigators worldwide regardless of age, clinical manifestations, or treatment status. Participation by physicians and patients is completely voluntary. Patients provide appropriate written informed consent for their health information to be submitted to the Registry and for their data to be used in aggregate analyses. Treating physicians determine the frequency and type of assessments according to the individual patient's need for standard medical care and follow‐up. This detailed patient information is collected in the Pompe Registry database. Because of the voluntary and observational nature of the program, the frequency and types of assessments reported for each patient will vary. Physicians can report their patients' characteristics, including gender; age; clinical characteristics; and diagnostic parameters, including methods of diagnosis and the results of enzymatic and genetic testing. The Pompe Registry can be accessed only by participating physicians. In accordance with the consent provided by patients, information gathered in the Pompe Registry can only be shared to the general public through peer‐reviewed publications. This is also the mechanism by which the Registry can provide information for other genetic and phenotype databases. The Pompe Registry is the largest global repository of data for Pompe disease and a valuable resource for the medical community. Information on the Registry can be found at https://www.registrynxt.com/ and also at https://clinicaltrials.gov.
 
 We have analyzed reported aggregate patient information in the Pompe Registry to first determine the number, frequency, and characteristics of all GAA sequence variants that were reported into the Registry database as candidate disease‐associated variants among patients diagnosed with Pompe disease on the basis of clinical features and GAA deficiency. The present analysis is a foundational report and is the first of a series of planned analyses on variant data from the Pompe Registry. It focuses on the geographic distribution and frequencies of the variants, including the novel, as yet unpublished, variants. While Pompe disease is a clinical spectrum, analysis of the variant‐phenotype and preliminary genotype–phenotype correlations is based on the assignment of variants to three groups of patients characterized by age of symptom onset with or without cardiomyopathy (HP:0001638).
+
+<!--page-->
 
 # 2 | METHODS
 
@@ -88,11 +98,15 @@ Variants were classified as "novel" if they were reported in the Registry but no
 
 ## 2.6 | Patient phenotypic subgroup classification
 
-Patients were classified into one of three groups based on the reported age at first sign or symptom onset and reported the presence or the absence of cardiomyopathy: Group A, onset of symptoms ≤ 12 months of age with cardiomyopathy (patients typically classified as classic infantile Pompe disease); Group B, onset of symptoms ≤ 12 years of age (includes patients with onset of symptoms ≤ 12 months of age without cardiomyopathy in the first year of life and not included in Group A); and Group C, onset of symptoms > 12 years of age. The presence of cardiomyopathy was obtained from patient records as reported on the Registry CRF and may not reflect the exact onset. The patient classifications were based on the criteria described in previous Registry publications (Kishnani et al., 2013, 2014) to allow for meaningful analysis, interpretation, and explanation of results of the reported Registry data. Clinical features of phenotypes were described using available Human Phenotype Ontology (HPO) terms and identification numbers (Kohler et al., 2019; The Human Phenotype Ontology (HPO), 2019). To provide further clinically relevant information, homozygous genotypes were used to further rate a subset of variants by degree of severity.
+Patients were classified into one of three groups based on the reported age at first sign or symptom onset and reported the presence or the absence of cardiomyopathy: Group A, onset of symptoms ≤ 12 months of age with cardiomyopathy (patients typically classified as classic infantile Pompe disease); Group B, onset of symptoms ≤ 12 years of age (includes patients with onset of symptoms ≤ 12 months of age without cardiomyopathy in the first year of life and not included in Group A); and Group C, onset of symptoms > 12 years of age. The presence of cardiomyopathy was obtained from patient records as reported on the Registry CRF and may not reflect the exact onset. The patient classifications were based on the criteria described in previous Registry publications (Kishnani et al., 2013, 2014) to allow for meaningful analysis, interpretation, and explanation of results of the reported Registry data. Clinical features of phenotypes were described using available Human Phenotype Ontology (HPO) terms and identification numbers (Kohler et al., 2019; The Human Phenotype Ontology (HPO), 2019).
+
+To provide further clinically relevant information, homozygous genotypes were used to further rate a subset of variants by degree of severity.
 
 ## 2.7 | Statistical analyses
 
 Descriptive statistics were used to summarize demographic and variant information as this was a foundational report intended to provide an initial overview of variants reported among patients in the Pompe Registry. Thus, since there were no a priori hypotheses, no formal inferential statistical tests were conducted. Frequencies reported in 1 to < 5 patients are reported as < 5 to protect patient privacy. All analyses were conducted using SAS 9.4 (SAS Institute Inc., Cary, NC).
+
+<!--page-->
 
 # 3 | RESULTS
 
@@ -165,10 +179,6 @@ d Native Hawaiian or other Pacific Islander or multiple race categories.
 A total of 2,075 (1,205 exonic/ 870 intronic) GAA variants were reported among the 1,079 patients (Table 2). Of these, 392 variants were unique (as defined in Methods), 80 being novel (Table 3), and 312 variants (Table S1) being known. Two or more variants were reported in the large majority (*n* = 969) of patients (Table 2). Nineteen patients (7 in Group A; 5 in Group B; and 7 in Group C) had three variants reported, and four patients had four (2 in Group A; and 1 in Groups B and C each). Among patients with two or more variants were 17 with the common pseudodeficiency variant, c.1726G>A frequently found in Asian populations (M. A. Kroos et al., 2008; Kumamoto et al., 2009; Yang et al., 2011) and < 5 with the pseudodeficiency allele c.271G>A, frequent in Caucasians (Swallow et al., 1989; van Diggelen et al., 2009; data not shown).
 
 Only one variant was reported in the Registry for 110 patients: 18 in Group A, 24 in Group B, and 68 in Group C (Table 2). Among these 110 patients, diagnosis was reported to have been made by a combination of DNA analysis and GAA enzyme assays, which include measurement of enzyme activity in blood‐based assays (lymphocytes and leukocytes), fibroblasts, and skeletal muscle tissue in most (82.7%) patients and by DNA analysis only in 17.3% of patients.
-
-Table 4 provides an overview of the five most common variants across the clinical spectrum by patient group globally and regionally as reported in the Pompe Registry. Globally, eight different variants represent most of the reported variants. Two of these eight variants (c.525del and c.2481+102_2646+31del) are not group‐specific, and Groups B and C share the same common variants. Among Group A, the variant c.2560C>T is the most common globally and in both North America and Latin America and is among the five most common in Europe but not in Asia‐Pacific and the Middle East. The variant c.1935C>A was the second most common globally and the most common in Asia‐Pacific but was not frequently reported in any other region. Also, in Groups B and C, c.‐32‐13T>G is the most commonly reported variant globally as well as in Europe and North America, and in Group C only in Latin America, but not in Asia‐Pacific and the Middle East.
-
-Other variants predicted to affect correct splicing or causing in‐frame smaller or larger structural changes (encompassing 1–54 amino acids) were equally frequent in all three groups (data not shown). The functional impact of most novel variants cannot be foreseen. This is true for missense variants, small in‐frame deletion or insertion variants, and variants in or near splice sites that have either no effect, a partial effect, or a detrimental effect on GAA synthesis and function. The ACMG guidelines for classifying the novel variants based on severity were followed (see section 3.3 novel variants for results). For severity rating one can cautiously, in parallel, also build on the phenotype of the patients in which the variants were found. Thus, we have listed all individual variants reported in Group A in a separate Table 5. Each variant reported in Table 5 likely contributes to the classic infantile Pompe disease phenotype and is potentially very severe.
 
 <!--table: 2-->
 
@@ -298,6 +308,12 @@ d Pathogenicity is based on criteria for severity provided in the ACMG guideline
 
 <!--end-->
 
+<!--page-->
+
+Table 4 provides an overview of the five most common variants across the clinical spectrum by patient group globally and regionally as reported in the Pompe Registry. Globally, eight different variants represent most of the reported variants. Two of these eight variants (c.525del and c.2481+102_2646+31del) are not group‐specific, and Groups B and C share the same common variants. Among Group A, the variant c.2560C>T is the most common globally and in both North America and Latin America and is among the five most common in Europe but not in Asia‐Pacific and the Middle East. The variant c.1935C>A was the second most common globally and the most common in Asia‐Pacific but was not frequently reported in any other region. Also, in Groups B and C, c.‐32‐13T>G is the most commonly reported variant globally as well as in Europe and North America, and in Group C only in Latin America, but not in Asia‐Pacific and the Middle East.
+
+Other variants predicted to affect correct splicing or causing in‐frame smaller or larger structural changes (encompassing 1–54 amino acids) were equally frequent in all three groups (data not shown). The functional impact of most novel variants cannot be foreseen. This is true for missense variants, small in‐frame deletion or insertion variants, and variants in or near splice sites that have either no effect, a partial effect, or a detrimental effect on GAA synthesis and function. The ACMG guidelines for classifying the novel variants based on severity were followed (see section 3.3 novel variants for results). For severity rating one can cautiously, in parallel, also build on the phenotype of the patients in which the variants were found. Thus, we have listed all individual variants reported in Group A in a separate Table 5. Each variant reported in Table 5 likely contributes to the classic infantile Pompe disease phenotype and is potentially very severe.
+
 <!--table: 4-->
 
 **TABLE 4** The five most commonly reported variants among patients by phenotypic subgroup across the clinical spectrum of Pompe disease globally and by geographic region
@@ -306,39 +322,39 @@ d Pathogenicity is based on criteria for severity provided in the ACMG guideline
 |---|---|---|---|---|---|---|
 | | **DNA** | **Protein** | **DNA** | **Protein** | **DNA** | **Protein** |
 | **Global** | *N* = 373 variants | | *N* = 459 variants | | *N* = 1,243 variants | |
-| | c.2560C>T (*n* = 28) | p.(Arg854Ter) | c.‐32‐13T>G (*n* = 128) | p.? | c.‐32‐13T>G (*n* = 561) | p.? |
-| | c.1935C>A (*n* = 27) | p.(Asp645Glu) | c.2481+102_2646+31del (*n* = 20) | p.(Gly828_Asn882del) | c.525del (*n* = 71) | p.(Glu176ArgfsTer45) |
-| | c.525del (*n* = 21) | p.(Glu176ArgfsTer45) | c.525del (*n* = 19) | p.(Glu176ArgfsTer45) | c.2481+102_2646+31del (*n* = 46) | p.(Gly828_Asn882del) |
-| | c.2481+102_2646+31del (*n* = 14) | p.(Gly828_Asn882del) | c.2238G>C (*n* = 18) | p.(Trp746Cys) | c.2238G>C (*n* = 20) | p.(Trp746Cys) |
-| | c.1726G>A (*n* = 11)d | p.(Gly576Ser) | c.307T>G (*n* = 9) | p.(Cys103Gly) | c.307T>G (*n* = 18) | p.(Cys103Gly) |
+| | c.2560C>T (n = 28) | p.(Arg854Ter) | c.‐32‐13T>G (n = 128) | p.? | c.‐32‐13T>G (n = 561) | p.? |
+| | c.1935C>A (n = 27) | p.(Asp645Glu) | c.2481+102_2646+31del (n = 20) | p.(Gly828_Asn882del) | c.525del (n = 71) | p.(Glu176ArgfsTer45) |
+| | c.525del (n = 21) | p.(Glu176ArgfsTer45) | c.525del (n = 19) | p.(Glu176ArgfsTer45) | c.2481+102_2646+31del (n = 46) | p.(Gly828_Asn882del) |
+| | c.2481+102_2646+31del (n = 14) | p.(Gly828_Asn882del) | c.2238G>C (n = 18) | p.(Trp746Cys) | c.2238G>C (n = 20) | p.(Trp746Cys) |
+| | c.1726G>A (n = 11)d | p.(Gly576Ser) | c.307T>G (n = 9) | p.(Cys103Gly) | c.307T>G (n = 18) | p.(Cys103Gly) |
 | **Europe** | *N* = 125 variants | | *N* = 245 variants | | *N* = 822 variants | |
-| | c.525del (*n* = 12) | p.(Glu176ArgfsTer45) | c.‐32‐13T>G (*n* = 88) | p.? | c.‐32‐13T>G (*n* = 398) | p.? |
-| | c.2481+102_2646+31del (*n* = 9) | p.(Gly828_Asn882del) | c.2481+102_2646+31del (*n* = 11) | p.(Gly828_Asn882del) | c.525del (*n* = 55) | p.(Glu176ArgfsTer45) |
-| | c.2237G>A (*n* = 7) | p.(Trp746Ter) | c.525del (*n* = 9) | p.(Glu176ArgfsTer45) | c.2481+102_2646+31del (*n* = 25) | p.(Gly828_Asn882del) |
-| | c.2560C>T (*n* = 7) | p.(Arg854Ter) | c.307T>G (*n* = 8) | p.(Cys103Gly) | c.307T>G (*n* = 14) | p.(Cys103Gly) |
-| | c.1933G>A (*n* = 5) | p.(Asp645Asn) | c.1933 G>A (*n* = 5) | p.(Asp645Asn) | c.1655T>C (*n* = 10) | p.(Leu552Pro) |
+| | c.525del (n = 12) | p.(Glu176ArgfsTer45) | c.‐32‐13T>G (n = 88) | p.? | c.‐32‐13T>G (n = 398) | p.? |
+| | c.2481+102_2646+31del (n = 9) | p.(Gly828_Asn882del) | c.2481+102_2646+31del (n = 11) | p.(Gly828_Asn882del) | c.525del (n = 55) | p.(Glu176ArgfsTer45) |
+| | c.2237G>A (n = 7) | p.(Trp746Ter) | c.525del (n = 9) | p.(Glu176ArgfsTer45) | c.2481+102_2646+31del (n = 25) | p.(Gly828_Asn882del) |
+| | c.2560C>T (n = 7) | p.(Arg854Ter) | c.307T>G (n = 8) | p.(Cys103Gly) | c.307T>G (n = 14) | p.(Cys103Gly) |
+| | c.1933G>A (n = 5) | p.(Asp645Asn) | c.1933 G>A (n = 5) | p.(Asp645Asn) | c.1655T>C (n = 10) | p.(Leu552Pro) |
 | **North America** | *N* = 172 variants | | *N* = 148 variants | | *N* = 342 variants | |
-| | c.2560C>T (*n* = 19) | p.(Arg854Ter) | c.‐32‐13T>G (*n* = 40) | p.? | c.‐32‐13T>G (*n* = 154) | p.? |
-| | c.525del (*n* = 9) | p.(Glu176ArgfsTer45) | c.525del (*n* = 10) | p.(Glu176ArgfsTer45) | c.2481+102_2646+31del (*n* = 21) | p.(Gly828_Asn882del) |
-| | c.2297A>C (*n* = 6) | p.(Tyr766Ser) | c.2481+102_2646+31del (*n* = 9) | p.(Gly828_Asn882del) | c.525del (*n* = 16) | p.(Glu176ArgfsTer45) |
-| | c.1799G>A (*n*<5) | p.(Arg600His) | c.2560C>T (*n* = 5) | p.(Arg854Ter) | c.1655T>C (*n* = 5) | p.(Leu552Pro) |
-| | c.1844G>A (*n*<5) | p.(Gly615Glu) | c.1082C>T (*n*<5) | p.(Pro361Leu) | c.2560C>T (*n* = 5) | p.(Arg854Ter) |
+| | c.2560C>T (n = 19) | p.(Arg854Ter) | c.‐32‐13T>G (n = 40) | p.? | c.‐32‐13T>G (n = 154) | p.? |
+| | c.525del (n = 9) | p.(Glu176ArgfsTer45) | c.525del (n = 10) | p.(Glu176ArgfsTer45) | c.2481+102_2646+31del (n = 21) | p.(Gly828_Asn882del) |
+| | c.2297A>C (n = 6) | p.(Tyr766Ser) | c.2481+102_2646+31del (n = 9) | p.(Gly828_Asn882del) | c.525del (n = 16) | p.(Glu176ArgfsTer45) |
+| | c.1799G>A (n<5) | p.(Arg600His) | c.2560C>T (n = 5) | p.(Arg854Ter) | c.1655T>C (n = 5) | p.(Leu552Pro) |
+| | c.1844G>A (n<5) | p.(Gly615Glu) | c.1082C>T (n<5) | p.(Pro361Leu) | c.2560C>T (n = 5) | p.(Arg854Ter) |
 | **Asia‐Pacific** | *N* = 62 variants | | *N* = 58 variants | | *N* = 69 variants | |
-| | c.1935C>A (*n* = 26) | p.(Asp645Glu) | c.2238G>C (*n* = 15) | p.(Trp746Cys) | c.2238G>C (*n* = 19) | p.(Trp746Cys) |
-| | c.1726G>A (*n* = 11)d | p.(Gly576Ser) | c.2662G>T (*n* = 5) | p.(Glu888Ter) | c.1935C>A (*n* = 7) | p.(Asp645Glu) |
-| | c.1411_1414del (*n*<5) | p.(Glu471ProfsTer5) | c.1634C>T (*n*<5) | p.(Pro545Leu) | c.1726G>A (*n*<5)d | p.(Gly576Ser) |
-| | c.1843G>A (*n*<5) | p.(Gly615Arg) | c.1935C>A (*n*<5) | p.(Asp645Glu) | c.1822C>T (*n*<5) | p.(Arg608Ter) |
-| | c.1465G>A (*n*<5) | p.(Asp489Asn) | c.1726G>A (*n*<5)d | p.(Gly576Ser) | c.1843G>A (*n*<5) | p.(Gly615Arg) |
-| **Latin America** | *N*<5 variants | | *N*<5 variants | | *N* = 10 variants | |
-| | c.2560C>T (*n*<5) | p.(Arg854Ter) | c.1556T>C (*n*<5) | p.(Met519Thr) | c.‐32‐13T>G (*n* = 7) | p.? |
-| | c.1912G>T (*n*<5) | p.(Gly638Trp) | c.1408_1410del (*n*<5) | p.(Asn470del) | c.1465G>A (*n*<5) | p.(Asp489Asn) |
-| | c.2481+102_2646+31del (*n*<5) | p.(Gly828_Asn882del) | — | — | c.1832G>A (*n*<5) | p.(Gly611Asp) |
-| | — | — | — | — | c.2560C>T (*n*<5) | p.(Arg854Ter) |
-| **Middle East** | *N* = 10 variants | | *N*<5 variants | | *N* = 0 | |
-| | c.340_341insT (*n* = 6) | p.(Lys114fsTer32) | c.1064T>C (*n*<5) | p.(Leu355Pro) | — | — |
-| | c.2015G>A (*n*<5) | p.(Arg672Gln) | c.1210G>A (*n*<5) | p.(Asp404Asn) | — | — |
-| | c.1799G>A (*n*<5) | p.(Arg600His) | c.2015G>A (*n*<5) | p.(Arg672Gln) | — | — |
-| | c.2056_2057delinsCC (*n*<5) | NA | c.2105G>A (*n*<5) | p.(Arg702His) | — | — |
+| | c.1935C>A (n = 26) | p.(Asp645Glu) | c.2238G>C (n = 15) | p.(Trp746Cys) | c.2238G>C (n = 19) | p.(Trp746Cys) |
+| | c.1726G>A (n = 11)d | p.(Gly576Ser) | c.2662G>T (n = 5) | p.(Glu888Ter) | c.1935C>A (n = 7) | p.(Asp645Glu) |
+| | c.1411_1414del (n<5) | p.(Glu471ProfsTer5) | c.1634C>T (n<5) | p.(Pro545Leu) | c.1726G>A (n<5)d | p.(Gly576Ser) |
+| | c.1843G>A (n<5) | p.(Gly615Arg) | c.1935C>A (n<5) | p.(Asp645Glu) | c.1822C>T (n<5) | p.(Arg608Ter) |
+| | c.1465G>A (n<5) | p.(Asp489Asn) | c.1726G>A (n<5)d | p.(Gly576Ser) | c.1843G>A (n<5) | p.(Gly615Arg) |
+| **Latin America** | N<5 variants | | N<5 variants | | *N* = 10 variants | |
+| | c.2560C>T (n<5) | p.(Arg854Ter) | c.1556T>C (n<5) | p.(Met519Thr) | c.‐32‐13T>G (n = 7) | p.? |
+| | c.1912G>T (n<5) | p.(Gly638Trp) | c.1408_1410del (n<5) | p.(Asn470del) | c.1465G>A (n<5) | p.(Asp489Asn) |
+| | c.2481+102_2646+31del (n<5) | p.(Gly828_Asn882del) | — | — | c.1832G>A (n<5) | p.(Gly611Asp) |
+| | — | — | — | — | c.2560C>T (n<5) | p.(Arg854Ter) |
+| **Middle East** | *N* = 10 variants | | N<5 variants | | *N* = 0 | |
+| | c.340_341insT (n = 6) | p.(Lys114fsTer32) | c.1064T>C (n<5) | p.(Leu355Pro) | — | — |
+| | c.2015G>A (n<5) | p.(Arg672Gln) | c.1210G>A (n<5) | p.(Asp404Asn) | — | — |
+| | c.1799G>A (n<5) | p.(Arg600His) | c.2015G>A (n<5) | p.(Arg672Gln) | — | — |
+| | c.2056_2057delinsCC (n<5) | NA | c.2105G>A (n<5) | p.(Arg702His) | — | — |
 
 Note. Variant frequencies reported in the Pompe Registry in fewer than five patients are reported as < 5 to protect patient privacy.
 
@@ -352,13 +368,17 @@ d c.1726G>A is a well‐known pseudodeficiency variant and is linked to other va
 
 <!--end-->
 
+<!--page-->
+
 ## 3.3 | Novel variants
 
 There were 94 (4.5%) novel variants reported (18 in Group A, 17 in Group B, and 59 in Group C). Of these, 80 are unique (Tables 2,3). Most novel variants were reported in patients in Europe (66.7%) and North America (20.0%). As seen in Figure 1, these unique novel variants were located throughout the GAA gene (73 in exons; 7 in introns). All variant types were represented. Overall, substitution (missense) was the most frequent type of variant reported among the three groups, accounting for 40.0% (*n* = 32) of the 80 unique novel variants, followed by frameshift variants (33.8%; *n* = 27). Without knowing the precise impact of these variants on GAA function, there is good reason to assume that the majority of the novel variants have a pathogenic effect since they were identified in patients diagnosed with Pompe disease in absence of other known sets of disease‐causing GAA variants.
 
 In addition, the impact of the novel variants was preliminarily predicted using the validated programs (Richards et al., 2015; Vihinen et al., 2012), SIFT, PolyPhen, or FATHMM for 47 of the 80 unique novel variants for which impact was not evident from their nature (Table 3; Supporting Information). The predicted pathogenicity based on the ACMG criteria for severity and impact (where available) for the 80 unique novel variants are reported in Table 3. Overall, 51.3% (*n* = 41) of the 80 variants were classified as pathogenic, 13.8% (*n* = 11) as likely pathogenic, and 35% (*n* = 28) as VUS. Of the 17 unique novel variants reported for Group A, 11 were classified as pathogenic, one as likely pathogenic, and five as VUS (Table 3). Among these 17 unique novel variants reported for Group A, frameshift variants were the most common type (35.3%; *n* = 6). Of these variants, two (c.541_545del and c.982_908del), present in exons 2 and 6, respectively, mapped to the N Terminal Beta Sheet domain; one (c.1507del) mapped to the catalytic GH31 domain; and two (c.2740dup and c.2742dup) mapped to the Distal Beta Sheet domain. Only one (c.1311_1312ins26), present at exon 8, mapped to the catalytic GH31 domain just before the start of insert 1 in the translated protein. No predictions of impact were available for these frameshift variants using bioinformatics algorithms. However, all were classified as pathogenic based on the ACMG's severity scores. Other variant types were reported in < 5 patients in Group A.
 
-Deletion (small) variants mapped to the N terminal Beta Sheet domain (c.930_932del), the catalytic GH31 domain (c.2056_2057del), and the Proximal Beta Sheet (c.2459_2461del, also present in Group C). All three variants were classified as VUS based on the ACMG guidelines. Splicing variants mapped to the N Terminal GH31 domain (c.693‐2A>C), the catalytic GH31 domain (c.2041–2A>G), and the Distal Beta Sheet (c.2800–1G>C). Substitution (missense) variants mapping to the N terminal Beta Sheet domain were predicted to be damaging by SIFT and FATHMM and probably damaging by Polyphen (c.665T>G). Three of these four variants (c.693–2A>C, c.2041–2A>G, and c.2800–1G>C) were predicted to be pathogenic; the fourth, c.665T>G was classified as VUS per the ACMG severity scoring.
+Deletion (small) variants mapped to the N terminal Beta Sheet domain (c.930_932del), the catalytic GH31 domain (c.2056_2057del), and the Proximal Beta Sheet (c.2459_2461del, also present in Group C). All three variants were classified as VUS based on the ACMG guidelines. Splicing variants mapped to the N Terminal GH31 domain (c.693‐2A>C), the catalytic GH31 domain (c.2041–2A>G), and the Distal Beta Sheet (c.2800–1G>C). Substitution (missense) variants mapping to the N terminal Beta Sheet domain were predicted to be damaging by SIFT and FATHMM and probably damaging by Polyphen (c.665T>G). Three of these four variants (c.693–2A>C, c.2041–2A>G, and c.2800–1G>C) were predicted to be pathogenic; the fourth, c.665T>G was classified as VUS per the ACMG severity scoring. Those mapping to the catalytic GH31 domain (c.2056_2057del) and the Proximal Beta Sheet (c.2459_2461del, also present in Group C) were classified as VUS based on the ACMG guidelines.
+
+<!--page-->
 
 <!--page-->
 
@@ -390,7 +410,7 @@ catalytic GH31 domain (c.1211A>T and c.2096T>C) were predicted to be damaging by
 | intron10 | c.1551+1G>T |
 | exon11 | c.1561G>A; c.1564C>G; c.1564C>T |
 | intron11 | c.1637–2A>G |
-| exon12 | c.1642G>T; c.1650dup; c.1654del; c.1655T>C; c.1703A>T; c.1705dup; c.1724A>C; c.1726G>Aa; c.1735G>A |
+| exon12 | c.1642G>T; c.1650dup; c.1654del; c.1655T>C; c.1703A>T; c.1705dup; c.1724A>C; c.1726G>A^a^; c.1735G>A |
 | intron12 | c.1754+1G>A; c.1754+2T>A |
 | exon13 | c.1796C>A; c.1798C>T; c.1799G>A; c.1802C>G; c.1802C>T; c.1822C>T; c.1841C>A c.1843G>A; c.1844G>A; c.1846G>A; c.1880C>T |
 | exon14 | c.1912G>T; c.1913G>A; c.1927G>A; c.1933G>A; c.1933G>C; c.1933G>T; c.1935C>A; c.1941C>G; c.1942G>A; c.1962_1964del; c.1979G>A; **c.2004C>A**; c.2015G>A; c.2023_2025del; c.2024_2026del; c.2040G>A |
@@ -408,7 +428,7 @@ catalytic GH31 domain (c.1211A>T and c.2096T>C) were predicted to be damaging by
 
 *Note.* Variants in boldface indicate novel variants. They were reported in the Registry but not reported in the publicly available sources (see Methods) identified as of June 2017.
 
-a c.1726G>A is a well‐known pseudodeficiency variant and is linked to other variants (see main text).
+^a^ c.1726G>A is a well‐known pseudodeficiency variant and is linked to other variants (see main text).
 
 <!--end-->
 
@@ -442,16 +462,16 @@ Of 2,075 variants reported in the Pompe Registry, 80 unique variants were novel,
 
 **TABLE 6** Variants reported in homozygosity for patients by phenotypic subgroup across the clinical spectrum of Pompe disease
 
-| **Group A by CRIM status (*N* = 56 patients)a** | | **Group B (*N* = 12 patients)b** | **Group C (*N* = 17 patients)c** |
+| Group A by CRIM status (*N* = 56 patients)^a^ | | Group B (*N* = 12 patients)^b^ | Group C (*N* = 17 patients)^c^ |
 |---|---|---|---|
 | **CRIM‐positive (*n* = 30)** | **CRIM‐negative (*n* = 25)** | | |
 | c.307T>G | c.340_341insT | c.‐32‐13T>G | c.‐32‐13T>G (*n*=13) |
 | c.655G>A | c.525_526del | c.670C>T | c.‐32‐3C>A |
 | c.877G>A | c.525del | c.1064T>C | c.‐32‐3C>G |
 | c.925G>A | c.1195‐18_2190‐20del | c.1437G>A | c.1076‐22T>G |
-| c.1195‐2A>G | c.1496G>A | c.1447G>A | c.2481+102_2646+31deld |
-| c.1210G>A | c.1637‐2A>G | c.1843G>Ae | |
-| c.1561G>A | c.2237G>A | c.1933G>Ae | |
+| c.1195‐2A>G | c.1496G>A | c.1447G>A | c.2481+102_2646+31del^d^ |
+| c.1210G>A | c.1637‐2A>G | c.1843G>A^e^ | |
+| c.1561G>A | c.2237G>A | c.1933G>A^e^ | |
 | c.1564C>G | c.2495_2496del | c.1935C>A | |
 | c.1726G>A | c.2560C>T | c.2530_2541del | |
 | c.1799G>A | c.2608C>T | c.2744A>C | |
@@ -470,15 +490,15 @@ Of 2,075 variants reported in the Pompe Registry, 80 unique variants were novel,
 
 *Note:* Frequencies of each variant are < 5, except where noted. Some variants were reported in more than 1 patient, and therefore the total numbers of variants listed in the table are less than the number of patients in each group.
 
-a Group A: Onset of symptoms =?12 months of age with cardiomyopathy (patients classified as classic infantile Pompe disease). Group A also may include a subset of patients with less severe cardiomyopathy and slower disease progression.
+^a^ Group A: Onset of symptoms =?12 months of age with cardiomyopathy (patients classified as classic infantile Pompe disease). Group A also may include a subset of patients with less severe cardiomyopathy and slower disease progression.
 
-b Group B: Onset of symptoms =?12 years of age (includes patients with onset of symptoms =?12 months of age without cardiomyopathy and not included in Group A).
+^b^ Group B: Onset of symptoms =?12 years of age (includes patients with onset of symptoms =?12 months of age without cardiomyopathy and not included in Group A).
 
-c Group C: Onset of symptoms >?12 years of age.
+^c^ Group C: Onset of symptoms >?12 years of age.
 
-d The reporting of this variant in Group C, which is typically found in Group A, may reflect that the information was entered incorrectly in the Registry or may be the result of a technical error in the genetic analysis.
+^d^ The reporting of this variant in Group C, which is typically found in Group A, may reflect that the information was entered incorrectly in the Registry or may be the result of a technical error in the genetic analysis.
 
-e Group classification is based on age of symptom onset and reported the presence of cardiomyopathy (as described above). Any delays in cardiac assessment or diagnosis could lead to a misclassification. These patients appear to have been misclassified, most likely due to the date that cardiac assessments were requested and/or results recorded in the Registry. If this happened after the cutoff age for Group A (=?12 months of age), then the patient would be analyzed as Group B.
+^e^ Group classification is based on age of symptom onset and reported the presence of cardiomyopathy (as described above). Any delays in cardiac assessment or diagnosis could lead to a misclassification. These patients appear to have been misclassified, most likely due to the date that cardiac assessments were requested and/or results recorded in the Registry. If this happened after the cutoff age for Group A (=?12 months of age), then the patient would be analyzed as Group B.
 
 <!--end-->
 
@@ -498,7 +518,7 @@ It may be difficult to estimate the severity of variants for a number of reasons
 
 <!--page-->
 
-within exons and regulatory regions of the *GAA* gene, such as quantitative polymerase chain reaction (qPCR) or paralog ratio testing (PRT), are not done routinely. In addition, *GAA* mRNA assay that would allow detection of other types of variants such as deep intronic variants also is not performed by many laboratories. However, the importance of finding two variants to confirm Pompe disease diagnosis is recognized, and current initiatives to improve testing are underway, mainly through academic collaboration. Increased efforts to expand this and incorporate it into standard practice, for example, through the issuance and updating of guidelines, such as those from the European Pompe Consortium (EPOC; van der Ploeg et al., 2017), are needed. Nineteen of the 110 patients with just one variant were reported to have been diagnosed based on clinical signs and DNA analysis only and not by GAA enzyme assay. Although these patients were reported to have Pompe disease, their GAA level was not reported and we therefore cannot be certain how their diagnosis was confirmed. While all patients enrolled in the Pompe Registry must have a reported confirmed Pompe disease diagnosis (see Methods), we acknowledge the possibility of the presence of a second, unidentified or unrecorded pathogenic variant or of misdiagnosed carriers. Likewise, additional unidentified pathogenic or unrecorded variants may be present in cases where there were discordant results regarding the groupings of patients.
+within exons and regulatory regions of the *GAA* gene, such as quantitative polymerase chain reaction (qPCR) or paralog ratio testing (PRT), are not done routinely. In addition, GAA mRNA assay that would allow detection of other types of variants such as deep intronic variants also is not performed by many laboratories. However, the importance of finding two variants to confirm Pompe disease diagnosis is recognized, and current initiatives to improve testing are underway, mainly through academic collaboration. Increased efforts to expand this and incorporate it into standard practice, for example, through the issuance and updating of guidelines, such as those from the European Pompe Consortium (EPOC; van der Ploeg et al., 2017), are needed. Nineteen of the 110 patients with just one variant were reported to have been diagnosed based on clinical signs and DNA analysis only and not by GAA enzyme assay. Although these patients were reported to have Pompe disease, their GAA level was not reported and we therefore cannot be certain how their diagnosis was confirmed. While all patients enrolled in the Pompe Registry must have a reported confirmed Pompe disease diagnosis (see Methods), we acknowledge the possibility of the presence of a second, unidentified or unrecorded pathogenic variant or of misdiagnosed carriers. Likewise, additional unidentified pathogenic or unrecorded variants may be present in cases where there were discordant results regarding the groupings of patients.
 
 Misdiagnosis may also play a role in the differentiation between Group A and B patients. While age of onset of symptoms is the basis of patient classification in our analysis, it is not the sole discriminating factor for the patient phenotypic subgroups. Rather, the presence of cardiomyopathy in patients under the age of 1 year is the distinguishing feature. We cannot exclude that Group A may include a subset of patients with less severe cardiomyopathy and slower disease progression and Group B a subset of patients with a delayed diagnosis of cardiomyopathy as previously reported in the literature (Kishnani, Steiner et al., 2006; Slonim et al., 2000). For instance, homozygous variants c.1843G>A, c.1933G>A, and 1935C>A, typically found in classic infantile Pompe disease, were reported in both Groups A and B (Table 6). Upon careful review, the patients in Group B appear to have had cardiomyopathy reported in the Registry after 12 months of age.
 
@@ -605,7 +625,7 @@ De Filippi, P., Saeidi, K., Ravaglia, S., Dardis, A., Angelini, C., Mongini, T.,
 
 den Dunnen, J. T., Dalgleish, R., Maglott, D. R., Hart, R. K., Greenblatt, M. S., McGowan‐Jordan, J., ... Taschner, P. E. M. (2016). HGVS recommendations for the description of sequence variants: 2016 Update. *Human Mutation*, *37*(6), 564–569. https://doi.org/10.1002/humu.22981
 
-Duke University Medical Center. (2017). *GAA Mutation Database*. Retrieved June 30, 2017 from https://pediatrics.duke.edu/sites/pediatrics.duke.edu/files/field/attachments/GAA_mutation_database.pdf
+Duke University Medical Center. (2017). GAA Mutation Database. Retrieved June 30, 2017 from https://pediatrics.duke.edu/sites/pediatrics.duke.edu/files/field/attachments/GAA_mutation_database.pdf
 
 Erasmus MC University Medical Center. (2017). Mutations in human acid alpha‐glucosidase. Retrieved June 30, 2017 from http://cluster15.erasmusmc.nl/klgn/pompe/mutations.html?lang=en or http://www.pompecenter.nl
 
@@ -617,7 +637,7 @@ Güngör, D., & Reuser, A. J. J. (2013). How to describe the clinical spectrum i
 
 Herbert, M., Cope, H., Li, J. S., & Kishnani, P. S. (2018). Severe cardiac involvement is rare in patients with late‐onset Pompe disease and the common c.‐32‐13T>G variant: Implications for newborn screening. *The Journal of Pediatrics*, *198*, 308–312. https://doi.org/10.1016/j.jpeds.2018.02.007
 
-HGNC 4065. (2018). Symbol report for *GAA*. Retrieved from https://www.genenames.org/data/gene‐symbol‐report/#!/hgnc_id/4065
+HGNC 4065. (2018). Symbol report for GAA. Retrieved from https://www.genenames.org/data/gene‐symbol‐report/#!/hgnc_id/4065
 
 <!--page-->
 
@@ -659,7 +679,7 @@ Montagnese, F., Barca, E., Musumeci, O., Mondello, S., Migliorato, A., Ciranni, 
 
 Montalvo, A. L. E., Bembi, B., Donnarumma, M., Filocamo, M., Parenti, G., Rossi, M., ... Pittis, M. G. (2006). Mutation profile of the GAA gene in 40 Italian patients with late onset glycogen storage disease type II. *Human Mutation*, *27*(10), 999–1006. https://doi.org/10.1002/humu.20374
 
-Musumeci, O., Thieme, A., Claeys, K. G., Wenninger, S., Kley, R. A., Kuhn, M., ... Schoser, B. (2015). Homozygosity for the common *GAA* gene splice site mutation c.‐32–13 T>G in Pompe disease is associated with the classical adult phenotypical spectrum. *Neuromuscular Disorders*, *25*(9), 719–724. https://doi.org/10.1016/j.nmd.2015.07.002
+Musumeci, O., Thieme, A., Claeys, K. G., Wenninger, S., Kley, R. A., Kuhn, M., ... Schoser, B. (2015). Homozygosity for the common GAA gene splice site mutation c.‐32–13 T>G in Pompe disease is associated with the classical adult phenotypical spectrum. *Neuromuscular Disorders*, *25*(9), 719–724. https://doi.org/10.1016/j.nmd.2015.07.002
 
 NCBI Resource Coordinators. (2016). Database resources of the National Center for Biotechnology Information. *Nucleic Acids Research*, *44*(D1), D7–D19. https://doi.org/10.1093/nar/gkv1290
 
@@ -716,517 +736,3 @@ Zampieri, S., Buratti, E., Dominissini, S., Montalvo, A. L., Pittis, M. G., Bemb
 Additional supporting information may be found online in the Supporting Information section.
 
 > **How to cite this article:** Reuser AJ, van der Ploeg AT, Chien Y‐H, et al. GAA variants and phenotypes among 1079 patients with Pompe disease: Data from the Pompe Registry. *Human Mutation*. 2019;40:2146–2164. https://doi.org/10.1002/humu.23878
-
-<!--page-->
-
-### SUPPORTING INFORMATION
-
-**Description of Methods Used to Identify Novel (Those Not Previously Published or Identified) Variants and the Likely Impact of These Novel Variants**
-
-Allele frequencies used to identify novel variants were extracted from the following sources, with hyperlinks to their online websites and references with details and descriptions of each:
-
-- The Genome Aggregation Database (http://gnomad.broadinstitute.org/) (Genome Aggregation Database (gnomAD), 2017)
-- The Exome Aggregation Consortium (http://exac.broadinstitute.org/) (Lek et al., 2016)
-- The NHLBI Exome Sequencing Project (https://esp.gs.washington.edu/drupal/) (Tennessen et al., 2012)
-- 1000 genome project consortium (http://www.internationalgenome.org/) (Genomes Project Consortium et al., 2015)
-- National Center for Biotechnology Information Database Resources (NCBI Resource Coordinators, 2014)
-
-The relationship between variants and human phenotype was analyzed using the public archive Clinvar (Landrum et al., 2014), and the Human Genome Mutation Database (HGMD) (Stenson et al., 2014).
-
-The likely impact of variant was predicted using bioinformatics algorithms, such as PROVEAN (Choi et al., 2012), SIFT (Sim et al., 2012), PolyPhen (Adzhubei et al., 2010), and FATHMM (Shihab et al., 2015), as described below, and based on a number of criteria recommended in the ACMG Standards and Guidelines for the interpretation of sequence variants (Richards et al., 2015) and Guidelines for Reporting and Using Prediction Tools for Genetic Variant Analysis (Vihinen et al., 2012). Results are provided in TABLE 3 of the main manuscript.
-
-Combination of potentially multiple records in dbNSFP when transcripts with different Ref and Alt amino acids overlapped at a specific position was performed. The worst of the predictions was kept for SIFT, PolyPhen, and FATHMM. If SIFT was smaller than 0.05 (rankscore>0.55) the corresponding NS was predicted as "Damaging"; otherwise it was predicted as "Tolerated". PolyPhen-2 prediction based on HumVar, was "probably damaging", HVAR score in [0.909,1] or rankscore in [0.62955,0.9711]); "possibly damaging", HVAR in [0.447,0.908] or rankscore in [0.44359,0.62885]); and "benign", HVAR score in [0,0.446] or rankscore in [0.01281,0.44315]). Score cutoff for binary classification was 0.5 for HVAR score or 0.45998 for rankscore, i.e., the prediction was "neutral" if the HVAR score was smaller than 0.5 (rankscore smaller than 0.45998), and "deleterious" if the HVAR score was larger than 0.5 (rankscore larger than 0.45998). If a FATHMM-MKL_coding_score was >0.5 (or rankscore >0.28317) the corresponding nsSNV was predicted as "Damaging"; otherwise it was predicted as "Tolerated".
-
-<!--page-->
-
-<!--page-->
-
-# SUPPORTING REFERENCES
-
-Adzhubei, I. A., Schmidt, S., Peshkin, L., Ramensky, V. E., Gerasimova, A., Bork, P., . . . Sunyaev, S. R. (2010). A method and server for predicting damaging missense mutations. *Nature Methods, 7*(4), 248-249. doi: 10.1038/nmeth0410-248
-
-Choi, Y., Sims, G. E., Murphy, S., Miller, J. R., & Chan, A. P. (2012). Predicting the functional effect of amino acid substitutions and indels. *PLoS One, 7*(10), e46688. doi: 10.1371/journal.pone.0046688
-
-Genome Aggregation Database (gnomAD). (2017). GAA glucosidase, alpha; acid. Retrieved June 30, 2017 from https://gnomad.broadinstitute.org/gene/ENSG00000171298.
-
-Genomes Project Consortium, Auton, A., Brooks, L. D., Durbin, R. M., Garrison, E. P., Kang, H. M., . . . Abecasis, G. R. (2015). A global reference for human genetic variation. *Nature, 526*(7571), 68-74. doi: 10.1038/nature15393
-
-Landrum, M. J., Lee, J. M., Riley, G. R., Jang, W., Rubinstein, W. S., Church, D. M., & Maglott, D. R. (2014). ClinVar: public archive of relationships among sequence variation and human phenotype. *Nucleic Acids Research, 42*(Database issue), D980-D985. doi: 10.1093/nar/gkt1113
-
-Lek, M., Karczewski, K. J., Minikel, E. V., Samocha, K. E., Banks, E., Fennell, T., . . . Exome Aggregation, C. (2016). Analysis of protein-coding genetic variation in 60,706 humans. *Nature, 536*(7616), 285-291. doi: 10.1038/nature19057
-
-NCBI Resource Coordinators. (2014). Database Resources for the National Center for Biotechnology Information. *Nucleic Acids Research, 42*(Database Issue), D7-D17.
-
-Richards, S., Aziz, N., Bale, S., Bick, D., Das, S., Gastier-Foster, J., . . . Committee, A. L. Q. A. (2015). Standards and guidelines for the interpretation of sequence variants: a joint consensus recommendation of the American College of Medical Genetics and Genomics and the Association for Molecular Pathology. *Genetics in Medicine, 17*(5), 405-424. doi: 10.1038/gim.2015.30
-
-Shihab, H. A., Rogers, M. F., Gough, J., Mort, M., Cooper, D. N., Day, I. N., . . . Campbell, C. (2015). An integrative approach to predicting the functional effects of non-coding and coding sequence variation. *Bioinformatics, 31*(10), 1536-1543. doi: 10.1093/bioinformatics/btv009
-
-Sim, N. L., Kumar, P., Hu, J., Henikoff, S., Schneider, G., & Ng, P. C. (2012). SIFT web server: predicting effects of amino acid substitutions on proteins. *Nucleic Acids Research, 40*(Web Server issue), W452-457. doi: 10.1093/nar/gks539
-
-Stenson, P. D., Mort, M., Ball, E. V., Shaw, K., Phillips, A., & Cooper, D. N. (2014). The Human Gene Mutation Database: building a comprehensive mutation repository for clinical and molecular genetics, diagnostic testing and personalized genomic medicine. *Human Genetics, 133*(1), 1-9. doi: 10.1007/s00439-013-1358-4
-
-Tennessen, J. A., Bigham, A. W., O'Connor, T. D., Fu, W., Kenny, E. E., Gravel, S., . . . Project, N. E. S. (2012). Evolution and functional impact of rare coding variation from deep sequencing of human exomes. *Science, 337*(6090), 64-69. doi: 10.1126/science.1219240
-
-Vihinen, M., den Dunnen, J. T., Dalgleish, R., & Cotton, R. G. (2012). Guidelines for establishing locus specific databases. *Human Mutation, 33*(2), 298-305. doi: 10.1002/humu.21646
-
-<!--page-->
-
-## **SUPPORTING INFORMATION TABLE S1. Distribution of Unique Known Variants Among Patients in Phenotypic Subgroups†**
-
-<!--table: 7-->
-
-| Location | DNA‡ | Protein§ | N Variants | Group¶ |
-|----------|------|----------|------------|--------|
-| intron1 | c.-32-13T>G | p.? | 689 | B,C |
-| intron1 | c.-32-17_-32-10delinsTCCCTGCTGAGCCTCCTACAGGCCTCCCG | p.? | <5 | A,B |
-| intron1 | c.-32-3C>A | p.? | <5 | C |
-| intron1 | c.-32-3C>G | p.? | <5 | C |
-| exon2 | c.3G>A | p.(Met1?) | <5 | C |
-| exon2 | c.40_47del | p.(Ala14ArgfsTer18) | <5 | A |
-| exon2 | c.118C>T | p.(Arg40Ter) | 8 | B,C |
-| exon2 | c.236_246del | p.(Pro79ArgfsTer12) | <5 | A,B |
-| exon2 | c.241C>T | p.(Gln81Ter) | <5 | B,C |
-| exon2 | c.258C>A | p.(Pro86Pro) | <5 | C |
-| exon2 | c.258dup | p.(Asn87fsTer9) | 13 | A,B,C |
-| exon2 | c.265C>T | p.(Arg89Cys) | <5 | C |
-| exon2 | c.266G>A | p.(Arg89His) | <5 | A |
-| exon2 | c.271G>A | p.(Asp91Asn) | <5 | C |
-| exon2 | c.271del | p.(Asp91fsTer51) | <5 | C |
-| exon2 | c.307T>C | p.(Cys103Arg) | <5 | C |
-| exon2 | c.307T>G | p.(Cys103Gly) | 34 | A,B,C |
-| exon2 | c.323G>A | p.(Cys108Ser) | <5 | B |
-| exon2 | c.340_341insT | p.(Lys114fsTer32) | 6 | A |
-| exon2 | c.352C>T | p.(Gln118Ter) | <5 | A |
-| exon2 | c.364A>G | p.(Met122Val) | <5 | B,C |
-| exon2 | c.365del | p.(Met122ArgfsTer20) | <5 | C |
-| exon2 | c.378_379del | p.(Cys127LeufsTer18) | <5 | A,C |
-| exon2 | c.379_380del | p.(Cys127LeufsTer18) | <5 | C |
-| exon2 | c.380G>A | p.(Cys127Tyr) | <5 | C |
-| exon2 | c.424_440del | p.(Ser142LleufsTer29) | <5 | B |
-| exon2 | c.461_469del | p.(Arg154_Thr156del) | <5 | C |
-| exon2 | c.482_483del | p.(Pro161fsTer15) | 7 | C |
-| exon2 | c.502C>T | p.(Arg168Trp) | <5 | B |
-| exon2 | c.510C>T | p.(Asp170Asp) | <5 | B,C |
-| exon2 | c.525_526del | p.(Asn177ProfsTer11) | 5 | A,C |
-| exon2 | c.525del | p.(Glu176ArgfsTer45) | 111 | A,B,C |
-| exon2 | c.546G>A | p.? | 9 | B,C |
-| intron2 | c.546+1G>T | p.? | <5 | C |
-| intron2 | c.546+2_5del | p.? | <5 | A |
-| exon3 | c.568C>T | p.(Arg190Cys) | <5 | B |
-| exon3 | c.569G>A | p.(Arg190His) | <5 | B,C |
-| exon3 | c.572A>G | p.(Tyr191Cys) | <5 | A,B |
-| exon3 | c.573C>A | p.(Tyr191Ter) | <5 | B,C |
-| exon3 | c.655G>A | p.(Gly219Arg) | 14 | A,B,C |
-| exon3 | c.670C>T | p.(Arg224Trp) | 16 | A,B,C |
-| exon3 | c.691C>T | p.(Leu231Leu) | <5 | B |
-
-<!--end-->
-
-<!--page-->
-
-<!--table: 8-->
-
-| Location | DNA‡ | Protein§ | N Variants | Group¶ |
-|----------|------|----------|------------|--------|
-| intron3 | c.692+1G>C | p.? | <5 | C |
-| intron3 | c.692+5G>T | p.? | 7 | B,C |
-| intron3 | c.693-1G>C | p.? | <5 | C |
-| exon4 | c.701C>A | p.(Thr234Lys) | <5 | B,C |
-| exon4 | c.716del | p.(Leu239fsTer29) | <5 | A |
-| exon4 | c.722_723del | p.(Phe241CysfsTer88) | <5 | A |
-| exon4 | c.742del | p.(Leu248ProfsTer20) | <5 | C |
-| exon4 | c.743T>C | p.(Leu248Pro) | <5 | C |
-| exon4 | c.752C>T | p.(Ser251Leu) | <5 | B |
-| exon4 | c.761C>T | p.(Ser254Leu) | <5 | B |
-| exon4 | c.784G>A | p.(Glu262Lys) | 12 | A,B,C |
-| exon4 | c.794del | p.(Ser265IlefsTer3) | <5 | A,C |
-| exon4 | c.811A>G | p.(Thr271Ala) | <5 | B |
-| exon4 | c.827_845del | p.(Ile276ThrfsTer32) | <5 | C |
-| exon4 | c.836G>A | p.(Trp279Ter) | <5 | C |
-| exon4 | c.841C>T | p.(Arg281Trp) | <5 | B |
-| exon4 | c.853C>T | p.(Pro285Ser) | <5 | C |
-| exon4 | c.854C>G | p.(Pro285Arg) | <5 | A,C |
-| exon5 | c.868A>G | p.(Asn290Asp) | <5 | C |
-| exon5 | c.871C>T | p.(Leu291Phe) | <5 | A,B |
-| exon5 | c.872T>C | p.(Leu291Pro) | <5 | A |
-| exon5 | c.875A>G | p.(Tyr292Cys) | <5 | B |
-| exon5 | c.877G>A | p.(Gly293Arg) | 10 | A,B,C |
-| exon5 | c.883C>A | p.(His295Asn) | <5 | C |
-| exon5 | c.896T>C | p.(Leu299Pro) | <5 | B,C |
-| exon5 | c.923A>C | p.(His308Pro) | <5 | B,C |
-| exon5 | c.925G>A | p.(Gly309Arg) | 16 | A,B,C |
-| exon5 | c.947A>G | p.(Asn316Ser) | <5 | A |
-| exon5 | c.953T>A | p.(Met318Lys) | <5 | B |
-| exon5 | c.953T>C | p.(Met318Thr) | <5 | A |
-| exon6 | c.989G>A | p.(Trp330Ter) | <5 | C |
-| exon6 | c.1000G>T | p.(Gly334Cys) | <5 | A |
-| exon6 | c.1003G>A | p.(Gly335Arg) | <5 | B |
-| exon6 | c.1040C>G | p.(Pro347Arg) | <5 | C |
-| exon6 | c.1047del | p.(Ser349ArgfsTer43) | <5 | B,C |
-| exon6 | c.1051del | p.(Val351CysfsTer41) | 6 | B,C |
-| exon6 | c.1062C>G | p.(Tyr354Ter) | <5 | A,B |
-| exon6 | c.1064T>C | p.(Leu355Pro) | 8 | A,B,C |
-| exon6 | c.1075G>A | p.(Gly359Arg) | <5 | C |
-| intron6 | c.1075+13C>T | p.? | <5 | A,B |
-| intron6 | c.1076-1G>A | p.? | <5 | C |
-| intron6 | c.1076-1G>C | p.? | <5 | C |
-| intron6 | c.1076-22T>G | p.(Asp319_Val358delins) | 6 | B,C |
-| intron6 | c.1076-2A>G | p.? | <5 | C |
-| exon7 | c.1082C>T | p.(Pro361Leu) | 9 | A,B,C |
-| exon7 | c.1099T>C | p.(Trp367Arg) | <5 | A,B |
-| exon7 | c.1100G>A | p.(Trp367Ter) | <5 | B |
-| exon7 | c.1106T>A | p.(Leu369Gln) | <5 | C |
-
-<!--end-->
-
-<!--page-->
-
-<!--table: 9-->
-
-| Location | DNA‡ | Protein§ | N Variants | Group¶ |
-|----------|------|----------|------------|--------|
-| exon7 | c.1115A>T | p.(His372Leu) | 5 | A,C |
-| exon7 | c.1124G>A | p.(Arg375His) | <5 | C |
-| exon7 | c.1124G>T | p.(Arg375Leu) | <5 | C |
-| exon7 | c.1128_1129delinsC | p.(Trp376CysfsTer16) | 6 | B,C |
-| exon7 | c.1129G>C | p.(Gly377Arg) | <5 | A |
-| exon7 | c.1134C>G | p.(Tyr378Ter) | <5 | C |
-| exon7 | c.1143del | p.(Ala382LeufsTer10) | 6 | C |
-| exon7 | c.1157dup | p.(Val387GlyfsTer119) | <5 | A |
-| exon7 | c.1190C>T | p.(Pro397Leu) | <5 | A,B,C |
-| exon7 | c.1193del | p.(Leu398ArgfsTer42) | <5 | C |
-| intron7 | c.1194+2T>A | p.? | <5 | C |
-| intron7 | c.1195-2A>G | p.? | <5 | A |
-| intron7 | c.1195-8G>A | p.? | <5 | C |
-| exon8 | c.1197_1208del | p.(Val400_Asn403del) | <5 | A |
-| exon8 | c.1210G>A | p.(Asp404Asn) | 13 | A,B,C |
-| exon8 | c.1211A>G | p.(Asp404Gly) | <5 | A,C |
-| exon8 | c.1219T>C | p.(Tyr407His) | <5 | C |
-| exon8 | c.1221C>A | p.(Tyr407Ter) | <5 | A |
-| exon8 | c.1222A>G | p.(Met408Val) | <5 | C |
-| exon8 | c.1239C>G | p.(Asp413Glu) | <5 | C |
-| exon8 | c.1281G>T | p.(Met427Ile) | <5 | A |
-| exon8 | c.1286A>G | p.(Gln429Arg) | <5 | A |
-| exon8 | c.1291_1299del | p.(Leu431_Gln433del) | <5 | C |
-| exon8 | c.1293_1312del | p.(Gln433AspfsTer66) | <5 | B |
-| exon8 | c.1309C>T | p.(Arg437Cys) | <5 | C |
-| exon8 | c.1316T>A | p.(Met439Lys) | <5 | C |
-| exon8 | c.1320_1322del | p.(Met440del) | <5 | B |
-| exon8-15 | c.1195-18_2190-20del | p.(Asp399ValfsTer6) | <5 | A |
-| intron8 | c.1326+1G>A | p.? | <5 | C |
-| intron8 | c.1327-2A>G | p.? | <5 | A |
-| exon9 | c.1333G>C | p.(Ala445Pro) | <5 | B |
-| exon9 | c.1354_1372del | p.(Ala452_Pro458del_458fsTer19) | <5 | C |
-| exon9 | c.1355del | p.(Ser454AlafsTer23) | <5 | C |
-| exon9 | c.1370C>T | p.(Pro457Leu) | <5 | B |
-| exon9 | c.1373_1375del | p.(Asp459del) | <5 | C |
-| exon9 | c.1375G>A | p.(Asp459Asn) | <5 | C |
-| exon9 | c.1396G>T | p.(Val466Phe) | <5 | A,C |
-| exon9 | c.1396del | p.(Val466PhefsTer11) | <5 | A,B,C |
-| exon9 | c.1402A>T | p.(Ile468Phe) | 5 | A,B,C |
-| exon9 | c.1408_1410del | p.(Asn470del) | <5 | A,B |
-| exon9 | c.1411_1414del | p.(Glu471ProfsTer5) | <5 | A |
-| exon9 | c.1437G>A | p.(Asp443_Lys479del) | 6 | B,C |
-| intron9 | c.1437+1G>A | p.? | <5 | A |
-| intron9 | c.1437+2T>C | p.(Asp443_Lys479del) | <5 | A,B,C |
-| intron9 | c.1438-1G>C | p.? | <5 | A,B,C |
-| intron9 | c.1438-1G>T | p.? | <5 | C |
-| intron9 | c.1438-2A>G | p.? | <5 | B |
-
-<!--end-->
-
-<!--page-->
-
-<!--table: 10-->
-
-| Location | DNA‡ | Protein§ | N Variants | Group¶ |
-|----------|------|----------|------------|--------|
-| exon10 | c.1441T>C | p.(Trp481Arg) | 7 | A,B,C |
-| exon10 | c.1441del | p.(Trp481GlyfsTer39) | <5 | A |
-| exon10 | c.1445C>G | p.(Pro482Arg) | <5 | C |
-| exon10 | c.1445C>T | p.(Pro482Leu) | <5 | B |
-| exon10 | c.1446del | p.(Ser484ProfsTer36) | <5 | C |
-| exon10 | c.1447G>A | p.(Gly483Arg) | 6 | A,B,C |
-| exon10 | c.1456G>C | p.(Ala486Pro) | <5 | C |
-| exon10 | c.1456G>T | p.(Ala486Ser) | <5 | C |
-| exon10 | c.1465G>A | p.(Asp489Asn) | 13 | A,B,C |
-| exon10 | c.1466A>G | p.(Asp489Gly) | <5 | A |
-| exon10 | c.1478C>T | p.(Pro493Leu) | 6 | C |
-| exon10 | c.1495T>A | p.(Trp499Arg) | <5 | B |
-| exon10 | c.1496G>A | p.(Trp499Ter) | <5 | A |
-| exon10 | c.1498_1512del | p.(Asp501_Glu505del) | <5 | C |
-| exon10 | c.1537G>A | p.(Asp513Asn) | <5 | B |
-| exon10 | c.1548G>A | p.(Trp516Ter) | 17 | A,B,C |
-| intron10 | c.1551+1G>A | p.(Val480_Ile517del) | <5 | C |
-| intron10 | c.1551+1G>C | p.(Val480_Ile517del) | 7 | C |
-| intron10 | c.1551+1G>T | p.(Val480_Ile517del) | <5 | A |
-| intron10 | c.1551+3_1551+6del | p.(Val480_Ile517del) | <5 | C |
-| intron10 | c.1551+49A>C | p.? | <5 | C |
-| exon11 | c.1556T>C | p.(Met519Thr) | <5 | B |
-| exon11 | c.1560C>G | p.(Asn520Lys) | <5 | C |
-| exon11 | c.1561G>A | p.(Glu521Lys) | 8 | A,B,C |
-| exon11 | c.1564C>A | p.(Pro522Thr) | <5 | B |
-| exon11 | c.1564C>G | p.(Pro522Ala) | 9 | A,B,C |
-| exon11 | c.1564C>T | p.(Pro522Ser) | <5 | A |
-| exon11 | c.1568C>A | p.(Ser523Tyr) | <5 | B |
-| exon11 | c.1581A>G | p.(Arg527Arg) | <5 | C |
-| exon11 | c.1583G>C | p.(Gly528Ala) | <5 | B |
-| exon11 | c.1594G>A | p.(Gly532Ser) | <5 | C |
-| exon11 | c.1610del | p.(Glu537GlyfsTer41) | <5 | B,C |
-| exon11 | c.1634C>T | p.(Pro545Leu) | 7 | B,C |
-| exon11 | c.1636G>C | p.(Gly546Ala) | <5 | B |
-| intron11 | c.1636+1G>C | p.? | 5 | B,C |
-| intron11 | c.1637-2A>G | p.? | <5 | A |
-| exon12 | c.1642G>T | p.(Val548Phe) | <5 | A,C |
-| exon12 | c.1645G>C | p.(Gly549Arg) | <5 | B |
-| exon12 | c.1650dup | p.(Thr551AspfsTer85) | <5 | A |
-| exon12 | c.1654del | p.(Leu552SerfsTer26) | <5 | A |
-| exon12 | c.1655T>C | p.(Leu552Pro) | 19 | A,B,C |
-| exon12 | c.1669A>T | p.(Ile557Phe) | <5 | B,C |
-| exon12 | c.1694_1697del | p.(Leu565ProfsTer12) | <5 | C |
-| exon12 | c.1703A>T | p.(His568Leu) | <5 | A,C |
-| exon12 | c.1705dup | p.(Tyr569LeufsTer67) | <5 | A |
-| exon12 | c.1710C>G | p.(Asn570Lys) | <5 | B,C |
-| exon12 | c.1716C>G | p.(His572Gln) | <5 | B |
-| exon12 | c.1717A>C | p.(Asn573His) | <5 | C |
-
-<!--end-->
-
-<!--page-->
-
-<!--table: 11-->
-
-| Location | DNA‡ | Protein§ | N Variants | Group¶ |
-|----------|------|----------|------------|--------|
-| exon12 | c.1724A>C | p.(Tyr575Ser) | <5 | A |
-| exon12 | c.1726G>A | p.(Gly576Ser) | 17 | A,B,C |
-| exon12 | c.1735G>A | p.(Glu579Lys) | <5 | A,B,C |
-| exon12 | c.1748C>T | p.(Ser583Phe) | <5 | C |
-| exon12 | c.1754G>A | p.(Arg585Lys) | <5 | C |
-| intron12 | c.1754+1G>A | p.? | <5 | A,C |
-| intron12 | c.1754+2T>A | p.? | <5 | A |
-| intron12 | c.1754+2T>C | p.? | <5 | B |
-| exon13 | c.1781G>A | p.(Arg594His) | <5 | B,C |
-| exon13 | c.1781G>C | p.(Arg594Pro) | <5 | B |
-| exon13 | c.1796C>A | p.(Ser599Tyr) | <5 | A,B,C |
-| exon13 | c.1798C>T | p.(Arg600Cys) | 5 | A,B,C |
-| exon13 | c.1799G>A | p.(Arg600His) | 13 | A,B,C |
-| exon13 | c.1802C>G | p.(Ser601Trp) | <5 | A,C |
-| exon13 | c.1802C>T | p.(Ser601Leu) | <5 | A,C |
-| exon13 | c.1804A>G | p.(Thr602Ala) | <5 | B |
-| exon13 | c.1819_1836del | p.(Gly607_His612del) | <5 | B,C |
-| exon13 | c.1822C>T | p.(Arg608Ter) | 7 | A,B,C |
-| exon13 | c.1826dup | p.(Tyr609Ter) | <5 | C |
-| exon13 | c.1827del | p.(Tyr609Ter) | <5 | B,C |
-| exon13 | c.1832G>A | p.(Gly611Asp) | <5 | C |
-| exon13 | c.1835A>G | p.(His612Arg) | <5 | B |
-| exon13 | c.1841C>A | p.(Thr614Lys) | 7 | A,B,C |
-| exon13 | c.1843G>A | p.(Gly615Arg) | 9 | A,B,C |
-| exon13 | c.1844G>A | p.(Gly615Glu) | 5 | A,B |
-| exon13 | c.1844_1846del | p.(Gly615del) | <5 | C |
-| exon13 | c.1846G>A | p.(Asp616Asn) | <5 | A |
-| exon13 | c.1856G>A | p.(Ser619Asn) | <5 | B |
-| exon13 | c.1857C>G | p.(Ser619Arg) | <5 | B,C |
-| exon13 | c.1880C>T | p.(Ser627Phe) | 5 | A,C |
-| intron13 | c.1888+1G>A | p.? | <5 | B,C |
-| exon14 | c.1903A>G | p.(Asn635Asp) | <5 | B |
-| exon14 | c.1912G>T | p.(Gly638Trp) | 8 | A,B,C |
-| exon14 | c.1913G>A | p.(Gly638Glu) | <5 | A |
-| exon14 | c.1913G>T | p.(Gly638Val) | <5 | B |
-| exon14 | c.1923G>A | p.(Leu641Leu) | <5 | C |
-| exon14 | c.1924G>T | p.(Val642Phe) | <5 | B |
-| exon14 | c.1927G>A | p.(Gly643Arg) | 21 | A,B,C |
-| exon14 | c.1933G>A | p.(Asp645Asn) | 14 | A,B,C |
-| exon14 | c.1933G>C | p.(Asp645His) | <5 | A |
-| exon14 | c.1933G>T | p.(Asp645Tyr) | <5 | A,C |
-| exon14 | c.1935C>A | p.(Asp645Glu) | 42 | A,B,C |
-| exon14 | c.1941C>G | p.(Cys647Trp) | <5 | A,C |
-| exon14 | c.1942G>A | p.(Gly648Ser) | 7 | A,C |
-| exon14 | c.1951_1952delinsT | p.(Gly651SerfsTer45) | <5 | C |
-| exon14 | c.1962_1964del | p.(Glu656del) | <5 | A,C |
-| exon14 | c.1978C>T | p.(Arg660Cys) | <5 | B |
-| exon14 | c.1979G>A | p.(Arg660His) | 9 | A,B,C |
-
-<!--end-->
-
-<!--page-->
-
-<!--table: 12-->
-
-| Location | DNA‡ | Protein§ | N Variants | Group¶ |
-|----------|------|----------|------------|--------|
-| exon14 | c.1993G>A | p.(Gly665Arg) | <5 | B |
-| exon14 | c.2014C>T | p.(Arg672Trp) | 7 | B,C |
-| exon14 | c.2015G>A | p.(Arg672Gln) | 5 | A,B,C |
-| exon14 | c.2023_2025del | p.(Ans675del) | <5 | A |
-| exon14 | c.2024_2026del | p.(Asn675del) | <5 | A |
-| exon14 | c.2040G>A | p.? | <5 | A |
-| intron14 | c.2041-1G>A | p.? | <5 | C |
-| exon15 | c.2051C>T | p.(Pro684Leu) | <5 | A |
-| exon15 | c.2055C>A | p.(Tyr685Ter) | <5 | C |
-| exon15 | c.2066_2070dup | p.(Ala691fsTer6) | <5 | C |
-| exon15 | c.2078dup | p.(Ala694GlnfsTer42) | <5 | A |
-| exon15 | c.2104C>T | p.(Arg702Cys) | <5 | A,B,C |
-| exon15 | c.2105G>A | p.(Arg702His) | <5 | B |
-| exon15 | c.2105G>T | p.(Arg702Leu) | <5 | A,C |
-| exon15 | c.2132C>G | p.(Thr711Arg) | <5 | B,C |
-| exon15 | c.2135T>C | p.(Leu712Pro) | <5 | B,C |
-| exon15 | c.2136_2137del | p.(Phe713ProfsTer23) | <5 | C |
-| exon15 | c.2161G>T | p.(Glu721Ter) | <5 | B |
-| exon15 | c.2173C>T | p.(Arg725Trp) | 8 | A,C |
-| intron15 | c.2189+1G>A | p.? | <5 | B |
-| exon16 | c.2210C>A | p.(Thr737Asn) | <5 | B |
-| exon16 | c.2214G>A | p.(Trp738Ter) | <5 | B,C |
-| exon16 | c.2219_2220del | p.(Val740GlyfsTer55) | <5 | A,C |
-| exon16 | c.2222A>T | p.(Asp741Val) | <5 | C |
-| exon16 | c.2227C>T | p.(Gln743Ter) | <5 | A |
-| exon16 | c.2228A>G | p.(Gln743Arg) | 5 | B,C |
-| exon16 | c.2236T>C | p.(Trp746Arg) | <5 | A |
-| exon16 | c.2237G>A | p.(Trp746Ter) | 20 | A,B,C |
-| exon16 | c.2237G>C | p.(Trp746Ser) | <5 | B |
-| exon16 | c.2238G>A | p.(Trp746Ter) | <5 | A,B |
-| exon16 | c.2238G>C | p.(Trp746Cys) | 38 | B,C |
-| exon16 | c.2242G>T | p.(Glu748Ter) | <5 | C |
-| exon16 | c.2242dup | p.(Glu748fsTer48) | 9 | B,C |
-| exon16 | c.2269C>T | p.(Gln757Ter) | <5 | C |
-| exon16 | c.2274dup | p.(Gly759ArgfsTer6) | <5 | A |
-| exon16 | c.2281delinsAT | p.(Ala761fs) | <5 | B,C |
-| exon16 | c.2294G>A | p.(Gly765Asp) | <5 | A |
-| exon16 | c.2296T>A | p.(Tyr766Asn) | <5 | A |
-| exon16 | c.2297A>C | p.(Tyr766Ser) | 8 | A,B,C |
-| exon16 | c.2297A>G | p.(Tyr766Cys) | <5 | B |
-| exon16 | c.2298_2301delinsAAAGTA | p.(Tyr766Ter) | <5 | C |
-| exon16 | c.2303C>T | p.(Pro768Leu) | <5 | A |
-| exon16 | c.2320G>A | p.(Asn774Asn) | <5 | C |
-| exon16 | c.2322_2323insGGTGAGTCTGCAAACGGGGAGT | p.(Leu775GlyfsTer70) | <5 | C |
-| intron16 | c.2331+1G>A | p.? | <5 | A |
-| intron16 | c.2331+20A>G | p.? | <5 | B,C |
-| intron16 | c.2331+2T>A | p.? | <5 | A,B,C |
-
-<!--end-->
-
-<!--page-->
-
-<!--table: 13-->
-
-| Location | DNA‡ | Protein§ | N Variants | Group¶ |
-|----------|------|----------|------------|--------|
-| exon17 | c.2338A>G | p.(Ile780Val) | <5 | C |
-| exon17 | c.2395C>T | p.(His799Tyr) | <5 | C |
-| exon17 | c.2408_2426del | p.(Gln803ProfsTer39) | <5 | A |
-| exon17 | c.2431del | p.(Leu811TrpfsTer37) | <5 | B,C |
-| exon17 | c.2431dup | p.(Leu811fsTer73) | <5 | B |
-| exon17 | c.2446G>A | p.(Val816Ile) | <5 | B |
-| exon17 | c.2474C>G | p.(Pro825Arg) | <5 | B,C |
-| intron17 | c.2481+102_2646+31del | p.(Gly828_Asn882del) | 80 | A,B,C |
-| exon18 | c.2495_2496del | p.(Thr832AsnfsTer51) | 6 | A,B |
-| exon18 | c.2501_2502del | p.(Thr834ArgfsTer49) | <5 | A,B |
-| exon18 | c.2512C>T | p.(Gln838Ter) | <5 | A,C |
-| exon18 | c.2528T>C | p.(Leu843Pro) | <5 | A |
-| exon18 | c.2530_2541del | p.(Arg844_Leu847del) | 10 | B,C |
-| exon18 | c.2544del | p.(Lys849ArgfsTer39) | <5 | C |
-| exon18 | c.2560C>T | p.(Arg854Ter) | 45 | A,B,C |
-| exon18 | c.2604del | p.(Leu868fs) | <5 | C |
-| exon18 | c.2608C>T | p.(Arg870Ter) | 17 | A,B,C |
-| intron18 | c.2646+2T>A | p.(Val876_Asn882del) | <5 | A |
-| intron18 | c.2647-20T>G | p.? | <5 | C |
-| exon19 | c.2662G>T | p.(Glu888Ter) | 14 | A,B,C |
-| exon19 | c.2706del | p.(Lys903ArgfsTer2) | <5 | C |
-| exon19 | c.2707_2709del | p.(Lys903del) | <5 | A |
-| exon19 | c.2725G>A | p.(Val909Met) | <5 | B |
-| exon19 | c.2738C>G | p.(Pro912Arg) | <5 | B,C |
-| exon19 | c.2741delinsGAC | p.(Gln914fsTer30) | <5 | A |
-| exon19 | c.2744A>C | p.(Gln915Pro) | <5 | B |
-| exon19 | c.2770T>C | p.(Ser924Pro) | <5 | A |
-| exon19 | c.2780C>T | p.(Thr927Ile) | <5 | C |
-| intron19 | c.2799+4A>G | p.? | <5 | C |
-| exon20 | c.2815_2816del | p.(Val939LeufsTer78) | 5 | A,B,C |
-| exon20 | c.2841_2842insT | p.(Leu948SerfsTer70) | <5 | A |
-| exon20 | c.2846T>A | p.(Val949Asp) | <5 | A |
-
-<!--end-->
-
-†The phenotypic subgroups are defined as follows. Group A: onset of symptoms ≤12 months of age with cardiomyopathy (patients classified as classic infantile Pompe disease); Group B: onset of symptoms ≤12 years of age (includes patients with onset of symptoms ≤12 months of age without cardiomyopathy and not included in Group A); Group C: onset of symptoms >12 years of age.
-
-‡c.1726G>A is a common pseudodeficiency variant and is linked to other variants (see main text).
-
-§The protein is provided where data were available. The value p.? is used to indicate that the impact on the RNA is unknown.
-
-¶Designates the phenotypic subgroup(s) of patients in which a variant is reported: Group A, Group B, and/or Group C.
-
-Note: Impact of the variants in the table is provided in the Pompe disease mutation database at http://www.pompecenter.nl (>molecular aspects>Pompe variants database).
-
-<!--page-->
-
-## **SUPPORTING INFORMATION TABLE S2. Novel Variants (with Appropriate Consent†) from the Pompe Registry Submitted to, and Accepted by, the Single Nucleotide Polymorphism Database (dbSNP) with submission ID SUB4205047 (http://www.ncbi.nlm.nih.gov/SNP/) and the Leiden Open Variation Database (LOVD; https://www.lovd.nl/).**
-
-<!--table: 14-->
-
-| Variant | Protein | Genomic Location of Variant | dbSNP Submission Number | LOVD Variant ID |
-|---------|---------|----------------------------|------------------------|-----------------|
-| c.665T>G | p.(Val222Gly) | NC_000017.10:g.78079666T>G | ss2137543935 | 0000500691 |
-| c.692T>C | p.(Leu231Pro) | NC_000017.10:g.78079693T>C | ss3654261701 | 0000500692 |
-| c.692+1G>T | p.? | NC_000017.10:g.78079694G>T | ss3654261702 | 0000500693 |
-| c.693-2A>C | p.? | NC_000017.10:g.78081354A>C | ss3654261703 | 0000500694 |
-| c.766_784del | p.(Tyr256SerfsTer6) | NC_000017.10:g.78081429_78081447del | ss3654261704 | 0000500695 |
-| c.878G>T | p.(Gly293Val) | NC_000017.10:g.78081618G>T | ss3654261705 | 0000500696 |
-| c.930_932del | p.(Phe311del) | NC_000017.10:g.78081670_78081672del | ss3654261706 | 0000500697 |
-| c.950C>T | p.(Ala317Val) | NC_000017.10:g.78081690C>T | ss3654261707 | 0000500698 |
-| c.994_995insTT | p.(Ser332PhefsTer61) | NC_000017.10:g.78082127_78082128insTT | ss3654261708 | 0000500699 |
-| c.1109G>A | p.(Gly370Asp) | NC_000017.10:g.78082321G>A | ss3654261709 | 0000500700 |
-| c.1114C>G | p.(His372Asp) | NC_000017.10:g.78082326C>G | ss3654261710 | 0000500701 |
-| c.1114C>T | p.(His372Tyr) | NC_000017.10:g.78082326C>T | ss3654261711 | 0000500702 |
-| c.1121G>A | p.(Cys374Tyr) | NC_000017.10:g.78082333G>A | ss3654261712 | 0000500703 |
-| c.1211A>T | p.(Asp404Val) | NC_000017.10:g.78082512A>T | ss3654261713 | 0000500704 |
-| c.1388_1406del | p.(Arg463ProfsTer8) | NC_000017.10:g.78083805_78083823del | ss3654261714 | 0000500705 |
-| c.1409A>G | p.(Asn470Ser) | NC_000017.10:g.78083826A>G | ss3654261715 | 0000500853 |
-| c.1477C>T | p.(Pro493Ser) | NC_000017.10:g.78084565C>T | ss3654261717 | 0000500854 |
-| c.1526A>T | p.(Gln509Leu) | NC_000017.10:g.78084614A>T | ss3654261718 | 0000500855 |
-| c.1551+3A>T | p.? | NC_000017.10:g.78084642A>T | ss3654261719 | 0000500856 |
-| c.1559A>G | p.(Asn520Ser) | NC_000017.10:g.78084747A>G | ss3654261720 | 0000500857 |
-| c.1670T>G | p.(Ile557Ser) | NC_000017.10:g.78085815T>G | ss3654261721 | 0000500858 |
-| c.1681_1699dup | p.(Thr567LysfsTer75) | NC_000017.10:g.78085826_78085844dup1 | ss3654261722 | 0000500859 |
-| c.1754+1dup | p.? | NC_000017.10:g.78085900dup | ss3654261723 | 0000500860 |
-| c.1825T>G | p.(Tyr609Asp) | NC_000017.10:g.78086447T>G | ss3654261724 | 0000500861 |
-| c.1839G>C | p.(Trp613Cys) | NC_000017.10:g.78086461G>C | ss3654261725 | 0000500863 |
-| c.1847dup | p.(Asp61GlufsTer20) | NC_000017.10:g.78086469dup | ss3654261726 | 0000500862 |
-| c.1876_1878del | p.(Ser627del) | NC_000017.10:g.78086498_78086500del | ss3654261727 | 0000500864 |
-| c.1944_1950del | p.(Phe649AlafsTer45) | NC_000017.10:g.78086730_78086736del | ss3654261728 | 0000500865 |
-| c.1961C>G | p.(Ser654Ter) | NC_000017.10:g.78086747C>G | ss3654261729 | 0000500866 |
-| c.2020C>T | p.(His674Tyr) | NC_000017.10:g.78086806C>T | ss3654261730 | 0000500867 |
-
-<!--end-->
-
-<!--page-->
-
-<!--table: 15-->
-
-| Variant | Protein | Genomic Location of Variant | dbSNP Submission Number | LOVD Variant ID |
-|---------|---------|----------------------------|------------------------|-----------------|
-| c.2041-2A>G | p.? | NC_000017.10:g.78087015A>G | ss3654261731 | 0000500868 |
-| c.2084dup | p.(Met695IlefsTer70) | NC_000017.10:g.78087060dup | ss3654261732 | 0000500869 |
-| c.2096T>C | p.(Leu699Pro) | NC_000017.10:g.78087072T>C | ss3654261733 | 0000500870 |
-| c.2109del | p.(Tyr703Ter) | NC_000017.10:g.78087085del | ss3654261734 | 0000500872 |
-| c.2146G>C | p.(Ala716Pro) | NC_000017.10:g.78087122G>C | ss3654261735 | 0000500873 |
-| c.2153_2156delinsACGCCG | p.(Val718AspfsTer47) | NC_000017.10:g.78087129_78087132delinsACGCCG | ss3654261736 | 0000500874 |
-| c.2237G>T | p.(Trp746Leu) | NC_000017.10:g.78090814G>T | ss3654261737 | 0000500875 |
-| c.2240G>A | p.(Gly747Glu) | NC_000017.10:g.78090817G>A | ss3654261738 | 0000500876 |
-| c.2258_2259insC | p.(Val755SerfsTer41) | NC_000017.10:g.78090835_78090836insC | ss3654261739 | 0000500877 |
-| c.2261dup | p.(Val755LysfsTer10) | NC_000017.10:g.78090838dup | ss3654261740 | 0000500878 |
-| c.2331+101del | p.? | NC_000017.10:g.78091009del536 | ss3654261741 | 0000500879 |
-| c.2407C>T | p.(Gln803Ter) | NC_000017.10:g.78091474C>T | ss3654261742 | 0000500880 |
-| c.2459_2461del | p.(Ala820del) | NC_000017.10:g.78091526_78091528del | ss3654261743 | 0000500881 |
-| c.2460dup | p.(Gly821TrpfsTer63) | NC_000017.10:g.78091527dup | ss3654261744 | 0000500882 |
-| c.2480A>G | p.(Gln827Arg) | NC_000017.10:g.78091547A>G | ss3654261745 | 0000500883 |
-| c.2515C>T | p.(Gln839Ter) | NC_000017.10:g.78092025C>T | ss3654261746 | 0000500884 |
-| c.2619C>G | p.(Tyr873Ter) | NC_000017.10:g.78092129C>G | ss3654261747 | 0000500885 |
-| c.2655_2656del | p.(Val886GlufsTer2) | NC_000017.10:g.78092460_ | ss3654261748 | 0000500886 |
-| c.2720T>C | p.(Leu907Pro) | NC_000017.10:g.78092525T>C | ss3654261749 | 0000500887 |
-| c.2740dup | p.(Gln914ProfsTer104) | NC_000017.10:g.78092545dup | ss3654261750 | 0000500888 |
-| c.2742dup | p.(Gln915AlafsTer10) | NC_000017.10:g.78092547dup | ss3654261751 | 0000500890 |
-| c.2757del | p.(Asn919LysfsTer24) | NC_000017.10:g.78092562del | ss3654261752 | 0000500891 |
-| c.2800-1G>C | p.? | NC_000017.10:g.78093070G>C | ss3654261753 | 0000500893 |
-
-<!--end-->
-
-†Informed written patient consent is required to share patient data submitted to the Pompe Registry (see Methods of the main manuscript). Not all Registry patients agree to have their data shared. Only novel *GAA* variants for which appropriate updated patient consent was available were submitted to the Single Nucleotide Polymorphism Database (dSNP) and the Leiden Open Variation Database (LOVD)

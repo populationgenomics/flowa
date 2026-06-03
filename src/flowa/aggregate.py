@@ -169,9 +169,9 @@ def resolve_aggregate_citations(
 ) -> None:
     """Post-process aggregate output: resolve quotes to bboxes + markdown anchors.
 
-    Loads each paper's pre-built `pdf_index.pkl.zst` (PDF bboxes) and `markdown.md`
-    (markdown anchors) via the same path the gateway uses; the convert step
-    earlier in this pipeline wrote both, so they're present.
+    Loads each paper's pre-built `pdf_index.pkl.zst` (PDF bboxes) and assembled
+    markdown — `merged.md` else `main.md` (markdown anchors) — via the same path the
+    gateway uses; the convert step earlier in this pipeline wrote both, so they're present.
     """
     # Collect all (doi, quote) pairs, grouped by DOI.
     doi_quotes: dict[str, list[str]] = {}
@@ -188,7 +188,7 @@ def resolve_aggregate_citations(
         markdown_provider=lambda doi: load_markdown_from_storage(base, doi),
     )
 
-    # Attach the resolved location (PDF bboxes + markdown.md anchor) onto each
+    # Attach the resolved location (PDF bboxes + markdown anchor) onto each
     # claim's citation, as a single `location` object mirroring ResolvedQuote.
     # `None` when the paper's artifacts were unavailable (the DOI errored); a
     # present-but-empty location (no bboxes, null anchor) when the quote simply

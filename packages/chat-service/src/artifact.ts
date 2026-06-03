@@ -21,11 +21,13 @@ const CitationBbox = z.object({
 const CitationMarkdownAnchor = z.object({
   start: z
     .number()
-    .describe("Start offset (Unicode code point) of the quote in markdown.md."),
+    .describe(
+      "Start offset (Unicode code point) of the quote in the assembled markdown.",
+    ),
   end: z
     .number()
     .describe(
-      "End offset (exclusive, Unicode code point) of the quote in markdown.md.",
+      "End offset (exclusive, Unicode code point) of the quote in the assembled markdown.",
     ),
 });
 
@@ -36,7 +38,7 @@ const CitationLocation = z.object({
       "PDF highlight rectangles for the quote; empty when it wasn't aligned in the source PDF.",
     ),
   markdown_anchor: CitationMarkdownAnchor.nullable().describe(
-    "Half-open [start, end) code-point range of the quote in markdown.md; null when it wasn't located there.",
+    "Half-open [start, end) code-point range of the quote in the assembled markdown; null when it wasn't located there.",
   ),
 });
 
@@ -47,7 +49,7 @@ const ArtifactCitation = z.object({
       "Verbatim passage from the source document. Must be copied exactly — enough context to validate the claim.",
     ),
   location: CitationLocation.nullish().describe(
-    "Pre-computed resolution of the quote: where it lives in the source PDF (bboxes) and the assembled markdown.md (anchor). Present on pipeline-generated citations (possibly with empty bboxes / null anchor); absent on citations added during editing.",
+    "Pre-computed resolution of the quote: where it lives in the source PDF (bboxes) and the assembled markdown (anchor). Present on pipeline-generated citations (possibly with empty bboxes / null anchor); absent on citations added during editing.",
   ),
 });
 

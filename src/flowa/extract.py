@@ -12,12 +12,21 @@ from pydantic_ai import Agent, NativeOutput
 from flowa.models import create_model, get_model_settings
 from flowa.prompts import load_prompt_and_schema
 from flowa.settings import ModelConfig, Settings
-from flowa.storage import assessment_url, encode_doi, exists, paper_url, read_json, read_text, write_bytes, write_json
+from flowa.storage import (
+    assessment_url,
+    encode_doi,
+    exists,
+    full_md_url,
+    read_json,
+    read_text,
+    write_bytes,
+    write_json,
+)
 
 log = logging.getLogger(__name__)
 
-# Maximum tokens per paper (heuristic: 1 token ≈ 4 chars). Sized for markdown.md
-# = main paper + appended supplements; the build-time per-paper supplement budget
+# Maximum tokens per paper (heuristic: 1 token ≈ 4 chars). Sized for the assembled
+# markdown = main paper + appended supplements; the build-time per-paper supplement budget
 # (flowa.assemble) is the primary gate, this is the safety net for oversized input.
 MAX_PAPER_TOKENS = 100000
 MAX_PAPER_CHARS = MAX_PAPER_TOKENS * 4
@@ -67,11 +76,12 @@ async def extract_paper_async(
         log.info('Already extracted: %s', extraction_url)
         return
 
-    # Load markdown - skip if not available
+    # Load the assembled markdown (merged.md if there are supplements, else main.md);
+    # skip if the paper hasn't been transcribed yet.
     try:
-        markdown = read_text(paper_url(base, doi, 'markdown.md'))
+        markdown = read_text(full_md_url(base, doi))
     except FileNotFoundError:
-        log.info('Skipping %s: markdown.md not available', doi)
+        log.info('Skipping %s: no transcription available', doi)
         return
 
     # Load variant details (stored by query command)
@@ -119,7 +129,8 @@ def extract_paper(
 ) -> None:
     """Extract evidence from a single paper via LLM.
 
-    Reads markdown.md from papers/{encoded_doi}/ and variant_details.json from
+    Reads the assembled markdown (merged.md else main.md) from papers/{encoded_doi}/
+    and variant_details.json from
     assessments/{variant_id}/, calls LLM for extraction, stores result to
     assessments/{variant_id}/extractions/{encoded_doi}.json.
     """

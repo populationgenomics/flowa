@@ -24,7 +24,7 @@ function makeFakeStorage(): FakeStorage {
     prefix: "",
     readTextCalls,
     setMarkdown(doi, body) {
-      markdownByKey.set(`papers/${encodeURIComponent(doi)}/markdown.md`, body);
+      markdownByKey.set(`papers/${encodeURIComponent(doi)}/merged.md`, body);
     },
     read: async () => null,
     readText: async (key: string) => {
@@ -76,7 +76,10 @@ const PAPER_BODY = Array.from({ length: 20 }, (_, i) => `line ${i + 1}`).join(
   "\n",
 );
 
-const MARKDOWN_KEY = `papers/${encodeURIComponent("10.1/smith")}/markdown.md`;
+// loadMarkdown tries merged.md (the assembled artifact) first, then falls back to
+// main.md (the bare transcription) — mirroring flowa.storage.full_md_url.
+const MERGED_KEY = `papers/${encodeURIComponent("10.1/smith")}/merged.md`;
+const MAIN_KEY = `papers/${encodeURIComponent("10.1/smith")}/main.md`;
 
 describe("per-session paper-markdown cache", () => {
   test("first searchPaper call triggers one loadMarkdown invocation", async () => {
@@ -94,7 +97,7 @@ describe("per-session paper-markdown cache", () => {
       paperId: "Smith2024",
       pattern: "line 5",
     });
-    expect(storage.readTextCalls).toEqual([MARKDOWN_KEY]);
+    expect(storage.readTextCalls).toEqual([MERGED_KEY]);
     expect(session.paperMarkdownCache.get("Smith2024")).toBe(PAPER_BODY);
   });
 
@@ -122,7 +125,7 @@ describe("per-session paper-markdown cache", () => {
       pattern: "line 7",
     });
 
-    expect(storage.readTextCalls).toEqual([MARKDOWN_KEY]);
+    expect(storage.readTextCalls).toEqual([MERGED_KEY]);
   });
 
   test("unknown paperId returns an error and never touches storage", async () => {
@@ -183,6 +186,13 @@ describe("per-session paper-markdown cache", () => {
     expect(second).toEqual({
       error: "Unknown paper ID or full text not available: Smith2024",
     });
-    expect(storage.readTextCalls).toEqual([MARKDOWN_KEY, MARKDOWN_KEY]);
+    // Each loadMarkdown tries merged.md then main.md; the missing paper is retried
+    // (not cached), so two attempts -> four reads.
+    expect(storage.readTextCalls).toEqual([
+      MERGED_KEY,
+      MAIN_KEY,
+      MERGED_KEY,
+      MAIN_KEY,
+    ]);
   });
 });

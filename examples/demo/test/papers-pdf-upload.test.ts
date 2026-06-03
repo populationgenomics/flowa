@@ -19,6 +19,7 @@ import {
 } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
+import { Writable } from "node:stream";
 import type { NextApiRequest, NextApiResponse } from "next";
 import { encodeDoi } from "@flowajs/react-viewer";
 
@@ -154,7 +155,7 @@ describe("POST /api/papers/[doi]/pdf", () => {
       doi,
       size: contents.length,
     });
-    const destPath = join(stagingDir, "source.pdf");
+    const destPath = join(stagingDir, "main.pdf");
     expect(existsSync(destPath)).toBe(true);
     expect(readFileSync(destPath)).toEqual(contents);
     expect(existsSync(tmpFile)).toBe(false);
@@ -179,5 +180,95 @@ describe("POST /api/papers/[doi]/pdf", () => {
     await handler(postReq("10.1234/foo"), res);
     expect(captured.statusCode).toBe(400);
     expect(captured.body).toMatchObject({ error: "file too large" });
+  });
+});
+
+// GET streams the full PDF: merged.pdf (main + PDF supplements) when present, else
+// main.pdf. A Writable-backed mock lets the route's createReadStream(...).pipe(res)
+// complete; headers are set synchronously before piping, so they're captured.
+function makeStreamRes(): {
+  res: NextApiResponse;
+  captured: CapturedResponse;
+  done: Promise<void>;
+} {
+  const captured: CapturedResponse = {
+    statusCode: 0,
+    body: undefined,
+    headers: {},
+  };
+  let resolveDone!: () => void;
+  const done = new Promise<void>((r) => {
+    resolveDone = r;
+  });
+  const writable = new Writable({
+    write(_chunk, _enc, cb) {
+      cb();
+    },
+  });
+  writable.on("finish", () => resolveDone());
+  const res = Object.assign(writable, {
+    status(code: number) {
+      captured.statusCode = code;
+      return res;
+    },
+    json(body: unknown) {
+      captured.body = body;
+      resolveDone();
+      return res;
+    },
+    setHeader(name: string, value: string) {
+      captured.headers[name] = value;
+      return res;
+    },
+  }) as unknown as NextApiResponse;
+  return { res, captured, done };
+}
+
+function getReq(doi: string): NextApiRequest {
+  return {
+    method: "GET",
+    query: { doi },
+    headers: {},
+  } as unknown as NextApiRequest;
+}
+
+describe("GET /api/papers/[doi]/pdf", () => {
+  const doi = "10.1371/journal.pone.0131517";
+
+  function paperDir(): string {
+    const dir = join(dataRoot, "papers", encodeDoi(doi));
+    mkdirSync(dir, { recursive: true });
+    return dir;
+  }
+
+  test("404 when neither main.pdf nor merged.pdf exists", async () => {
+    const { default: handler } =
+      await import("../src/pages/api/papers/[doi]/pdf");
+    const { res, captured } = makeRes();
+    await handler(getReq(doi), res);
+    expect(captured.statusCode).toBe(404);
+  });
+
+  test("serves main.pdf when only main.pdf exists", async () => {
+    const { default: handler } =
+      await import("../src/pages/api/papers/[doi]/pdf");
+    writeFileSync(join(paperDir(), "main.pdf"), Buffer.from("%PDF main\n"));
+    const { res, captured, done } = makeStreamRes();
+    await handler(getReq(doi), res);
+    await done;
+    expect(captured.headers["Content-Type"]).toBe("application/pdf");
+    expect(captured.headers["Content-Length"]).toBe("10");
+  });
+
+  test("prefers merged.pdf over main.pdf when both exist", async () => {
+    const { default: handler } =
+      await import("../src/pages/api/papers/[doi]/pdf");
+    const dir = paperDir();
+    writeFileSync(join(dir, "main.pdf"), Buffer.from("%PDF main\n")); // 10 bytes
+    writeFileSync(join(dir, "merged.pdf"), Buffer.from("%PDF merged supp\n")); // 17 bytes
+    const { res, captured, done } = makeStreamRes();
+    await handler(getReq(doi), res);
+    await done;
+    expect(captured.headers["Content-Length"]).toBe("17"); // merged.pdf, not main.pdf
   });
 });

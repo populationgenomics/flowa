@@ -38,7 +38,11 @@ export async function loadMarkdown(
   storage: Storage,
   doi: string,
 ): Promise<string | null> {
-  return storage.readText(`papers/${encodeDoi(doi)}/markdown.md`);
+  // The assembled markdown is `merged.md` when the paper has supplements, else the
+  // main-PDF transcription `main.md` — mirroring flowa.storage.full_md_url.
+  const enc = encodeDoi(doi);
+  const merged = await storage.readText(`papers/${enc}/merged.md`);
+  return merged ?? storage.readText(`papers/${enc}/main.md`);
 }
 
 export async function loadPaperMetadata(

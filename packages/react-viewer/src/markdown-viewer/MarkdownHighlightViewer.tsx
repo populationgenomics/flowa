@@ -13,7 +13,7 @@ import { codePointAnchorToUtf16 } from "./offsets";
 import type { CodePointAnchor } from "./types";
 
 export interface MarkdownHighlightViewerProps {
-  /** URL to fetch the paper's `markdown.md` as text. */
+  /** URL to fetch the paper's the assembled markdown as text. */
   markdownUrl: string;
   /**
    * Code-point range of the active quote to highlight + scroll to. Null/omitted
@@ -37,8 +37,9 @@ const REMARK_PLUGINS: Options["remarkPlugins"] = [
 ];
 
 /**
- * Renders a paper's `markdown.md` (the assembled source.md + converted xlsx/docx
- * supplements) and highlights the quote at `anchor`, scrolling it into view.
+ * Renders a paper's assembled markdown (the main-PDF transcription + PDF-supplement
+ * transcriptions + converted xlsx/docx supplements) and highlights the quote at
+ * `anchor`, scrolling it into view.
  *
  * The Markdown analogue of `PdfHighlightViewer`: the highlight is painted by a
  * rehype plugin that splits hast text nodes at the anchor boundaries, so a quote

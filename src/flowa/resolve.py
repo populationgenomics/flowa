@@ -22,7 +22,7 @@ from anchorite import PdfIndex, locate_quote_span
 from pydantic import BaseModel, Field
 
 from flowa.pdf_index_cache import deserialize as deserialize_pdf_index_payload
-from flowa.storage import exists, paper_url, read_bytes, read_text
+from flowa.storage import exists, full_md_url, paper_url, read_bytes, read_text
 
 log = logging.getLogger(__name__)
 
@@ -48,7 +48,7 @@ class HighlightBbox(BaseModel):
 
 
 class MarkdownAnchor(BaseModel):
-    """A half-open ``[start, end)`` range into the paper's markdown.md, in
+    """A half-open ``[start, end)`` range into the paper's assembled markdown, in
     Unicode code points — Python ``str`` indices, exactly what
     ``anchorite.locate_quote_span`` returns and passed through unchanged.
     """
@@ -58,11 +58,11 @@ class MarkdownAnchor(BaseModel):
 
 
 class ResolvedQuote(BaseModel):
-    """Where a quote lands in a paper: PDF bboxes and/or a markdown.md char span.
+    """Where a quote lands in a paper: PDF bboxes and/or an assembled-markdown char span.
 
     `bboxes` is empty when the quote couldn't be aligned in the PDF (or no
     `PdfIndex` was available); `markdown_anchor` is null when it couldn't be
-    located in markdown.md (or no markdown.md was available).
+    located in the markdown (or no markdown was available).
     """
 
     bboxes: list[HighlightBbox] = Field(default_factory=list)
@@ -73,7 +73,7 @@ class ResolvedCitations(BaseModel):
     """Output: a `ResolvedQuote` per (DOI, quote) plus per-DOI fetch errors.
 
     `resolved[doi][quote]` carries the quote's PDF bboxes and markdown anchor. A
-    DOI whose `PdfIndex` and markdown.md are *both* unavailable is absent from
+    DOI whose `PdfIndex` and markdown are *both* unavailable is absent from
     `resolved` and surfaces in `errors` — consumers distinguish "paper artifacts
     unavailable" from "quote not found" (empty bboxes + null anchor).
     """
@@ -148,8 +148,8 @@ def resolve_citations(
     """Resolve quote → bbox + markdown-anchor mappings for a batch of (DOI, quotes).
 
     `pdf_index_provider(doi)` returns a `PdfIndex` (or None); `markdown_provider(doi)`
-    returns the paper's markdown.md text (or None). Omit `markdown_provider` to
-    skip anchor resolution (bboxes only). A DOI whose `PdfIndex` and markdown.md
+    returns the paper's assembled markdown text (or None). Omit `markdown_provider` to
+    skip anchor resolution (bboxes only). A DOI whose `PdfIndex` and markdown
     are both unavailable is surfaced as a per-DOI error in `result.errors`.
     Provider exceptions propagate.
     """
@@ -161,8 +161,8 @@ def resolve_citations(
         pdf_index = pdf_index_provider(citation.doi)
         markdown = markdown_provider(citation.doi) if markdown_provider is not None else None
         if pdf_index is None and markdown is None:
-            log.warning('Neither pdf_index nor markdown.md available for %s', citation.doi)
-            errors[citation.doi] = 'pdf_index and markdown.md not available'
+            log.warning('Neither pdf_index nor markdown available for %s', citation.doi)
+            errors[citation.doi] = 'pdf_index and markdown not available'
             continue
         t0 = time.monotonic()
         quotes = resolve_quotes_in_paper(citation.quotes, pdf_index, markdown)
@@ -209,13 +209,14 @@ def load_pdf_index_from_storage(base: str, doi: str) -> PdfIndex | None:
 
 
 def load_markdown_from_storage(base: str, doi: str) -> str | None:
-    """Read `papers/{doi}/markdown.md` from a flowa storage base, or None if absent.
+    """Read a paper's assembled markdown (`merged.md` else `main.md`), or None if absent.
 
-    The consumer-facing assembled artifact (source.md + converted supplements).
-    `resolve_citations` normalises it on demand via `anchorite.locate_quote_span`;
-    there is no persisted markdown index to load.
+    The consumer-facing artifact (main.md + PDF-supplement transcriptions + converted
+    office supplements; just main.md for a no-supplement paper). `resolve_citations`
+    normalises it on demand via `anchorite.locate_quote_span`; there is no persisted
+    markdown index to load.
     """
-    md_url = paper_url(base, doi, 'markdown.md')
+    md_url = full_md_url(base, doi)
     if not exists(md_url):
         return None
     return read_text(md_url)
@@ -234,12 +235,12 @@ def resolve(
         ),
     ),
 ) -> None:
-    """Resolve citation quotes to PDF bounding boxes and markdown.md anchors.
+    """Resolve citation quotes to PDF bounding boxes and assembled-markdown anchors.
 
     Reads `{ "citations": [ { "doi": "...", "quotes": ["..."] } ] }` from stdin.
     Writes `{ "resolved": {...}, "errors": {...} }` to stdout.
 
-    DOIs whose `pdf_index.pkl.zst` and `markdown.md` are both missing from
+    DOIs whose `pdf_index.pkl.zst` and assembled markdown are both missing from
     storage surface in `errors` rather than rebuilding on the fly — run
     `flowa convert` to produce the artifacts.
     """

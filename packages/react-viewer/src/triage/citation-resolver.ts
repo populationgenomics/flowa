@@ -10,8 +10,8 @@
  *  - `bboxes: []` for `resolved[doi][quote]` — the quote was searched for but
  *    could not be aligned in the PDF. The viewer surfaces "Could not locate
  *    quote" for the PDF pane.
- *  - `markdownAnchor: null` — the quote could not be located in markdown.md.
- *  - Entry in `errors[doi]` — neither the PDF index nor markdown.md was
+ *  - `markdownAnchor: null` — the quote could not be located in the assembled markdown.
+ *  - Entry in `errors[doi]` — neither the PDF index nor the assembled markdown was
  *    available for the paper; its quotes are absent from `resolved`. Consumers
  *    may surface this differently from a quote-not-found case.
  */
@@ -25,7 +25,7 @@ export interface CitationQuery {
 }
 
 /**
- * Where a quote landed in a paper: PDF bboxes and/or a markdown.md anchor.
+ * Where a quote landed in a paper: PDF bboxes and/or a the assembled markdown anchor.
  * Mirrors `flowa.resolve.ResolvedQuote` (wire keys `bboxes`, `markdown_anchor`).
  */
 export interface ResolvedQuote {

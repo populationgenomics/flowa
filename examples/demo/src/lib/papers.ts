@@ -7,7 +7,7 @@
  * status is purely a function of which files exist on disk:
  *
  *   - `extracted`     extractions/{encodedDoi}.json exists
- *   - `downloaded`    papers/{encodedDoi}/source.pdf exists but no extract
+ *   - `downloaded`    papers/{encodedDoi}/main.pdf exists but no extract
  *   - `needs_manual`  neither file exists (the curator must drop a PDF in)
  *
  * Mirrors what real consumers would derive from object storage. The
@@ -120,7 +120,7 @@ export async function listPapersForVariant(
   const papers: PaperRow[] = [];
   for (const doi of query.dois) {
     const encoded = encodeDoi(doi);
-    const pdfPath = join(dataDir, "papers", encoded, "source.pdf");
+    const pdfPath = join(dataDir, "papers", encoded, "main.pdf");
     const extractPath = join(assessmentDir, "extractions", `${encoded}.json`);
 
     let status: PaperStatus;
@@ -144,8 +144,12 @@ export async function listPapersForVariant(
     }
 
     const supplementsDir = join(dataDir, "papers", encoded, "supplements");
+    // Hide the convert-written `*.pdf.md` transcription sidecars; office + PDF
+    // supplements the curator uploaded are shown.
     const supplements = existsSync(supplementsDir)
-      ? (await readdir(supplementsDir)).sort()
+      ? (await readdir(supplementsDir))
+          .sort()
+          .filter((n) => !n.endsWith(".pdf.md"))
       : [];
 
     papers.push({

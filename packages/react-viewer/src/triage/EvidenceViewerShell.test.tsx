@@ -92,7 +92,7 @@ const ARTIFACT: CategorySuggestion = {
 };
 
 // Same as ARTIFACT but the first (default-focused) citation resolved BOTH a PDF
-// bbox and a markdown.md anchor — the case that earns the PDF/MD toggle.
+// bbox and a the assembled markdown anchor — the case that earns the PDF/MD toggle.
 const TOGGLE_ARTIFACT: CategorySuggestion = {
   ...ARTIFACT,
   claims: [
@@ -113,7 +113,7 @@ const TOGGLE_ARTIFACT: CategorySuggestion = {
   ],
 };
 
-// The first citation resolved ONLY a markdown.md anchor, no PDF bbox (a
+// The first citation resolved ONLY a the assembled markdown anchor, no PDF bbox (a
 // supplement-only quote, or a PDF text layer the anchor couldn't match). It
 // defaults to Markdown but still offers the toggle so the PDF stays reachable.
 const ANCHOR_ONLY_ARTIFACT: CategorySuggestion = {

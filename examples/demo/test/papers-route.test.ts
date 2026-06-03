@@ -127,7 +127,7 @@ describe("GET /api/papers", () => {
     );
     const encoded = encodeDoi(doi);
     mkdirSync(join(dataRoot, "papers", encoded), { recursive: true });
-    writeFileSync(join(dataRoot, "papers", encoded, "source.pdf"), "%PDF stub");
+    writeFileSync(join(dataRoot, "papers", encoded, "main.pdf"), "%PDF stub");
 
     const { res, captured } = makeRes();
     await handler(makeReq("GET", variant), res);

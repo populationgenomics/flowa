@@ -15,7 +15,7 @@ export interface ClaimCitation {
   quote: string;
   /**
    * Where the quote resolved in the paper's sources — PDF bboxes and the
-   * `markdown.md` anchor, as one `ResolvedQuote`. Absent on citations added
+   * the assembled markdown anchor, as one `ResolvedQuote`. Absent on citations added
    * during editing (and on legacy aggregates); present on pipeline citations,
    * possibly with empty `bboxes` / null `markdownAnchor` when the quote was
    * found in only one source.
