@@ -1,0 +1,11 @@
+# Code review ownership for flowa.
+#
+# GitHub requests a review from the matching owner on every PR that touches
+# these paths — including Dependabot's. This replaces Dependabot's `reviewers:`
+# option, which GitHub retired in 2025 (it now silently ignores that key);
+# CODEOWNERS is the supported mechanism for auto-requesting reviewers.
+#
+# `main` requires only the `lint` status check (no required code-owner
+# approval), so this only *requests* review — it never blocks the auto-merge of
+# routine Dependabot bumps (dependabot-auto-merge.yml).
+* @lgruen-vcgs
