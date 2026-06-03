@@ -16,8 +16,8 @@ def test_post_resolve_citations_rejects_malformed_body(client: TestClient) -> No
 
 
 def test_post_resolve_citations_returns_errors_for_missing_sources(client: TestClient) -> None:
-    """When both pdf_index.pkl.zst and markdown.md are absent, the DOI surfaces
-    in `errors` rather than `resolved`."""
+    """When both the pdf_index and the assembled markdown are absent, the DOI
+    surfaces in `errors` rather than `resolved`."""
     response = client.post(
         '/resolve-citations',
         json={'citations': [{'doi': '10.1/missing', 'quotes': ['anything']}]},
@@ -25,7 +25,7 @@ def test_post_resolve_citations_returns_errors_for_missing_sources(client: TestC
     assert response.status_code == 200
     body = response.json()
     assert body['resolved'] == {}
-    assert body['errors'] == {'10.1/missing': 'pdf_index and markdown.md not available'}
+    assert body['errors'] == {'10.1/missing': 'pdf_index and markdown not available'}
 
 
 def test_post_resolve_citations_returns_resolved_bboxes(client: TestClient, monkeypatch) -> None:
