@@ -36,6 +36,25 @@ updates:
       prefix: "deps"
     cooldown:
       default-days: 7
+    # Hold the published UI peer deps on their current majors. @flowajs/react-
+    # viewer declares @mantine/* and react / react-dom as peer dependencies
+    # (^8 / ^18); downstream consumers of the published package are on those
+    # majors (Mantine 8 / React 18). A major bump here drags the peer range
+    # ahead of those consumers and forces them through a breaking upgrade, so
+    # block majors for the @mantine/* family and the react stack until they
+    # migrate in lockstep. Minor/patch within 8.x / 18.x still flow (the
+    # npm-non-major group below).
+    ignore:
+      - dependency-name: "@mantine/*"
+        update-types: ["version-update:semver-major"]
+      - dependency-name: "react"
+        update-types: ["version-update:semver-major"]
+      - dependency-name: "react-dom"
+        update-types: ["version-update:semver-major"]
+      - dependency-name: "@types/react"
+        update-types: ["version-update:semver-major"]
+      - dependency-name: "@types/react-dom"
+        update-types: ["version-update:semver-major"]
     groups:
       npm-non-major:
         patterns:
