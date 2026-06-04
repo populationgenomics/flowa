@@ -13,15 +13,19 @@ pnpm add react react-dom @mantine/core @mantine/hooks @tabler/icons-react
 
 ## Exports
 
-- `sanitizeLlmMarkdown(md, mapping)` — single sanitization pipeline for
-  LLM-generated Markdown: marked → DOMPurify → citation-link validation.
+- `LlmContent` — renders LLM-generated Markdown via
+  [react-markdown](https://github.com/remarkjs/react-markdown) (GFM tables, raw
+  HTML escaped) with click-to-resolve citation links. Links that aren't a valid
+  `#cite:AuthorYear` resolving in the supplied mapping render as plain text.
+- `PdfHighlightViewer` — react-pdf-based viewer with 0–1000 normalized bbox
+  highlight overlays.
+- `MarkdownHighlightViewer` — the Markdown analogue: renders a paper's assembled
+  Markdown and highlights a citation's code-point anchor span (one `<mark>` per
+  overlapping text node, so a table-row-spanning quote leaves the table intact).
 - `parseCitationsFromMarkdown(md)` — extract `(paperId, quote)` pairs from
   citation links of the form `[display](#cite:AuthorYear "verbatim quote")`.
 - `parseCiteHref(href)` / `isCitationHref(href)` — parse / validate citation
   fragment URLs.
-- `LlmContent` — renders LLM Markdown with click-to-resolve citation links.
-- `PdfHighlightViewer` — react-pdf-based viewer with 0–1000 normalized bbox
-  highlight overlays.
 
 ## Citation contract
 
@@ -33,8 +37,9 @@ Citation links use the form:
 
 `AuthorYear` matches `[A-Za-z]+\d+` and must resolve in the supplied
 `PaperIdMapping.byAuthorYear`. The title attribute carries the verbatim quote
-used to resolve a bbox. `sanitizeLlmMarkdown` strips every `<a>` tag that
-fails this format or whose `AuthorYear` is absent from the mapping.
+used to resolve a bbox. `LlmContent` renders any link that fails this format or
+whose `AuthorYear` is absent from the mapping as plain text — raw HTML is
+escaped (no `rehype-raw`), so untrusted model output can't inject markup.
 
 ## Bbox coordinate scale
 
