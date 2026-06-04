@@ -16,6 +16,10 @@
 #   option was retired by GitHub in 2025 (it is now silently ignored), so the
 #   code owner is what gets a review request on each PR. The weekly cadence
 #   keeps the inbox manageable.
+# - No explicit `labels:` — Dependabot applies its defaults (`dependencies`
+#   plus the `python:uv` / `javascript:npm` ecosystem label, which it
+#   auto-creates). Naming a label here that Dependabot does not auto-create
+#   makes it error whenever that label is missing from the repo.
 
 version: 2
 
@@ -28,9 +32,6 @@ updates:
     schedule:
       interval: "weekly"
     open-pull-requests-limit: 10
-    labels:
-      - "dependencies"
-      - "npm"
     commit-message:
       prefix: "deps"
     cooldown:
@@ -49,9 +50,6 @@ updates:
     schedule:
       interval: "weekly"
     open-pull-requests-limit: 10
-    labels:
-      - "dependencies"
-      - "python"
     commit-message:
       prefix: "deps"
     cooldown:
@@ -71,9 +69,6 @@ updates:
     schedule:
       interval: "weekly"
     open-pull-requests-limit: 10
-    labels:
-      - "dependencies"
-      - "python"
     commit-message:
       prefix: "deps"
     cooldown:
