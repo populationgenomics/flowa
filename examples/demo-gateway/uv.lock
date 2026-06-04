@@ -451,7 +451,7 @@ requires-dist = [
     { name = "httpx" },
     { name = "jinja2" },
     { name = "logfire" },
-    { name = "markitdown", extras = ["docx", "xls", "xlsx"], specifier = ">=0.1.6" },
+    { name = "markitdown", extras = ["docx", "xls", "xlsx"], specifier = ">=0.1.5" },
     { name = "pydantic-ai-slim", extras = ["anthropic"], marker = "extra == 'anthropic'", specifier = "==1.101.0" },
     { name = "pydantic-ai-slim", extras = ["bedrock"], marker = "extra == 'bedrock'", specifier = "==1.101.0" },
     { name = "pydantic-ai-slim", extras = ["google"], marker = "extra == 'google'", specifier = "==1.101.0" },
@@ -762,7 +762,7 @@ wheels = [
 
 [[package]]
 name = "logfire"
-version = "3.5.1"
+version = "4.34.0"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "executing" },
@@ -773,9 +773,9 @@ dependencies = [
     { name = "rich" },
     { name = "typing-extensions" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/b3/7a/e918a1f1ba62eaf1b20917a37b8fb820800e78a21eaf42677f925fb15f14/logfire-3.5.1.tar.gz", hash = "sha256:8ac97284af1e266257d640dcca584528ee015024e84f512ecef6e2cedd581f1d", size = 264880, upload-time = "2025-02-04T16:05:54.097Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/81/a6/6cbd7064d7ab120fbdd72ca1a218b3fa3343a5f1f0733fcfa34d43333aaf/logfire-4.34.0.tar.gz", hash = "sha256:d88bb04f26a5ae0064d36eeb0fca5413599f0e2d068d629bcab25993ff405e25", size = 1144711, upload-time = "2026-05-26T18:09:51.81Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/78/13/8c181b24daaddcf7f259e63e914a1b19e645f06c7ea025e0bea0553c0f29/logfire-3.5.1-py3-none-any.whl", hash = "sha256:8821ef5c83e566354a63d35cff4486ae91103d86f1677fe61632178b40a3e081", size = 178547, upload-time = "2025-02-04T16:05:50.222Z" },
+    { url = "https://files.pythonhosted.org/packages/de/04/a386debccf1e91575dda55fa07b96f8309fc544833d7eec24b69869278f9/logfire-4.34.0-py3-none-any.whl", hash = "sha256:b9d9fc71aec184b28c29a9a9e280c954a3ea52c399f1d7b95ce82bff6b177364", size = 344385, upload-time = "2026-05-26T18:09:48.436Z" },
 ]
 
 [[package]]
