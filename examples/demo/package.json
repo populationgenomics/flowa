@@ -51,7 +51,7 @@
     "@types/react": "18.3.18",
     "@types/react-dom": "18.3.5",
     "autoprefixer": "10.5.0",
-    "concurrently": "9.2.1",
+    "concurrently": "10.0.0",
     "happy-dom": "20.9.0",
     "pdfjs-dist": "5.7.284",
     "postcss": "8.5.15",
