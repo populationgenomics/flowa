@@ -30,7 +30,7 @@
     "@flowajs/chat-service": "workspace:*",
     "@flowajs/prompts": "workspace:*",
     "@flowajs/react-viewer": "workspace:*",
-    "@hono/node-server": "1.19.14",
+    "@hono/node-server": "2.0.4",
     "@mantine/core": "8.3.18",
     "@mantine/hooks": "8.3.18",
     "@tabler/icons-react": "3.44.0",
