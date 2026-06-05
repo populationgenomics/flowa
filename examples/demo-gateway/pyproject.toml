@@ -17,16 +17,10 @@ dependencies = [
 # Match the polyglot supply-chain posture of the parent flowa repo: only
 # install package versions ≥ 7 days old.
 exclude-newer = "7 days"
-# Bypass the gate for anchorite — flowa pulls it as a base dep and we need
-# to consume newly-cut versions immediately. seq-smith comes along because
-# new anchorite releases pin it tightly. pydantic-ai-slim is bypassed
-# temporarily so we can pick up 1.101.0's Bedrock native-output and adaptive-
-# thinking fixes ahead of the 7-day age threshold; the exact pin lives in
-# flowa's pyproject.toml. pydantic-graph rides along because pydantic-ai-slim
-# pins it via upstream equality. Drop these two entries (in lockstep with the
-# parent flowa pyproject) once 1.101.0 ages past 7 days on PyPI (around
-# 2026-05-29).
-exclude-newer-package = { anchorite = "0 days", seq-smith = "0 days", pydantic-ai-slim = "0 days", pydantic-graph = "0 days" }
+# Bypass the gate only for the first-party packages flowa pulls in and needs
+# fresh: anchorite (a base dep) and seq-smith, which new anchorite releases pin
+# tightly. Third-party packages always observe the 7-day floor.
+exclude-newer-package = { anchorite = "0 days", seq-smith = "0 days" }
 
 [tool.uv.sources]
 # flowapy (the PyPI distribution name; import is still `flowa`) lives one
