@@ -38,14 +38,14 @@ dependencies = [
 
 [project.optional-dependencies]
 # pydantic-ai-slim drives both PDF→Markdown transcription (`flowa.convert`) and
-# evidence extraction/aggregation. Pinned exact while the 7-day supply-chain
-# floor is bypassed for this package below — see [tool.uv].exclude-newer-package.
-# Once 1.101.0 ages past the gate, the pin can be relaxed to a range and the
-# exception removed.
-anthropic = ["pydantic-ai-slim[anthropic]==1.101.0"]
-bedrock = ["pydantic-ai-slim[bedrock]==1.101.0"]
-google = ["pydantic-ai-slim[google]==1.101.0"]
-openai = ["pydantic-ai-slim[openai]==1.101.0"]
+# evidence extraction/aggregation. Floored at 1.101.0 (Bedrock native-output and
+# adaptive-thinking fixes) and capped below 2.0: the library ships breaking
+# changes roughly weekly, so the major cap blocks an unreviewed jump while the
+# 7-day supply-chain gate (below) still governs which minor we float onto.
+anthropic = ["pydantic-ai-slim[anthropic]>=1.101.0,<2"]
+bedrock = ["pydantic-ai-slim[bedrock]>=1.101.0,<2"]
+google = ["pydantic-ai-slim[google]>=1.101.0,<2"]
+openai = ["pydantic-ai-slim[openai]>=1.101.0,<2"]
 
 [project.urls]
 Homepage = "https://github.com/populationgenomics/flowa"
@@ -58,17 +58,10 @@ Issues = "https://github.com/populationgenomics/flowa/issues"
 # in-repo equivalent for the Python side so contributors and CI inherit it.
 exclude-newer = "7 days"
 
-# Bypass the gate for anchorite — we own the package and need to consume
-# newly-cut versions immediately. seq-smith comes along because new anchorite
-# releases pin it tightly. pydantic-ai-slim is bypassed temporarily so we can
-# pick up 1.101.0's Bedrock native-output and adaptive-thinking fixes ahead of
-# the 7-day age threshold; the exact pin in [project.optional-dependencies]
-# keeps the bypass scoped to one deliberately-chosen version. pydantic-graph
-# is a transitive dep that pydantic-ai-slim==1.101.0 pins to ==1.101.0 in its
-# upstream metadata, so the equality constraint already scopes that bypass too.
-# Drop the pydantic-ai-slim + pydantic-graph entries (and relax the version
-# pin) once 1.101.0 ages past 7 days on PyPI (around 2026-05-29).
-exclude-newer-package = { anchorite = "0 days", seq-smith = "0 days", pydantic-ai-slim = "0 days", pydantic-graph = "0 days" }
+# Bypass the gate only for first-party packages we publish and need to consume
+# immediately after cutting: anchorite, plus seq-smith which new anchorite
+# releases pin tightly. Third-party packages always observe the 7-day floor.
+exclude-newer-package = { anchorite = "0 days", seq-smith = "0 days" }
 
 [dependency-groups]
 dev = [
