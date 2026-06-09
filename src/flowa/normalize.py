@@ -1,4 +1,12 @@
-"""VEP REST normaliser.
+"""Variant normaliser over Ensembl REST (VEP + Variant Recoder).
+
+VEP supplies the annotation (gene, MANE Select, transcripts, protein,
+exon/intron, rsID); the `grch38` genomic block comes from the Ensembl
+Variant Recoder, which returns canonical forward-strand `hgvsg`/`spdi` for
+SNVs, indels, and splice variants alike. (VEP's HGVS-c endpoint returns no
+`hgvsg`, and its `allele_string` is in the overlapped transcript's strand —
+the minus strand for reverse-strand genes — so a forward-strand genomic
+HGVS can't be derived from it.) Both endpoints share `rest.ensembl.org`.
 
 Produces the canonical normalised-variant dict consumed by:
 
@@ -70,6 +78,7 @@ biotypes, and the gene's MANE Select / the caller-supplied transcript
 clinical-literature-relevant transcripts only.
 """
 
+import asyncio
 import logging
 import re
 from datetime import UTC, datetime
@@ -174,6 +183,38 @@ async def _fetch_vep(hgvs: str) -> tuple[list[dict], str | None]:
         return response.json(), response.headers.get('x-ensembl-release')
 
 
+@retry_transient_http
+async def _fetch_recoder(hgvs: str) -> dict:
+    """Resolve canonical forward-strand genomic forms via Ensembl Variant Recoder.
+
+    VEP's `/vep/human/hgvs` endpoint never returns `hgvsg`, and its
+    `allele_string` is in the overlapped transcript's strand orientation, so a
+    minus-strand coding or splice variant can't be turned into a forward-strand
+    genomic HGVS from VEP alone. The Variant Recoder
+    (`/variant_recoder/human/<hgvs>`, same Ensembl REST host) maps any input —
+    SNV, indel, deep-intronic/splice — to canonical GRCh38 `hgvsg` + `spdi`.
+
+    Returns the single allele record (our inputs carry one alt allele).
+    """
+    url = f'{VEP_REST_BASE}/variant_recoder/human/{hgvs}'
+
+    log.info('Querying Variant Recoder REST for %s', hgvs)
+    async with httpx.AsyncClient(timeout=30.0) as client:
+        response = await client.get(url, headers={'accept': 'application/json'})
+        response.raise_for_status()
+        data = response.json()
+
+    if not isinstance(data, list) or not data:
+        raise ValueError(f'Variant Recoder returned no records for {hgvs!r}')
+    # Each list entry maps allele -> record; the single-allele input yields one
+    # record carrying hgvsg/spdi. Non-dict housekeeping values (e.g. a warnings
+    # list) are skipped.
+    for rec in data[0].values():
+        if isinstance(rec, dict) and rec.get('hgvsg'):
+            return rec
+    raise ValueError(f'Variant Recoder record lacked hgvsg for {hgvs!r}')
+
+
 def _strip_version(transcript_id: str) -> str:
     """`NM_001035.3` → `NM_001035`. Pass-through for empty/None-shaped inputs."""
     if not transcript_id:
@@ -220,32 +261,31 @@ def _project_transcript_compact(tc: dict) -> dict:
     }
 
 
-def _construct_grch38_hgvs_g(chrom: str, pos: int, ref: str, alt: str) -> str:
-    """Build the GRCh38 HGVS g. expression from VEP's bare-field response.
+def _grch38_from_recoder(rec: dict, hgvs: str) -> dict:
+    """Build the `grch38` block from a Variant Recoder allele record.
 
-    Handles SNVs only (`g.<pos><REF>><ALT>`). For indels we fall through to
-    `_extract_hgvsg` which prefers VEP's own `hgvsg` field when present.
+    Picks the GRCh38 primary-assembly forms by their `NC_` accession (the
+    Recoder also returns `LRG_` / `NW_` alternates, which we drop). `hgvs_g` is
+    taken verbatim — already the `NC_<chr>.<ver>:g.…` shape Mastermind wants —
+    and `chrom`/`pos`/`ref`/`alt` come from the matching SPDI
+    (`<acc>:<0-based-pos>:<ref>:<alt>`), correct for SNVs and indels alike.
     """
-    nc = _GRCH38_NC.get(chrom)
-    if nc is None:
-        raise ValueError(f'no GRCh38 NC_ mapping for chromosome {chrom!r}')
-    return f'{nc}:g.{pos}{ref}>{alt}'
-
-
-def _extract_hgvsg(annotation: dict, chrom: str, pos: int, ref: str, alt: str) -> str:
-    """Prefer VEP's `hgvsg` field; fall back to constructing one for SNVs."""
-    hgvsg = annotation.get('hgvsg')
-    if hgvsg:
-        return hgvsg
-    # No hgvsg in response: build it for SNVs; fail loudly for indels (VEP
-    # should always supply hgvsg with hgvs=1, so falling through is an
-    # unexpected case worth flagging).
-    if len(ref) == 1 and len(alt) == 1 and ref != alt and ref in 'ACGT' and alt in 'ACGT':
-        return _construct_grch38_hgvs_g(chrom, pos, ref, alt)
-    raise ValueError(
-        f"VEP response lacked 'hgvsg' for non-SNV allele {ref}/{alt} at "
-        f"{chrom}:{pos}; can't synthesise HGVS g. notation locally"
-    )
+    nc_to_chrom = {nc: chrom for chrom, nc in _GRCH38_NC.items()}
+    hgvs_g = next((h for h in rec.get('hgvsg', []) if h.split(':', 1)[0] in nc_to_chrom), None)
+    spdi = next((s for s in rec.get('spdi', []) if s.split(':', 1)[0] in nc_to_chrom), None)
+    if hgvs_g is None or spdi is None:
+        raise ValueError(
+            f'Variant Recoder returned no GRCh38 NC_ genomic form for {hgvs!r} '
+            f'(hgvsg={rec.get("hgvsg")}, spdi={rec.get("spdi")})'
+        )
+    acc, pos0, ref, alt = spdi.split(':')
+    return {
+        'hgvs_g': hgvs_g,
+        'chrom': nc_to_chrom[acc],
+        'pos': int(pos0) + 1,  # SPDI is 0-based; grch38.pos is 1-based
+        'ref': ref,
+        'alt': alt,
+    }
 
 
 def _select_rsid(annotation: dict) -> str | None:
@@ -310,7 +350,10 @@ async def normalize_variant(hgvs: str, caller_transcript: str) -> dict:
             `transcript_consequences[]` (caller typo or unindexed
             transcript).
     """
-    annotations, source_version = await _fetch_vep(hgvs)
+    (annotations, source_version), recoder_rec = await asyncio.gather(
+        _fetch_vep(hgvs),
+        _fetch_recoder(hgvs),
+    )
     if not annotations:
         raise ValueError(f'VEP returned no annotations for {hgvs!r}')
 
@@ -329,23 +372,12 @@ async def normalize_variant(hgvs: str, caller_transcript: str) -> dict:
         raise ValueError(f'VEP returned no gene_symbol for {hgvs!r}')
     hgnc_id = primary.get('hgnc_id')
 
-    # Genomic coordinates: prefer VEP's hgvsg, fall back to construction for SNVs.
-    chrom = annotation.get('seq_region_name', '')
-    start = annotation.get('start')
-    allele_string: str = annotation.get('allele_string', '')
-    ref, _, alt = allele_string.partition('/')
-    if not chrom or start is None or not ref or not alt:
-        raise ValueError(
-            f'VEP response missing required positional fields (seq_region_name/start/allele_string) for {hgvs!r}'
-        )
-
-    grch38_block = {
-        'hgvs_g': _extract_hgvsg(annotation, chrom, start, ref, alt),
-        'chrom': chrom,
-        'pos': start,
-        'ref': ref,
-        'alt': alt,
-    }
+    # Genomic forms come from the Variant Recoder, not VEP: VEP's HGVS-c
+    # endpoint returns no hgvsg and reports allele_string in the transcript's
+    # strand (the minus strand for reverse-strand genes), so a forward-strand
+    # genomic HGVS can't be derived from it. The Recoder gives the canonical
+    # GRCh38 form for SNVs, indels, and splice/intronic variants alike.
+    grch38_block = _grch38_from_recoder(recoder_rec, hgvs)
 
     # user_transcript only when caller's transcript differs from MANE Select.
     user_transcript_block: dict | None = None

@@ -84,7 +84,7 @@ def parse_variant_spec_cli(raw: str) -> VariantSpec:
 
     Accepts either inline JSON (``--variant-spec '{...}'``) or a path
     reference (``--variant-spec @path/to/spec.json``). The ``@``-prefix
-    form is for spike scripts and local debugging where typing the JSON
+    form is for local debugging and one-off scripts where typing the JSON
     inline is awkward.
     """
     if raw.startswith('@'):

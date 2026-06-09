@@ -42,11 +42,11 @@ async def query_mastermind(hgvs_g: str, api_token: str) -> list[int]:
     """Query Mastermind API for PMIDs (relevance-ranked, capped).
 
     Uses the genomic HGVS form (`NC_<chr>.<ver>:g.<pos><ref>><alt>`) as the
-    `variant` parameter. Per Spike B, this is one of two formats Mastermind
-    accepts and is preferred over the legacy `GENE:c.` form because it's
-    genomically unambiguous (no transcript-version-isoform conflation) and
-    improves splice-variant recall — Mastermind tokenises c.-form queries
-    against the splice region, returning unrelated papers.
+    `variant` parameter. This is one of two formats Mastermind accepts and is
+    preferred over the legacy `GENE:c.` form because it's genomically
+    unambiguous (no transcript-version-isoform conflation) and improves
+    splice-variant recall — Mastermind tokenises c.-form queries against the
+    splice region, returning unrelated papers.
     """
     log.info('Querying Mastermind for %s', hgvs_g)
 
@@ -192,17 +192,16 @@ async def query_litvar(
 
     Strategy (sequential, early-stop on first non-empty match):
 
-    1. **rsID** when VEP supplied one — most reliable across notations
-       (Spike G: every variant with an rsID resolved via every form, all
-       routed to the same LitVar `_id`).
+    1. **rsID** when VEP supplied one — most reliable across notations: an
+       rsID resolves via every form, all routed to the same LitVar `_id`.
     2. **`gene + p.short`** — catches missense/nonsense variants typically
-       cited in 1-letter protein form (Spike C3: RYR2 Y4725C, no rsID,
+       cited in 1-letter protein form (e.g. RYR2 Y4725C with no rsID
        resolves only via this path).
-    3. **`gene + c.`** — last resort. Spike G found a real variant
-       (MYBPC3 c.2864_2865delCT, frameshift, 48 PMIDs in LitVar) where
-       neither (1) nor (2) resolves — frameshift variants often lack a
-       clean p.short form, and rsID coverage isn't always supplied by
-       upstream normalisers even when LitVar has rsID-indexed the entry.
+    3. **`gene + c.`** — last resort, for a variant where neither (1) nor
+       (2) resolves (e.g. MYBPC3 c.2864_2865delCT, a frameshift with 48
+       PMIDs in LitVar) — frameshift variants often lack a clean p.short
+       form, and rsID coverage isn't always supplied by upstream
+       normalisers even when LitVar has rsID-indexed the entry.
 
     Stops on the first non-empty result and logs which path matched, so
     we can collect empirical data on fallback frequency. Returns an empty
@@ -210,9 +209,9 @@ async def query_litvar(
     failure, which propagates, so callers can still run the rest of the
     pipeline (e.g. ClinVar) without false-failing.
 
-    Why not `gene + p.long` too? Spike G confirmed it's fully redundant:
-    every variant where LitVar matched the 3-letter form was already
-    covered by the 1-letter form on the same internal `_id`.
+    Why not `gene + p.long` too? It's fully redundant: every variant where
+    LitVar matched the 3-letter form was already covered by the 1-letter
+    form on the same internal `_id`.
     """
     p_short_bare = _bare_change(protein_short)
     c_bare = _bare_change(hgvs_c)
