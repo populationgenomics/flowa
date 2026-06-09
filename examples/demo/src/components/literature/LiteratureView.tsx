@@ -23,7 +23,7 @@ import type { LatestRunInfo } from "@/lib/runs";
 import type { ProgressResponse } from "@/lib/progressEvents";
 import { PaperStatusGroup } from "./PaperStatusGroup";
 import { ProgressLog } from "./ProgressLog";
-import { matchFiles } from "./matchFilename";
+import { matchFilesToPapers } from "@flowajs/react-viewer";
 
 const POLL_INTERVAL_ACTIVE_MS = 15_000;
 const POLL_INTERVAL_TERMINAL_MS = 60_000;
@@ -226,21 +226,30 @@ export function LiteratureView({ variantId }: LiteratureViewProps) {
   const handleBulkUpload = useCallback(
     async (files: File[]) => {
       if (!papersResp) return;
-      const matched = matchFiles(files, papersResp.papers);
-      const accepted = matched.filter((m) => m.paper !== null);
-      const skipped = matched.filter((m) => m.paper === null);
-      for (const { paper, file } of accepted) {
-        if (!paper) continue;
-        await uploadPaperPdf(paper, file);
+      const filesByName = new Map(files.map((f) => [f.name, f]));
+      const { mains, supplements, unmatched } = matchFilesToPapers(
+        files.map((f) => f.name),
+        papersResp.papers,
+      );
+      // Mains first: a supplement's POST requires the paper's main.pdf to exist.
+      for (const { filename, paper } of mains) {
+        const file = filesByName.get(filename);
+        if (file) await uploadPaperPdf(paper, file);
+      }
+      // Then supplements, in the lexicographic order the matcher returned, so
+      // their ingestion ordinals follow filename order.
+      for (const { filename, paper } of supplements) {
+        const file = filesByName.get(filename);
+        if (file) await uploadPaperSupplement(paper, file, variantId);
       }
       await fetchPapers();
-      if (skipped.length > 0) {
+      if (unmatched.length > 0) {
         setError(
-          `Could not match ${skipped.length} file(s) by PMID or encoded DOI: ${skipped.map((s) => s.file.name).join(", ")}`,
+          `Could not match ${unmatched.length} file(s) by PMID or encoded DOI: ${unmatched.join(", ")}`,
         );
       }
     },
-    [papersResp, fetchPapers],
+    [papersResp, fetchPapers, variantId],
   );
 
   const handleOpenAllUrls = useCallback(() => {
@@ -482,13 +491,14 @@ function BulkDropzone({ onFiles }: BulkDropzoneProps) {
     >
       <Group justify="space-between" align="center">
         <Text size="sm">
-          Drop PDFs here (named <code>&lt;PMID&gt;.pdf</code> or{" "}
-          <code>&lt;encoded-DOI&gt;.pdf</code>) to bulk-upload.
+          Drop papers (<code>&lt;PMID&gt;.pdf</code> or{" "}
+          <code>&lt;encoded-DOI&gt;.pdf</code>) and supplements (
+          <code>&lt;id&gt;_supp.*</code>) here to bulk-upload.
         </Text>
         <input
           ref={inputRef}
           type="file"
-          accept="application/pdf"
+          accept=".pdf,.xlsx,.xls,.docx"
           multiple
           style={{ display: "none" }}
           data-testid="bulk-dropzone-input"

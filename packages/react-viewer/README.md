@@ -26,6 +26,11 @@ pnpm add react react-dom @mantine/core @mantine/hooks @tabler/icons-react
   citation links of the form `[display](#cite:AuthorYear "verbatim quote")`.
 - `parseCiteHref(href)` / `isCitationHref(href)` — parse / validate citation
   fragment URLs.
+- `matchFilesToPapers(filenames, papers)` — match uploaded files to papers by
+  filename: a main paper PDF is `<id>.pdf`, a supplement is `<id>[_ ]supp…`
+  (any extension), where `<id>` is a PubMed id or an encoded DOI. Returns
+  `{ mains, supplements, unmatched }`, supplements sorted lexicographically.
+  `parseSupplementFilename(name)` exposes the supplement-naming rule on its own.
 
 ## Citation contract
 

@@ -76,6 +76,15 @@ export {
   type SessionInfo,
 } from "./triage/ChatSection";
 
+// Paper matching — match uploaded files to papers by filename
+export {
+  matchFilesToPapers,
+  parseSupplementFilename,
+  type MatchablePaper,
+  type FileMatch,
+  type MatchFilesResult,
+} from "./paper-matching/matchFilesToPapers";
+
 // Citation resolver (callback contract for chat-introduced citations)
 export type {
   CitationQuery,
