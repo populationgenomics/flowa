@@ -162,3 +162,24 @@ def test_claim_quote_must_come_from_extraction() -> None:
         extraction_quotes_by_paper={'Smith2024': {'a quote the extraction actually surfaced'}},
     )
     assert 'claim_quote_not_in_extraction' in _rules(errors)
+
+
+def test_claim_quote_substring_of_extraction_passes() -> None:
+    # The extraction surfaces a long passage; the aggregator legitimately trims
+    # it to its load-bearing clause. That contiguous substring is still verbatim
+    # source text (it resolves to a highlight downstream), so it is grounded.
+    surfaced = (
+        'Each parent was heterozygous for one allele, and an unaffected sister did not have a mutation at either site.'
+    )
+    trimmed = 'an unaffected sister did not have a mutation at either site'
+    cat = _cat(
+        notes=f'Non-carrier sib ([sib](#cite:Smith2024 "{trimmed}")).',
+        papers=('Smith2024',),
+        claims=(_claim('Smith2024', trimmed),),
+    )
+    errors = validate_aggregate_category(
+        cat,
+        valid_paper_ids={'Smith2024'},
+        extraction_quotes_by_paper={'Smith2024': {surfaced}},
+    )
+    assert errors == []

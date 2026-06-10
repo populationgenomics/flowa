@@ -13,8 +13,11 @@ anchorite-backed resolver, not here.
 
 Keep in sync with `packages/chat-service/src/chat.ts` (`validateArtifactContent`).
 One rule here has no edit-time counterpart — `claim_quote_not_in_extraction`:
-every claim citation quote must be one the extraction surfaced. It's the same
-kind of exact, model-vs-model check; chat-service can't run it because an edit
+every claim citation quote must be byte-present in a quote the extraction
+surfaced — exact, or a contiguous substring of one (the aggregator legitimately
+trims a long surfaced passage to its load-bearing clause; that span is still
+verbatim source text and still resolves to a highlight downstream). It is still
+byte-exact, not a fuzzy threshold. chat-service can't run it because an edit
 session has no extraction input to compare against.
 """
 
@@ -26,6 +29,20 @@ from flowa.artifact import CategoryResult
 # Group 1 = paper_id; group 2 = quote (absent when the title attribute is
 # omitted, surfaced as `cite_missing_quote`).
 _CITE_LINK_RE = re.compile(r'\[[^\]]*\]\(#cite:([^ )"]+)(?:\s+"([^"]*)")?\)')
+
+
+def _quote_grounded(quote: str, allowed: set[str]) -> bool:
+    """True if `quote` is byte-present in any extraction quote the model was fed.
+
+    Exact set-membership (fast path), or a contiguous substring of a surfaced
+    quote — the aggregator trimming a long extraction passage to its load-bearing
+    clause is grounded, not fabricated. An empty quote grounds nothing.
+    """
+    if not quote:
+        return False
+    if quote in allowed:
+        return True
+    return any(quote in surfaced for surfaced in allowed)
 
 
 def validate_aggregate_category(
@@ -90,11 +107,18 @@ def validate_aggregate_category(
             )
             break
 
-    # Every claim citation quote must be one the extraction surfaced.
+    # Every claim citation quote must be grounded in what the extraction surfaced.
+    # The aggregate model is fed only the extraction quotes (never the paper
+    # Markdown), so a claim quote is grounded iff it is byte-present in a surfaced
+    # quote for that paper. A contiguous SUBSTRING of a surfaced quote counts:
+    # the extraction deliberately captures long passages (a full sentence / table
+    # row) and the aggregator legitimately trims to the load-bearing clause, which
+    # is still verbatim source text and still resolves to a highlight downstream.
+    # Only a quote contained in NO surfaced quote is a fabrication/alteration.
     for claim in cat_result.claims:
         allowed = extraction_quotes_by_paper.get(claim.paper_id, set())
         for citation in claim.citations:
-            if citation.quote not in allowed:
+            if not _quote_grounded(citation.quote, allowed):
                 errors.append(
                     (
                         'claim_quote_not_in_extraction',
