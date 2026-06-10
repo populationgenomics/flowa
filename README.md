@@ -53,12 +53,20 @@ The PyPI distribution is named `flowapy` (the `flowa` name was already taken), b
 
 ## Usage
 
+A variant is passed as `--variant-spec`, either inline JSON or `@path/to/spec.json`. The
+envelope is `{"schema_version": 1, "variants": [{ "kind": "hgvs_c", "transcript": ...,
+"hgvs_c": ... }]}` — `hgvs_c` is the bare coding change with no transcript prefix. The gene
+symbol and genomic coordinates are derived downstream, so they aren't part of the spec.
+
 ```bash
+# Example variant spec (GAA / Pompe, NM_000152.5:c.2238G>C)
+SPEC='{"schema_version":1,"variants":[{"kind":"hgvs_c","transcript":"NM_000152.5","hgvs_c":"c.2238G>C"}]}'
+
 # Full pipeline
-flowa run --variant-id VAR123 --gene GAA --hgvs-c "NM_000152.5:c.2238G>C" --source litvar
+flowa run --variant-id VAR123 --variant-spec "$SPEC" --source litvar
 
 # Individual steps (for debugging)
-flowa query --variant-id VAR123 --gene GAA --hgvs-c "NM_000152.5:c.2238G>C" --source litvar
+flowa query --variant-id VAR123 --variant-spec "$SPEC" --source litvar
 flowa download --doi '10.1038/s41586-020-2308-7'
 flowa convert --doi '10.1038/s41586-020-2308-7'
 flowa extract --variant-id VAR123 --doi '10.1038/s41586-020-2308-7'
@@ -232,7 +240,9 @@ Run the pipeline directly from a checkout (the [Quickstart](#quickstart) demo wr
 export FLOWA_STORAGE_BASE=file:///tmp/flowa
 export FLOWA_CONVERT_MODEL__NAME=bedrock:au.anthropic.claude-sonnet-4-6
 export FLOWA_EXTRACTION_MODEL__NAME=bedrock:au.anthropic.claude-opus-4-6
-uv run flowa run --variant-id test --gene GAA --hgvs-c "NM_000152.5:c.2238G>C" --source litvar
+uv run flowa run --variant-id test \
+  --variant-spec '{"schema_version":1,"variants":[{"kind":"hgvs_c","transcript":"NM_000152.5","hgvs_c":"c.2238G>C"}]}' \
+  --source litvar
 ```
 
 ### Docker
@@ -244,7 +254,9 @@ docker run \
   -e FLOWA_CONVERT_MODEL__NAME=bedrock:au.anthropic.claude-sonnet-4-6 \
   -e FLOWA_EXTRACTION_MODEL__NAME=bedrock:au.anthropic.claude-opus-4-6 \
   -e AWS_REGION=ap-southeast-2 \
-  flowa run --variant-id VAR123 --gene GAA --hgvs-c "NM_000152.5:c.2238G>C" --source litvar
+  flowa run --variant-id VAR123 \
+  --variant-spec '{"schema_version":1,"variants":[{"kind":"hgvs_c","transcript":"NM_000152.5","hgvs_c":"c.2238G>C"}]}' \
+  --source litvar
 ```
 
 ### AWS Batch
@@ -279,6 +291,6 @@ aws batch submit-job \
   --job-definition flowa-worker \
   --job-queue flowa-queue \
   --container-overrides '{
-    "command": ["run", "--variant-id", "VAR123", "--gene", "GAA", "--hgvs-c", "NM_000152.5:c.2238G>C", "--source", "litvar"]
+    "command": ["run", "--variant-id", "VAR123", "--variant-spec", "{\"schema_version\":1,\"variants\":[{\"kind\":\"hgvs_c\",\"transcript\":\"NM_000152.5\",\"hgvs_c\":\"c.2238G>C\"}]}", "--source", "litvar"]
   }'
 ```

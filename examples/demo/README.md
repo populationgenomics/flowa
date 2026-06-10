@@ -187,7 +187,8 @@ if [ -n "${BEDROCK_INFERENCE_PROFILE:-}" ]; then
   export FLOWA_EXTRACTION_MODEL__BEDROCK_INFERENCE_PROFILE="$BEDROCK_INFERENCE_PROFILE"
   export FLOWA_CONVERT_MODEL__BEDROCK_INFERENCE_PROFILE="$BEDROCK_INFERENCE_PROFILE"
 fi
-uv run flowa run --variant-id $VARIANT --gene RYR2 --hgvs-c "NM_001035.3:c.14174A>G"
+uv run flowa run --variant-id $VARIANT \
+  --variant-spec '{"schema_version":1,"variants":[{"kind":"hgvs_c","transcript":"NM_001035.3","hgvs_c":"c.14174A>G"}]}'
 ```
 
 Open `http://localhost:7700/viewer/$VARIANT/acmg_classification` (with
