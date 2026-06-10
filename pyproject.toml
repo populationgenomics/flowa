@@ -1,6 +1,6 @@
 [project]
 name = "flowapy"
-version = "0.4.1"
+version = "0.4.2"
 description = "Variant literature assessment pipeline with AI extraction"
 readme = "README.md"
 requires-python = "==3.13.*"

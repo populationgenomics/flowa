@@ -22,6 +22,7 @@ from flowa.assemble import assemble_paper
 from flowa.models import create_model, get_model_settings
 from flowa.pdf_index_cache import build as build_pdf_index_payload
 from flowa.pdf_index_cache import serialize as serialize_pdf_index_payload
+from flowa.pdfium import run_pdfium
 from flowa.prompts import load_text_prompt
 from flowa.settings import ModelConfig, Settings
 from flowa.storage import (
@@ -174,7 +175,10 @@ async def transcribe(
     Splits the PDF into chunks (``page_count`` pages each), converts each chunk
     concurrently, then joins the results with ``<!--page-->`` separators.
     """
-    doc_chunks = list(chunks(pdf_bytes, page_count=page_count))
+    # chunks() drives PDFium (page splitting); route it through the single
+    # PDFium lane and fully materialise the generator there so no PDFium call
+    # leaks onto the event-loop thread during iteration.
+    doc_chunks = await run_pdfium(lambda: list(chunks(pdf_bytes, page_count=page_count)))
 
     coros = [_generate_markdown(chunk.data, model, prompt) for chunk in doc_chunks]
     chunk_results = list(await asyncio.gather(*coros))
@@ -295,9 +299,11 @@ async def convert_paper_async(base: str, doi: str, model: ModelConfig, prompt_se
         full_pdf_bytes = read_bytes(full_pdf_url(base, doi))
         markdown = read_text(full_md_url(base, doi))
         t0 = time.monotonic()
-        blob = await asyncio.to_thread(
-            lambda: serialize_pdf_index_payload(build_pdf_index_payload(full_pdf_bytes, markdown))
-        )
+        # PdfIndex construction drives PDFium, so it goes on the single PDFium
+        # lane; the zstd serialisation is plain CPU work, so it goes back to the
+        # general pool and doesn't hold the scarce lane while other papers wait.
+        payload = await run_pdfium(lambda: build_pdf_index_payload(full_pdf_bytes, markdown))
+        blob = await asyncio.to_thread(lambda: serialize_pdf_index_payload(payload))
         write_bytes(index_url, blob)
         log.info('Wrote pdf_index for DOI %s: %.1f MB in %.1fs', doi, len(blob) / 1e6, time.monotonic() - t0)
 
