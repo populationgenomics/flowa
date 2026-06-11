@@ -72,28 +72,16 @@ if (!existsSync(dataRoot) && existsSync(fixturesRoot)) {
   cpSync(fixturesRoot, dataRoot, { recursive: true });
 }
 
-// pdfjs worker + cmaps must live under public/ for the viewer page to
-// reach them. The pnpm workspace's `ignore-scripts=true` policy
-// suppresses pdfjs-dist's postinstall, and our own postinstall could
-// also be skipped, so re-run the copy idempotently on every boot.
-const pdfjsCopy = spawnSync(
-  "pnpm",
-  ["exec", "tsx", "scripts/copy-pdfjs-assets.ts"],
-  { cwd: demoRoot, stdio: "inherit" },
-);
-if (pdfjsCopy.status !== 0) {
-  console.error("failed to copy pdfjs assets into public/pdfjs/");
-  process.exit(1);
-}
-
 // `@flowajs/chat-service` and `@flowajs/react-viewer` are consumed via their
 // `exports` maps, which resolve to `dist/`. On a cold clone `dist/` doesn't
 // exist yet, and the workspace's `ignore-scripts=true` policy means no
 // `prepare`/`postinstall` builds it. The `chat` process below imports
 // chat-service's `dist/server.js` at startup and has no watcher, so without a
 // prebuild it crashes with ERR_MODULE_NOT_FOUND and `killOthersOn:["failure"]`
-// tears the whole demo down. Build both once up front; react-viewer's watchers
-// (below) keep its `dist/` fresh after this initial build.
+// tears the whole demo down. copy-pdfjs-assets (below) likewise resolves the
+// pdf.js worker through react-viewer's `dist/`. Build both once up front;
+// react-viewer's watchers (below) keep its `dist/` fresh after this initial
+// build.
 const prebuild = spawnSync(
   "pnpm",
   [
@@ -112,6 +100,21 @@ if (prebuild.status !== 0) {
   process.exit(1);
 }
 
+// pdfjs worker + cmaps must live under public/ for the viewer page to reach
+// them. copy-pdfjs-assets derives them from @flowajs/react-viewer's bundled
+// pdf.js, so this must run *after* the prebuild above that creates
+// react-viewer's `dist/`. The workspace's `ignore-scripts=true` policy
+// suppresses postinstall hooks, so re-run the copy idempotently on every boot.
+const pdfjsCopy = spawnSync(
+  "pnpm",
+  ["exec", "tsx", "scripts/copy-pdfjs-assets.ts"],
+  { cwd: demoRoot, stdio: "inherit" },
+);
+if (pdfjsCopy.status !== 0) {
+  console.error("failed to copy pdfjs assets into public/pdfjs/");
+  process.exit(1);
+}
+
 // Translate LLM_MODEL + BEDROCK_INFERENCE_PROFILE into the FLOWA_* shape
 // pydantic-settings expects on the Python side. Provider creds (AWS_*,
 // ANTHROPIC_API_KEY, GOOGLE_*, OPENAI_API_KEY) are read by each SDK
@@ -124,13 +127,15 @@ const bedrockProfile = process.env.BEDROCK_INFERENCE_PROFILE;
 const flowaPromptDir = resolve(demoRoot, "..", "..", "prompts");
 const flowaEnv: Record<string, string> = {
   FLOWA_STORAGE_BASE: dataRoot,
+  FLOWA_CONVERSION_MODEL__NAME: llmModel,
   FLOWA_EXTRACTION_MODEL__NAME: llmModel,
-  FLOWA_CONVERT_MODEL__NAME: llmModel,
+  FLOWA_AGGREGATION_MODEL__NAME: llmModel,
   FLOWA_PROMPT_DIR: flowaPromptDir,
 };
 if (bedrockProfile) {
+  flowaEnv.FLOWA_CONVERSION_MODEL__BEDROCK_INFERENCE_PROFILE = bedrockProfile;
   flowaEnv.FLOWA_EXTRACTION_MODEL__BEDROCK_INFERENCE_PROFILE = bedrockProfile;
-  flowaEnv.FLOWA_CONVERT_MODEL__BEDROCK_INFERENCE_PROFILE = bedrockProfile;
+  flowaEnv.FLOWA_AGGREGATION_MODEL__BEDROCK_INFERENCE_PROFILE = bedrockProfile;
 }
 
 const env = {
