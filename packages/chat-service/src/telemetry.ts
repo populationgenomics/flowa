@@ -131,7 +131,8 @@ export type ValidationRule =
   | "claims_group_order"
   | "cite_unknown_paper_id"
   | "cite_missing_quote"
-  | "cite_quote_mismatch";
+  | "cite_quote_mismatch"
+  | "claim_not_linked_in_writeup";
 
 export function recordValidationError(rule: ValidationRule): void {
   validationErrorCounter.add(1, { rule });

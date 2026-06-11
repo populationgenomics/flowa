@@ -164,6 +164,36 @@ def test_claim_quote_must_come_from_extraction() -> None:
     assert 'claim_quote_not_in_extraction' in _rules(errors)
 
 
+def test_orphan_claim_flagged() -> None:
+    # A claim with no inline #cite link pointing at it — the regression this rule
+    # exists to catch: facts sit in claims[] disconnected from the write-up.
+    cat = _cat(
+        notes='Common in unrelated probands.',  # plain prose, no #cite link
+        papers=('Smith2024',),
+        claims=(_claim('Smith2024', _Q1),),
+    )
+    errors = validate_aggregate_category(
+        cat, valid_paper_ids={'Smith2024'}, extraction_quotes_by_paper={'Smith2024': {_Q1}}
+    )
+    assert 'claim_not_linked_in_writeup' in _rules(errors)
+
+
+def test_claim_linked_by_one_of_several_citations_passes() -> None:
+    # A claim may carry multiple citations; >=1 inline link to any of them
+    # satisfies the no-orphan rule — the others need not each be linked.
+    cat = _cat(
+        notes=f'Common ([nine probands](#cite:Smith2024 "{_Q1}")).',
+        papers=('Smith2024',),
+        claims=(_claim('Smith2024', _Q1, 'a second supporting quote'),),
+    )
+    errors = validate_aggregate_category(
+        cat,
+        valid_paper_ids={'Smith2024'},
+        extraction_quotes_by_paper={'Smith2024': {_Q1, 'a second supporting quote'}},
+    )
+    assert errors == []
+
+
 def test_claim_quote_substring_of_extraction_passes() -> None:
     # The extraction surfaces a long passage; the aggregator legitimately trims
     # it to its load-bearing clause. That contiguous substring is still verbatim

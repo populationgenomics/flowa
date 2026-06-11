@@ -4,7 +4,8 @@ These run at *genesis* (the `aggregate` pipeline stage) so the artifact is born
 valid, mirroring the edit-time checks `@flowajs/chat-service` already enforces
 on every commit. Every rule compares the model's own output against itself —
 id set-membership, claim grouping/order, and exact string equality between a
-notes `#cite` quote and a claim citation quote. There is deliberately **no
+notes `#cite` quote and a claim citation quote in BOTH directions (no dangling
+link without a claim; no orphan claim without an inline link). There is deliberately **no
 source-document matching and no fuzzy threshold**: those checks (verbatim
 grounding, contiguity) are heuristics with false positives/negatives, and a
 non-grounding quote already degrades gracefully downstream (no bbox/anchor →
@@ -154,5 +155,30 @@ def validate_aggregate_category(
                         f'{field_name}: quote referenced by #cite:{pid} does not match any claim citation for "{pid}" (quote: {quote!r})',
                     )
                 )
+
+    # Reverse of cite_quote_mismatch: every claim must be reachable from the
+    # write-up by >=1 inline #cite link. A claim sitting in claims[] that no
+    # narrative link points at is an orphan the curator cannot fact-check —
+    # the write-up and claims[] are two views of one set. A claim is linked iff
+    # one of its citation quotes is used verbatim by an inline link for the same
+    # paper. (Quotes that match no claim are already flagged cite_quote_mismatch
+    # above; they simply never satisfy a claim here.)
+    linked_quotes_by_paper: dict[str, set[str]] = {}
+    for text in (cat_result.notes, cat_result.description):
+        for match in _CITE_LINK_RE.finditer(text or ''):
+            pid, quote = match.group(1), match.group(2)
+            if quote is not None:
+                linked_quotes_by_paper.setdefault(pid, set()).add(quote)
+
+    for claim in cat_result.claims:
+        linked = linked_quotes_by_paper.get(claim.paper_id, set())
+        if not any(citation.quote in linked for citation in claim.citations):
+            errors.append(
+                (
+                    'claim_not_linked_in_writeup',
+                    f'claim for "{claim.paper_id}" is an orphan — no inline #cite: link in '
+                    f'notes/description references it; every claim must be cited inline in the write-up',
+                )
+            )
 
     return errors

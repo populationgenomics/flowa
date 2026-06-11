@@ -56,7 +56,7 @@ const BASE_YAML = [
   `description: short summary`,
   `notes: |-`,
   `  paragraph one`,
-  `  paragraph two`,
+  `  paragraph two [foundational claim](#cite:Smith2024 "foundational claim about the variant in five unrelated families")`,
   `papers:`,
   `  - paper_id: Smith2024`,
   `    rank_rationale: most important`,
@@ -93,7 +93,10 @@ function buildArtifact(overrides: Partial<Artifact> = {}): Artifact {
   return {
     category: "cat-A",
     description: "d",
-    notes: "n",
+    // The default notes links the default claim so the fixture is internally
+    // valid (no orphan claim). Tests that exercise other rules override notes
+    // or claims as needed.
+    notes: '[a claim](#cite:Smith2024 "verbatim quote long enough")',
     papers: [{ paper_id: "Smith2024", rank_rationale: "top" }],
     claims: [
       {
@@ -197,7 +200,8 @@ describe("str_replace validation", () => {
     const session = makeSession();
     const tools = makeTools(session);
     const result = await tools.str_replace.execute({
-      old_str: "notes: |-\n  paragraph one\n  paragraph two\n",
+      old_str:
+        'notes: |-\n  paragraph one\n  paragraph two [foundational claim](#cite:Smith2024 "foundational claim about the variant in five unrelated families")\n',
       new_str: "",
     });
     expect((result as { is_error: boolean }).is_error).toBe(true);
@@ -303,7 +307,7 @@ describe("search", () => {
 const REWRITTEN_YAML = [
   `category: cat-B`,
   `description: updated short`,
-  `notes: updated notes`,
+  `notes: 'updated notes [ref](#cite:Jones2025 "new claim from a different paper supported by a long quote")'`,
   `papers:`,
   `  - paper_id: Jones2025`,
   `    rank_rationale: now the most load-bearing source`,
@@ -396,6 +400,35 @@ describe("validateArtifactContent", () => {
       buildArtifact({
         notes:
           'See [here](#cite:Smith2024 "verbatim quote long enough") for details.',
+      }),
+    );
+    expect(errs).toEqual([]);
+  });
+
+  test("orphan claim with no inline link is flagged", () => {
+    const errs = validateArtifactContent(
+      buildArtifact({
+        notes: "Plain prose with no citation link.",
+        // default claim (Smith2024) is now unreferenced by the write-up
+      }),
+    );
+    expect(errs.join(" | ")).toMatch(/orphan/);
+  });
+
+  test("claim linked by one of several citations passes", () => {
+    const errs = validateArtifactContent(
+      buildArtifact({
+        notes: 'See [here](#cite:Smith2024 "verbatim quote long enough").',
+        claims: [
+          {
+            paper_id: "Smith2024",
+            text: "a claim",
+            citations: [
+              { quote: "verbatim quote long enough" },
+              { quote: "a second supporting quote" },
+            ],
+          },
+        ],
       }),
     );
     expect(errs).toEqual([]);

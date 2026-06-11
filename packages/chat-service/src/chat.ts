@@ -330,6 +330,35 @@ export function validateArtifactContent(
     }
   }
 
+  // Reverse of cite_quote_mismatch: every claim must be reachable from the
+  // write-up by >=1 inline #cite link. An orphan claim — one no narrative link
+  // points at — is a fact the curator cannot reach; claims[] and the write-up's
+  // links are two views of one set. Mirrors content_validation.py.
+  const linkedQuotesByPaper = new Map<string, Set<string>>();
+  for (const text of [artifact.notes, artifact.description]) {
+    CITE_LINK_RE.lastIndex = 0;
+    let m: RegExpExecArray | null;
+    while ((m = CITE_LINK_RE.exec(text)) !== null) {
+      const quote = m[2];
+      if (quote === undefined) continue;
+      const pid = m[1]!;
+      const set = linkedQuotesByPaper.get(pid) ?? new Set<string>();
+      set.add(quote);
+      linkedQuotesByPaper.set(pid, set);
+    }
+  }
+  for (const claim of artifact.claims) {
+    const linked = linkedQuotesByPaper.get(claim.paper_id);
+    const isLinked =
+      linked !== undefined && claim.citations.some((c) => linked.has(c.quote));
+    if (!isLinked) {
+      errors.push(
+        `claim for "${claim.paper_id}" is an orphan — no inline #cite: link in notes/description references it; every claim must be cited inline in the write-up`,
+      );
+      recordValidationError("claim_not_linked_in_writeup");
+    }
+  }
+
   return errors;
 }
 
