@@ -8,8 +8,6 @@ strand-naive construction this replaced sent `g.…T>C` to Mastermind and got
 zero papers for every minus-strand variant.
 """
 
-import asyncio
-
 import flowa.normalize as normalize
 
 # Minimal VEP response for GJB2 NM_004004.6:c.101T>C (minus strand). Only the
@@ -57,10 +55,10 @@ def _patch(monkeypatch, vep, recoder):
     monkeypatch.setattr(normalize, '_fetch_recoder', fake_recoder)
 
 
-def test_minus_strand_genomic_is_forward_strand(monkeypatch):
+async def test_minus_strand_genomic_is_forward_strand(monkeypatch):
     _patch(monkeypatch, _GJB2_VEP, _GJB2_RECODER)
 
-    result = asyncio.run(normalize.normalize_variant('NM_004004.6:c.101T>C', 'NM_004004.6'))
+    result = await normalize.normalize_variant('NM_004004.6:c.101T>C', 'NM_004004.6')
 
     g = result['grch38']
     # Coding T>C on the minus strand is genomic A>G — never the strand-relative T>C.
@@ -71,7 +69,7 @@ def test_minus_strand_genomic_is_forward_strand(monkeypatch):
     assert result['mane_select']['transcript_id'] == 'NM_004004.6'
 
 
-def test_recoder_indel_uses_spdi_sequences(monkeypatch):
+async def test_recoder_indel_uses_spdi_sequences(monkeypatch):
     # COL4A3 c.5010_*14del — an indel; the old SNV-only construction raised here.
     vep = [
         {
@@ -98,7 +96,7 @@ def test_recoder_indel_uses_spdi_sequences(monkeypatch):
     }
     _patch(monkeypatch, vep, recoder)
 
-    result = asyncio.run(normalize.normalize_variant('NM_000091.5:c.5010_*14del', 'NM_000091.5'))
+    result = await normalize.normalize_variant('NM_000091.5:c.5010_*14del', 'NM_000091.5')
 
     g = result['grch38']
     assert g['hgvs_g'] == 'NC_000002.12:g.227311867_227311884del'

@@ -6,8 +6,6 @@ the deterministic partitioning and filename-sanitisation logic, plus
 the network fetch monkeypatched.
 """
 
-import asyncio
-
 from flowa.download import _partition_media_urls, _sanitize_supplement_filename, download_paper_async
 from flowa.storage import paper_url, read_bytes, write_bytes, write_json
 
@@ -56,7 +54,7 @@ def test_sanitize_supplement_filename_truncates_to_128() -> None:
     assert len(out) == 128
 
 
-def test_download_writes_main_pdf_and_ord_prefixed_supplements(tmp_path, monkeypatch) -> None:
+async def test_download_writes_main_pdf_and_ord_prefixed_supplements(tmp_path, monkeypatch) -> None:
     base = str(tmp_path)
     write_json(paper_url(base, DOI, 'metadata.json'), {'pmid': 42})
 
@@ -66,7 +64,7 @@ def test_download_writes_main_pdf_and_ord_prefixed_supplements(tmp_path, monkeyp
         return b'MAINPDF', [('Fig S1.pdf', b'PDFSUP'), ('table.xlsx', b'XLSX')], 'ok'
 
     monkeypatch.setattr('flowa.download.fetch_pmc_paper', fake_fetch)
-    asyncio.run(download_paper_async(base, DOI))
+    await download_paper_async(base, DOI)
 
     assert read_bytes(paper_url(base, DOI, 'main.pdf')) == b'MAINPDF'
     # Shared ord sequence; the basename is sanitised (space -> underscore).
@@ -74,7 +72,7 @@ def test_download_writes_main_pdf_and_ord_prefixed_supplements(tmp_path, monkeyp
     assert read_bytes(paper_url(base, DOI, 'supplements/001_table.xlsx')) == b'XLSX'
 
 
-def test_download_skips_when_main_pdf_exists(tmp_path, monkeypatch) -> None:
+async def test_download_skips_when_main_pdf_exists(tmp_path, monkeypatch) -> None:
     base = str(tmp_path)
     write_bytes(paper_url(base, DOI, 'main.pdf'), b'EXISTING')
     write_json(paper_url(base, DOI, 'metadata.json'), {'pmid': 42})
@@ -86,7 +84,7 @@ def test_download_skips_when_main_pdf_exists(tmp_path, monkeypatch) -> None:
         return b'NEW', [], 'ok'
 
     monkeypatch.setattr('flowa.download.fetch_pmc_paper', fake_fetch)
-    asyncio.run(download_paper_async(base, DOI))
+    await download_paper_async(base, DOI)
 
     assert not called  # main.pdf present -> the whole PMC fetch is skipped
     assert read_bytes(paper_url(base, DOI, 'main.pdf')) == b'EXISTING'

@@ -561,6 +561,7 @@ dev = [
     { name = "mypy" },
     { name = "pre-commit", specifier = ">=4.5.1" },
     { name = "pytest" },
+    { name = "pytest-asyncio" },
     { name = "ruff" },
     { name = "types-defusedxml" },
     { name = "types-openpyxl", specifier = ">=3.1.5.20260518" },

@@ -7,7 +7,6 @@ pypdf-generated PDFs. The fake transcribe returns ``"T{n}"`` for an n-page PDF a
 records each call's page count, so we can assert exactly which PDFs were transcribed.
 """
 
-import asyncio
 import io
 
 from pypdf import PdfReader, PdfWriter
@@ -76,12 +75,12 @@ def test_accept_pdf_supplements_drops_unreadable() -> None:
 # --- convert_paper_async --------------------------------------------------------
 
 
-def test_convert_no_supplements(tmp_path, monkeypatch) -> None:
+async def test_convert_no_supplements(tmp_path, monkeypatch) -> None:
     base = str(tmp_path)
     calls = _patch(monkeypatch)
     write_bytes(paper_url(base, DOI, 'main.pdf'), _pdf(2))
 
-    asyncio.run(convert_paper_async(base, DOI, MODEL))
+    await convert_paper_async(base, DOI, MODEL)
 
     assert calls == [2]
     assert read_text(paper_url(base, DOI, 'main.md')) == 'T2'
@@ -92,13 +91,13 @@ def test_convert_no_supplements(tmp_path, monkeypatch) -> None:
     assert full_pdf_url(base, DOI).endswith('/main.pdf')
 
 
-def test_convert_with_pdf_supplement_builds_merge(tmp_path, monkeypatch) -> None:
+async def test_convert_with_pdf_supplement_builds_merge(tmp_path, monkeypatch) -> None:
     base = str(tmp_path)
     _patch(monkeypatch)
     write_bytes(paper_url(base, DOI, 'main.pdf'), _pdf(2))
     write_bytes(paper_url(base, DOI, 'supplements/000_s1.pdf'), _pdf(1))
 
-    asyncio.run(convert_paper_async(base, DOI, MODEL))
+    await convert_paper_async(base, DOI, MODEL)
 
     assert _pages(read_bytes(paper_url(base, DOI, 'merged.pdf'))) == 3  # 2 main + 1 supplement
     assert full_pdf_url(base, DOI).endswith('/merged.pdf')
@@ -110,12 +109,12 @@ def test_convert_with_pdf_supplement_builds_merge(tmp_path, monkeypatch) -> None
     assert 'T1' in md
 
 
-def test_convert_is_incremental_per_supplement(tmp_path, monkeypatch) -> None:
+async def test_convert_is_incremental_per_supplement(tmp_path, monkeypatch) -> None:
     base = str(tmp_path)
     calls = _patch(monkeypatch)
     write_bytes(paper_url(base, DOI, 'main.pdf'), _pdf(2))
     write_bytes(paper_url(base, DOI, 'supplements/000_s1.pdf'), _pdf(1))
-    asyncio.run(convert_paper_async(base, DOI, MODEL))
+    await convert_paper_async(base, DOI, MODEL)
     assert sorted(calls) == [1, 2]  # main + first supplement
 
     # Add a second supplement; mimic the PDF-supplement invalidation (drop merged.pdf +
@@ -125,7 +124,7 @@ def test_convert_is_incremental_per_supplement(tmp_path, monkeypatch) -> None:
         remove(paper_url(base, DOI, f))
     write_bytes(paper_url(base, DOI, 'supplements/001_s2.pdf'), _pdf(3))
 
-    asyncio.run(convert_paper_async(base, DOI, MODEL))
+    await convert_paper_async(base, DOI, MODEL)
 
     assert calls == [3]  # only the new supplement is transcribed
     assert _pages(read_bytes(paper_url(base, DOI, 'merged.pdf'))) == 6  # 2 + 1 + 3
@@ -134,25 +133,25 @@ def test_convert_is_incremental_per_supplement(tmp_path, monkeypatch) -> None:
     assert '<!--supplement: 001_s2.pdf-->' in md
 
 
-def test_convert_cached_is_noop(tmp_path, monkeypatch) -> None:
+async def test_convert_cached_is_noop(tmp_path, monkeypatch) -> None:
     base = str(tmp_path)
     calls = _patch(monkeypatch)
     write_bytes(paper_url(base, DOI, 'main.pdf'), _pdf(1))
-    asyncio.run(convert_paper_async(base, DOI, MODEL))
+    await convert_paper_async(base, DOI, MODEL)
     calls.clear()
 
-    asyncio.run(convert_paper_async(base, DOI, MODEL))
+    await convert_paper_async(base, DOI, MODEL)
 
     assert calls == []  # fast path: all derived artifacts present
 
 
-def test_convert_page_cap_drops_oversized_supplement(tmp_path, monkeypatch) -> None:
+async def test_convert_page_cap_drops_oversized_supplement(tmp_path, monkeypatch) -> None:
     base = str(tmp_path)
     _patch(monkeypatch)
     write_bytes(paper_url(base, DOI, 'main.pdf'), _pdf(1))
     write_bytes(paper_url(base, DOI, 'supplements/000_big.pdf'), _pdf(25))  # over the 20 cap
 
-    asyncio.run(convert_paper_async(base, DOI, MODEL))
+    await convert_paper_async(base, DOI, MODEL)
 
     assert not exists(paper_url(base, DOI, 'supplements/000_big.pdf.md'))  # never transcribed
     assert not exists(paper_url(base, DOI, 'merged.pdf'))  # nothing accepted -> no merge
@@ -160,12 +159,12 @@ def test_convert_page_cap_drops_oversized_supplement(tmp_path, monkeypatch) -> N
     assert read_text(full_md_url(base, DOI)) == 'T1'  # full_md falls back to main.md
 
 
-def test_convert_drops_stale_merge_when_last_supplement_removed(tmp_path, monkeypatch) -> None:
+async def test_convert_drops_stale_merge_when_last_supplement_removed(tmp_path, monkeypatch) -> None:
     base = str(tmp_path)
     _patch(monkeypatch)
     write_bytes(paper_url(base, DOI, 'main.pdf'), _pdf(1))
     write_bytes(paper_url(base, DOI, 'supplements/000_s1.pdf'), _pdf(1))
-    asyncio.run(convert_paper_async(base, DOI, MODEL))
+    await convert_paper_async(base, DOI, MODEL)
     assert exists(paper_url(base, DOI, 'merged.pdf'))
 
     # Remove the supplement + its sidecar + index + merged.md, but leave merged.pdf:
@@ -173,7 +172,7 @@ def test_convert_drops_stale_merge_when_last_supplement_removed(tmp_path, monkey
     for f in ('supplements/000_s1.pdf', 'supplements/000_s1.pdf.md', 'pdf_index.pkl.zst', 'merged.md'):
         remove(paper_url(base, DOI, f))
 
-    asyncio.run(convert_paper_async(base, DOI, MODEL))
+    await convert_paper_async(base, DOI, MODEL)
 
     assert not exists(paper_url(base, DOI, 'merged.pdf'))
     assert full_pdf_url(base, DOI).endswith('/main.pdf')

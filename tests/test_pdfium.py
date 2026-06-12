@@ -26,14 +26,11 @@ def _record(hold: float) -> tuple[int, str, float, float]:
     return (threading.get_ident(), threading.current_thread().name, enter, time.perf_counter())
 
 
-def test_run_pdfium_serialises_concurrent_calls() -> None:
+async def test_run_pdfium_serialises_concurrent_calls() -> None:
     hold = 0.02
     n = 8
 
-    async def drive() -> list[tuple[int, str, float, float]]:
-        return list(await asyncio.gather(*(run_pdfium(lambda: _record(hold)) for _ in range(n))))
-
-    records = asyncio.run(drive())
+    records = list(await asyncio.gather(*(run_pdfium(lambda: _record(hold)) for _ in range(n))))
     assert len(records) == n
 
     # Every callable ran on the one PDFium worker thread.
