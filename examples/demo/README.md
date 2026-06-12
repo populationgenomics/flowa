@@ -181,11 +181,13 @@ replicate that translation when invoking the CLI directly:
 ```bash
 cd examples/demo && set -a && source .env && set +a && cd ../..
 export FLOWA_STORAGE_BASE="$PWD/examples/demo/demo-data"
+export FLOWA_CONVERSION_MODEL__NAME="$LLM_MODEL"
 export FLOWA_EXTRACTION_MODEL__NAME="$LLM_MODEL"
-export FLOWA_CONVERT_MODEL__NAME="$LLM_MODEL"
+export FLOWA_AGGREGATION_MODEL__NAME="$LLM_MODEL"
 if [ -n "${BEDROCK_INFERENCE_PROFILE:-}" ]; then
+  export FLOWA_CONVERSION_MODEL__BEDROCK_INFERENCE_PROFILE="$BEDROCK_INFERENCE_PROFILE"
   export FLOWA_EXTRACTION_MODEL__BEDROCK_INFERENCE_PROFILE="$BEDROCK_INFERENCE_PROFILE"
-  export FLOWA_CONVERT_MODEL__BEDROCK_INFERENCE_PROFILE="$BEDROCK_INFERENCE_PROFILE"
+  export FLOWA_AGGREGATION_MODEL__BEDROCK_INFERENCE_PROFILE="$BEDROCK_INFERENCE_PROFILE"
 fi
 uv run flowa run --variant-id $VARIANT \
   --variant-spec '{"schema_version":1,"variants":[{"kind":"hgvs_c","transcript":"NM_001035.3","hgvs_c":"c.14174A>G"}]}'

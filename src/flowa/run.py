@@ -15,13 +15,9 @@ from flowa.extract import extract_paper_async
 from flowa.progress import ProgressCallback, ProgressEvent, Stage, emit, now_iso
 from flowa.query import query_dois_async
 from flowa.schema import VariantSpec, parse_variant_spec_cli
-from flowa.settings import ModelConfig, Settings
+from flowa.settings import DEFAULT_DOWNLOAD_CONCURRENCY, LLM_CONCURRENCY, ModelConfig, Settings
 
 log = logging.getLogger(__name__)
-
-DEFAULT_CONVERT_CONCURRENCY = 20
-DEFAULT_EXTRACT_CONCURRENCY = 20
-DEFAULT_DOWNLOAD_CONCURRENCY = 5
 
 
 async def process_paper(
@@ -32,8 +28,7 @@ async def process_paper(
     extraction_model: ModelConfig,
     prompt_set: str,
     download_semaphore: asyncio.Semaphore,
-    convert_semaphore: asyncio.Semaphore,
-    extract_semaphore: asyncio.Semaphore,
+    llm_semaphore: asyncio.Semaphore,
     on_paper_done: Callable[[Stage, str], None] | None = None,
 ) -> None:
     """Download, convert, and extract a single paper.
@@ -41,6 +36,10 @@ async def process_paper(
     `on_paper_done(stage, doi)` fires after each sub-stage completes
     (stage in {"download", "convert", "extract"}), letting the caller
     surface per-stage progress.
+
+    The convert and extract sub-stages are both LLM calls and share a single
+    `llm_semaphore`, so total in-flight LLM work across all papers stays under
+    one ceiling.
     """
     with logfire.span('flowa.process_paper', doi=doi):
         async with download_semaphore:
@@ -48,12 +47,12 @@ async def process_paper(
         if on_paper_done is not None:
             on_paper_done('download', doi)
 
-        async with convert_semaphore:
+        async with llm_semaphore:
             await convert_paper_async(base, doi, convert_model, prompt_set)
         if on_paper_done is not None:
             on_paper_done('convert', doi)
 
-        async with extract_semaphore:
+        async with llm_semaphore:
             await extract_paper_async(base, variant_id, doi, extraction_model, prompt_set)
         if on_paper_done is not None:
             on_paper_done('extract', doi)
@@ -64,8 +63,7 @@ async def run_pipeline(
     variant_id: str,
     variant_spec: VariantSpec,
     source: Literal['mastermind', 'litvar'] = 'mastermind',
-    convert_concurrency: int = DEFAULT_CONVERT_CONCURRENCY,
-    extract_concurrency: int = DEFAULT_EXTRACT_CONCURRENCY,
+    llm_concurrency: int = LLM_CONCURRENCY,
     download_concurrency: int = DEFAULT_DOWNLOAD_CONCURRENCY,
     on_progress: ProgressCallback | None = None,
 ) -> None:
@@ -85,8 +83,7 @@ async def run_pipeline(
     with logfire.span('flowa.pipeline', variant_id=variant_id, source=source):
         base = settings.flowa_storage_base
         download_semaphore = asyncio.Semaphore(download_concurrency)
-        convert_semaphore = asyncio.Semaphore(convert_concurrency)
-        extract_semaphore = asyncio.Semaphore(extract_concurrency)
+        llm_semaphore = asyncio.Semaphore(llm_concurrency)
 
         # 1. Query literature sources
         log.info('=== Query (%s) ===', source)
@@ -110,11 +107,10 @@ async def run_pipeline(
 
         # 2. Process papers in parallel (download -> convert -> extract).
         log.info(
-            '=== Processing %d papers (max concurrent: %d downloads, %d converts, %d extracts) ===',
+            '=== Processing %d papers (max concurrent: %d downloads, %d LLM calls) ===',
             len(dois),
             download_concurrency,
-            convert_concurrency,
-            extract_concurrency,
+            llm_concurrency,
         )
         completed = 0
         failed = 0
@@ -144,12 +140,11 @@ async def run_pipeline(
                     base,
                     variant_id,
                     doi,
-                    settings.flowa_convert_model,
+                    settings.flowa_conversion_model,
                     settings.flowa_extraction_model,
                     settings.flowa_prompt_set,
                     download_semaphore,
-                    convert_semaphore,
-                    extract_semaphore,
+                    llm_semaphore,
                     on_paper_done=on_paper_done,
                 )
                 completed += 1
@@ -181,7 +176,12 @@ async def run_pipeline(
         log.info('=== Aggregating ===')
         emit(on_progress, ProgressEvent(timestamp=now_iso(), stage='aggregate', kind='stage_started'))
         await aggregate_evidence_async(
-            base, variant_id, settings.flowa_extraction_model, settings.ncbi_api_key, settings.flowa_prompt_set
+            base,
+            variant_id,
+            settings.flowa_aggregation_model,
+            settings.ncbi_api_key,
+            settings.flowa_prompt_set,
+            concurrency=llm_concurrency,
         )
         emit(on_progress, ProgressEvent(timestamp=now_iso(), stage='aggregate', kind='stage_done'))
 
@@ -196,14 +196,11 @@ def run(
         help='Variant spec as inline JSON or @path/to/spec.json',
     ),
     source: Literal['mastermind', 'litvar'] = typer.Option('mastermind', '--source', '-s', help='Literature source'),
-    convert_concurrency: int = typer.Option(
-        DEFAULT_CONVERT_CONCURRENCY, '--convert-concurrency', help='Max concurrent PDF-to-Markdown conversions'
-    ),
-    extract_concurrency: int = typer.Option(
-        DEFAULT_EXTRACT_CONCURRENCY, '--extract-concurrency', help='Max concurrent LLM extractions'
+    llm_concurrency: int = typer.Option(
+        LLM_CONCURRENCY, '--llm-concurrency', help='Max concurrent LLM calls (conversion, extraction, aggregation)'
     ),
 ) -> None:
     """Run the full assessment pipeline: query -> download -> convert -> extract -> aggregate."""
     variant_spec = parse_variant_spec_cli(variant_spec_raw)
     s = Settings()  # type: ignore[call-arg]
-    asyncio.run(run_pipeline(s, variant_id, variant_spec, source, convert_concurrency, extract_concurrency))
+    asyncio.run(run_pipeline(s, variant_id, variant_spec, source, llm_concurrency))

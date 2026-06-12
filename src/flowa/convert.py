@@ -323,4 +323,4 @@ def convert_paper(
     and the pre-built index to pdf_index.pkl.zst.
     """
     s = Settings()  # type: ignore[call-arg]
-    asyncio.run(convert_paper_async(s.flowa_storage_base, doi, s.flowa_convert_model, s.flowa_prompt_set))
+    asyncio.run(convert_paper_async(s.flowa_storage_base, doi, s.flowa_conversion_model, s.flowa_prompt_set))

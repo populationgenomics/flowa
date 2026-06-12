@@ -11,14 +11,18 @@ from pathlib import Path
 import jinja2
 import pytest
 
-from flowa.prompts import load_prompt_and_schema, load_text_prompt
+from flowa.prompts import load_aggregation, load_prompt_and_schema, load_text_prompt
 
-# Ensure cwd-relative `prompts/` resolution in `load_prompt_and_schema` lands at the repo root.
+# Ensure cwd-relative `prompts/` resolution lands at the repo root.
 REPO_ROOT = Path(__file__).resolve().parent.parent
 
 
 @pytest.fixture(autouse=True)
 def _chdir_repo_root(monkeypatch):
+    # Resolve against the in-repo `prompts/` (cwd-relative default), independent of any
+    # ambient FLOWA_PROMPT_DIR/FLOWA_PROMPT_SET a developer shell may export.
+    monkeypatch.delenv('FLOWA_PROMPT_DIR', raising=False)
+    monkeypatch.delenv('FLOWA_PROMPT_SET', raising=False)
     monkeypatch.chdir(REPO_ROOT)
 
 
@@ -39,30 +43,53 @@ def test_load_extraction_prompt_renders():
     assert '{{ full_text }}' not in rendered
 
 
-def test_load_aggregation_prompt_renders():
-    template, output_type = load_prompt_and_schema('aggregation', 'generic')
+def test_load_aggregation_manifest_and_modules():
+    agg = load_aggregation('generic')
 
-    rendered = template.render(
+    # The generic set declares a single label-based category.
+    assert agg.categories == [{'id': 'acmg_classification', 'module': 'categories/acmg_classification.txt'}]
+    assert set(agg.modules) == {'acmg_classification'}
+    assert agg.authoring.strip()
+    assert agg.modules['acmg_classification'].strip()
+
+    # The output model is the set's CategoryResult subclass.
+    fields = agg.category_result.model_fields
+    for name in ('category', 'description', 'notes', 'papers', 'claims', 'classification', 'classification_rationale'):
+        assert name in fields, f'CategoryResult missing field {name!r}'
+
+
+def test_aggregation_prompt_renders_with_injected_slots():
+    agg = load_aggregation('generic')
+
+    rendered = agg.template.render(
         variant_details='STUB_VARIANT_DETAILS',
         clinvar_data='STUB_CLINVAR_DATA',
         evidence_extractions='STUB_EVIDENCE_EXTRACTIONS',
+        authoring='STUB_AUTHORING',
+        category_module='STUB_CATEGORY_MODULE',
+        category_id='acmg_classification',
     )
 
-    assert 'STUB_VARIANT_DETAILS' in rendered
-    assert 'STUB_CLINVAR_DATA' in rendered
-    assert 'STUB_EVIDENCE_EXTRACTIONS' in rendered
-    assert hasattr(output_type, 'model_fields')
-    assert '{{ variant_details }}' not in rendered
-    assert '{{ clinvar_data }}' not in rendered
-    assert '{{ evidence_extractions }}' not in rendered
+    for stub in (
+        'STUB_VARIANT_DETAILS',
+        'STUB_CLINVAR_DATA',
+        'STUB_EVIDENCE_EXTRACTIONS',
+        'STUB_AUTHORING',
+        'STUB_CATEGORY_MODULE',
+        'acmg_classification',
+    ):
+        assert stub in rendered
+
+    for marker in ('{{ authoring }}', '{{ category_module }}', '{{ category_id }}', '{{ evidence_extractions }}'):
+        assert marker not in rendered
 
 
 def test_aggregation_prompt_strict_undefined():
     """Missing context vars must raise rather than silently render empty."""
-    template, _ = load_prompt_and_schema('aggregation', 'generic')
+    agg = load_aggregation('generic')
 
     with pytest.raises(jinja2.UndefinedError):
-        template.render(variant_details='only this one provided')
+        agg.template.render(variant_details='only this one provided')
 
 
 def test_load_text_prompt_uses_active_set_when_present(tmp_path, monkeypatch):

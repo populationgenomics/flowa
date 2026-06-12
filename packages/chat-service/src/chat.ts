@@ -390,14 +390,13 @@ function validateAndCommit(
     };
   }
 
-  const newCategory = validation.data.category;
-  if (
-    newCategory !== session.category &&
-    session.aggregateCategories.includes(newCategory)
-  ) {
+  // `category` is fixed for the session — a verdict only ever changes within its
+  // category, never moves across categories. The engine stamps it at genesis and
+  // the module/schema are bound to it at session start, so reject any mutation.
+  if (validation.data.category !== session.category) {
     recordToolValidationFailure(tool);
     return {
-      error: `Category ${newCategory} already has a result for this aggregate.`,
+      error: `Category is fixed for this session (${session.category}); it cannot be changed to ${validation.data.category}.`,
       is_error: true,
     };
   }

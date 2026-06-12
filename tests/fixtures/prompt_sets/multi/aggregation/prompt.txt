@@ -1,0 +1,13 @@
+SYNTHETIC GENESIS TEMPLATE (test fixture).
+
+Variant: {{ variant_details }}
+ClinVar: {{ clinvar_data }}
+
+{{ category_module }}
+
+{{ authoring }}
+
+Produce one result for category `{{ category_id }}`.
+
+Evidence:
+{{ evidence_extractions }}

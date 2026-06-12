@@ -82,7 +82,6 @@ function makeSession(overrides: Partial<SessionContext> = {}): SessionContext {
     artifactVersion: 0,
     artifactDirty: false,
     category: "cat-A",
-    aggregateCategories: ["cat-A"],
     locationCache: new Map(),
     paperMarkdownCache: new Map(),
     ...overrides,
@@ -210,30 +209,19 @@ describe("str_replace validation", () => {
     expect(session.artifactDirty).toBe(false);
   });
 
-  test("category change to an existing aggregate category is rejected", async () => {
-    const session = makeSession({ aggregateCategories: ["cat-A", "cat-B"] });
+  test("changing category is rejected — it is fixed for the session", async () => {
+    const session = makeSession();
     const tools = makeTools(session);
     const result = await tools.str_replace.execute({
       old_str: `category: cat-A`,
       new_str: `category: cat-B`,
     });
     expect(result).toEqual({
-      error: "Category cat-B already has a result for this aggregate.",
+      error:
+        "Category is fixed for this session (cat-A); it cannot be changed to cat-B.",
       is_error: true,
     });
     expect(session.artifactDirty).toBe(false);
-  });
-
-  test("category change to a category NOT in aggregateCategories succeeds", async () => {
-    const session = makeSession({ aggregateCategories: ["cat-A"] });
-    const tools = makeTools(session);
-    const result = await tools.str_replace.execute({
-      old_str: `category: cat-A`,
-      new_str: `category: cat-C`,
-    });
-    expect(result).toBe("Edit applied successfully.");
-    expect(session.artifactDirty).toBe(true);
-    expect(session.artifactYaml).toContain(`category: cat-C`);
   });
 });
 
@@ -305,7 +293,7 @@ describe("search", () => {
 // ---------------------------------------------------------------------------
 
 const REWRITTEN_YAML = [
-  `category: cat-B`,
+  `category: cat-A`,
   `description: updated short`,
   `notes: 'updated notes [ref](#cite:Jones2025 "new claim from a different paper supported by a long quote")'`,
   `papers:`,
@@ -321,7 +309,6 @@ const REWRITTEN_YAML = [
 describe("write tool", () => {
   test("validates and commits a wholesale rewrite", async () => {
     const session = makeSession({
-      aggregateCategories: ["cat-A"],
       paperIds: { Smith2024: "10.1/smith", Jones2025: "10.1/jones" },
     });
     const tools = makeTools(session);

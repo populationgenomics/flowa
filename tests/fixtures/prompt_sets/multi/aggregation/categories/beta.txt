@@ -1,0 +1,2 @@
+CATEGORY BETA (test fixture): assess the beta dimension of the evidence and set
+`verdict` to one of BETA_PRESENT or BETA_ABSENT.

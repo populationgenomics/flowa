@@ -1,0 +1,2 @@
+CATEGORY ALPHA (test fixture): assess the alpha dimension of the evidence and
+set `verdict` to one of ALPHA_HIGH, ALPHA_LOW, or ALPHA_NONE.

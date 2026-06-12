@@ -82,15 +82,17 @@ The model settings are nested config objects: set their sub-fields with the `__`
 | Variable                       | Description                                                                  | Example                                      |
 | ------------------------------ | ---------------------------------------------------------------------------- | -------------------------------------------- |
 | `FLOWA_STORAGE_BASE`           | Storage path for PDFs, extractions, results                                  | `s3://bucket`, `gs://bucket`, `file:///path` |
-| `FLOWA_CONVERT_MODEL__NAME`    | LLM for PDF→Markdown conversion (anchorite), in `<provider>:<model>` form   | `bedrock:au.anthropic.claude-sonnet-4-6`     |
-| `FLOWA_EXTRACTION_MODEL__NAME` | LLM for extraction and aggregation                                           | `bedrock:au.anthropic.claude-opus-4-6`       |
+| `FLOWA_CONVERSION_MODEL__NAME`  | LLM for PDF→Markdown conversion (anchorite), in `<provider>:<model>` form   | `bedrock:au.anthropic.claude-sonnet-4-6`     |
+| `FLOWA_EXTRACTION_MODEL__NAME` | LLM for extraction                                                            | `bedrock:au.anthropic.claude-sonnet-4-6`     |
+| `FLOWA_AGGREGATION_MODEL__NAME` | LLM for aggregation                                                          | `bedrock:au.anthropic.claude-opus-4-8`       |
 
 Optional:
 
 | Variable                                            | Description                                                                                                                  |
 | --------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------- |
-| `FLOWA_CONVERT_MODEL__BEDROCK_INFERENCE_PROFILE`    | Bedrock application inference profile ARN for cost attribution. When set, `__NAME` must point at the underlying foundation model. |
-| `FLOWA_EXTRACTION_MODEL__BEDROCK_INFERENCE_PROFILE` | Same, for the extraction/aggregation model.                                                                                 |
+| `FLOWA_CONVERSION_MODEL__BEDROCK_INFERENCE_PROFILE`  | Bedrock application inference profile ARN for cost attribution. When set, `__NAME` must point at the underlying foundation model. |
+| `FLOWA_EXTRACTION_MODEL__BEDROCK_INFERENCE_PROFILE` | Same, for the extraction model.                                                                                             |
+| `FLOWA_AGGREGATION_MODEL__BEDROCK_INFERENCE_PROFILE` | Same, for the aggregation model.                                                                                            |
 | `MASTERMIND_API_TOKEN`                              | Required when querying with `--source mastermind`; use `--source litvar` (free, no token) otherwise.                        |
 | `NCBI_API_KEY`                                      | Optional NCBI key for higher PubMed rate limits.                                                                            |
 
@@ -238,8 +240,9 @@ Run the pipeline directly from a checkout (the [Quickstart](#quickstart) demo wr
 
 ```bash
 export FLOWA_STORAGE_BASE=file:///tmp/flowa
-export FLOWA_CONVERT_MODEL__NAME=bedrock:au.anthropic.claude-sonnet-4-6
-export FLOWA_EXTRACTION_MODEL__NAME=bedrock:au.anthropic.claude-opus-4-6
+export FLOWA_CONVERSION_MODEL__NAME=bedrock:au.anthropic.claude-sonnet-4-6
+export FLOWA_EXTRACTION_MODEL__NAME=bedrock:au.anthropic.claude-sonnet-4-6
+export FLOWA_AGGREGATION_MODEL__NAME=bedrock:au.anthropic.claude-opus-4-8
 uv run flowa run --variant-id test \
   --variant-spec '{"schema_version":1,"variants":[{"kind":"hgvs_c","transcript":"NM_000152.5","hgvs_c":"c.2238G>C"}]}' \
   --source litvar
@@ -251,8 +254,9 @@ uv run flowa run --variant-id test \
 docker build --build-arg LLM_EXTRA=bedrock -t flowa .
 docker run \
   -e FLOWA_STORAGE_BASE=s3://bucket \
-  -e FLOWA_CONVERT_MODEL__NAME=bedrock:au.anthropic.claude-sonnet-4-6 \
-  -e FLOWA_EXTRACTION_MODEL__NAME=bedrock:au.anthropic.claude-opus-4-6 \
+  -e FLOWA_CONVERSION_MODEL__NAME=bedrock:au.anthropic.claude-sonnet-4-6 \
+  -e FLOWA_EXTRACTION_MODEL__NAME=bedrock:au.anthropic.claude-sonnet-4-6 \
+  -e FLOWA_AGGREGATION_MODEL__NAME=bedrock:au.anthropic.claude-opus-4-8 \
   -e AWS_REGION=ap-southeast-2 \
   flowa run --variant-id VAR123 \
   --variant-spec '{"schema_version":1,"variants":[{"kind":"hgvs_c","transcript":"NM_000152.5","hgvs_c":"c.2238G>C"}]}' \
@@ -275,8 +279,9 @@ aws batch register-job-definition \
     ],
     "environment": [
       {"name": "FLOWA_STORAGE_BASE", "value": "s3://flowa-data"},
-      {"name": "FLOWA_CONVERT_MODEL__NAME", "value": "bedrock:au.anthropic.claude-sonnet-4-6"},
-      {"name": "FLOWA_EXTRACTION_MODEL__NAME", "value": "bedrock:au.anthropic.claude-opus-4-6"}
+      {"name": "FLOWA_CONVERSION_MODEL__NAME", "value": "bedrock:au.anthropic.claude-sonnet-4-6"},
+      {"name": "FLOWA_EXTRACTION_MODEL__NAME", "value": "bedrock:au.anthropic.claude-sonnet-4-6"},
+      {"name": "FLOWA_AGGREGATION_MODEL__NAME", "value": "bedrock:au.anthropic.claude-opus-4-8"}
     ]
   }' \
   --retry-strategy '{"attempts": 2}' \

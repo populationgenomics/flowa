@@ -2,11 +2,12 @@
   "name": "@flowajs/prompts",
   "private": true,
   "version": "0.0.0",
-  "description": "Workspace anchor for prompt sets consumed by @flowajs/chat-service. Each subdirectory is a self-contained set with its own aggregation_edit_schema.ts and aggregation_edit_prompt.txt.",
+  "description": "Workspace anchor for prompt sets consumed by @flowajs/chat-service. Each subdirectory is a self-contained set; its aggregation artifacts (edit schema, templates, manifest, modules) live under <set>/aggregation/.",
   "license": "MIT",
   "type": "module",
   "exports": {
-    "./*": "./*/aggregation_edit_schema.ts"
+    "./*": "./*/aggregation/edit_schema.ts",
+    "./*/categories.json": "./*/aggregation/categories.json"
   },
   "dependencies": {
     "@flowajs/chat-service": "workspace:*",

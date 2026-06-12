@@ -30,8 +30,9 @@ def make_flowa_settings(storage_base: Path) -> FlowaSettings:
     the real pipeline in tests, so the model fields are placeholders."""
     return FlowaSettings.model_construct(
         flowa_storage_base=str(storage_base),
-        flowa_convert_model=ModelConfig(name='stub:test'),
+        flowa_conversion_model=ModelConfig(name='stub:test'),
         flowa_extraction_model=ModelConfig(name='stub:test'),
+        flowa_aggregation_model=ModelConfig(name='stub:test'),
         flowa_prompt_set='generic',
         flowa_log_level='INFO',
         mastermind_api_token=None,

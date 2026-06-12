@@ -12,7 +12,11 @@ import {
   listEditDrafts,
 } from "./storage-keys.js";
 import { schemaForPrompt, type Artifact } from "./artifact.js";
-import { loadEditPromptTemplate } from "./prompts.js";
+import {
+  loadAuthoring,
+  loadCategoryModule,
+  loadEditPromptTemplate,
+} from "./prompts.js";
 import type { Storage } from "./storage/interface.js";
 import {
   type LocationCache,
@@ -35,10 +39,8 @@ export interface SessionContext {
   artifactVersion: number;
   /** Set to true when an edit modifies the artifact during a turn. */
   artifactDirty: boolean;
-  /** Result selector (`category` in flowa-generic terms). */
+  /** Result selector (`category` in flowa-generic terms). Immutable for the session. */
   category: string;
-  /** All categories present in the aggregate (for rename-conflict detection). */
-  aggregateCategories: string[];
   /** Cached citation locations from the initial artifact, keyed by (paperId, quote). */
   locationCache: LocationCache;
   /** Paper ID → full markdown text, lazy-populated by paper tools. */
@@ -50,7 +52,7 @@ export interface SessionConfig {
   storage: Storage;
   /** Zod schema for the deployment's full artifact (extends the citation-grounded core). */
   schema: z.ZodType<Artifact>;
-  /** Directory containing `aggregation_edit_prompt.txt`. */
+  /** A prompt set's `aggregation/` dir: `edit_prompt.txt`, `authoring.txt`, `categories.json`, `categories/`. */
   promptDir: string;
   /** Session JWT signing config. */
   jwtSecret: string;
@@ -172,13 +174,13 @@ export async function rebuildSession(
       artifactYaml,
       schema: config.schema,
       promptDir: config.promptDir,
+      category,
     }),
     expiresAt,
     artifactYaml,
     artifactVersion,
     artifactDirty: false,
     category,
-    aggregateCategories: extractAggregateCategories(aggregate),
     locationCache,
     paperMarkdownCache: new Map(),
   };
@@ -239,7 +241,6 @@ export async function createEditSession(
   }));
 
   const paperIds = buildPaperIds(aggregate);
-  const aggregateCategories = extractAggregateCategories(aggregate);
 
   const locationCache = buildLocationCache(input.initialArtifact);
   const artifactYaml = artifactToYaml(input.initialArtifact);
@@ -250,6 +251,7 @@ export async function createEditSession(
     artifactYaml,
     schema: config.schema,
     promptDir: config.promptDir,
+    category: input.category,
   });
 
   const sessionId = randomUUID();
@@ -275,7 +277,6 @@ export async function createEditSession(
     artifactVersion: input.initialVersion,
     artifactDirty: false,
     category: input.category,
-    aggregateCategories,
     locationCache,
     paperMarkdownCache: new Map(),
   };
@@ -302,20 +303,6 @@ function extractArtifactFromAggregate(
     throw new Error(`Category ${category} not found in aggregation.json`);
   }
   return JSON.stringify(result, null, 2);
-}
-
-/** Extract all categories present in aggregation.json results. */
-function extractAggregateCategories(aggregate: unknown): string[] {
-  if (
-    typeof aggregate !== "object" ||
-    aggregate === null ||
-    !("results" in aggregate)
-  ) {
-    return [];
-  }
-  return (aggregate as { results: { category: string }[] }).results.map(
-    (r) => r.category,
-  );
 }
 
 // ---------------------------------------------------------------------------
@@ -387,6 +374,8 @@ interface BuildPromptArgs {
   artifactYaml: string;
   schema: z.ZodType<Artifact>;
   promptDir: string;
+  /** The session's category — selects which domain module is injected. */
+  category: string;
 }
 
 function buildEditSystemPrompt({
@@ -395,13 +384,19 @@ function buildEditSystemPrompt({
   artifactYaml,
   schema,
   promptDir,
+  category,
 }: BuildPromptArgs): string {
   const template = loadEditPromptTemplate(promptDir);
   const paperIndex = buildPaperIndex(papers, paperIds);
 
+  // Mirror genesis composition: inject the shared authoring guidance and this
+  // category's domain module as plain string values (never template-parsed),
+  // so both sides render byte-identical fragments from one source.
   return promptEnv.renderString(template, {
     artifact_schema: schemaForPrompt(schema),
     paper_index: paperIndex,
     initial_artifact: addLineNumbers(artifactYaml),
+    authoring: loadAuthoring(promptDir),
+    category_module: loadCategoryModule(promptDir, category),
   });
 }

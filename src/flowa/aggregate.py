@@ -10,13 +10,16 @@ from typing import Any
 
 import logfire
 import typer
-from pydantic import BaseModel
+from botocore.exceptions import ClientError
 from pydantic_ai import Agent, ModelRetry, NativeOutput, RunContext
+from pydantic_ai.agent import AgentRunResult
+from tenacity import retry, retry_if_exception, stop_after_attempt, wait_random_exponential
 
+from flowa.artifact import CategoryResult
 from flowa.clinvar import format_clinvar_for_prompt, query_clinvar
 from flowa.content_validation import validate_aggregate_category
 from flowa.models import create_model, get_model_settings
-from flowa.prompts import load_prompt_and_schema
+from flowa.prompts import load_aggregation
 from flowa.resolve import (
     CitationQuery,
     load_markdown_from_storage,
@@ -24,14 +27,13 @@ from flowa.resolve import (
     resolve_citations,
 )
 from flowa.schema import AGGREGATION_SCHEMA_VERSION, with_schema_version
-from flowa.settings import ModelConfig, Settings
+from flowa.settings import LLM_CONCURRENCY, ModelConfig, Settings
 from flowa.storage import (
     assessment_url,
     encode_doi,
     exists,
     paper_url,
     read_json,
-    write_bytes,
     write_json,
 )
 
@@ -123,21 +125,23 @@ async def _drain_events(ctx: RunContext[None], stream: AsyncIterable[Any]) -> No
 def create_aggregate_agent(
     model: ModelConfig,
     paper_id_to_doi: dict[str, str],
-    output_type: type[BaseModel],
+    output_type: type[CategoryResult],
     extraction_quotes_by_paper: dict[str, set[str]],
-) -> Agent[None, BaseModel]:
-    """Create a Pydantic AI agent that validates artifact content at genesis.
+) -> Agent[None, CategoryResult]:
+    """Create a Pydantic AI agent that validates one category's artifact at genesis.
 
     The output validator enforces the same rules chat-service applies on every
     edit — paper-id membership, claim grouping/order, and citation fidelity
     (`content_validation.validate_aggregate_category`) — plus the genesis-only
-    rule that each claim quote comes from the paper's extraction input. A
-    violation raises ModelRetry; callers must drive this agent with `run`
-    (+ `_drain_events`), not `run_stream`, for that retry to fire.
+    rule that each claim quote comes from the paper's extraction input. Each
+    category subagent emits a single ``CategoryResult``, so the validator runs on
+    that one result; the paper-id / quote inputs are whole-variant and shared
+    across categories. A violation raises ModelRetry; callers must drive this
+    agent with `run` (+ `_drain_events`), not `run_stream`, for that retry to fire.
     """
     valid_paper_ids = set(paper_id_to_doi)
 
-    agent: Agent[None, BaseModel] = Agent(
+    agent: Agent[None, CategoryResult] = Agent(
         create_model(model),
         output_type=NativeOutput(output_type),
         retries=3,
@@ -145,13 +149,11 @@ def create_aggregate_agent(
     )
 
     @agent.output_validator
-    def validate_content(ctx: RunContext[None], result: BaseModel) -> BaseModel:
+    def validate_content(ctx: RunContext[None], result: CategoryResult) -> CategoryResult:
         messages: list[str] = []
-        for cat_result in result.results:  # type: ignore[attr-defined]
-            code = getattr(cat_result, 'code', None) or getattr(cat_result, 'category', '<unknown>')
-            for rule, message in validate_aggregate_category(cat_result, valid_paper_ids, extraction_quotes_by_paper):
-                _aggregate_retry_counter.add(1, {'rule': rule})
-                messages.append(f'code={code}: {message}')
+        for rule, message in validate_aggregate_category(result, valid_paper_ids, extraction_quotes_by_paper):
+            _aggregate_retry_counter.add(1, {'rule': rule})
+            messages.append(message)
 
         if messages:
             raise ModelRetry('Invalid aggregate output: ' + '; '.join(messages))
@@ -159,6 +161,36 @@ def create_aggregate_agent(
         return result
 
     return agent
+
+
+def _is_bedrock_throttle(exc: BaseException) -> bool:
+    """True for a Bedrock throttle, surfaced as a botocore ``ClientError`` with
+    ``Error.Code == 'ThrottlingException'``. Bedrock has no dedicated exception
+    class for this, so a ``retry_if_exception_type`` predicate would never match.
+    """
+    return isinstance(exc, ClientError) and exc.response.get('Error', {}).get('Code') == 'ThrottlingException'
+
+
+@retry(
+    retry=retry_if_exception(_is_bedrock_throttle),
+    stop=stop_after_attempt(6),
+    wait=wait_random_exponential(multiplier=2, max=60),
+    reraise=True,
+    before_sleep=lambda rs: log.warning(
+        'Bedrock throttled an aggregate category subagent; backing off (attempt %d/6)', rs.attempt_number
+    ),
+)
+async def _run_category_agent(
+    agent: Agent[None, CategoryResult], prompt: str, semaphore: asyncio.Semaphore
+) -> AgentRunResult[CategoryResult]:
+    """Run one category subagent under the LLM-concurrency cap, retrying throttles.
+
+    The semaphore is held only for a single attempt, so a backing-off subagent
+    frees its slot while it waits; the jittered exponential wait desynchronises
+    concurrently-throttled subagents instead of retrying them in lockstep.
+    """
+    async with semaphore:
+        return await agent.run(prompt, event_stream_handler=_drain_events)
 
 
 def resolve_aggregate_citations(
@@ -216,9 +248,15 @@ async def aggregate_evidence_async(
     model: ModelConfig,
     ncbi_api_key: str | None = None,
     prompt_set: str = 'generic',
+    concurrency: int = LLM_CONCURRENCY,
     dry_run: bool = False,
 ) -> None:
-    """Aggregate evidence across all papers for a variant."""
+    """Aggregate evidence across all papers for a variant.
+
+    Fans out one subagent per declared category (``aggregation/categories.json``),
+    each with its own full thinking/output budget, bounded by ``concurrency`` (the
+    shared LLM-call ceiling) and assembled deterministically in manifest order.
+    """
     aggregation_url = assessment_url(base, variant_id, 'aggregation.json')
     aggregation_raw_url = assessment_url(base, variant_id, 'aggregation_raw.json')
 
@@ -302,14 +340,13 @@ async def aggregate_evidence_async(
         for claim in entry['claims']:
             bucket.update(citation['quote'] for citation in claim['citations'])
 
+    agg = load_aggregation(prompt_set)
     log.info(
-        'Aggregating evidence from %d papers + ClinVar (model: %s)',
+        'Aggregating evidence from %d papers + ClinVar across %d categories (model: %s)',
         len(evidence_extractions),
+        len(agg.categories),
         model.name,
     )
-
-    # Load prompt and schema from prompt set
-    prompt_template, output_type = load_prompt_and_schema('aggregation', prompt_set)
 
     # ensure_ascii=False so the model sees the extraction quotes' real unicode
     # (en-dashes, µ, Greek letters); the escaped \uXXXX form confuses verbatim
@@ -320,51 +357,64 @@ async def aggregate_evidence_async(
         if evidence_extractions
         else 'No papers discussing this variant were found.'
     )
-    prompt = prompt_template.render(
-        variant_details=variant_details,
-        clinvar_data=clinvar_text,
-        evidence_extractions=evidence_text,
-    )
+
+    def render_category(entry: dict[str, str]) -> str:
+        return agg.template.render(
+            variant_details=variant_details,
+            clinvar_data=clinvar_text,
+            evidence_extractions=evidence_text,
+            authoring=agg.authoring,
+            category_module=agg.modules[entry['id']],
+            category_id=entry['id'],
+        )
 
     if dry_run:
-        print('=== PROMPT ===')
-        print(prompt)
+        for entry in agg.categories:
+            print(f'=== PROMPT [{entry["id"]}] ===')
+            print(render_category(entry))
         print('\n=== PAPER ID MAPPING ===')
         for pid, doi in paper_id_to_doi.items():
             print(f'  {pid} -> {doi}')
         return
 
-    agent = create_aggregate_agent(model, paper_id_to_doi, output_type, extraction_quotes_by_paper)
+    agent = create_aggregate_agent(model, paper_id_to_doi, agg.category_result, extraction_quotes_by_paper)
+    semaphore = asyncio.Semaphore(concurrency)
 
-    log.info('Calling LLM for aggregate assessment')
+    async def run_category(entry: dict[str, str]) -> tuple[str, AgentRunResult[CategoryResult]]:
+        return entry['id'], await _run_category_agent(agent, render_category(entry), semaphore)
+
+    log.info('Fanning out %d category subagents for aggregate assessment', len(agg.categories))
     t0 = time.monotonic()
-    # run() (not run_stream) so the graph owns the loop and the output-validator
-    # ModelRetry actually retries; the event-stream handler keeps the model
-    # request streaming so long extended-thinking doesn't go silent and trip a
-    # provider read-timeout. See _drain_events.
-    result = await agent.run(prompt, event_stream_handler=_drain_events)
-    output = result.output
-    raw_messages_json = result.all_messages_json()
+    category_runs = await asyncio.gather(*(run_category(entry) for entry in agg.categories))
     elapsed = time.monotonic() - t0
 
-    # Post-LLM: resolve quotes to bboxes, replace paper_id with DOI
-    aggregate_dict = output.model_dump()
+    # Assemble the top-level artifact in manifest order, stamping `category`
+    # authoritatively (the model's own value is advisory). Categories are
+    # independent assessments — there is no cross-category reconciliation; the
+    # same source quote legitimately informing two categories is not a conflict.
+    results: list[dict[str, Any]] = []
+    for category_id, run in category_runs:
+        result_dict = run.output.model_dump()
+        result_dict['category'] = category_id
+        results.append(result_dict)
+    aggregate_dict: dict[str, Any] = {'results': results}
+
+    # Post-LLM: resolve quotes to bboxes + markdown anchors, add paper_id_mapping.
     with logfire.span('flowa.resolve_citations', paper_count=len(paper_id_to_doi)):
         resolve_aggregate_citations(aggregate_dict, paper_id_to_doi, base, metadata_cache)
 
-    # Store structured aggregation result
     write_json(aggregation_url, with_schema_version(aggregate_dict, AGGREGATION_SCHEMA_VERSION))
 
-    # Store raw LLM conversation for debugging
-    write_bytes(aggregation_raw_url, raw_messages_json)
+    # Store the raw per-category LLM transcripts for debugging, keyed by category id.
+    raw_by_category = {category_id: json.loads(run.all_messages_json()) for category_id, run in category_runs}
+    write_json(aggregation_raw_url, raw_by_category)
 
-    results_list = output.results  # type: ignore[attr-defined]
-    total_claims = sum(len(cat_result.claims) for cat_result in results_list)
-    total_papers = sum(len(cat_result.papers) for cat_result in results_list)
+    total_claims = sum(len(r['claims']) for r in results)
+    total_papers = sum(len(r['papers']) for r in results)
     log.info(
         'Aggregated variant %s: %d categories, %d claims across %d papers in %.1fs',
         variant_id,
-        len(results_list),
+        len(results),
         total_claims,
         total_papers,
         elapsed,
@@ -385,6 +435,11 @@ def aggregate_evidence(
     s = Settings()  # type: ignore[call-arg]
     asyncio.run(
         aggregate_evidence_async(
-            s.flowa_storage_base, variant_id, s.flowa_extraction_model, s.ncbi_api_key, s.flowa_prompt_set, dry_run
+            s.flowa_storage_base,
+            variant_id,
+            s.flowa_aggregation_model,
+            s.ncbi_api_key,
+            s.flowa_prompt_set,
+            dry_run=dry_run,
         )
     )

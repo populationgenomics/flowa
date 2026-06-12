@@ -66,7 +66,6 @@ function makeSession(): SessionContext {
     artifactVersion: 0,
     artifactDirty: false,
     category: "cat-A",
-    aggregateCategories: ["cat-A"],
     locationCache: new Map(),
     paperMarkdownCache: new Map(),
   };

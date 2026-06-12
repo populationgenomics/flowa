@@ -1,0 +1,16 @@
+SYNTHETIC EDIT TEMPLATE (test fixture).
+
+The artifact's category is fixed for this session.
+
+{{ category_module }}
+
+{{ authoring }}
+
+ARTIFACT SCHEMA:
+{{ artifact_schema }}
+
+PAPER INDEX:
+{{ paper_index }}
+
+CURRENT ARTIFACT:
+{{ initial_artifact }}

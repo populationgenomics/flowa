@@ -27,7 +27,7 @@ export interface CreateAppOptions {
    */
   schema?: z.ZodType<Artifact>;
   jwtSecret: string;
-  /** Directory containing `aggregation_edit_prompt.txt`. */
+  /** A prompt set's `aggregation/` dir: `edit_prompt.txt`, `authoring.txt`, `categories.json`, `categories/`. */
   promptDir: string;
   /** Session token lifetime in seconds. Default: 4 hours. */
   jwtTtlSeconds?: number;

@@ -50,10 +50,10 @@ const dataRoot = resolve(
   process.env.DEMO_DATA_DIR ?? "./demo-data",
 );
 
-// Locate the prompt-template directory by resolving the schema's package
-// export — `prompts/generic/aggregation_edit_schema.ts` lives in the same
-// directory as `aggregation_edit_prompt.txt`, which is what
-// `loadEditPromptTemplate` reads.
+// Locate the prompt directory by resolving the schema's package export —
+// `@flowajs/prompts/generic` points at `prompts/generic/aggregation/edit_schema.ts`,
+// so its dirname is `prompts/generic/aggregation/`, where chat-service reads
+// `edit_prompt.txt`, `authoring.txt`, `categories.json`, and `categories/`.
 const promptDir = dirname(
   fileURLToPath(import.meta.resolve("@flowajs/prompts/generic")),
 );

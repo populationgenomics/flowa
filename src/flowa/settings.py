@@ -3,6 +3,12 @@
 from pydantic import BaseModel
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
+# Default fan-out concurrency for the pipeline stages. Every LLM stage
+# (conversion, extraction, aggregation) shares one ceiling, LLM_CONCURRENCY; the
+# non-LLM download stage keeps its own, lighter bound.
+DEFAULT_DOWNLOAD_CONCURRENCY = 5
+LLM_CONCURRENCY = 20
+
 
 class ModelConfig(BaseModel):
     """LLM model configuration with optional provider-specific extras.
@@ -44,8 +50,9 @@ class Settings(BaseSettings):
     flowa_storage_base: str
 
     # Models
-    flowa_convert_model: ModelConfig
+    flowa_conversion_model: ModelConfig
     flowa_extraction_model: ModelConfig
+    flowa_aggregation_model: ModelConfig
 
     # Prompt set
     flowa_prompt_set: str = 'generic'

@@ -1,0 +1,131 @@
+THIS ASSESSMENT — ACMG CLASSIFICATION FROM PRIOR REPORTS:
+
+Weigh the aggregated literature and ClinVar evidence for this variant and select ONE ACMG
+classification term: Pathogenic, Likely Pathogenic, VUS, Likely Benign, or Benign. The `classification`
+field carries that term; `classification_rationale` is one short clause naming the deciding factor
+(e.g. "Expert panel P with PS3 + PM3_Strong" or "Single VUS ClinVar submission, no literature") — do
+not recapitulate ClinVar counts, PMIDs, or phenotypes there.
+
+The primary metric is the number of UNRELATED families/cases meeting current evidence standards.
+
+DEDUPLICATION (the central analytical act):
+
+- Case counts are a lower bound — state them as "at least N".
+- Papers that cite the same research groups or "previously reported" cases are not independent; be
+  conservative about overlapping cohorts.
+- ClinVar submissions frequently cite the same papers in the evidence (identifiable by matching PMID).
+  Do NOT add ClinVar-mentioned cases on top of paper-extracted case counts. The number of ClinVar
+  submissions is classification consensus, not case data — 40 labs submitting "Pathogenic" is not 40
+  additional cases.
+- Distinguish family-level from individual-level counts, and de novo from inherited cases. Note
+  asymptomatic carriers separately (evidence for a benign assertion).
+- When the same family appears in multiple sources, count it once; state the deduplicated total and
+  explain any overlap.
+
+A CLASSIFICATION LABEL IS A CLAIM, NOT EVIDENCE:
+
+A P/LP/VUS/LB/B label from any source — paper or ClinVar — asserts a conclusion; always evaluate the
+underlying basis.
+
+- In-silico predictions alone (PP3) cannot support LP/P under current ACMG/AMP standards, regardless
+  of how many tools agree. An older classification resting solely on in-silico suites does not meet
+  current standards.
+- Variant type matters: LoF variants (frameshift, nonsense, canonical splice) in a gene with
+  established haploinsufficiency carry a high prior — presence in an affected individual is
+  meaningful. Missense variants require stronger independent evidence (de novo, segregation, validated
+  functional assays, or compound het with a known pathogenic variant in trans).
+- "Described as pathogenic" below means the underlying evidence supports pathogenicity under current
+  standards — not merely that a source applied the label.
+
+CLINVAR SUBMISSIONS:
+
+- ClinGen expert panels: present their conclusion, applied criteria, and reasoning in full.
+- Other submissions: evaluate critically — disregard those without evidence or reasoning (they
+  contribute a submission count only).
+- Consider recency: newer evidence may undermine older submissions.
+- For "Conflicting interpretations": examine the distribution (39 P + 1 VUS is not the same shape as
+  20 P + 15 B) and the reasoning quality; consider whether phenotypic or zygosity differences explain
+  the conflict.
+
+CLASSIFICATION CRITERIA AND MANDATORY `description` TEMPLATES:
+
+Use the EXACT sentence structure for the template that fits the evidence; fill `<DETAILS>` per the
+guidance below.
+
+PATHOGENIC — expert-classified, OR pathogenic/likely-pathogenic in ≥2 de novo unrelated cases or ≥5
+unrelated cases in recessive/inherited conditions (or without allelic information). Caution with
+high-population-frequency variants or where the disease association does not match the patient's
+phenotype (incidental finding).
+  "This variant has strong previous evidence of pathogenicity in unrelated individuals. <DETAILS>."
+
+LIKELY PATHOGENIC — pathogenic in 1 de novo unrelated case, or in ≥3 and <5 unrelated cases in
+recessive/inherited conditions, or in ≤2 unrelated cases (or without allelic information). Same
+cautions as above.
+  "This variant has moderate previous evidence of pathogenicity in unrelated individuals. <DETAILS>."
+
+VUS — not previously described in clinical databases or literature; OR previously described with
+conflicting or inconclusive classifications; OR described in ≥3 additional unrelated cases with
+consistent phenotype but absent in gnomAD (rare disorders only). Pick the matching template:
+  - No previous reports anywhere: "This variant has no previous evidence of pathogenicity."
+  - Conflicting: "Previous reports of pathogenicity for this variant are conflicting. <DETAILS>."
+  - Inconclusive: "Previous evidence of pathogenicity for this variant is inconclusive. <DETAILS>."
+  - Multiple consistent VUS cases absent in the population: "This variant has previously been described
+    as a variant of uncertain significance in multiple independent cases with consistent phenotype
+    despite being absent in the general population. <DETAILS>."
+
+LIKELY BENIGN — described as benign in <3 unrelated cases, or seen in cis with an alternative
+pathogenic variant / in a case with an alternative explanation for a consistent phenotype.
+  "This variant has moderate previous evidence of being benign in unrelated individuals. <DETAILS>."
+
+BENIGN — expert-classified, OR classified as benign in ≥3 unrelated cases.
+  "This variant has strong previous evidence of being benign in unrelated individuals. <DETAILS>."
+
+FILLING IN `<DETAILS>`:
+
+Keep it as brief as the evidence warrants — for a single paper with clean evidence, one or two
+sentences naming case count/type and phenotype is enough. Include only what is informative:
+- Number and type of cases (compound heterozygous, heterozygous, homozygous, de novo).
+- Phenotype — specific clinical features over generic disease labels when the paper provides them.
+- Age-of-onset spectrum when distinctive (especially neonatal/screening relevance, or onset differing
+  by zygosity).
+- Expert panel classifications when present; key sources when particularly informative.
+
+Do NOT put in `<DETAILS>`: ACMG criterion codes, in-silico scores, gene-disease novelty / OMIM /
+gene-function context, or functional-assay detail.
+
+NOTES CALIBRATION FOR THIS CATEGORY:
+
+Pick the regime that fits the evidence; blend when it sits between them:
+- Simple (sparse / single-source / absent evidence — e.g. one VUS submission, no literature): flat
+  per-source format, no Summary/Supporting/Refuting scaffolding. Note ClinVar absence and literature
+  absence explicitly when applicable. ~30-80 words.
+- Established consensus (a canonical variant — expert panel reviewed, dozens of concordant
+  submissions, well-known references): lead with the consensus statement (ClinVar aggregate, expert
+  panel + applied criteria, canonical reference); name the canonical paper(s) once; do not enumerate
+  every submission or historical case. Any finding that REFUTES the consensus must still be surfaced
+  in full per-source detail. ~60-150 words.
+- Complex (multiple sources with real conflicts, substantial zygosity/onset variability, or per-source
+  detail the curator must triage): a Summary (1-3 sentences: verdict, primary metric, critical
+  caveat), then Supporting evidence, then Refuting evidence (omit the refuting section if none).
+  ~150-300 words depending on paper count.
+
+These word counts are calibration anchors, not caps.
+
+Preserve phenotypic specificity — curators need detail to match the variant to their patient:
+- GOOD: "3 het adults: 2 with joint pain and muscle weakness; 1 asymptomatic with elevated CK (450 U/L)"
+- POOR: "3 het adults with muscular symptoms"
+- GOOD: "dilated cardiomyopathy (LVEF 25-35%), onset ages 28-42"
+- POOR: "cardiac involvement"
+
+Synthesise age of onset prominently when present (it drives neonatal/screening relevance): state the
+overall onset range across sources; note any pattern by zygosity (e.g. "biallelic cases presented
+neonatally; het carriers remained asymptomatic into adulthood"); flag the earliest reported onset;
+distinguish age at symptom onset from age at diagnosis; note the age at assessment for asymptomatic
+carriers.
+
+WHEN THERE IS NO EVIDENCE:
+
+If neither the literature nor ClinVar provides any evidence for this variant, classify it VUS with the
+no-previous-reports description ("This variant has no previous evidence of pathogenicity."), set
+`classification_rationale` accordingly, and emit empty `papers` and `claims`. Do not invent papers,
+claims, or citations.

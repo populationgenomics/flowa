@@ -1,13 +1,13 @@
 /**
- * Render smoke test: load the real `prompts/generic/aggregation_edit_prompt.txt`
- * and render it with a schema that mirrors `prompts/generic/aggregation_edit_schema.ts`
- * (citation-grounded core via `artifactFields` + `classification` +
- * `classification_rationale`). Verifies the deployment-extension pattern
- * compiles, the prompt template renders without `throwOnUndefined` errors,
- * the JSON Schema serialisation works, and a hand-crafted fixture artifact
- * validates against the schema.
+ * Render smoke test: load the real `prompts/generic/aggregation/edit_prompt.txt`
+ * and render it the way `buildEditSystemPrompt` does — with the shared
+ * `authoring.txt` and the active category's module injected as plain string
+ * values, plus the artifact schema, paper index, and initial artifact. Verifies
+ * the deployment-extension pattern compiles, the template renders without
+ * `throwOnUndefined` errors, the JSON Schema serialisation works, the injected
+ * fragments land, and a hand-crafted fixture artifact validates against the schema.
  *
- * Does NOT import `prompts/generic/aggregation_edit_schema.ts` directly because
+ * Does NOT import `prompts/generic/aggregation/edit_schema.ts` directly because
  * that file imports `@flowajs/chat-service` by name (the public contract for
  * external deployments) and will only resolve once the package is built. The
  * test reconstructs the same schema inline using `artifactFields` from
@@ -21,8 +21,14 @@ import { dirname, join, resolve } from "node:path";
 import nunjucks from "nunjucks";
 import { z } from "zod";
 import { artifactFields, schemaForPrompt } from "../src/artifact.js";
-import { loadEditPromptTemplate } from "../src/prompts.js";
+import {
+  loadAuthoring,
+  loadCategoryModule,
+  loadEditPromptTemplate,
+} from "../src/prompts.js";
 
+// The prompt directory is a set's `aggregation/` subdir — the same directory
+// the deployment entry derives from `@flowajs/prompts/<set>`.
 const GENERIC_PROMPT_DIR = resolve(
   dirname(fileURLToPath(import.meta.url)),
   "..",
@@ -30,9 +36,12 @@ const GENERIC_PROMPT_DIR = resolve(
   "..",
   "prompts",
   "generic",
+  "aggregation",
 );
 
-// Mirrors prompts/generic/aggregation_edit_schema.ts. Kept inline (rather than
+const GENERIC_CATEGORY = "acmg_classification";
+
+// Mirrors prompts/generic/aggregation/edit_schema.ts. Kept inline (rather than
 // imported) because that file imports @flowajs/chat-service by name; we
 // exercise the same shape via artifactFields directly.
 const GenericArtifactSchema = z.object({
@@ -53,6 +62,20 @@ const promptEnv = new nunjucks.Environment(undefined, {
   autoescape: false,
   throwOnUndefined: true,
 });
+
+function render(
+  vars: Record<string, unknown>,
+  category: string = GENERIC_CATEGORY,
+): string {
+  return promptEnv.renderString(loadEditPromptTemplate(GENERIC_PROMPT_DIR), {
+    artifact_schema: schemaForPrompt(GenericArtifactSchema),
+    paper_index: FIXTURE_PAPER_INDEX,
+    initial_artifact: FIXTURE_INITIAL_ARTIFACT,
+    authoring: loadAuthoring(GENERIC_PROMPT_DIR),
+    category_module: loadCategoryModule(GENERIC_PROMPT_DIR, category),
+    ...vars,
+  });
+}
 
 const FIXTURE_ARTIFACT = {
   category: "acmg_classification",
@@ -77,22 +100,22 @@ const FIXTURE_INITIAL_ARTIFACT = `   1\tcategory: acmg_classification
    8\tclaims: []
 `;
 
-describe("prompts/generic/aggregation_edit_prompt.txt", () => {
+describe("prompts/generic/aggregation/edit_prompt.txt", () => {
   test("renders against the generic deployment schema without errors", () => {
-    const template = loadEditPromptTemplate(GENERIC_PROMPT_DIR);
-    const rendered = promptEnv.renderString(template, {
-      artifact_schema: schemaForPrompt(GenericArtifactSchema),
-      paper_index: FIXTURE_PAPER_INDEX,
-      initial_artifact: FIXTURE_INITIAL_ARTIFACT,
-    });
+    const rendered = render({});
 
     // No unresolved Nunjucks placeholders.
     expect(rendered).not.toMatch(/\{\{ \w+ \}\}/);
 
-    // Three context vars actually got interpolated.
+    // The four injected context vars actually landed.
     expect(rendered).toContain('"$schema"');
     expect(rendered).toContain(FIXTURE_PAPER_INDEX);
     expect(rendered).toContain("classification: VUS");
+
+    // The shared authoring fragment and the category module are injected
+    // verbatim (catches a missing/renamed slot or fragment file).
+    expect(rendered).toContain("LINKED-CLAIM NARRATIVE");
+    expect(rendered).toContain("ACMG CLASSIFICATION FROM PRIOR REPORTS");
 
     // Core flowa-generic field names appear by name in the prompt body
     // (catches accidental drift if a future edit renames a field in the
@@ -144,22 +167,41 @@ describe("prompts/generic/aggregation_edit_prompt.txt", () => {
         artifact_schema: schemaForPrompt(GenericArtifactSchema),
         // paper_index intentionally omitted
         initial_artifact: FIXTURE_INITIAL_ARTIFACT,
+        authoring: loadAuthoring(GENERIC_PROMPT_DIR),
+        category_module: loadCategoryModule(
+          GENERIC_PROMPT_DIR,
+          GENERIC_CATEGORY,
+        ),
       }),
     ).toThrow(/null or undefined/);
   });
+
+  test("rejects an edit session bound to an undeclared category", () => {
+    expect(() =>
+      loadCategoryModule(GENERIC_PROMPT_DIR, "not_a_category"),
+    ).toThrow(/not declared/);
+  });
 });
 
-describe("prompts/generic/aggregation_edit_schema.ts (companion file)", () => {
+describe("prompts/generic/aggregation/edit_schema.ts (companion file)", () => {
   test("file exists and references the documented contract", () => {
-    const path = join(GENERIC_PROMPT_DIR, "aggregation_edit_schema.ts");
+    const path = join(GENERIC_PROMPT_DIR, "edit_schema.ts");
     const text = readFileSync(path, "utf-8");
 
-    // The deployment-extension pattern from §6.2: spread artifactFields,
-    // add deployment fields. If this changes, the prompt's field-name
+    // The deployment-extension pattern: take the citation-grounded core
+    // schema from @flowajs/chat-service and `.extend(...)` it with the
+    // deployment's fields. If this changes, the prompt's field-name
     // references must move with it.
     expect(text).toContain('from "@flowajs/chat-service"');
-    expect(text).toContain("artifactFields");
+    expect(text).toContain(".extend(");
     expect(text).toContain("classification");
     expect(text).toContain("classification_rationale");
+  });
+
+  test("the category manifest declares the generic category", () => {
+    const manifest = JSON.parse(
+      readFileSync(join(GENERIC_PROMPT_DIR, "categories.json"), "utf-8"),
+    ) as { id: string; module: string }[];
+    expect(manifest.map((e) => e.id)).toContain(GENERIC_CATEGORY);
   });
 });

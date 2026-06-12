@@ -1,0 +1,88 @@
+THE WRITE-UP IS A LINKED-CLAIM NARRATIVE:
+
+The synthesis exists to be fact-checked claim by claim. Every load-bearing fact that traces to a
+paper must be an inline citation link the curator can click through to the exact source span — not
+a bare `(PMID: …)` mention. The write-up (`notes` and `description`) and `claims[]` are two views
+of one set, bound by two hard rules:
+- Every paper-sourced fact in the write-up is an inline `[text](#cite:paper_id "verbatim quote")` link.
+- Every entry in `claims[]` is linked at least once from the write-up. A claim that no inline link
+  points at is an orphan and will be rejected — either link it or drop it.
+
+FIELD DISCIPLINE — `description` vs `notes`:
+
+- `description` is report-facing: the mandatory template sentence for the verdict, carrying the
+  deciding evidence and its citation, and nothing more.
+- `notes` is the curator-facing synthesis and audit trail: the per-source reasoning as a
+  linked-claim narrative, with derivation, de-duplication, and caveats.
+
+This is a split of content by audience, not a length budget — keep both as short as the evidence
+warrants.
+
+SOURCE PROVENANCE — assert only what the inputs support:
+
+- The provided paper extractions are the citable source — ground every paper-sourced fact with a
+  `#cite:` link.
+- ClinVar has no source document — reference it in prose, never with a `#cite:` link.
+- Never state a source, count, accession, submitter, or PMID that is not present in the inputs.
+  Anything the provided papers and ClinVar do not contain must not appear in the synthesis.
+
+LENGTH AND SPECIFICITY:
+
+- Match length to evidence complexity — use the shortest form that conveys the evidence, and earn
+  additional structure only when the evidence warrants it. Compress consensus; never compress
+  refuting evidence.
+- Preserve the specific, quantitative detail a curator needs to evaluate the evidence; do not
+  collapse it into generic labels.
+
+NOTES STYLE:
+
+- Concise and factual; use standard abbreviations where they aid concision.
+- One entry per source, with the paper_id (or "ClinVar") in **bold** as the leading identifier.
+- Group similar findings to avoid repetition; note uncertainties, conflicts, caveats, and relevant
+  negative findings.
+- Do not write meta-commentary about the verdict ("Pathogenic selected", "Based on the evidence,
+  …") — the verdict is already in the structured output; lead with the evidence.
+- Do not pad a citation with an explanation of its own quote — the link already carries the verbatim
+  quote; state the conclusion in your own brief words.
+- State an absence once (e.g. "No ClinVar submissions"); do not restate it across multiple bullets.
+
+CITATION LINKS:
+
+- Form: `[link text](#cite:paper_id "verbatim quote")`. The link text is free-form. The
+  `#cite:paper_id` href format is required exactly — the application uses it to identify the paper.
+- The title attribute (the quoted string after the href) must be copied verbatim from the source —
+  byte-identical to a `citations[].quote` value on a `claims[]` entry with the same paper_id. The
+  quote is highlighted in the PDF, so include enough surrounding context to validate the claim;
+  avoid isolated values or single words that could match many locations.
+- The quote must be a single contiguous span. Do not insert `...` / `…` elisions, bracketed
+  annotations, or any edit. To cover two non-adjacent passages, use two separate `#cite:` links,
+  each carrying its own contiguous quote.
+
+PAPERS AND CLAIMS — the curator-facing triage list:
+
+List position encodes importance — no numeric ranks, no HIGH/MEDIUM/LOW labels.
+
+- `papers[]`: ordered by contribution to the synthesis (first = most important). Each entry carries a
+  one-sentence `rank_rationale` shown to the curator in the "Why this rank?" popover.
+- `claims[]`: grouped by `paper_id` in the same order as `papers[]`; within each paper's group,
+  ordered by importance (first = most load-bearing on the synthesis).
+
+Emit a claim if and only if its removal would force a materially different `description` or `notes`.
+Background context, methodology-only details, and tangential observations belong in prose, not in
+`claims[]`. The curator's attention is scarce; every claim listed is an ask for a fact-check, so be
+honest about what is load-bearing.
+
+Consolidate within a single paper only:
+- Merge near-duplicate quotes from the same paper into one claim carrying both quotes in `citations[]`
+  (prefer the longer quote; keep both when each adds context).
+- Keep a multi-citation synthesis claim (several quotes that jointly establish one fact) intact.
+- Keep distinct data points (different timepoints, cohorts, populations, measurements) as separate
+  claims.
+- Never merge cross-paper duplication — the same fact in two papers stays as two claims, one per
+  paper, to preserve corroboration signal.
+
+These invariants are enforced and will reject the output if violated:
+- Every `paper_id` in `claims[]` appears in `papers[]`; `paper_id` values in `papers[]` are unique.
+- Within a single paper's claims, quotes are distinguishable — no duplicates or near-duplicates.
+- Every `#cite:` quote in `notes`/`description` byte-matches a `citations[].quote` on a `claims[]`
+  entry with the same `paper_id`, and every claim is linked at least once from the write-up.

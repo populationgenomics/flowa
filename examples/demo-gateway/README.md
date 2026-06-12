@@ -51,7 +51,7 @@ directly by Next.js — there is no `/runs/{id}/progress` endpoint here.
 | `DEMO_GATEWAY_PORT` | `7702` | Listening port. |
 | `DEMO_MAX_CONCURRENT_RUNS` | `3` | Hard cap on concurrent pipeline tasks (429 on overflow). |
 | `LOG_LEVEL` | `INFO` | Python root logger level. |
-| `FLOWA_*` | — | Required: `FLOWA_STORAGE_BASE`, `FLOWA_EXTRACTION_MODEL__NAME`, `FLOWA_CONVERT_MODEL__NAME`, etc. The demo's `start.ts` translates `LLM_MODEL` and `BEDROCK_INFERENCE_PROFILE` from the demo's `.env` into the corresponding `FLOWA_*` keys. |
+| `FLOWA_*` | — | Required: `FLOWA_STORAGE_BASE`, `FLOWA_CONVERSION_MODEL__NAME`, `FLOWA_EXTRACTION_MODEL__NAME`, `FLOWA_AGGREGATION_MODEL__NAME`, etc. The demo's `start.ts` translates `LLM_MODEL` and `BEDROCK_INFERENCE_PROFILE` from the demo's `.env` into the corresponding `FLOWA_*` keys. |
 
 ## Standalone
 
