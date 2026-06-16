@@ -2,3 +2,12 @@ packages:
   - "packages/*"
   - "examples/*"
   - "prompts"
+
+# Supply-chain hygiene: only install npm package versions >= 7 days old (10080
+# minutes). This is the pnpm-side mirror of the uv `exclude-newer = "7 days"`
+# gate declared in the Python pyproject files, so CI and contributors inherit
+# the same floor in-repo instead of relying on each machine's global config.
+# First-party @flowajs/* packages are workspace-linked here (never pulled from
+# the registry), so they need no carve-out; a downstream consumer that installs
+# them from npm declares its own exclusion.
+minimumReleaseAge: 10080
