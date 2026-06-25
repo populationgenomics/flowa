@@ -199,7 +199,9 @@ async def _fetch_recoder(hgvs: str) -> dict:
     url = f'{VEP_REST_BASE}/variant_recoder/human/{hgvs}'
 
     log.info('Querying Variant Recoder REST for %s', hgvs)
-    async with httpx.AsyncClient(timeout=30.0) as client:
+    # Variant Recoder can take ~1 min for very large genes (e.g. TTN), well past
+    # the default read timeout, so allow a generous read while keeping connect tight.
+    async with httpx.AsyncClient(timeout=httpx.Timeout(30.0, read=120.0)) as client:
         response = await client.get(url, headers={'accept': 'application/json'})
         response.raise_for_status()
         data = response.json()
