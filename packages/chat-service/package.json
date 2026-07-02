@@ -107,7 +107,7 @@
     }
   },
   "devDependencies": {
-    "@ai-sdk/amazon-bedrock": "4.0.116",
+    "@ai-sdk/amazon-bedrock": "5.0.0",
     "@ai-sdk/anthropic": "3.0.83",
     "@ai-sdk/google": "3.0.81",
     "@ai-sdk/google-vertex": "4.0.144",
