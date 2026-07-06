@@ -69,6 +69,59 @@ async def test_minus_strand_genomic_is_forward_strand(monkeypatch):
     assert result['mane_select']['transcript_id'] == 'NM_004004.6'
 
 
+async def test_mane_scoped_to_caller_gene(monkeypatch):
+    # POLG NM_002693.3:c.2663G>A sits in POLG exon 17 and within 5 kb downstream
+    # of FANCI. VEP flags the MANE Select of *both* genes, and lists FANCI's
+    # first. Gene identity must follow the caller (POLG), and the mane_select
+    # block must be POLG's own MANE — not FANCI's downstream consequence.
+    vep = [
+        {
+            'seq_region_name': '15',
+            'start': 89321196,
+            'strand': -1,
+            'allele_string': 'G/A',
+            'transcript_consequences': [
+                {
+                    'transcript_id': 'NM_001113378.2',
+                    'gene_symbol': 'FANCI',
+                    'mane_select': 'ENST00000310775.10',
+                    'biotype': 'protein_coding',
+                    'consequence_terms': ['downstream_gene_variant'],
+                },
+                {
+                    'transcript_id': 'NM_002693.3',
+                    'gene_symbol': 'POLG',
+                    'hgnc_id': 'HGNC:9179',
+                    'hgvsc': 'NM_002693.3:c.2663G>A',
+                    'hgvsp': 'NP_002684.1:p.Gly888Asp',
+                    'mane_select': 'ENST00000268124.10',
+                    'biotype': 'protein_coding',
+                    'exon': '17/23',
+                    'consequence_terms': ['missense_variant'],
+                },
+            ],
+            'colocated_variants': [{'id': 'rs878854560'}],
+        }
+    ]
+    recoder = {
+        'hgvsg': ['NC_000015.10:g.89321196C>T', 'LRG_765:g.12345C>T'],
+        'spdi': ['NC_000015.10:89321195:C:T', 'LRG_765:12344:C:T'],
+    }
+    _patch(monkeypatch, vep, recoder)
+
+    result = await normalize.normalize_variant('NM_002693.3:c.2663G>A', 'NM_002693.3')
+
+    assert result['gene_symbol'] == 'POLG'
+    assert result['hgnc_id'] == 'HGNC:9179'
+    # MANE Select is POLG's own transcript, not FANCI's flagged (downstream) one.
+    assert result['mane_select']['transcript_id'] == 'NM_002693.3'
+    assert result['mane_select']['protein_short'] == 'NP_002684.1:p.G888D'
+    assert result['mane_select']['exon'] == '17/23'
+    # The caller *is* the gene's MANE Select, so there's no separate user block.
+    assert result['user_transcript'] is None
+    assert result['grch38']['hgvs_g'] == 'NC_000015.10:g.89321196C>T'
+
+
 async def test_recoder_indel_uses_spdi_sequences(monkeypatch):
     # COL4A3 c.5010_*14del — an indel; the old SNV-only construction raised here.
     vep = [

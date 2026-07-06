@@ -299,10 +299,19 @@ def _select_rsid(annotation: dict) -> str | None:
     return None
 
 
-def _select_mane(tcs: list[dict]) -> dict | None:
-    """VEP marks the MANE Select transcript with `mane_select` populated."""
+def _select_mane(tcs: list[dict], gene_symbol: str) -> dict | None:
+    """The MANE Select transcript of `gene_symbol`.
+
+    VEP flags each gene's MANE Select transcript with `mane_select` populated.
+    A variant near a gene boundary overlaps more than one gene, so several
+    entries can be flagged; scoping the match to the caller's gene keeps a
+    neighbouring gene's MANE from hijacking gene identity and the mane_select
+    projection. (POLG NM_002693.3:c.2663G>A is a downstream_gene_variant of
+    FANCI, whose MANE NM_001113378.2 is flagged too — an unscoped search would
+    pick FANCI's and mislabel the variant.)
+    """
     for tc in tcs:
-        if tc.get('mane_select'):
+        if tc.get('mane_select') and tc.get('gene_symbol') == gene_symbol:
             return tc
     return None
 
@@ -364,15 +373,20 @@ async def normalize_variant(hgvs: str, caller_transcript: str) -> dict:
     if not tcs:
         raise ValueError(f'VEP returned no transcript_consequences for {hgvs!r}')
 
-    mane_entry = _select_mane(tcs)
     caller_entry = _select_caller(tcs, caller_transcript)
 
-    # gene_symbol / hgnc_id: prefer MANE entry, fall back to the caller's.
-    primary = mane_entry or caller_entry
-    gene_symbol = primary.get('gene_symbol')
+    # Gene identity follows the caller's transcript: the caller chose it, so its
+    # gene is authoritative even when the variant also overlaps a neighbouring
+    # gene (whose MANE transcript VEP may flag as well).
+    gene_symbol = caller_entry.get('gene_symbol')
     if not gene_symbol:
         raise ValueError(f'VEP returned no gene_symbol for {hgvs!r}')
-    hgnc_id = primary.get('hgnc_id')
+    hgnc_id = caller_entry.get('hgnc_id')
+
+    # MANE Select projection for that gene (None when the gene has no MANE
+    # transcript). Scoped to gene_symbol so a neighbouring gene's flagged MANE
+    # can't stand in as this variant's MANE Select.
+    mane_entry = _select_mane(tcs, gene_symbol)
 
     # Genomic forms come from the Variant Recoder, not VEP: VEP's HGVS-c
     # endpoint returns no hgvsg and reports allele_string in the transcript's
