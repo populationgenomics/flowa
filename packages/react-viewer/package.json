@@ -73,7 +73,7 @@
     "@types/mdast": "4.0.4",
     "@types/react": "18.3.18",
     "@types/react-dom": "18.3.5",
-    "ai": "6.0.201",
+    "ai": "7.0.11",
     "autoprefixer": "10.5.2",
     "happy-dom": "20.10.6",
     "postcss": "8.5.15",
