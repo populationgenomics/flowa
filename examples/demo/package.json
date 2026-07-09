@@ -24,7 +24,7 @@
     "@ai-sdk/google": "3.0.81",
     "@ai-sdk/google-vertex": "4.0.144",
     "@ai-sdk/openai": "3.0.70",
-    "@ai-sdk/react": "3.0.198",
+    "@ai-sdk/react": "4.0.12",
     "@aws-sdk/client-s3": "3.1075.0",
     "@aws-sdk/credential-providers": "3.1075.0",
     "@flowajs/chat-service": "workspace:*",
