@@ -542,7 +542,7 @@ requires-dist = [
     { name = "boto3" },
     { name = "defusedxml" },
     { name = "fsspec", specifier = ">=2026.4.0" },
-    { name = "gcsfs", specifier = ">=2026.4.0" },
+    { name = "gcsfs", specifier = ">=2026.7.0" },
     { name = "httpx" },
     { name = "jinja2" },
     { name = "logfire" },
@@ -625,7 +625,7 @@ wheels = [
 
 [[package]]
 name = "gcsfs"
-version = "2026.6.0"
+version = "2026.7.0"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "aiohttp" },
@@ -637,9 +637,9 @@ dependencies = [
     { name = "google-cloud-storage-control" },
     { name = "requests" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/cd/ad/36777b2030b96d32f5c557606ac11bf5d0e152620fc15055bd1e30194037/gcsfs-2026.6.0.tar.gz", hash = "sha256:bfb1f912b3f51006b00bcd5fcef915214cb51f8b892a3974178430a55990ba3f", size = 1007987, upload-time = "2026-06-18T03:16:08.99Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/d3/33/58e23c6f492e091c2f01ae1bffe331aa97e18a0b3d24ff90ef648335ddc8/gcsfs-2026.7.0.tar.gz", hash = "sha256:2df36ce1e9010e76dc4295774030495a97496838483c619e9f63bc0ab7bdc770", size = 1265874, upload-time = "2026-07-06T15:02:30.683Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/69/43/a0096d96d3271640bbda056b9d22249be141a54509859b99002ee6149a01/gcsfs-2026.6.0-py3-none-any.whl", hash = "sha256:4a81fe40fbdef450aeaacb534b42c04059f8f3b080e3e169137247a5bb023464", size = 89629, upload-time = "2026-06-18T03:16:07.407Z" },
+    { url = "https://files.pythonhosted.org/packages/ef/eb/a5c4b39903928e6be7735cc7aa31b6c3bbf3d887419e1e7ac751dba02233/gcsfs-2026.7.0-py3-none-any.whl", hash = "sha256:8ce6c08ea64302d8fd4bc23a615ccd9e7752541cde1a88ec8362109bd79cde78", size = 91131, upload-time = "2026-07-06T15:02:29.208Z" },
 ]
 
 [[package]]

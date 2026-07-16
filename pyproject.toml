@@ -22,7 +22,7 @@ dependencies = [
     # release (e.g. gcsfs publishing 2026.5.0 before s3fs does) can't make the
     # resolver regress a backend to its pre-CalVer 0.x line. Bump them together.
     "fsspec>=2026.4.0",
-    "gcsfs>=2026.4.0",  # GCS support for fsspec
+    "gcsfs>=2026.7.0",  # GCS support for fsspec
     "httpx",
     "jinja2",
     "logfire",
