@@ -33,7 +33,7 @@ flowapy = { path = "../..", editable = true }
 dev = [
     "httpx",
     "mypy",
-    "pre-commit>=4.5.1",
+    "pre-commit>=4.6.1",
     "pytest",
     "pytest-asyncio",
     "ruff",
