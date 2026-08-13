@@ -570,7 +570,7 @@ dev = [
     { name = "pytest-asyncio" },
     { name = "ruff" },
     { name = "types-defusedxml" },
-    { name = "types-openpyxl", specifier = ">=3.1.5.20260518" },
+    { name = "types-openpyxl", specifier = ">=3.1.5.20260724" },
 ]
 
 [[package]]

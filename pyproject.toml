@@ -72,7 +72,7 @@ dev = [
     "pytest-asyncio",
     "types-defusedxml",
     "pre-commit>=4.6.1",
-    "types-openpyxl>=3.1.5.20260518",
+    "types-openpyxl>=3.1.5.20260724",
 ]
 
 [project.scripts]
