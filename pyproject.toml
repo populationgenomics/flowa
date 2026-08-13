@@ -26,7 +26,7 @@ dependencies = [
     "httpx",
     "jinja2",
     "logfire",
-    "markitdown[docx,xls,xlsx]>=0.1.6",
+    "markitdown[docx,xls,xlsx]>=0.1.7",
     "pydantic-settings",
     "pypdf",
     "s3fs>=2026.4.0",   # S3/MinIO support for fsspec (see fsspec floor above)
