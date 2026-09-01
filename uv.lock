@@ -561,7 +561,7 @@ requires-dist = [
     { name = "pydantic-ai-slim", extras = ["openai"], marker = "extra == 'openai'", specifier = ">=2.32.0,<3" },
     { name = "pydantic-settings" },
     { name = "pypdf" },
-    { name = "s3fs", specifier = ">=2026.4.0" },
+    { name = "s3fs", specifier = ">=2026.7.0" },
     { name = "tenacity" },
     { name = "typer" },
     { name = "zstandard" },

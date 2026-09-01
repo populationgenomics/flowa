@@ -17,10 +17,11 @@ dependencies = [
     "anchorite>=0.5.1",
     "boto3",
     "defusedxml",
-    # fsspec and its s3fs/gcsfs backends release in CalVer lockstep with tight
-    # `fsspec==` pins; floor them at the current CalVer so a one-sided backend
-    # release (e.g. gcsfs publishing 2026.5.0 before s3fs does) can't make the
-    # resolver regress a backend to its pre-CalVer 0.x line. Bump them together.
+    # fsspec and its s3fs/gcsfs backends share a CalVer line, but only s3fs pins
+    # fsspec tightly (`>=X,<X.0.1`); gcsfs takes a lower bound and can run ahead,
+    # as it does at 2026.8.0 today. Floor all three at the newest CalVer they have
+    # all published, so a one-sided backend release can't let the resolver regress
+    # a backend to an older CalVer, or to its pre-CalVer 0.x line. Bump together.
     "fsspec>=2026.7.0",
     "gcsfs>=2026.7.0",  # GCS support for fsspec
     "httpx2[socks]>=2.12.0",
@@ -29,7 +30,7 @@ dependencies = [
     "markitdown[docx,xls,xlsx]>=0.1.7",
     "pydantic-settings",
     "pypdf",
-    "s3fs>=2026.4.0",   # S3/MinIO support for fsspec (see fsspec floor above)
+    "s3fs>=2026.7.0",   # S3/MinIO support for fsspec (see fsspec floor above)
     "tenacity",
     "typer",
     "zstandard",
