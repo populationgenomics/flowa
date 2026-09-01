@@ -17,7 +17,7 @@ end-to-end on a laptop without an actual pipeline run.
   start script probes for it and prints a clear error if it's
   missing.
 - A credential for one of the supported LLM providers
-  (`anthropic`, `bedrock`, `google-gla`, `google-vertex`, `openai`).
+  (`anthropic`, `bedrock`, `google`, `google-cloud`, `openai`).
 
 ## Quickstart
 

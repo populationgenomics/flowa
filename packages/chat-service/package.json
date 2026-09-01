@@ -1,6 +1,6 @@
 {
   "name": "@flowajs/chat-service",
-  "version": "0.3.0",
+  "version": "0.4.0",
   "description": "Stateless service that orchestrates LLM conversations over flowa artifacts.",
   "license": "MIT",
   "type": "module",
@@ -40,8 +40,8 @@
     "./llm/interface": "./dist/llm/interface.js",
     "./llm/anthropic": "./dist/llm/anthropic.js",
     "./llm/bedrock": "./dist/llm/bedrock.js",
-    "./llm/google-gla": "./dist/llm/google-gla.js",
-    "./llm/google-vertex": "./dist/llm/google-vertex.js",
+    "./llm/google": "./dist/llm/google.js",
+    "./llm/google-cloud": "./dist/llm/google-cloud.js",
     "./llm/openai": "./dist/llm/openai.js"
   },
   "scripts": {

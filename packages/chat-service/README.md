@@ -26,8 +26,8 @@ Two consumption modes:
    ┌─────────┴─────────┐
    ▼                   ▼
 Storage              LlmProvider
-  fs | s3 | gcs   anthropic | bedrock | google-gla
-                  google-vertex | openai
+  fs | s3 | gcs   anthropic | bedrock | google
+                  google-cloud | openai
 ```
 
 The HTTP surface is provider-agnostic. Backends and the LLM provider are
@@ -65,8 +65,8 @@ two optional knobs: `providerOptions` (per-provider thinking/reasoning
 config) and `prepareStep(messages)` (per-step messages transformation, used
 by Bedrock for prompt-cache point injection).
 
-Five providers are supported: `anthropic`, `bedrock`, `google-gla`,
-`google-vertex`, `openai`. Each ai-sdk package is an optional peer — install
+Five providers are supported: `anthropic`, `bedrock`, `google`,
+`google-cloud`, `openai`. Each ai-sdk package is an optional peer — install
 only what you use. Selection at runtime via `LLM_MODEL=<provider>:<model>`.
 
 ### Authentication
@@ -97,7 +97,7 @@ etc.). The default env-driven `index.ts` applies it on `/sessions` when
 
 | Var | Required? | Purpose |
 |-----|-----------|---------|
-| `LLM_MODEL` | yes | `<provider>:<model>` — e.g. `bedrock:au.anthropic.claude-sonnet-4-6`, `anthropic:claude-sonnet-4-6`, `google-gla:gemini-2.5-pro`, `google-vertex:gemini-2.5-pro`, `openai:gpt-5`. |
+| `LLM_MODEL` | yes | `<provider>:<model>` — e.g. `bedrock:au.anthropic.claude-sonnet-4-6`, `anthropic:claude-sonnet-4-6`, `google:gemini-2.5-pro`, `google-cloud:gemini-2.5-pro`, `openai:gpt-5`. |
 | `STORAGE_BACKEND` | yes | One of `fs`, `s3`, `gcs`. |
 | `STORAGE_FS_ROOT` | when `fs` | Absolute path to the storage root directory. |
 | `STORAGE_S3_BUCKET` | when `s3` | Bucket name. Region, endpoint, and credentials come from the AWS SDK's standard env vars (`AWS_REGION`, `AWS_ENDPOINT_URL_S3`, `AWS_ACCESS_KEY_ID`, etc.); set those to point at AWS S3 or any S3-compat provider. |

@@ -1,15 +1,15 @@
 import { createGoogleGenerativeAI } from "@ai-sdk/google";
 import type { LlmProvider } from "./interface.js";
 
-export interface GoogleGlaProviderOptions {
+export interface GoogleProviderOptions {
   modelId: string;
   /** Optional pre-built provider client. */
   client?: ReturnType<typeof createGoogleGenerativeAI>;
 }
 
 /**
- * Google Generative Language API (`google-gla`) — Gemini via the public
- * key-based API (`GOOGLE_API_KEY`). For Vertex AI, use `./google-vertex`.
+ * Google Generative Language API (`google`) — Gemini via the public
+ * key-based API (`GOOGLE_API_KEY`). For Vertex AI, use `./google-cloud`.
  *
  * `providerOptions.google.thinkingConfig.includeThoughts = true` surfaces
  * Gemini's reasoning trace.
@@ -20,8 +20,8 @@ export interface GoogleGlaProviderOptions {
  * Implicit caching for prompts above ~32K tokens (Gemini 2.5+) still
  * applies automatically.
  */
-export function createGoogleGlaProvider(
-  options: GoogleGlaProviderOptions,
+export function createGoogleProvider(
+  options: GoogleProviderOptions,
 ): LlmProvider {
   const client = options.client ?? createGoogleGenerativeAI();
   return {

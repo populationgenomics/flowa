@@ -11,8 +11,8 @@ import type { LlmProvider } from "./interface.js";
 const KNOWN_PROVIDERS = [
   "anthropic",
   "bedrock",
-  "google-gla",
-  "google-vertex",
+  "google",
+  "google-cloud",
   "openai",
 ] as const;
 type KnownProvider = (typeof KNOWN_PROVIDERS)[number];
@@ -47,13 +47,13 @@ export async function createProvider(model: string): Promise<LlmProvider> {
         ...(inferenceProfile ? { inferenceProfile } : {}),
       });
     }
-    case "google-gla": {
-      const { createGoogleGlaProvider } = await import("./google-gla.js");
-      return createGoogleGlaProvider({ modelId });
+    case "google": {
+      const { createGoogleProvider } = await import("./google.js");
+      return createGoogleProvider({ modelId });
     }
-    case "google-vertex": {
-      const { createGoogleVertexProvider } = await import("./google-vertex.js");
-      return createGoogleVertexProvider({ modelId });
+    case "google-cloud": {
+      const { createGoogleCloudProvider } = await import("./google-cloud.js");
+      return createGoogleCloudProvider({ modelId });
     }
     case "openai": {
       const { createOpenAIProvider } = await import("./openai.js");

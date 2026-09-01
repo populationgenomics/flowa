@@ -200,9 +200,9 @@ describe("bedrock provider", () => {
   });
 });
 
-describe("google-gla provider", () => {
+describe("google provider", () => {
   test("name + thinkingConfig under the `google` namespace", async () => {
-    const provider = await createProvider("google-gla:gemini-2.5-pro");
+    const provider = await createProvider("google:gemini-2.5-pro");
     expect(provider.name).toBe("gcp.gemini");
     expect(provider.providerOptions).toEqual({
       google: { thinkingConfig: { includeThoughts: true } },
@@ -210,14 +210,14 @@ describe("google-gla provider", () => {
   });
 
   test("prepareStep is undefined (CachedContent API doesn't fit per-step)", async () => {
-    const provider = await createProvider("google-gla:gemini-2.5-pro");
+    const provider = await createProvider("google:gemini-2.5-pro");
     expect(provider.prepareStep).toBeUndefined();
   });
 });
 
-describe("google-vertex provider", () => {
-  test("name + thinkingConfig under the `vertex` namespace (separate from google-gla)", async () => {
-    const provider = await createProvider("google-vertex:gemini-2.5-pro");
+describe("google-cloud provider", () => {
+  test("name + thinkingConfig under the `vertex` namespace (separate from google)", async () => {
+    const provider = await createProvider("google-cloud:gemini-2.5-pro");
     expect(provider.name).toBe("gcp.gemini");
     expect(provider.providerOptions).toEqual({
       vertex: { thinkingConfig: { includeThoughts: true } },
@@ -225,7 +225,7 @@ describe("google-vertex provider", () => {
   });
 
   test("prepareStep is undefined", async () => {
-    const provider = await createProvider("google-vertex:gemini-2.5-pro");
+    const provider = await createProvider("google-cloud:gemini-2.5-pro");
     expect(provider.prepareStep).toBeUndefined();
   });
 });
