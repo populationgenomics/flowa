@@ -64,7 +64,7 @@
     "zustand": "^4.5.0"
   },
   "devDependencies": {
-    "@ai-sdk/react": "3.0.198",
+    "@ai-sdk/react": "4.0.58",
     "@mantine/core": "8.3.18",
     "@mantine/hooks": "8.3.18",
     "@tabler/icons-react": "3.44.0",
