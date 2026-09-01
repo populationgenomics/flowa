@@ -5,7 +5,7 @@ import logging
 from typing import Any, Literal
 from xml.etree.ElementTree import Element
 
-import httpx
+import httpx2
 import typer
 from defusedxml import ElementTree
 from pydantic import ValidationError
@@ -54,7 +54,7 @@ async def query_mastermind(hgvs_g: str, api_token: str) -> list[int]:
     pmids: list[int] = []
     page = 1
 
-    async with httpx.AsyncClient(timeout=30.0) as client:
+    async with httpx2.AsyncClient(timeout=30.0) as client:
         while True:
             log.debug('Fetching page %d', page)
 
@@ -104,7 +104,9 @@ _LITVAR_AUTOCOMPLETE_URL = 'https://www.ncbi.nlm.nih.gov/research/litvar2-api/va
 _LITVAR_SEARCH_URL = 'https://www.ncbi.nlm.nih.gov/research/litvar2-api/search/'
 
 
-async def _litvar_resolve_variant_id(client: httpx.AsyncClient, query: str, *, expected_gene: str | None) -> str | None:
+async def _litvar_resolve_variant_id(
+    client: httpx2.AsyncClient, query: str, *, expected_gene: str | None
+) -> str | None:
     """Look up LitVar's internal variant id for an autocomplete query.
 
     Returns the `_id` of the first match (filtered by `expected_gene` when
@@ -135,7 +137,7 @@ async def _litvar_resolve_variant_id(client: httpx.AsyncClient, query: str, *, e
     return selected['_id']
 
 
-async def _litvar_fetch_pmids(client: httpx.AsyncClient, variant_id: str) -> list[int]:
+async def _litvar_fetch_pmids(client: httpx2.AsyncClient, variant_id: str) -> list[int]:
     """Fetch PMIDs for a LitVar variant id (relevance-ranked, capped)."""
     pmids: list[int] = []
     page = 1
@@ -222,7 +224,7 @@ async def query_litvar(
         ('gene+c.', f'{gene_symbol} {c_bare}' if c_bare else '', gene_symbol),
     ]
 
-    async with httpx.AsyncClient(timeout=30.0) as client:
+    async with httpx2.AsyncClient(timeout=30.0) as client:
         for path_label, query, expected_gene in attempts:
             if not query:
                 continue
@@ -335,7 +337,7 @@ def _extract_date(date_elem: Element | None) -> str | None:
 @retry_transient_http
 async def fetch_pubmed_metadata_batch(pmids: list[int]) -> dict[int, dict[str, Any]]:
     """Fetch metadata for multiple papers from PubMed in a single EFetch request."""
-    async with httpx.AsyncClient(timeout=30.0) as client:
+    async with httpx2.AsyncClient(timeout=30.0) as client:
         response = await client.get(
             EFETCH_URL,
             params={
@@ -517,6 +519,6 @@ def query_dois(
     except ValueError as e:
         log.error('%s', e)
         raise typer.Exit(1) from None
-    except httpx.HTTPError as e:
+    except httpx2.HTTPError as e:
         log.error('HTTP Error: %s', e)
         raise typer.Exit(1) from e

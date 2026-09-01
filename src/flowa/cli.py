@@ -35,11 +35,13 @@ logfire.configure(
     service_name='flowa-worker',
 )
 # Patches Agent class globally — captures every agent run (extraction,
-# aggregation, transcription) with zero changes in those modules.
+# aggregation, transcription) with zero changes in those modules. The
+# instrumentation format version is pydantic-ai's default; run spans carry
+# token usage under `gen_ai.aggregated_usage.*`, which is what OTLP consumers
+# need to query.
 Agent.instrument_all(
     InstrumentationSettings(
         include_content=False,
-        version=3,
     )
 )
 

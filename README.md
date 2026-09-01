@@ -101,7 +101,7 @@ Optional:
 Models use [pydantic-ai format](https://ai.pydantic.dev/models/). Examples:
 
 - **AWS Bedrock**: `bedrock:au.anthropic.claude-sonnet-4-6` (convert), `bedrock:au.anthropic.claude-opus-4-6` (extraction)
-- **Google Gemini**: `google-gla:gemini-3-pro`
+- **Google Gemini**: `google:gemini-3-pro` (Gemini API), `google-cloud:gemini-3-pro` (Vertex AI)
 - **OpenAI**: `openai:gpt-5.2`
 
 Provider credentials:

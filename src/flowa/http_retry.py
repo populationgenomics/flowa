@@ -6,14 +6,14 @@ retries it on timeouts, network errors, 429, and 5xx — but lets 4xx
 or unindexed identifiers and won't succeed on retry.
 """
 
-import httpx
+import httpx2
 from tenacity import retry, retry_if_exception, stop_after_attempt, wait_exponential
 
 
 def is_retryable_http(exc: BaseException) -> bool:
-    if isinstance(exc, httpx.TimeoutException | httpx.NetworkError):
+    if isinstance(exc, httpx2.TimeoutException | httpx2.NetworkError):
         return True
-    if isinstance(exc, httpx.HTTPStatusError):
+    if isinstance(exc, httpx2.HTTPStatusError):
         return exc.response.status_code in {429, 500, 502, 503, 504}
     return False
 

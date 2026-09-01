@@ -4,7 +4,7 @@ import logging
 from collections.abc import Iterable
 from typing import Any
 
-import httpx
+import httpx2
 from defusedxml import ElementTree
 
 from flowa.http_retry import retry_transient_http
@@ -75,7 +75,7 @@ def query_clinvar(hgvs_c: str, ncbi_api_key: str | None = None) -> dict[str, Any
     search_term = f'"{hgvs_c}"'
     log.info('Querying ClinVar for %s', hgvs_c)
 
-    with httpx.Client(timeout=30.0) as client:
+    with httpx2.Client(timeout=30.0) as client:
         # Step 1: ESearch to find VariationID
         response = client.get(
             ESEARCH_URL,

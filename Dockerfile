@@ -1,8 +1,12 @@
 FROM ghcr.io/astral-sh/uv:python3.13-trixie-slim
 
-# Required for git-sourced deps in pyproject.toml/uv.lock (currently the
+# git: required for git-sourced deps in pyproject.toml/uv.lock (currently the
 # pydantic-ai-slim fork pin). Drop once all deps come from a registry.
-RUN apt-get update && apt-get install -y --no-install-recommends git && rm -rf /var/lib/apt/lists/*
+# ca-certificates: already present in the base image, named explicitly because
+# httpx2 verifies TLS against the OS trust store (truststore) rather than a
+# bundled CA set. A base image without it fails at runtime on the NCBI/VEP/
+# CrossRef calls, not at build time, so the dependency is worth declaring.
+RUN apt-get update && apt-get install -y --no-install-recommends ca-certificates git && rm -rf /var/lib/apt/lists/*
 
 # Support for custom build steps
 COPY README* *build.d /build.d/

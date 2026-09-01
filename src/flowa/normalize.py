@@ -83,7 +83,7 @@ import logging
 import re
 from datetime import UTC, datetime
 
-import httpx
+import httpx2
 
 from flowa.http_retry import retry_transient_http
 from flowa.schema import NORMALIZED_VARIANT_SCHEMA_VERSION
@@ -173,7 +173,7 @@ async def _fetch_vep(hgvs: str) -> tuple[list[dict], str | None]:
     params = {'mane': 1, 'numbers': 1, 'protein': 1, 'hgvs': 1, 'refseq': 1}
 
     log.info('Querying VEP REST for %s', hgvs)
-    async with httpx.AsyncClient(timeout=30.0) as client:
+    async with httpx2.AsyncClient(timeout=30.0) as client:
         response = await client.get(
             url,
             params=params,
@@ -201,7 +201,7 @@ async def _fetch_recoder(hgvs: str) -> dict:
     log.info('Querying Variant Recoder REST for %s', hgvs)
     # Variant Recoder can take ~1 min for very large genes (e.g. TTN), well past
     # the default read timeout, so allow a generous read while keeping connect tight.
-    async with httpx.AsyncClient(timeout=httpx.Timeout(30.0, read=120.0)) as client:
+    async with httpx2.AsyncClient(timeout=httpx2.Timeout(30.0, read=120.0)) as client:
         response = await client.get(url, headers={'accept': 'application/json'})
         response.raise_for_status()
         data = response.json()
@@ -354,7 +354,7 @@ async def normalize_variant(hgvs: str, caller_transcript: str) -> dict:
         The normalised dict (see module docstring for the canonical shape).
 
     Raises:
-        httpx.HTTPStatusError: VEP REST returned a permanent 4xx error
+        httpx2.HTTPStatusError: VEP REST returned a permanent 4xx error
             (after no further retries).
         ValueError: VEP returned an empty / unexpected response shape.
         LookupError: the caller's transcript wasn't present in VEP's

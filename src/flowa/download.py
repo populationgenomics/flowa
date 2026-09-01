@@ -6,7 +6,7 @@ import logging
 import re
 
 import boto3
-import httpx
+import httpx2
 import typer
 from botocore import UNSIGNED
 from botocore.config import Config
@@ -108,7 +108,7 @@ def _sanitize_supplement_filename(basename: str) -> str:
 
 
 @retry_transient_http
-async def _fetch_pmcid(client: httpx.AsyncClient, pmid: int, email: str, tool: str) -> str | None:
+async def _fetch_pmcid(client: httpx2.AsyncClient, pmid: int, email: str, tool: str) -> str | None:
     """Resolve PMID -> PMCID via NCBI idconv; None when no PMCID is registered."""
     url = (
         f'https://pmc.ncbi.nlm.nih.gov/tools/idconv/api/v1/articles/'
@@ -123,7 +123,7 @@ async def _fetch_pmcid(client: httpx.AsyncClient, pmid: int, email: str, tool: s
 
 
 async def fetch_pmc_paper(
-    pmid: int, client: httpx.AsyncClient, email: str, tool: str
+    pmid: int, client: httpx2.AsyncClient, email: str, tool: str
 ) -> tuple[bytes | None, list[tuple[str, bytes]], str]:
     """Fetch a paper's main PDF and its supplements (PDF + xlsx/docx) from PMC.
 
@@ -214,7 +214,7 @@ async def download_paper_async(
 
     log.info('Downloading %s (PMID %s)', doi, pmid)
 
-    async with httpx.AsyncClient(timeout=timeout) as client:
+    async with httpx2.AsyncClient(timeout=timeout) as client:
         main_bytes, supplements, message = await fetch_pmc_paper(pmid, client, email, tool)
 
     if main_bytes is None:

@@ -121,7 +121,7 @@ def get_model_settings(
         if config.bedrock_inference_profile:
             bedrock_settings['bedrock_inference_profile'] = config.bedrock_inference_profile
         return bedrock_settings if bedrock_settings else None
-    if config.name.startswith('google-gla:') or config.name.startswith('google-vertex:'):
+    if config.name.startswith('google:') or config.name.startswith('google-cloud:'):
         if effort is None and max_tokens is None:
             return None
         from pydantic_ai.models.google import GoogleModelSettings
@@ -132,7 +132,7 @@ def get_model_settings(
         if effort is not None:
             google_settings['google_thinking_config'] = {'include_thoughts': True}
         return google_settings
-    if config.name.startswith('openai:'):
+    if config.name.startswith('openai:') or config.name.startswith('openai-responses:'):
         if effort is None and max_tokens is None:
             return None
         from pydantic_ai.models.openai import OpenAIResponsesModelSettings
