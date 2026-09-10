@@ -14,7 +14,7 @@
     "lint": "prettier --check ."
   },
   "devDependencies": {
-    "prettier": "3.8.4"
+    "prettier": "3.9.6"
   },
   "pnpm": {
     "overrides": {
