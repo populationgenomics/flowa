@@ -65,8 +65,8 @@ importers:
         specifier: 3.44.0
         version: 3.44.0(react@18.3.1)
       ai:
-        specifier: 6.0.201
-        version: 6.0.201(zod@4.4.3)
+        specifier: 7.0.97
+        version: 7.0.97(zod@4.4.3)
       formidable:
         specifier: 3.5.4
         version: 3.5.4
@@ -168,8 +168,8 @@ importers:
         specifier: 2.8.0
         version: 2.8.0(@opentelemetry/api@1.9.1)
       ai:
-        specifier: 6.0.201
-        version: 6.0.201(zod@4.4.3)
+        specifier: 7.0.97
+        version: 7.0.97(zod@4.4.3)
       aws4fetch:
         specifier: 1.0.20
         version: 1.0.20
@@ -272,8 +272,8 @@ importers:
         specifier: 18.3.5
         version: 18.3.5(@types/react@18.3.18)
       ai:
-        specifier: 6.0.201
-        version: 6.0.201(zod@4.4.3)
+        specifier: 7.0.97
+        version: 7.0.97(zod@4.4.3)
       autoprefixer:
         specifier: 10.5.2
         version: 10.5.2(postcss@8.5.23)
@@ -340,9 +340,9 @@ packages:
     peerDependencies:
       zod: ^3.25.76 || ^4.1.8
 
-  '@ai-sdk/gateway@3.0.127':
-    resolution: {integrity: sha512-Obmw5hmE5x+ccRrMp/Djx5r0rpFVX87YqE6OY06g5fwYlRI30dA84ARfTzX45ivCvkW4eCnBpOVXVWQ/pjH85w==}
-    engines: {node: '>=18'}
+  '@ai-sdk/gateway@4.0.78':
+    resolution: {integrity: sha512-fcamzmFlcy+c/tIc7QcATLe/kArgSVGQ1QxaddMjhOSX8zypc2hmD5sHB2bp1DSFcSxDD32d6usF9a7xLCTULg==}
+    engines: {node: '>=22'}
     peerDependencies:
       zod: ^3.25.76 || ^4.1.8
 
@@ -382,9 +382,19 @@ packages:
     peerDependencies:
       zod: ^3.25.76 || ^4.1.8
 
+  '@ai-sdk/provider-utils@5.0.39':
+    resolution: {integrity: sha512-VIFp4Qv3j+V941crFB1y2VG5yeGbeLOFRxiPaZJETkkpo1H5WviLx6H5yRkFkrXIGxnTGygKsPgCAJG0X61Auw==}
+    engines: {node: '>=22'}
+    peerDependencies:
+      zod: ^3.25.76 || ^4.1.8
+
   '@ai-sdk/provider@3.0.10':
     resolution: {integrity: sha512-Q3BZ27qfpYqnCYGvE3vt+Qi6LGOF9R5Nmzn+9JoM1lCRsD9mYaIhfJLkSunN48nfGXJ6n+XNV0J/XVpqGQl7Dw==}
     engines: {node: '>=18'}
+
+  '@ai-sdk/provider@4.0.13':
+    resolution: {integrity: sha512-sJvnbFIFLzmKFXIjfwS8XCOAj6puHCawItwvA9PBZgk2f/l/TiC4OSfK3ueDbUVXfRCOn5eJN97EIF10toIOmQ==}
+    engines: {node: '>=22'}
 
   '@ai-sdk/react@3.0.198':
     resolution: {integrity: sha512-ozlxMidzvKXAefvnq95Y34rJ5MipXABIv1bg2RLEnWUBxGrKxNHrYl0fTfi6grTN88wSXMZYaMY2oHMCHDFuJw==}
@@ -1816,6 +1826,9 @@ packages:
   '@vitest/utils@4.1.11':
     resolution: {integrity: sha512-zTCVGpyFsGWBhllOyKlTw/vnr6D9qxsfSDyfbyZmTyjHw5N/VuvzHpHoQjm2ZJzn4RJgx5w4r7V0er69CmLgPQ==}
 
+  '@workflow/serde@4.1.0':
+    resolution: {integrity: sha512-pav4F2BoirECWR7Nf1TKt+2eETcBj7jj4cBefQ8VXQCA6NPkaKeLfj/zMgi+3zYV5ZIBT4GuUiphsj0/b9hPQQ==}
+
   a-sync-waterfall@1.0.1:
     resolution: {integrity: sha512-RYTOHHdWipFUliRFMCS4X2Yn2X8M87V/OpSqWzKKOGhzqyUxzyVmhHDH9sAvG+ZuQf/TAOFsLCpMw09I1ufUnA==}
 
@@ -1847,9 +1860,9 @@ packages:
     peerDependencies:
       zod: ^3.25.76 || ^4.1.8
 
-  ai@6.0.201:
-    resolution: {integrity: sha512-iDmXSy7csk+SYaCkTUMwsOE/73pksR1spctV+u+DW97v+R/Cj01gchgCUNVrn9QyNHqOJQuTg+JBVsBsp6lOag==}
-    engines: {node: '>=18'}
+  ai@7.0.97:
+    resolution: {integrity: sha512-tQGZ234p/bk5X/LNQdB43a5/z1Bve7wK0EOR1AwN6xrosZih4MIC/3pXhcnytcpBJHMbhLISW6J1dFTd/tnwPA==}
+    engines: {node: '>=22'}
     peerDependencies:
       zod: ^3.25.76 || ^4.1.8
 
@@ -2223,6 +2236,10 @@ packages:
 
   eventsource-parser@3.1.0:
     resolution: {integrity: sha512-kJezFj9YFAMLeORyi7aCLxLbD5/qWMQnoMVlVPyHIll7lgRJCc3JVln9Vgl9nwQi0YkMnhdGTMNn7CkRRAptMg==}
+    engines: {node: '>=18.0.0'}
+
+  eventsource-parser@3.1.1:
+    resolution: {integrity: sha512-EKN1vKAMcZ8MlYMpaNuxN6R9yakzH6uajHcHVTqWJzvu5pWw9DyhbP35HH8MVBQ+dZjAfDxk+A8NiR9KWaXiyQ==}
     engines: {node: '>=18.0.0'}
 
   expand-template@2.0.3:
@@ -3434,6 +3451,10 @@ packages:
   undici-types@7.24.6:
     resolution: {integrity: sha512-WRNW+sJgj5OBN4/0JpHFqtqzhpbnV0GuB+OozA9gCL7a993SmU+1JBZCzLNxYsbMfIeDL+lTsphD5jN5N+n0zg==}
 
+  undici@7.29.1:
+    resolution: {integrity: sha512-RYONW2MeafgYlkVOKYKkA/Ag7BmXqgIWCa8t1m0JcxrQg9pI9lEqRhAOruOBCbAohOa/gkCF+iPi9hrgvTzu6Q==}
+    engines: {node: '>=20.18.1'}
+
   unified@11.0.5:
     resolution: {integrity: sha512-xKvGhPWw3k84Qjh8bI3ZeJjqnyadK+GEFtazSfZv/rKeTkTjOJho6mFqh2SM96iIcZokxiOpg78GazTSg8+KHA==}
 
@@ -3738,10 +3759,10 @@ snapshots:
       '@vercel/oidc': 3.2.0
       zod: 4.4.3
 
-  '@ai-sdk/gateway@3.0.127(zod@4.4.3)':
+  '@ai-sdk/gateway@4.0.78(zod@4.4.3)':
     dependencies:
-      '@ai-sdk/provider': 3.0.10
-      '@ai-sdk/provider-utils': 4.0.27(zod@4.4.3)
+      '@ai-sdk/provider': 4.0.13
+      '@ai-sdk/provider-utils': 5.0.39(zod@4.4.3)
       '@vercel/oidc': 3.2.0
       zod: 4.4.3
 
@@ -3789,7 +3810,20 @@ snapshots:
       eventsource-parser: 3.1.0
       zod: 4.4.3
 
+  '@ai-sdk/provider-utils@5.0.39(zod@4.4.3)':
+    dependencies:
+      '@ai-sdk/provider': 4.0.13
+      '@standard-schema/spec': 1.1.0
+      '@workflow/serde': 4.1.0
+      eventsource-parser: 3.1.1
+      undici: 7.29.1
+      zod: 4.4.3
+
   '@ai-sdk/provider@3.0.10':
+    dependencies:
+      json-schema: 0.4.0
+
+  '@ai-sdk/provider@4.0.13':
     dependencies:
       json-schema: 0.4.0
 
@@ -5167,6 +5201,8 @@ snapshots:
       convert-source-map: 2.0.0
       tinyrainbow: 3.1.1
 
+  '@workflow/serde@4.1.0': {}
+
   a-sync-waterfall@1.0.1: {}
 
   abort-controller@3.0.0:
@@ -5195,12 +5231,11 @@ snapshots:
       '@opentelemetry/api': 1.9.1
       zod: 4.4.3
 
-  ai@6.0.201(zod@4.4.3):
+  ai@7.0.97(zod@4.4.3):
     dependencies:
-      '@ai-sdk/gateway': 3.0.127(zod@4.4.3)
-      '@ai-sdk/provider': 3.0.10
-      '@ai-sdk/provider-utils': 4.0.27(zod@4.4.3)
-      '@opentelemetry/api': 1.9.1
+      '@ai-sdk/gateway': 4.0.78(zod@4.4.3)
+      '@ai-sdk/provider': 4.0.13
+      '@ai-sdk/provider-utils': 5.0.39(zod@4.4.3)
       zod: 4.4.3
 
   ansi-regex@5.0.1: {}
@@ -5570,6 +5605,8 @@ snapshots:
   event-target-shim@5.0.1: {}
 
   eventsource-parser@3.1.0: {}
+
+  eventsource-parser@3.1.1: {}
 
   expand-template@2.0.3:
     optional: true
@@ -7138,6 +7175,8 @@ snapshots:
   ufo@1.6.4: {}
 
   undici-types@7.24.6: {}
+
+  undici@7.29.1: {}
 
   unified@11.0.5:
     dependencies:
