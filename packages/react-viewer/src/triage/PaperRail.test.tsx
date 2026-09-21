@@ -4,12 +4,24 @@ import { describe, it, expect, vi } from "vitest";
 import { render, screen, fireEvent } from "@testing-library/react";
 import { MantineProvider } from "@mantine/core";
 import { PaperRail } from "./PaperRail";
+import type { PaperIdMapping } from "../citations/types";
 import type { Claim, RankedPaper, TriageStateValue } from "./types";
 
 const PAPERS: RankedPaper[] = [
   { paperId: "Smith2024", rankRationale: "Functional." },
   { paperId: "Jones2023", rankRationale: "Clinical." },
 ];
+
+const MAPPING: PaperIdMapping = {
+  byAuthorYear: {
+    Smith2024: { doi: "10.1234/smith.2024", pmid: 39012345 },
+    Jones2023: { doi: "10.1234/jones.2023" },
+  },
+  byDoi: {
+    "10.1234/smith.2024": "Smith2024",
+    "10.1234/jones.2023": "Jones2023",
+  },
+};
 
 const CLAIMS_BY_PAPER = new Map<string, Claim[]>([
   [
@@ -27,6 +39,7 @@ function renderRail(opts: {
   papersDone?: Record<string, { triageDoneAt: Date; triageDoneBy: string }>;
   focusedPaperId?: string | null;
   onFocusPaper?: (id: string) => void;
+  paperIdMapping?: PaperIdMapping;
 }) {
   const onFocusPaper = opts.onFocusPaper ?? vi.fn();
   return render(
@@ -38,6 +51,7 @@ function renderRail(opts: {
         papersDone={opts.papersDone ?? {}}
         focusedPaperId={opts.focusedPaperId ?? null}
         onFocusPaper={onFocusPaper}
+        paperIdMapping={opts.paperIdMapping}
       />
     </MantineProvider>,
   );
@@ -80,6 +94,25 @@ describe("PaperRail", () => {
     expect(screen.getByTestId("paper-row-Smith2024").textContent).toContain(
       "✓ done",
     );
+  });
+
+  it("shows the PubMed id under the cite key, or the DOI without one", () => {
+    renderRail({ paperIdMapping: MAPPING });
+    expect(screen.getByTestId("paper-id-Smith2024").textContent).toBe(
+      "PMID 39012345",
+    );
+    expect(screen.getByTestId("paper-id-Jones2023").textContent).toBe(
+      "10.1234/jones.2023",
+    );
+  });
+
+  it("shows no identifier line without a mapping or for an unmapped paper", () => {
+    renderRail({});
+    expect(screen.queryByTestId("paper-id-Smith2024")).toBeNull();
+    renderRail({
+      paperIdMapping: { byAuthorYear: {}, byDoi: {} },
+    });
+    expect(screen.queryByTestId("paper-id-Jones2023")).toBeNull();
   });
 
   it("calls onFocusPaper with the paperId on click", () => {
