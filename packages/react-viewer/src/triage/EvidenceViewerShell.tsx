@@ -103,7 +103,21 @@ export interface EvidenceViewerShellProps {
   /** When true, hides chat surface + Rewrite affordance. */
   readOnly?: boolean;
 
-  /** Title bar text. Defaults to a generic "Evidence Viewer". */
+  /**
+   * What the evidence under review is about, as the consumer names it.
+   * Shown as the header's first line and first in the window title, so
+   * two viewers open side by side can be told apart.
+   */
+  title?: string;
+  /**
+   * Custom markup for the header's first line, in place of `title`
+   * rendered as plain text. `title` still feeds the window title.
+   */
+  titleSlot?: ReactNode;
+  /**
+   * The category under review. Follows "Evidence Viewer" in the header's
+   * second line and in the window title.
+   */
   categoryName?: string;
 }
 
@@ -142,6 +156,8 @@ export function EvidenceViewerShell({
   initialFocusTarget = null,
   onCitationClick,
   readOnly = false,
+  title,
+  titleSlot,
   categoryName,
 }: EvidenceViewerShellProps) {
   // ── Derived structure from the parsed artifact ────────────────────
@@ -733,13 +749,14 @@ export function EvidenceViewerShell({
     },
   });
 
-  // ── Document title ────────────────────────────────────────────────
-  const titleParts: string[] = ["Evidence Viewer"];
-  if (categoryName) titleParts.push(categoryName);
-  const title = titleParts.join(" — ");
+  // ── Header and document title ─────────────────────────────────────
+  const viewerLabel = ["Evidence Viewer", categoryName]
+    .filter(Boolean)
+    .join(" — ");
+  const windowTitle = [title, viewerLabel].filter(Boolean).join(" — ");
   useEffect(() => {
-    if (typeof document !== "undefined") document.title = title;
-  }, [title]);
+    if (typeof document !== "undefined") document.title = windowTitle;
+  }, [windowTitle]);
 
   // ── Render guards ─────────────────────────────────────────────────
   if (!artifact) {
@@ -784,9 +801,23 @@ export function EvidenceViewerShell({
 
   return (
     <div className="flex h-full flex-col">
-      <div className="border-b border-gray-200 bg-gray-50 px-4 py-2">
+      <div
+        className="border-b border-gray-200 bg-gray-50 px-4 py-2"
+        data-testid="viewer-header"
+      >
+        {titleSlot ??
+          (title && (
+            <Text
+              size="md"
+              fw={700}
+              className="text-gray-900"
+              data-testid="viewer-title"
+            >
+              {title}
+            </Text>
+          ))}
         <Text size="sm" fw={600} className="text-gray-700">
-          {title}
+          {viewerLabel}
         </Text>
       </div>
 

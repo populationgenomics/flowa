@@ -611,4 +611,69 @@ describe("EvidenceViewerShell", () => {
       expect(container.querySelector("mark.anchor-highlight")).not.toBeNull(),
     );
   });
+
+  it("puts the consumer's title first in the header and the window title", async () => {
+    render(
+      wrap(
+        <EvidenceViewerShell
+          {...baseProps}
+          artifact={ARTIFACT}
+          backend={makeBackend({ claims: [], papers: [], comments: [] })}
+          chatSessionFactory={NEVER_SESSION}
+          onVersionChange={vi.fn()}
+          title="Subject under review"
+          categoryName="Functional evidence"
+        />,
+      ),
+    );
+    expect((await screen.findByTestId("viewer-title")).textContent).toBe(
+      "Subject under review",
+    );
+    expect(screen.getByTestId("viewer-header").textContent).toContain(
+      "Evidence Viewer — Functional evidence",
+    );
+    expect(document.title).toBe(
+      "Subject under review — Evidence Viewer — Functional evidence",
+    );
+  });
+
+  it("renders a title slot in place of the plain title", async () => {
+    render(
+      wrap(
+        <EvidenceViewerShell
+          {...baseProps}
+          artifact={ARTIFACT}
+          backend={makeBackend({ claims: [], papers: [], comments: [] })}
+          chatSessionFactory={NEVER_SESSION}
+          onVersionChange={vi.fn()}
+          title="Subject under review"
+          titleSlot={<span data-testid="custom-title">Custom markup</span>}
+        />,
+      ),
+    );
+    expect((await screen.findByTestId("custom-title")).textContent).toBe(
+      "Custom markup",
+    );
+    expect(screen.queryByTestId("viewer-title")).toBeNull();
+    expect(document.title).toBe("Subject under review — Evidence Viewer");
+  });
+
+  it("keeps the generic header without a title", async () => {
+    render(
+      wrap(
+        <EvidenceViewerShell
+          {...baseProps}
+          artifact={ARTIFACT}
+          backend={makeBackend({ claims: [], papers: [], comments: [] })}
+          chatSessionFactory={NEVER_SESSION}
+          onVersionChange={vi.fn()}
+        />,
+      ),
+    );
+    expect((await screen.findByTestId("viewer-header")).textContent).toBe(
+      "Evidence Viewer",
+    );
+    expect(screen.queryByTestId("viewer-title")).toBeNull();
+    expect(document.title).toBe("Evidence Viewer");
+  });
 });
