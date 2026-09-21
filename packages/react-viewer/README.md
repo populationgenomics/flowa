@@ -83,6 +83,22 @@ loads in the browser). No `dynamic(() => …, { ssr: false })` wrapper needed.
 
 `LlmContent` is server-render-safe.
 
+## Loading feedback
+
+While a document downloads, the pane shows the bytes received and, when the
+server reports a content length, the total and a progress bar. A download that
+fails, or a viewer bundle that fails to load, shows the error with a Retry
+button. A failed import of `react-pdf` is not cached, so the retry (or the next
+mount) imports again.
+
+pdf.js fetches a large document in byte ranges, so the first page renders after
+a few small requests, only when the response lets it: the server has to answer
+with `Accept-Ranges: bytes`, and for a cross-origin file the CORS policy has to
+expose `Accept-Ranges`, `Content-Range` and `Content-Length` (S3 and MinIO need
+`ExposeHeaders` in the bucket's CORS rule for this). Otherwise the whole file
+downloads before anything renders, and a PDF that is not linearised shows
+nothing until the last byte arrives.
+
 ## Worker assets
 
 `PdfHighlightViewer` requires the consumer to serve `pdf.worker.min.mjs` and

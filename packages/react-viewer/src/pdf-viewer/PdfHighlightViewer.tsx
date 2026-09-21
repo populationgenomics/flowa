@@ -6,9 +6,17 @@ import {
   useRef,
   useState,
 } from "react";
-import { ActionIcon, Alert, Loader } from "@mantine/core";
+import {
+  ActionIcon,
+  Alert,
+  Button,
+  Loader,
+  Progress,
+  Text,
+} from "@mantine/core";
 import {
   IconAlertTriangle,
+  IconReload,
   IconZoomIn,
   IconZoomOut,
 } from "@tabler/icons-react";
@@ -53,23 +61,119 @@ function loadReactPdf(workerSrc: string): Promise<ReactPdfModule> {
       mod.pdfjs.GlobalWorkerOptions.workerSrc = workerSrc;
       return mod;
     });
+    // A failed import (a chunk that did not download, typically) is not
+    // cached: the next mount or an explicit retry imports again.
+    promise.catch(() => {
+      if (cached?.promise === promise) cached = null;
+    });
     cached = { promise, workerSrc };
   }
   return cached.promise;
 }
 
-function useReactPdf(workerSrc: string): ReactPdfModule | null {
+interface ReactPdfLoad {
+  mod: ReactPdfModule | null;
+  error: Error | null;
+  retry(): void;
+}
+
+function useReactPdf(workerSrc: string): ReactPdfLoad {
   const [mod, setMod] = useState<ReactPdfModule | null>(null);
+  const [error, setError] = useState<Error | null>(null);
+  const [attempt, setAttempt] = useState(0);
   useEffect(() => {
     let cancelled = false;
-    loadReactPdf(workerSrc).then((m) => {
-      if (!cancelled) setMod(m);
-    });
+    setError(null);
+    loadReactPdf(workerSrc).then(
+      (m) => {
+        if (!cancelled) setMod(m);
+      },
+      (e: unknown) => {
+        if (!cancelled) setError(e instanceof Error ? e : new Error(String(e)));
+      },
+    );
     return () => {
       cancelled = true;
     };
-  }, [workerSrc]);
-  return mod;
+  }, [workerSrc, attempt]);
+  const retry = useCallback(() => setAttempt((n) => n + 1), []);
+  return { mod, error, retry };
+}
+
+function formatBytes(n: number): string {
+  if (n >= 1024 * 1024) return `${(n / (1024 * 1024)).toFixed(1)} MB`;
+  return `${Math.max(1, Math.round(n / 1024))} KB`;
+}
+
+interface LoadProgress {
+  loaded: number;
+  /** Zero when the server did not report a content length. */
+  total: number;
+}
+
+/**
+ * Loading placeholder. With progress it names the bytes received and, when
+ * the total is known, the total and a bar, so a slow download of a large
+ * document is distinguishable from a stalled one.
+ */
+function LoadingState({ progress }: { progress: LoadProgress | null }) {
+  const known = progress !== null && progress.total > 0;
+  const percent = known
+    ? Math.min(100, Math.round((progress.loaded / progress.total) * 100))
+    : null;
+  return (
+    <div
+      className="flex h-full flex-col items-center justify-center gap-2"
+      data-testid="pdf-loading"
+    >
+      <Loader size="md" />
+      {progress && (
+        <Text size="xs" c="dimmed">
+          {known
+            ? `${formatBytes(progress.loaded)} of ${formatBytes(progress.total)} (${percent}%)`
+            : `${formatBytes(progress.loaded)} received`}
+        </Text>
+      )}
+      {percent !== null && (
+        <Progress value={percent} size="xs" className="w-48" />
+      )}
+    </div>
+  );
+}
+
+function LoadFailure({
+  title,
+  error,
+  onRetry,
+}: {
+  title: string;
+  error: Error | null;
+  onRetry(): void;
+}) {
+  return (
+    <div className="flex h-full items-center justify-center p-4">
+      <Alert
+        icon={<IconAlertTriangle size={16} />}
+        color="red"
+        variant="light"
+        title={title}
+        className="max-w-md"
+        data-testid="pdf-load-error"
+      >
+        <div>{error?.message ?? "Unknown error"}</div>
+        <Button
+          size="xs"
+          variant="light"
+          color="red"
+          mt="xs"
+          leftSection={<IconReload size={14} />}
+          onClick={onRetry}
+        >
+          Retry
+        </Button>
+      </Alert>
+    </div>
+  );
 }
 
 /** Render bbox highlights for a page as a single overlay (non-multiplicative). */
@@ -120,9 +224,23 @@ export const PdfHighlightViewer = ({
   workerSrc,
   cMapUrl,
 }: PdfHighlightViewerProps) => {
-  const reactPdf = useReactPdf(workerSrc);
+  const {
+    mod: reactPdf,
+    error: moduleError,
+    retry: retryModule,
+  } = useReactPdf(workerSrc);
 
   const [numPages, setNumPages] = useState<number | null>(null);
+  const [loadProgress, setLoadProgress] = useState<LoadProgress | null>(null);
+  const [loadError, setLoadError] = useState<Error | null>(null);
+  // Bumped by Retry; part of the Document key, so a retry remounts it and
+  // starts the download over.
+  const [loadAttempt, setLoadAttempt] = useState(0);
+  const retryLoad = useCallback(() => {
+    setLoadError(null);
+    setLoadProgress(null);
+    setLoadAttempt((n) => n + 1);
+  }, []);
   const containerRef = useRef<HTMLDivElement>(null);
   const targetPageRef = useRef<HTMLDivElement>(null);
   const hasScrolledRef = useRef(false);
@@ -306,6 +424,8 @@ export const PdfHighlightViewer = ({
   useEffect(() => {
     setNumPages(null);
     setPageAspectRatio(null);
+    setLoadProgress(null);
+    setLoadError(null);
     hasScrolledRef.current = false;
   }, [pdfUrl]);
 
@@ -373,12 +493,6 @@ export const PdfHighlightViewer = ({
       container.style.cursor = "grab";
     }
   }, []);
-
-  const loading = (
-    <div className="flex h-full items-center justify-center">
-      <Loader size="md" />
-    </div>
-  );
 
   return (
     <div className="relative flex h-full w-full flex-col">
@@ -451,13 +565,32 @@ export const PdfHighlightViewer = ({
         onPointerUp={handlePointerUp}
         onPointerCancel={handlePointerUp}
       >
-        {!reactPdf || !containerSize ? (
-          loading
+        {moduleError ? (
+          <LoadFailure
+            title="Could not load the PDF viewer"
+            error={moduleError}
+            onRetry={retryModule}
+          />
+        ) : !reactPdf || !containerSize ? (
+          <LoadingState progress={null} />
         ) : (
           <reactPdf.Document
+            key={`${pdfUrl}#${loadAttempt}`}
             file={pdfUrl}
             onLoadSuccess={({ numPages: n }) => setNumPages(n)}
-            loading={loading}
+            onLoadProgress={({ loaded, total }) =>
+              setLoadProgress({ loaded, total })
+            }
+            onLoadError={setLoadError}
+            onSourceError={setLoadError}
+            loading={<LoadingState progress={loadProgress} />}
+            error={
+              <LoadFailure
+                title="Could not load this PDF"
+                error={loadError}
+                onRetry={retryLoad}
+              />
+            }
             options={documentOptions}
           >
             {numPages &&
