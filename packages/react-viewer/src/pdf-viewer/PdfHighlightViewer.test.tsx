@@ -17,6 +17,7 @@ import {
 } from "./PdfHighlightViewer";
 import type { PdfHighlight } from "./types";
 import type { Rotation } from "./geometry";
+import type { PdfDocumentLike } from "./text-search";
 
 type DocumentProps = {
   file?: unknown;
@@ -98,6 +99,7 @@ function viewer(props: {
   onLoadError?: (error: Error, info: unknown) => void;
   rotation?: Rotation;
   onRotationChange?: (rotation: Rotation) => void;
+  captureFindShortcut?: boolean;
 }) {
   return wrap(
     <PdfHighlightViewer
@@ -108,6 +110,7 @@ function viewer(props: {
       onLoadError={props.onLoadError}
       rotation={props.rotation}
       onRotationChange={props.onRotationChange}
+      captureFindShortcut={props.captureFindShortcut}
     />,
   );
 }
@@ -118,6 +121,9 @@ function viewer(props: {
  * cached per `workerSrc`, so tests that need a fresh import pass their own.
  */
 function renderViewer(props: Parameters<typeof viewer>[0]) {
+  // happy-dom leaves element scrolling unimplemented.
+  Element.prototype.scrollTo ??= vi.fn();
+  Element.prototype.scrollIntoView ??= vi.fn();
   globalThis.ResizeObserver = class {
     constructor(private cb: ResizeObserverCallback) {}
     observe() {
@@ -699,6 +705,471 @@ describe("PdfHighlightViewer", () => {
     await waitFor(() =>
       expect(screen.getByTestId("page-1").dataset.rotate).toBe("0"),
     );
+  });
+
+  const viewport1000 = {
+    width: 1000,
+    height: 1000,
+    convertToViewportPoint: (x: number, y: number) => [x, 1000 - y],
+  };
+
+  /** A one-page document over the given text runs. */
+  const docWith = (items: unknown[]): PdfDocumentLike => ({
+    numPages: 1,
+    getPage: async () => ({
+      getTextContent: async () => ({ items }),
+      getViewport: () => viewport1000,
+    }),
+  });
+
+  /** Two runs, the second continuing the first line; "proband" appears in both. A fresh object each call. */
+  const twoRunDocument = () =>
+    docWith([
+      {
+        str: "The proband carried",
+        transform: [10, 0, 0, 10, 100, 900],
+        width: 190,
+        height: 10,
+        hasEOL: true,
+      },
+      {
+        str: "the variant; the proband's",
+        transform: [10, 0, 0, 10, 100, 880],
+        width: 260,
+        height: 10,
+      },
+    ]);
+
+  /** Document and page mocks that load `doc` and render its pages with their children. */
+  function mountDocument(doc: PdfDocumentLike | null) {
+    mockState.document = (props) => {
+      useEffect(() => {
+        if (doc) props.onLoadSuccess?.(doc);
+      }, []);
+      return doc ? <>{props.children}</> : <>{props.loading}</>;
+    };
+    mockState.page = (props) => {
+      useEffect(() => {
+        props.onLoadSuccess?.({ view: [0, 0, 600, 800], rotate: 0 });
+        props.onRenderSuccess?.();
+      }, [props.rotate, props.width]);
+      return (
+        <div data-testid={`page-${props.pageNumber}`}>{props.children}</div>
+      );
+    };
+  }
+
+  const matchBoxes = () =>
+    Array.from(
+      screen.getByTestId("page-1").firstElementChild?.children ?? [],
+    ) as HTMLElement[];
+
+  async function openFind() {
+    fireEvent.click(
+      await screen.findByRole("button", { name: "Find in document" }),
+    );
+    return screen.getByLabelText("Search text");
+  }
+
+  /** Runs `body` with a spy on element scrolling, restored afterwards. */
+  async function withScrollSpy(
+    body: (scrollTo: ReturnType<typeof vi.fn>) => Promise<void>,
+  ) {
+    const original = Element.prototype.scrollTo;
+    const scrollTo = vi.fn();
+    Element.prototype.scrollTo = scrollTo;
+    try {
+      await body(scrollTo);
+    } finally {
+      Element.prototype.scrollTo = original;
+    }
+  }
+
+  it("finds text in the document and steps through the matches, wrapping at the ends", async () => {
+    mountDocument(twoRunDocument());
+    renderViewer({ workerSrc: "/w/find.mjs" });
+    const input = await openFind();
+    fireEvent.change(input, { target: { value: "proband" } });
+    expect(await screen.findByText("1 of 2")).toBeDefined();
+
+    // Both matches are drawn, the current one in its own colour and on top.
+    // "proband" is characters 4–11 of a 19-character run 190 wide from
+    // x=100 on a 1000-wide page, 0.2 em below to 0.8 em above its baseline
+    // at y=900: left 14%, top 9.2%.
+    expect(matchBoxes().map((b) => b.style.backgroundColor)).toEqual([
+      "rgb(180, 210, 255)",
+      "rgb(255, 165, 80)",
+    ]);
+    expect(matchBoxes()[1]!.style.left).toBe("14%");
+    expect(matchBoxes()[1]!.style.top).toBe("9.2%");
+    expect(matchBoxes()[1]!.style.width).toBe("7%");
+
+    fireEvent.keyDown(input, { key: "Enter" });
+    expect(await screen.findByText("2 of 2")).toBeDefined();
+    fireEvent.keyDown(input, { key: "Enter" });
+    expect(await screen.findByText("1 of 2")).toBeDefined();
+    fireEvent.keyDown(input, { key: "Enter", shiftKey: true });
+    expect(await screen.findByText("2 of 2")).toBeDefined();
+
+    // Match boxes follow a turn like the quote highlights do.
+    fireEvent.click(screen.getByRole("button", { name: "Rotate right" }));
+    await waitFor(() => expect(matchBoxes()[0]!.style.left).toBe("89.8%"));
+    expect(matchBoxes()[0]!.style.top).toBe("14%");
+
+    fireEvent.change(input, { target: { value: "zebra" } });
+    expect(await screen.findByText("No matches")).toBeDefined();
+    expect(screen.getByTestId("page-1").firstElementChild).toBeNull();
+
+    fireEvent.keyDown(input, { key: "Escape" });
+    expect(screen.queryByTestId("pdf-find-bar")).toBeNull();
+  });
+
+  it("restarts at the first match when the query changes after stepping", async () => {
+    await withScrollSpy(async (scrollTo) => {
+      mountDocument(twoRunDocument());
+      renderViewer({ workerSrc: "/w/find-restart.mjs" });
+      const input = await openFind();
+      fireEvent.change(input, { target: { value: "proband" } });
+      expect(await screen.findByText("1 of 2")).toBeDefined();
+      fireEvent.keyDown(input, { key: "Enter" });
+      expect(await screen.findByText("2 of 2")).toBeDefined();
+      await waitFor(() => expect(scrollTo).toHaveBeenCalledTimes(2));
+
+      // "the" occurs three times; the selection starts over and the view
+      // moves once more, to the first of them.
+      fireEvent.change(input, { target: { value: "the" } });
+      expect(await screen.findByText("1 of 3")).toBeDefined();
+      await waitFor(() => expect(scrollTo).toHaveBeenCalledTimes(3));
+      const current = matchBoxes().find(
+        (b) => b.style.backgroundColor === "rgb(255, 165, 80)",
+      )!;
+      // The first "the" is on the first line; the second starts at the same
+      // x on the line below.
+      expect(current.style.left).toBe("10%");
+      expect(current.style.top).toBe("9.2%");
+    });
+  });
+
+  it("drops a pending request when the bar closes before the index lands", async () => {
+    await withScrollSpy(async (scrollTo) => {
+      let release!: () => void;
+      const gate = new Promise<void>((resolve) => {
+        release = resolve;
+      });
+      const slow = twoRunDocument();
+      mountDocument({
+        numPages: 1,
+        getPage: async () => {
+          const page = await slow.getPage(1);
+          return {
+            ...page,
+            getTextContent: async () => {
+              await gate;
+              return page.getTextContent();
+            },
+          };
+        },
+      });
+      renderViewer({ workerSrc: "/w/find-close-pending.mjs" });
+      const input = await openFind();
+      fireEvent.change(input, { target: { value: "proband" } });
+      expect(await screen.findByText("Indexing…")).toBeDefined();
+      fireEvent.keyDown(input, { key: "Escape" });
+      expect(screen.queryByTestId("pdf-find-bar")).toBeNull();
+      release();
+      await new Promise((resolve) => setTimeout(resolve, 200));
+      expect(scrollTo).not.toHaveBeenCalled();
+    });
+  });
+
+  it("scrolls to the first match of a query typed while the index was still building", async () => {
+    await withScrollSpy(async (scrollTo) => {
+      let release!: () => void;
+      const gate = new Promise<void>((resolve) => {
+        release = resolve;
+      });
+      const slow = twoRunDocument();
+      mountDocument({
+        numPages: 1,
+        getPage: async () => {
+          const page = await slow.getPage(1);
+          return {
+            ...page,
+            getTextContent: async () => {
+              await gate;
+              return page.getTextContent();
+            },
+          };
+        },
+      });
+      renderViewer({ workerSrc: "/w/find-slow.mjs" });
+      const input = await openFind();
+      fireEvent.change(input, { target: { value: "proband" } });
+      expect(await screen.findByText("Indexing…")).toBeDefined();
+      expect(scrollTo).not.toHaveBeenCalled();
+      release();
+      expect(await screen.findByText("1 of 2")).toBeDefined();
+      await waitFor(() => expect(scrollTo).toHaveBeenCalledTimes(1));
+    });
+  });
+
+  it("caps the matches it collects and says so", async () => {
+    mountDocument(
+      docWith([
+        {
+          str: "x".repeat(1200),
+          transform: [10, 0, 0, 10, 0, 500],
+          width: 900,
+          height: 10,
+        },
+      ]),
+    );
+    renderViewer({ workerSrc: "/w/find-cap.mjs" });
+    const input = await openFind();
+    fireEvent.change(input, { target: { value: "x" } });
+    expect(await screen.findByText("1 of 1000+")).toBeDefined();
+  });
+
+  it("reports a document without a text layer as text unavailable", async () => {
+    mountDocument(docWith([]));
+    renderViewer({ workerSrc: "/w/find-scan.mjs" });
+    await openFind();
+    expect(await screen.findByText("Text unavailable")).toBeDefined();
+  });
+
+  it("still searches the readable pages when one page's text cannot be read", async () => {
+    mountDocument({
+      numPages: 2,
+      getPage: async (n: number) => ({
+        getTextContent: async () => {
+          if (n === 1) throw new Error("corrupt font");
+          return {
+            items: [
+              {
+                str: "the proband",
+                transform: [10, 0, 0, 10, 100, 900],
+                width: 110,
+                height: 10,
+              },
+            ],
+          };
+        },
+        getViewport: () => viewport1000,
+      }),
+    });
+    renderViewer({ workerSrc: "/w/find-partial.mjs" });
+    const input = await openFind();
+    fireEvent.change(input, { target: { value: "proband" } });
+    expect(await screen.findByText("1 of 1")).toBeDefined();
+  });
+
+  it("indexes the next document afresh and leaves the view alone for it", async () => {
+    await withScrollSpy(async (scrollTo) => {
+      mountDocument(twoRunDocument());
+      const { rerender } = renderViewer({
+        workerSrc: "/w/find-switch.mjs",
+        pdfUrl: "/first.pdf",
+      });
+      const input = await openFind();
+      fireEvent.change(input, { target: { value: "proband" } });
+      expect(await screen.findByText("1 of 2")).toBeDefined();
+      await waitFor(() => expect(scrollTo).toHaveBeenCalledTimes(1));
+
+      // The next document has one match for the same query; it is found and
+      // counted, but the view is not moved for it.
+      mountDocument(
+        docWith([
+          {
+            str: "one proband",
+            transform: [10, 0, 0, 10, 100, 900],
+            width: 110,
+            height: 10,
+          },
+        ]),
+      );
+      rerender(
+        viewer({ workerSrc: "/w/find-switch.mjs", pdfUrl: "/second.pdf" }),
+      );
+      expect(await screen.findByText("1 of 1")).toBeDefined();
+      await new Promise((resolve) => setTimeout(resolve, 50));
+      expect(scrollTo).toHaveBeenCalledTimes(1);
+    });
+  });
+
+  it("rebuilds the index when a paper is reopened after another never loaded", async () => {
+    mountDocument(twoRunDocument());
+    const { rerender } = renderViewer({
+      workerSrc: "/w/find-reopen.mjs",
+      pdfUrl: "/a.pdf",
+    });
+    const input = await openFind();
+    fireEvent.change(input, { target: { value: "proband" } });
+    expect(await screen.findByText("1 of 2")).toBeDefined();
+
+    mountDocument(null);
+    rerender(viewer({ workerSrc: "/w/find-reopen.mjs", pdfUrl: "/b.pdf" }));
+    await screen.findByTestId("pdf-loading");
+
+    // A fresh load of the first paper gets a fresh index; this one has a
+    // third match, so the old index would show the wrong count.
+    mountDocument(
+      docWith([
+        {
+          str: "proband, proband, proband",
+          transform: [10, 0, 0, 10, 100, 900],
+          width: 250,
+          height: 10,
+        },
+      ]),
+    );
+    rerender(viewer({ workerSrc: "/w/find-reopen.mjs", pdfUrl: "/a.pdf" }));
+    expect(await screen.findByText("1 of 3")).toBeDefined();
+  });
+
+  it("moves to the current match when the bar is reopened, and not for a later document", async () => {
+    await withScrollSpy(async (scrollTo) => {
+      mountDocument(twoRunDocument());
+      const { container, rerender } = renderViewer({
+        workerSrc: "/w/find-reopen-scroll.mjs",
+        pdfUrl: "/a.pdf",
+      });
+      const input = await openFind();
+      fireEvent.change(input, { target: { value: "proband" } });
+      expect(await screen.findByText("1 of 2")).toBeDefined();
+      await waitFor(() => expect(scrollTo).toHaveBeenCalledTimes(1));
+
+      fireEvent.keyDown(input, { key: "Escape" });
+      expect(screen.queryByTestId("pdf-find-bar")).toBeNull();
+      const root = container.querySelector(".relative")!;
+      fireEvent.pointerDown(root, { pointerId: 1 });
+      fireEvent.keyDown(document.body, { key: "f", ctrlKey: true });
+      expect(screen.getByTestId("pdf-find-bar")).toBeDefined();
+      await waitFor(() => expect(scrollTo).toHaveBeenCalledTimes(2));
+
+      // Ctrl+F on the open bar refocuses the box without moving the view.
+      fireEvent.keyDown(screen.getByLabelText("Search text"), {
+        key: "f",
+        ctrlKey: true,
+      });
+      await new Promise((resolve) => setTimeout(resolve, 50));
+      expect(scrollTo).toHaveBeenCalledTimes(2);
+
+      mountDocument(twoRunDocument());
+      rerender(
+        viewer({ workerSrc: "/w/find-reopen-scroll.mjs", pdfUrl: "/b.pdf" }),
+      );
+      expect(await screen.findByText("1 of 2")).toBeDefined();
+      await new Promise((resolve) => setTimeout(resolve, 50));
+      expect(scrollTo).toHaveBeenCalledTimes(2);
+    });
+  });
+
+  it("takes Ctrl+F with focus in the pane, or on nothing after the pane was last used", () => {
+    const { container } = renderViewer({ workerSrc: "/w/shortcut.mjs" });
+    const root = container.querySelector(".relative")!;
+    const outsideField = document.createElement("textarea");
+    const outsideButton = document.createElement("button");
+    document.body.append(outsideField, outsideButton);
+    try {
+      // Nothing has been used yet: the browser keeps its find.
+      fireEvent.keyDown(document.body, { key: "f", ctrlKey: true });
+      expect(screen.queryByTestId("pdf-find-bar")).toBeNull();
+      // Something outside the pane was used last.
+      fireEvent.pointerDown(outsideButton, { pointerId: 1 });
+      fireEvent.keyDown(document.body, { key: "f", ctrlKey: true });
+      expect(screen.queryByTestId("pdf-find-bar")).toBeNull();
+      fireEvent.keyDown(outsideField, { key: "f", ctrlKey: true });
+      expect(screen.queryByTestId("pdf-find-bar")).toBeNull();
+      // The pane was used last; modifiers other than Ctrl or Cmd alone
+      // still leave the shortcut to the browser.
+      fireEvent.pointerDown(root, { pointerId: 1 });
+      fireEvent.keyDown(document.body, {
+        key: "f",
+        ctrlKey: true,
+        shiftKey: true,
+      });
+      expect(screen.queryByTestId("pdf-find-bar")).toBeNull();
+      fireEvent.keyDown(document.body, { key: "f", metaKey: true });
+      expect(screen.getByTestId("pdf-find-bar")).toBeDefined();
+    } finally {
+      outsideField.remove();
+      outsideButton.remove();
+    }
+  });
+
+  it("reads the physical key only when the layout gives no Latin letter", () => {
+    const { container } = renderViewer({ workerSrc: "/w/shortcut-layout.mjs" });
+    const root = container.querySelector(".relative")!;
+    fireEvent.pointerDown(root, { pointerId: 1 });
+    // Colemak: the physical F key types "p", and Ctrl+P is print.
+    fireEvent.keyDown(document.body, { key: "p", code: "KeyF", ctrlKey: true });
+    expect(screen.queryByTestId("pdf-find-bar")).toBeNull();
+    // A held key is ignored, and so is a key during composition.
+    fireEvent.keyDown(document.body, { key: "f", ctrlKey: true, repeat: true });
+    expect(screen.queryByTestId("pdf-find-bar")).toBeNull();
+    fireEvent.keyDown(document.body, {
+      key: "f",
+      ctrlKey: true,
+      isComposing: true,
+    });
+    expect(screen.queryByTestId("pdf-find-bar")).toBeNull();
+    // A Cyrillic layout: the same physical key, a non-Latin letter.
+    fireEvent.keyDown(document.body, { key: "а", code: "KeyF", ctrlKey: true });
+    expect(screen.getByTestId("pdf-find-bar")).toBeDefined();
+  });
+
+  it("counts focus landing in the pane as using it", () => {
+    const { container } = renderViewer({ workerSrc: "/w/shortcut-focus.mjs" });
+    const root = container.querySelector(".relative") as HTMLElement;
+    const outsideButton = document.createElement("button");
+    document.body.append(outsideButton);
+    try {
+      fireEvent.pointerDown(outsideButton, { pointerId: 1 });
+      fireEvent.focusIn(root);
+      fireEvent.keyDown(document.body, { key: "f", ctrlKey: true });
+      expect(screen.getByTestId("pdf-find-bar")).toBeDefined();
+    } finally {
+      outsideButton.remove();
+    }
+  });
+
+  it("closes on Escape from any control in the bar and hands focus back to the pane", async () => {
+    mountDocument(twoRunDocument());
+    const { container } = renderViewer({ workerSrc: "/w/escape-button.mjs" });
+    await openFind();
+    fireEvent.keyDown(screen.getByRole("button", { name: "Close find" }), {
+      key: "Escape",
+    });
+    expect(screen.queryByTestId("pdf-find-bar")).toBeNull();
+    expect(document.activeElement).toBe(container.querySelector(".relative"));
+  });
+
+  it("takes Ctrl+F from inside the pane regardless of what was used last", () => {
+    const { container } = renderViewer({ workerSrc: "/w/shortcut-inside.mjs" });
+    const outsideButton = document.createElement("button");
+    document.body.append(outsideButton);
+    try {
+      fireEvent.pointerDown(outsideButton, { pointerId: 1 });
+      fireEvent.keyDown(container.querySelector(".relative")!, {
+        key: "f",
+        ctrlKey: true,
+      });
+      expect(screen.getByTestId("pdf-find-bar")).toBeDefined();
+    } finally {
+      outsideButton.remove();
+    }
+  });
+
+  it("leaves Ctrl+F to the browser when the shortcut is switched off", () => {
+    const { container } = renderViewer({
+      workerSrc: "/w/no-shortcut.mjs",
+      captureFindShortcut: false,
+    });
+    fireEvent.pointerDown(container.querySelector(".relative")!, {
+      pointerId: 1,
+    });
+    fireEvent.keyDown(document.body, { key: "f", ctrlKey: true });
+    expect(screen.queryByTestId("pdf-find-bar")).toBeNull();
   });
 
   it("recovers when the viewer module fails to load", async () => {

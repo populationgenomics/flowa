@@ -93,6 +93,17 @@ paper stays upright until the user turns it. Like zoom, rotation can be
 controlled from outside through `rotation` and `onRotationChange`; it resets
 when another document opens.
 
+The find box (the magnifier in the toolbar, or Ctrl+F / Cmd+F with focus in
+the pane, or on nothing in particular after the pane was the last thing used)
+searches the text pdf.js reads from the document: case-insensitively, across
+line breaks and end-of-line hyphenation, with straight quotes and hyphens
+matching their typographic forms. It marks every match and steps through them
+with Enter and Shift+Enter, collecting at most 1000 and saying so. Focus
+elsewhere on the page keeps the browser's own find; pass
+`captureFindShortcut={false}` to keep the browser's find everywhere. A page
+whose text cannot be read is skipped, and a scanned document without a text
+layer reports "Text unavailable".
+
 ## Loading feedback
 
 While a document downloads, the pane shows the bytes received and, when the
