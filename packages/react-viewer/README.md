@@ -83,6 +83,12 @@ loads in the browser). No `dynamic(() => …, { ssr: false })` wrapper needed.
 
 `LlmContent` is server-render-safe.
 
+## Viewing controls
+
+The toolbar in the pane zooms the document and turns it in quarter turns.
+Highlights and the scroll to a quote follow the turn. A document whose pages
+carry their own `/Rotate` entry starts upright and turns from there.
+
 ## Loading feedback
 
 While a document downloads, the pane shows the bytes received and, when the

@@ -19,6 +19,7 @@ import type { PdfHighlight } from "./types";
 
 type DocumentProps = {
   file?: unknown;
+  children?: React.ReactNode;
   loading?: React.ReactNode;
   error?: React.ReactNode;
   onLoadSuccess?(d: { numPages: number }): void;
@@ -26,6 +27,17 @@ type DocumentProps = {
   onLoadError?(e: Error): void;
   onSourceError?(e: Error): void;
   onPassword?(callback: (value: unknown) => void, reason: number): void;
+};
+
+type PageProps = {
+  pageNumber: number;
+  rotate?: number;
+  children?: React.ReactNode;
+  onLoadSuccess?(p: {
+    originalWidth: number;
+    originalHeight: number;
+    rotate: number;
+  }): void;
 };
 
 /**
@@ -40,6 +52,7 @@ type DocumentProps = {
  */
 const mockState = vi.hoisted(() => ({
   document: null as null | ((props: DocumentProps) => React.ReactNode),
+  page: null as null | ((props: PageProps) => React.ReactNode),
   failForWorkerSrc: null as string | null,
   workerSrcSets: [] as string[],
 }));
@@ -56,7 +69,7 @@ vi.mock("react-pdf", () => ({
   },
   Document: (props: DocumentProps) =>
     mockState.document ? mockState.document(props) : null,
-  Page: () => null,
+  Page: (props: PageProps) => (mockState.page ? mockState.page(props) : null),
 }));
 
 // happy-dom does not implement ResizeObserver; stub it so the component mounts.
@@ -70,6 +83,7 @@ beforeEach(() => {
   globalThis.ResizeObserver =
     ResizeObserverStub as unknown as typeof ResizeObserver;
   mockState.document = null;
+  mockState.page = null;
   mockState.failForWorkerSrc = null;
   mockState.workerSrcSets = [];
 });
@@ -428,6 +442,55 @@ describe("PdfHighlightViewer", () => {
     });
     expect(screen.getByText("1.6 MB of 4.0 MB (40%)")).toBeDefined();
     expect(screen.queryByText(/12.0 MB/)).toBeNull();
+  });
+
+  it("turns the page and its highlights together", async () => {
+    mockState.document = (props) => {
+      useEffect(() => {
+        props.onLoadSuccess?.({ numPages: 1 });
+      }, []);
+      return <>{props.children}</>;
+    };
+    mockState.page = (props) => {
+      useEffect(() => {
+        props.onLoadSuccess?.({
+          originalWidth: 600,
+          originalHeight: 800,
+          rotate: 0,
+        });
+      }, []);
+      return (
+        <div data-testid="page" data-rotate={props.rotate ?? "none"}>
+          {props.children}
+        </div>
+      );
+    };
+    renderViewer({
+      workerSrc: "/w/rotate.mjs",
+      highlights: [
+        { bboxes: [{ page: 1, left: 100, top: 200, right: 400, bottom: 250 }] },
+      ],
+    });
+    const page = await screen.findByTestId("page");
+    await waitFor(() => expect(page.dataset.rotate).toBe("0"));
+    // The overlay wraps one div per bbox.
+    const box = () =>
+      (page.firstElementChild!.firstElementChild as HTMLElement).style;
+    expect(box().left).toBe("10%");
+    expect(box().top).toBe("20%");
+
+    fireEvent.click(screen.getByRole("button", { name: "Rotate right" }));
+    await waitFor(() => expect(page.dataset.rotate).toBe("90"));
+    // A clockwise quarter turn sends (x, y) to (SCALE − y, x): the box now
+    // starts at left 1000 − 250 and top 100, with its sides swapped.
+    expect(box().left).toBe("75%");
+    expect(box().top).toBe("10%");
+    expect(box().width).toBe("5%");
+    expect(box().height).toBe("30%");
+
+    fireEvent.click(screen.getByRole("button", { name: "Rotate left" }));
+    await waitFor(() => expect(page.dataset.rotate).toBe("0"));
+    expect(box().left).toBe("10%");
   });
 
   it("recovers when the viewer module fails to load", async () => {
