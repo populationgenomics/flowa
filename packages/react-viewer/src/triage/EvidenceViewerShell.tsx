@@ -105,13 +105,16 @@ export interface EvidenceViewerShellProps {
 
   /**
    * What the evidence under review is about, as the consumer names it.
-   * Shown as the header's first line and first in the window title, so
-   * two viewers open side by side can be told apart.
+   * Rendered as the document's heading on the header's first line and put
+   * first in the window title, so two viewers open side by side can be
+   * told apart. Pass it even when `titleSlot` supplies the markup: the
+   * window title has only this string to go on.
    */
   title?: string;
   /**
    * Custom markup for the header's first line, in place of `title`
-   * rendered as plain text. `title` still feeds the window title.
+   * rendered as a plain heading. The slot is the document's heading, so it
+   * should contain an `h1`.
    */
   titleSlot?: ReactNode;
   /**
@@ -754,8 +757,14 @@ export function EvidenceViewerShell({
     .filter(Boolean)
     .join(" — ");
   const windowTitle = [title, viewerLabel].filter(Boolean).join(" — ");
+  // The shell owns the window title while mounted and hands the previous
+  // one back on unmount, so a host page that embeds it keeps its own.
   useEffect(() => {
-    if (typeof document !== "undefined") document.title = windowTitle;
+    const previous = document.title;
+    document.title = windowTitle;
+    return () => {
+      document.title = previous;
+    };
   }, [windowTitle]);
 
   // ── Render guards ─────────────────────────────────────────────────
@@ -805,17 +814,18 @@ export function EvidenceViewerShell({
         className="border-b border-gray-200 bg-gray-50 px-4 py-2"
         data-testid="viewer-header"
       >
-        {titleSlot ??
-          (title && (
+        {titleSlot ||
+          (title ? (
             <Text
+              component="h1"
               size="md"
               fw={700}
-              className="text-gray-900"
+              className="m-0 text-gray-900"
               data-testid="viewer-title"
             >
               {title}
             </Text>
-          ))}
+          ) : null)}
         <Text size="sm" fw={600} className="text-gray-700">
           {viewerLabel}
         </Text>
