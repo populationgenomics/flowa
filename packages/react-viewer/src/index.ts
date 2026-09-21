@@ -45,6 +45,7 @@ export {
 } from "./triage/claim-refs";
 export {
   flattenClaimCitations,
+  formatPaperIdentifier,
   formatPaperLabel,
   encodeDoi,
   type FlatCitation,

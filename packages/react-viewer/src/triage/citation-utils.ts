@@ -61,6 +61,17 @@ export function flattenClaimCitations(
 }
 
 /**
+ * The identifier every surface shows for a paper: `PMID 12345` when it has
+ * one, else the DOI.
+ */
+export function formatPaperIdentifier(
+  doi: string,
+  pmid: number | undefined,
+): string {
+  return pmid ? `PMID ${pmid}` : doi;
+}
+
+/**
  * Format a paper label as `Author2024 (PMID 12345)` or
  * `Author2024 (10.1038/...)`. Falls back to the DOI / PMID alone when no
  * AuthorYear mapping is known.
@@ -71,7 +82,7 @@ export function formatPaperLabel(
   mapping: PaperIdMapping | undefined,
 ): string {
   const authorYear = mapping?.byDoi[doi];
-  const idSuffix = pmid ? `PMID ${pmid}` : doi;
+  const idSuffix = formatPaperIdentifier(doi, pmid);
   return authorYear ? `${authorYear} (${idSuffix})` : idSuffix;
 }
 

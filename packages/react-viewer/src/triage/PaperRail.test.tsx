@@ -98,21 +98,38 @@ describe("PaperRail", () => {
 
   it("shows the PubMed id under the cite key, or the DOI without one", () => {
     renderRail({ paperIdMapping: MAPPING });
-    expect(screen.getByTestId("paper-id-Smith2024").textContent).toBe(
+    expect(screen.getByTestId("paper-identifier-Smith2024").textContent).toBe(
       "PMID 39012345",
     );
-    expect(screen.getByTestId("paper-id-Jones2023").textContent).toBe(
+    expect(screen.getByTestId("paper-identifier-Jones2023").textContent).toBe(
       "10.1234/jones.2023",
     );
   });
 
-  it("shows no identifier line without a mapping or for an unmapped paper", () => {
+  it("carries the full identifier as the tooltip of the truncated line", () => {
+    renderRail({ paperIdMapping: MAPPING });
+    expect(
+      screen.getByTestId("paper-identifier-Jones2023").getAttribute("title"),
+    ).toBe("10.1234/jones.2023");
+  });
+
+  it("shows no identifier line without a mapping", () => {
     renderRail({});
-    expect(screen.queryByTestId("paper-id-Smith2024")).toBeNull();
+    expect(screen.queryByTestId("paper-identifier-Smith2024")).toBeNull();
+    expect(screen.queryByTestId("paper-identifier-Jones2023")).toBeNull();
+  });
+
+  it("omits the line for the one paper the mapping does not know", () => {
     renderRail({
-      paperIdMapping: { byAuthorYear: {}, byDoi: {} },
+      paperIdMapping: {
+        byAuthorYear: { Smith2024: MAPPING.byAuthorYear.Smith2024! },
+        byDoi: { "10.1234/smith.2024": "Smith2024" },
+      },
     });
-    expect(screen.queryByTestId("paper-id-Jones2023")).toBeNull();
+    expect(screen.getByTestId("paper-identifier-Smith2024").textContent).toBe(
+      "PMID 39012345",
+    );
+    expect(screen.queryByTestId("paper-identifier-Jones2023")).toBeNull();
   });
 
   it("calls onFocusPaper with the paperId on click", () => {

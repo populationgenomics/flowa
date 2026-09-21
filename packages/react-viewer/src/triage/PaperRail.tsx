@@ -1,6 +1,7 @@
 import { Badge, Text } from "@mantine/core";
 import type { PaperIdMapping } from "../citations/types";
 import type { Claim, RankedPaper, TriageStateValue } from "./types";
+import { formatPaperIdentifier } from "./citation-utils";
 import { claimKey } from "./store";
 
 export interface PaperRailProps {
@@ -19,14 +20,13 @@ export interface PaperRailProps {
   paperIdMapping?: PaperIdMapping;
 }
 
-/** "PMID 12345678" when the paper has one, else its DOI, else nothing. */
+/** The paper's identifier line, or nothing for a paper the mapping does not know. */
 function identifierLabel(
   paperId: string,
   mapping: PaperIdMapping | undefined,
 ): string | null {
   const entry = mapping?.byAuthorYear[paperId];
-  if (!entry) return null;
-  return entry.pmid ? `PMID ${entry.pmid}` : entry.doi;
+  return entry ? formatPaperIdentifier(entry.doi, entry.pmid) : null;
 }
 
 export function PaperRail({
@@ -87,7 +87,7 @@ export function PaperRail({
                 <div
                   className="truncate text-[11px] text-gray-500"
                   title={identifier}
-                  data-testid={`paper-id-${paper.paperId}`}
+                  data-testid={`paper-identifier-${paper.paperId}`}
                 >
                   {identifier}
                 </div>
