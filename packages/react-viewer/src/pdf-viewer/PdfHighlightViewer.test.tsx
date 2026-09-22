@@ -33,11 +33,9 @@ type PageProps = {
   pageNumber: number;
   rotate?: number;
   children?: React.ReactNode;
-  onLoadSuccess?(p: {
-    originalWidth: number;
-    originalHeight: number;
-    rotate: number;
-  }): void;
+  width?: number;
+  onLoadSuccess?(p: { view: number[]; rotate: number }): void;
+  onRenderSuccess?(): void;
 };
 
 /**
@@ -453,11 +451,7 @@ describe("PdfHighlightViewer", () => {
     };
     mockState.page = (props) => {
       useEffect(() => {
-        props.onLoadSuccess?.({
-          originalWidth: 600,
-          originalHeight: 800,
-          rotate: 0,
-        });
+        props.onLoadSuccess?.({ view: [0, 0, 600, 800], rotate: 0 });
       }, []);
       return (
         <div data-testid="page" data-rotate={props.rotate ?? "none"}>
@@ -491,6 +485,125 @@ describe("PdfHighlightViewer", () => {
     fireEvent.click(screen.getByRole("button", { name: "Rotate left" }));
     await waitFor(() => expect(page.dataset.rotate).toBe("0"));
     expect(box().left).toBe("10%");
+  });
+
+  /**
+   * Document and page mocks for a `pages`-page document whose pages carry
+   * the given own rotations; each page renders its rotation, its width and
+   * its children, and reports a render once loaded.
+   */
+  function mountPages(ownRotations: number[]) {
+    mockState.document = (props) => {
+      useEffect(() => {
+        props.onLoadSuccess?.({ numPages: ownRotations.length });
+      }, []);
+      return <>{props.children}</>;
+    };
+    mockState.page = (props) => {
+      useEffect(() => {
+        props.onLoadSuccess?.({
+          view: [0, 0, 600, 800],
+          rotate: ownRotations[props.pageNumber - 1] ?? 0,
+        });
+        props.onRenderSuccess?.();
+      }, []);
+      return (
+        <div
+          data-testid={`page-${props.pageNumber}`}
+          data-rotate={props.rotate ?? "none"}
+          data-width={props.width ?? "none"}
+        >
+          {props.children}
+        </div>
+      );
+    };
+  }
+
+  it("keeps a page's own rotation and turns from there", async () => {
+    mountPages([90]);
+    renderViewer({
+      workerSrc: "/w/own-rotation.mjs",
+      highlights: [
+        { bboxes: [{ page: 1, left: 100, top: 200, right: 400, bottom: 250 }] },
+      ],
+    });
+    const page = await screen.findByTestId("page-1");
+    await waitFor(() => expect(page.dataset.rotate).toBe("90"));
+    // The quote's box is in the page's own frame, so it does not move for
+    // the page's own rotation, only for the user's turn.
+    const box = () =>
+      (page.firstElementChild!.firstElementChild as HTMLElement).style;
+    expect(box().left).toBe("10%");
+    expect(box().top).toBe("20%");
+
+    fireEvent.click(screen.getByRole("button", { name: "Rotate right" }));
+    await waitFor(() => expect(page.dataset.rotate).toBe("180"));
+    expect(box().left).toBe("75%");
+    expect(box().top).toBe("10%");
+  });
+
+  it("gives each page its own rotation plus the turn", async () => {
+    mountPages([0, 90]);
+    renderViewer({ workerSrc: "/w/mixed-rotation.mjs" });
+    const first = await screen.findByTestId("page-1");
+    const second = await screen.findByTestId("page-2");
+    await waitFor(() => {
+      expect(first.dataset.rotate).toBe("0");
+      expect(second.dataset.rotate).toBe("90");
+    });
+    fireEvent.click(screen.getByRole("button", { name: "Rotate right" }));
+    await waitFor(() => {
+      expect(first.dataset.rotate).toBe("90");
+      expect(second.dataset.rotate).toBe("180");
+    });
+  });
+
+  it("refits the page to the container when a turn swaps its sides", async () => {
+    // An 800×600 container and a 600×800 page: fit to height gives 450
+    // wide upright, and the full 800 once turned.
+    mountPages([0]);
+    renderViewer({ workerSrc: "/w/fit.mjs" });
+    const page = await screen.findByTestId("page-1");
+    await waitFor(() => expect(page.dataset.width).toBe("450"));
+    fireEvent.click(screen.getByRole("button", { name: "Rotate right" }));
+    await waitFor(() => expect(page.dataset.width).toBe("800"));
+  });
+
+  it("does not scroll back to the quote on a turn", async () => {
+    const scrollTo = vi.fn();
+    Element.prototype.scrollTo = scrollTo;
+    mountPages([0]);
+    renderViewer({
+      workerSrc: "/w/turn-scroll.mjs",
+      highlights: [
+        { bboxes: [{ page: 1, left: 100, top: 200, right: 400, bottom: 250 }] },
+      ],
+    });
+    await screen.findByTestId("page-1");
+    // The first render scrolls to the quote once.
+    await waitFor(() => expect(scrollTo).toHaveBeenCalledTimes(1));
+    fireEvent.click(screen.getByRole("button", { name: "Rotate right" }));
+    await waitFor(() =>
+      expect(screen.getByTestId("page-1").dataset.rotate).toBe("90"),
+    );
+    expect(scrollTo).toHaveBeenCalledTimes(1);
+  });
+
+  it("resets the turn when another document opens", async () => {
+    mountPages([0]);
+    const { rerender } = renderViewer({
+      workerSrc: "/w/reset-turn.mjs",
+      pdfUrl: "/first.pdf",
+    });
+    await screen.findByTestId("page-1");
+    fireEvent.click(screen.getByRole("button", { name: "Rotate right" }));
+    await waitFor(() =>
+      expect(screen.getByTestId("page-1").dataset.rotate).toBe("90"),
+    );
+    rerender(viewer({ workerSrc: "/w/reset-turn.mjs", pdfUrl: "/second.pdf" }));
+    await waitFor(() =>
+      expect(screen.getByTestId("page-1").dataset.rotate).toBe("0"),
+    );
   });
 
   it("recovers when the viewer module fails to load", async () => {

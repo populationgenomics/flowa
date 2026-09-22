@@ -86,8 +86,11 @@ loads in the browser). No `dynamic(() => …, { ssr: false })` wrapper needed.
 ## Viewing controls
 
 The toolbar in the pane zooms the document and turns it in quarter turns.
-Highlights and the scroll to a quote follow the turn. A document whose pages
-carry their own `/Rotate` entry starts upright and turns from there.
+Highlights and the scroll to a quote follow the turn. Each page keeps its own
+`/Rotate` entry and turns from there, so a landscape table page in a portrait
+paper stays upright until the user turns it. Like zoom, rotation can be
+controlled from outside through `rotation` and `onRotationChange`; it resets
+when another document opens.
 
 ## Loading feedback
 

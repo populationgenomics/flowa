@@ -18,6 +18,7 @@ export {
   type PdfHighlightViewerProps,
 } from "./pdf-viewer/PdfHighlightViewer";
 export type { HighlightBbox, PdfHighlight } from "./pdf-viewer/types";
+export type { Rotation } from "./pdf-viewer/geometry";
 
 // Markdown viewer with anchor highlights
 export {

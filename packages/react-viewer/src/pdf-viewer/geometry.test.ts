@@ -59,6 +59,12 @@ describe("rotateBbox", () => {
     expect(box).toEqual(BOX);
   });
 
+  it("is undone by the opposite turn", () => {
+    expect(rotateBbox(rotateBbox(BOX, 90), 270)).toEqual(BOX);
+    expect(rotateBbox(rotateBbox(BOX, 270), 90)).toEqual(BOX);
+    expect(rotateBbox(rotateBbox(BOX, 180), 180)).toEqual(BOX);
+  });
+
   it("agrees with the equivalent number of single turns", () => {
     const once = rotateBbox(BOX, 90);
     expect(rotateBbox(once, 90)).toEqual(rotateBbox(BOX, 180));
