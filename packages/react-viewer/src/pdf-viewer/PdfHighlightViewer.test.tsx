@@ -10,7 +10,11 @@ import {
   waitFor,
 } from "@testing-library/react";
 import { MantineProvider } from "@mantine/core";
-import { PdfHighlightViewer, describeLoadError } from "./PdfHighlightViewer";
+import {
+  PdfHighlightViewer,
+  classifyLoadError,
+  describeLoadError,
+} from "./PdfHighlightViewer";
 import type { PdfHighlight } from "./types";
 
 type DocumentProps = {
@@ -21,6 +25,7 @@ type DocumentProps = {
   onLoadProgress?(p: { loaded: number; total: number }): void;
   onLoadError?(e: Error): void;
   onSourceError?(e: Error): void;
+  onPassword?(callback: (value: unknown) => void, reason: number): void;
 };
 
 /**
@@ -77,7 +82,7 @@ function viewer(props: {
   workerSrc: string;
   pdfUrl?: string;
   highlights?: PdfHighlight[];
-  onLoadError?: (error: Error) => void;
+  onLoadError?: (error: Error, info: unknown) => void;
 }) {
   return wrap(
     <PdfHighlightViewer
@@ -178,13 +183,89 @@ describe("PdfHighlightViewer", () => {
     expect(await screen.findByText("12.0 MB of 12.0 MB (100%)")).toBeDefined();
   });
 
-  it("treats a zero or unparseable total as unknown", async () => {
+  it("treats a zero total as unknown", async () => {
     reportingProgress(512 * 1024, 0);
     renderViewer({ workerSrc: "/w/progress-zero.mjs" });
     expect(await screen.findByText("512 KB received")).toBeDefined();
+  });
+
+  it("treats an unparseable total as unknown", async () => {
     reportingProgress(256 * 1024, Number.NaN);
     renderViewer({ workerSrc: "/w/progress-nan.mjs" });
     expect(await screen.findByText("256 KB received")).toBeDefined();
+  });
+
+  it("rounds a count just under a megabyte as one", async () => {
+    reportingProgress(1023.5 * 1024, 2 * MB);
+    renderViewer({ workerSrc: "/w/progress-boundary.mjs" });
+    expect(await screen.findByText("1.0 MB of 2.0 MB (50%)")).toBeDefined();
+  });
+
+  it("offers Retry once a download has gone quiet", async () => {
+    vi.useFakeTimers({ shouldAdvanceTime: true });
+    try {
+      mockState.document = (props) => <>{props.loading}</>;
+      renderViewer({ workerSrc: "/w/stall.mjs" });
+      await screen.findByTestId("pdf-loading");
+      expect(screen.queryByText("Still waiting for the server.")).toBeNull();
+      act(() => {
+        vi.advanceTimersByTime(15_000);
+      });
+      expect(screen.getByText("Still waiting for the server.")).toBeDefined();
+      expect(screen.getByRole("button", { name: "Retry" })).toBeDefined();
+    } finally {
+      vi.useRealTimers();
+    }
+  });
+
+  it("reports progress again after a Retry that follows a load", async () => {
+    // A load that resolves and then fails leaves the loaded flag set; Retry
+    // must clear it or the next download shows a bare spinner.
+    const mounts = vi.fn();
+    mockState.document = (props) => {
+      useEffect(() => {
+        mounts();
+        if (mounts.mock.calls.length === 1) {
+          props.onLoadSuccess?.({ numPages: 1 });
+          props.onLoadError?.(new Error("lost the connection"));
+        } else {
+          props.onLoadProgress?.({ loaded: 3 * MB, total: 12 * MB });
+        }
+      }, []);
+      return <>{props.loading}</>;
+    };
+    renderViewer({ workerSrc: "/w/retry-after-load.mjs" });
+    fireEvent.click(await screen.findByRole("button", { name: "Retry" }));
+    expect(await screen.findByText("3.0 MB of 12.0 MB (25%)")).toBeDefined();
+  });
+
+  it("puts its own loading state in react-pdf's error slot", async () => {
+    mockState.document = (props) => <>{props.error}</>;
+    renderViewer({ workerSrc: "/w/error-slot.mjs" });
+    expect(await screen.findByTestId("pdf-loading")).toBeDefined();
+    expect(screen.queryByText(/Failed to load/)).toBeNull();
+  });
+
+  it("rejects the password prompt so an encrypted file fails as such", async () => {
+    let passwordAnswer: unknown;
+    mockState.document = (props) => {
+      useEffect(() => {
+        props.onPassword?.((value) => {
+          passwordAnswer = value;
+        }, 1);
+        props.onLoadError?.(
+          Object.assign(new Error("No password given"), {
+            name: "PasswordException",
+          }),
+        );
+      }, []);
+      return <>{props.loading}</>;
+    };
+    renderViewer({ workerSrc: "/w/password.mjs" });
+    expect(
+      await screen.findByText("The PDF is password protected."),
+    ).toBeDefined();
+    expect(passwordAnswer).toBeInstanceOf(Error);
   });
 
   it("ignores progress once the document has loaded", async () => {
@@ -201,11 +282,16 @@ describe("PdfHighlightViewer", () => {
     expect(screen.queryByText(/12.0 MB/)).toBeNull();
   });
 
-  it("tells the consumer about a load failure", async () => {
+  it("tells the consumer about a load failure, classified", async () => {
     const onLoadError = vi.fn();
     mockState.document = (props) => {
       useEffect(() => {
-        props.onLoadError?.(new Error("HTTP 502"));
+        props.onLoadError?.(
+          Object.assign(new Error("Unexpected server response (403)"), {
+            name: "UnexpectedResponseException",
+            status: 403,
+          }),
+        );
       }, []);
       return <>{props.loading}</>;
     };
@@ -213,30 +299,41 @@ describe("PdfHighlightViewer", () => {
     await screen.findByText("Could not load this PDF");
     expect(onLoadError).toHaveBeenCalledTimes(1);
     expect(onLoadError.mock.calls[0]![0]).toMatchObject({
-      message: "HTTP 502",
+      message: "Unexpected server response (403)",
+    });
+    expect(onLoadError.mock.calls[0]![1]).toEqual({
+      kind: "http",
+      status: 403,
     });
   });
 
   it("lets a press on Retry through instead of starting a drag", async () => {
+    const originalSet = Element.prototype.setPointerCapture;
+    const originalRelease = Element.prototype.releasePointerCapture;
     const setPointerCapture = vi.fn();
     Element.prototype.setPointerCapture = setPointerCapture;
     Element.prototype.releasePointerCapture ??= vi.fn();
-    mockState.document = (props) => {
-      useEffect(() => {
-        props.onLoadError?.(new Error("HTTP 502"));
-      }, []);
-      return <>{props.loading}</>;
-    };
-    const { container } = renderViewer({ workerSrc: "/w/retry-press.mjs" });
-    const retry = await screen.findByRole("button", { name: "Retry" });
-    fireEvent.pointerDown(retry, { pointerId: 1, clientX: 10, clientY: 10 });
-    expect(setPointerCapture).not.toHaveBeenCalled();
-    fireEvent.pointerDown(container.querySelector(".overflow-auto")!, {
-      pointerId: 1,
-      clientX: 10,
-      clientY: 10,
-    });
-    expect(setPointerCapture).toHaveBeenCalledTimes(1);
+    try {
+      mockState.document = (props) => {
+        useEffect(() => {
+          props.onLoadError?.(new Error("HTTP 502"));
+        }, []);
+        return <>{props.loading}</>;
+      };
+      const { container } = renderViewer({ workerSrc: "/w/retry-press.mjs" });
+      const retry = await screen.findByRole("button", { name: "Retry" });
+      fireEvent.pointerDown(retry, { pointerId: 1, clientX: 10, clientY: 10 });
+      expect(setPointerCapture).not.toHaveBeenCalled();
+      fireEvent.pointerDown(container.querySelector(".overflow-auto")!, {
+        pointerId: 1,
+        clientX: 10,
+        clientY: 10,
+      });
+      expect(setPointerCapture).toHaveBeenCalledTimes(1);
+    } finally {
+      Element.prototype.setPointerCapture = originalSet;
+      Element.prototype.releasePointerCapture = originalRelease;
+    }
   });
 
   it("shows the load error, then a fresh download on Retry", async () => {
@@ -383,7 +480,7 @@ describe("describeLoadError", () => {
     );
   });
 
-  it("recognises a fetch that never got a response", () => {
+  it("recognises a fetch that never got a response, and not a parser crash", () => {
     expect(
       describeLoadError(
         named("UnknownErrorException", "Failed to fetch", {
@@ -391,9 +488,38 @@ describe("describeLoadError", () => {
         }),
       ),
     ).toBe("The download failed: a network or CORS error.");
+    // A TypeError thrown inside the worker's parser is wrapped the same way.
+    const crash = named(
+      "UnknownErrorException",
+      "Cannot read properties of undefined (reading 'x')",
+      {
+        details: "TypeError: Cannot read properties of undefined (reading 'x')",
+      },
+    );
+    expect(describeLoadError(crash)).toBe(
+      "Cannot read properties of undefined (reading 'x')",
+    );
+    expect(classifyLoadError(crash)).toEqual({ kind: "unknown" });
     expect(describeLoadError(named("UnknownErrorException", "odd"))).toBe(
       "odd",
     );
+  });
+
+  it("classifies each failure for the consumer", () => {
+    expect(classifyLoadError(named("MissingPDFException"))).toEqual({
+      kind: "not-found",
+    });
+    expect(
+      classifyLoadError(
+        named("UnexpectedResponseException", "raw", { status: 403 }),
+      ),
+    ).toEqual({ kind: "http", status: 403 });
+    expect(classifyLoadError(named("PasswordException"))).toEqual({
+      kind: "password",
+    });
+    expect(classifyLoadError(new Error("chunk load failed"))).toEqual({
+      kind: "unknown",
+    });
   });
 
   it("falls back to the message, or a placeholder for none", () => {

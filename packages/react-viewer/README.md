@@ -88,11 +88,15 @@ loads in the browser). No `dynamic(() => …, { ssr: false })` wrapper needed.
 While a document downloads, the pane shows the bytes received and, when the
 server reports a content length, the total and a progress bar. A download that
 fails, or a viewer bundle that fails to load, shows the cause with a Retry
-button. Retry re-uses the same `pdfUrl`; a consumer that hands out short-lived
-URLs can mint a new one from `onLoadError`, and a changed `pdfUrl` starts a
-fresh load. The package does not cache a failed import of `react-pdf`, so the
-retry (or the next mount) asks the bundler again; whether the bundler re-fetches
-a chunk that failed is up to it.
+button, and a download that goes quiet for fifteen seconds offers Retry too.
+Retry re-uses the same `pdfUrl`; `onLoadError` receives the error and a
+classification (`kind`, and the HTTP `status` where there is one), so a
+consumer that hands out short-lived URLs can mint a new one on a 403, and a
+changed `pdfUrl` starts a fresh load. A fresh load that fails calls
+`onLoadError` again, so the consumer bounds its own retries. The package does
+not cache a failed import of `react-pdf`, so the retry (or the next mount) asks
+the bundler again; whether the bundler re-fetches a chunk that failed is up to
+it.
 
 pdf.js fetches a large document in byte ranges, so the first page renders after
 a few small requests, only when the response lets it: the server has to answer
@@ -102,9 +106,8 @@ cross-origin file the CORS policy has to expose `Accept-Ranges`, which is not
 on the browser's safelist (S3 and MinIO need `ExposeHeaders` in the bucket's
 CORS rule for this; exposing `Content-Range` too is harmless). pdf.js also uses
 ranges only for files above twice its chunk size, about 128 KB. Without ranges
-the file streams from the start, and a PDF that is not linearised, whose
-cross-reference table sits at the end, shows nothing until the last byte
-arrives.
+pdf.js buffers the whole body before parsing, so nothing renders until the last
+byte arrives, whether or not the file is linearised.
 
 ## Worker assets
 
