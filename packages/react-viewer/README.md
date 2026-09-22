@@ -93,10 +93,13 @@ mount) imports again.
 
 pdf.js fetches a large document in byte ranges, so the first page renders after
 a few small requests, only when the response lets it: the server has to answer
-with `Accept-Ranges: bytes`, and for a cross-origin file the CORS policy has to
-expose `Accept-Ranges`, `Content-Range` and `Content-Length` (S3 and MinIO need
-`ExposeHeaders` in the bucket's CORS rule for this). Otherwise the whole file
-downloads before anything renders, and a PDF that is not linearised shows
+with `Accept-Ranges: bytes` and a `Content-Length`, the body must not be
+content-encoded (a gzip-compressed object disables ranges), and for a
+cross-origin file the CORS policy has to expose `Accept-Ranges` and
+`Content-Range`, which are not on the browser's safelist (S3 and MinIO need
+`ExposeHeaders` in the bucket's CORS rule for this). pdf.js also uses ranges
+only for files above twice its chunk size, about 128 KB. Otherwise the whole
+file downloads before anything renders, and a PDF that is not linearised shows
 nothing until the last byte arrives.
 
 ## Worker assets

@@ -1,4 +1,6 @@
 import {
+  type ComponentProps,
+  type ReactNode,
   useCallback,
   useEffect,
   useLayoutEffect,
@@ -96,19 +98,23 @@ function useReactPdf(workerSrc: string): ReactPdfLoad {
       cancelled = true;
     };
   }, [workerSrc, attempt]);
-  const retry = useCallback(() => setAttempt((n) => n + 1), []);
+  const retry = useCallback(() => {
+    setError(null);
+    setAttempt((n) => n + 1);
+  }, []);
   return { mod, error, retry };
 }
 
 function formatBytes(n: number): string {
   if (n >= 1024 * 1024) return `${(n / (1024 * 1024)).toFixed(1)} MB`;
-  return `${Math.max(1, Math.round(n / 1024))} KB`;
+  if (n >= 1024) return `${Math.round(n / 1024)} KB`;
+  return `${Math.round(n)} B`;
 }
 
 interface LoadProgress {
   loaded: number;
-  /** Zero when the server did not report a content length. */
-  total: number;
+  /** Null when the server did not report a content length. */
+  total: number | null;
 }
 
 /**
@@ -117,10 +123,11 @@ interface LoadProgress {
  * document is distinguishable from a stalled one.
  */
 function LoadingState({ progress }: { progress: LoadProgress | null }) {
-  const known = progress !== null && progress.total > 0;
-  const percent = known
-    ? Math.min(100, Math.round((progress.loaded / progress.total) * 100))
-    : null;
+  const total = progress?.total ?? null;
+  const percent =
+    progress && total !== null
+      ? Math.min(100, Math.round((progress.loaded / total) * 100))
+      : null;
   return (
     <div
       className="flex h-full flex-col items-center justify-center gap-2"
@@ -128,17 +135,48 @@ function LoadingState({ progress }: { progress: LoadProgress | null }) {
     >
       <Loader size="md" />
       {progress && (
-        <Text size="xs" c="dimmed">
-          {known
-            ? `${formatBytes(progress.loaded)} of ${formatBytes(progress.total)} (${percent}%)`
+        <Text size="xs" c="dimmed" role="status" aria-live="polite">
+          {total !== null
+            ? `${formatBytes(progress.loaded)} of ${formatBytes(total)} (${percent}%)`
             : `${formatBytes(progress.loaded)} received`}
         </Text>
       )}
       {percent !== null && (
-        <Progress value={percent} size="xs" className="w-48" />
+        <Progress
+          value={percent}
+          size="xs"
+          className="w-48"
+          aria-label="Download progress"
+        />
       )}
     </div>
   );
+}
+
+/**
+ * A short line for the alert. pdf.js's own messages embed the full URL of
+ * the document, which for a presigned link runs to several hundred
+ * characters and buries the cause; the raw message stays available as the
+ * line's tooltip.
+ */
+function describeLoadError(error: Error): string {
+  const status = (error as { status?: unknown }).status;
+  switch (error.name) {
+    case "MissingPDFException":
+      return "The file was not found on the server.";
+    case "UnexpectedResponseException":
+      return typeof status === "number"
+        ? `The server answered with status ${status}.`
+        : "The server answered unexpectedly.";
+    case "InvalidPDFException":
+      return "The file is not a valid PDF.";
+    case "PasswordException":
+      return "The PDF is password protected.";
+    case "AbortException":
+      return "The download was interrupted.";
+    default:
+      return error.message || "Unknown error";
+  }
 }
 
 function LoadFailure({
@@ -147,7 +185,7 @@ function LoadFailure({
   onRetry,
 }: {
   title: string;
-  error: Error | null;
+  error: Error;
   onRetry(): void;
 }) {
   return (
@@ -160,7 +198,7 @@ function LoadFailure({
         className="max-w-md"
         data-testid="pdf-load-error"
       >
-        <div>{error?.message ?? "Unknown error"}</div>
+        <div title={error.message}>{describeLoadError(error)}</div>
         <Button
           size="xs"
           variant="light"
@@ -173,6 +211,73 @@ function LoadFailure({
         </Button>
       </Alert>
     </div>
+  );
+}
+
+type DocumentProps = ComponentProps<ReactPdfModule["Document"]>;
+
+interface PdfDocumentProps {
+  reactPdf: ReactPdfModule;
+  pdfUrl: string;
+  options: DocumentProps["options"];
+  onLoadSuccess: NonNullable<DocumentProps["onLoadSuccess"]>;
+  children: ReactNode;
+}
+
+/**
+ * One document's load. Owns the progress and error state so that they die
+ * with the instance: the parent keys this on the URL, and react-pdf keeps a
+ * superseded download running until it settles, still reporting progress
+ * to the callbacks it was given. Held here, those reports land on an
+ * unmounted component and go nowhere instead of into the next document's
+ * state. A source that cannot be read at all never reaches react-pdf's
+ * error slot, so the failure state is decided here rather than left to it.
+ */
+function PdfDocument({
+  reactPdf,
+  pdfUrl,
+  options,
+  onLoadSuccess,
+  children,
+}: PdfDocumentProps) {
+  const [progress, setProgress] = useState<LoadProgress | null>(null);
+  const [error, setError] = useState<Error | null>(null);
+  // Bumped by Retry; the Document's key, so a retry remounts it and starts
+  // the download over.
+  const [attempt, setAttempt] = useState(0);
+  const retry = useCallback(() => {
+    setError(null);
+    setProgress(null);
+    setAttempt((n) => n + 1);
+  }, []);
+
+  if (error) {
+    return (
+      <LoadFailure
+        title="Could not load this PDF"
+        error={error}
+        onRetry={retry}
+      />
+    );
+  }
+  return (
+    <reactPdf.Document
+      key={attempt}
+      file={pdfUrl}
+      onLoadSuccess={onLoadSuccess}
+      onLoadProgress={({ loaded, total }) =>
+        setProgress({
+          loaded,
+          total: Number.isFinite(total) && total > 0 ? total : null,
+        })
+      }
+      onLoadError={setError}
+      onSourceError={setError}
+      loading={<LoadingState progress={progress} />}
+      options={options}
+    >
+      {children}
+    </reactPdf.Document>
   );
 }
 
@@ -231,16 +336,6 @@ export const PdfHighlightViewer = ({
   } = useReactPdf(workerSrc);
 
   const [numPages, setNumPages] = useState<number | null>(null);
-  const [loadProgress, setLoadProgress] = useState<LoadProgress | null>(null);
-  const [loadError, setLoadError] = useState<Error | null>(null);
-  // Bumped by Retry; part of the Document key, so a retry remounts it and
-  // starts the download over.
-  const [loadAttempt, setLoadAttempt] = useState(0);
-  const retryLoad = useCallback(() => {
-    setLoadError(null);
-    setLoadProgress(null);
-    setLoadAttempt((n) => n + 1);
-  }, []);
   const containerRef = useRef<HTMLDivElement>(null);
   const targetPageRef = useRef<HTMLDivElement>(null);
   const hasScrolledRef = useRef(false);
@@ -424,8 +519,6 @@ export const PdfHighlightViewer = ({
   useEffect(() => {
     setNumPages(null);
     setPageAspectRatio(null);
-    setLoadProgress(null);
-    setLoadError(null);
     hasScrolledRef.current = false;
   }, [pdfUrl]);
 
@@ -565,7 +658,7 @@ export const PdfHighlightViewer = ({
         onPointerUp={handlePointerUp}
         onPointerCancel={handlePointerUp}
       >
-        {moduleError ? (
+        {moduleError && !reactPdf ? (
           <LoadFailure
             title="Could not load the PDF viewer"
             error={moduleError}
@@ -574,24 +667,12 @@ export const PdfHighlightViewer = ({
         ) : !reactPdf || !containerSize ? (
           <LoadingState progress={null} />
         ) : (
-          <reactPdf.Document
-            key={`${pdfUrl}#${loadAttempt}`}
-            file={pdfUrl}
-            onLoadSuccess={({ numPages: n }) => setNumPages(n)}
-            onLoadProgress={({ loaded, total }) =>
-              setLoadProgress({ loaded, total })
-            }
-            onLoadError={setLoadError}
-            onSourceError={setLoadError}
-            loading={<LoadingState progress={loadProgress} />}
-            error={
-              <LoadFailure
-                title="Could not load this PDF"
-                error={loadError}
-                onRetry={retryLoad}
-              />
-            }
+          <PdfDocument
+            key={pdfUrl}
+            reactPdf={reactPdf}
+            pdfUrl={pdfUrl}
             options={documentOptions}
+            onLoadSuccess={(doc) => setNumPages(doc.numPages)}
           >
             {numPages &&
               Array.from({ length: numPages }, (_, i) => {
@@ -621,7 +702,7 @@ export const PdfHighlightViewer = ({
                   </div>
                 );
               })}
-          </reactPdf.Document>
+          </PdfDocument>
         )}
       </div>
     </div>
