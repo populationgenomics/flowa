@@ -62,7 +62,14 @@ import "@flowajs/react-viewer/styles.css";
 
 The bundle contains only the Tailwind utilities used by the package itself —
 no Preflight reset, so it won't fight your existing base styles (Mantine's
-own reset stays in effect).
+own reset stays in effect). The utilities sit outside any cascade layer, so
+unlayered component styles such as Mantine's cannot outrank them by layer
+order, and theme values are inlined rather than defined as variables on
+`:root`.
+
+If your app builds its own Tailwind stylesheet, import it after this one.
+Class names the two share (`text-sm`, `gap-2`, …) then resolve to your
+definitions, whichever Tailwind major your app is on.
 
 Consumers do **not** need a Tailwind toolchain. The CSS is statically built
 at package release time; nothing in your `tailwind.config` needs to point at

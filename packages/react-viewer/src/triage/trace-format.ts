@@ -8,12 +8,7 @@ const SUMMARY_CAP = 80;
 const PAYLOAD_CAP = 2000;
 
 export type ToolStatusKind =
-  | "spinner"
-  | "success"
-  | "error"
-  | "denied"
-  | "pending"
-  | "neutral";
+  "spinner" | "success" | "error" | "denied" | "pending" | "neutral";
 
 /**
  * Map a tool part's `state` to a presentational status. Covers the full

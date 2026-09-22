@@ -56,6 +56,27 @@ updates:
       - dependency-name: "@types/react-dom"
         update-types: ["version-update:semver-major"]
     groups:
+      # The AI SDK core and its provider / UI packages move in lockstep:
+      # each major of `ai` pairs with one major of every @ai-sdk/* package,
+      # and @ai-sdk/otel pins an exact `ai` version. Grouping them yields a
+      # single PR that can pass CI instead of one per package that each
+      # fail on their own. Majors get their own group so that a pending
+      # migration does not hold back minor and patch releases (security
+      # fixes included). Both are listed before npm-non-major because a
+      # dependency joins the first group it matches.
+      ai-sdk:
+        patterns:
+          - "ai"
+          - "@ai-sdk/*"
+        update-types:
+          - "minor"
+          - "patch"
+      ai-sdk-major:
+        patterns:
+          - "ai"
+          - "@ai-sdk/*"
+        update-types:
+          - "major"
       npm-non-major:
         patterns:
           - "*"

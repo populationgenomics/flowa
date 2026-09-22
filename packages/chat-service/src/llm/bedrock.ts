@@ -1,5 +1,5 @@
 import { createAmazonBedrock } from "@ai-sdk/amazon-bedrock";
-import type { ModelMessage } from "ai";
+import { markLastMessageForCaching } from "./cache-prefix.js";
 import type { LlmProvider } from "./interface.js";
 
 export interface BedrockProviderOptions {
@@ -63,18 +63,8 @@ export async function createBedrockProvider(
         },
       },
     },
-    prepareStep: ({ messages }: { messages: ModelMessage[] }) => ({
-      messages: messages.map((msg, i) =>
-        i === messages.length - 1
-          ? {
-              ...msg,
-              providerOptions: {
-                ...(msg.providerOptions ?? {}),
-                bedrock: { cachePoint: { type: "default" as const } },
-              },
-            }
-          : msg,
-      ),
+    prepareStep: markLastMessageForCaching("bedrock", {
+      cachePoint: { type: "default" },
     }),
   };
 }

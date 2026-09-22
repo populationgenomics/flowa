@@ -775,7 +775,7 @@ export function EvidenceViewerShell({
 
   return (
     <div className="flex h-full flex-col">
-      <div className="border-b bg-gray-50 px-4 py-2">
+      <div className="border-b border-gray-200 bg-gray-50 px-4 py-2">
         <Text size="sm" fw={600} className="text-gray-700">
           {title}
         </Text>

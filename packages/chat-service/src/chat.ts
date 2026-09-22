@@ -6,7 +6,7 @@ import {
   createAgentUIStream,
   createUIMessageStreamResponse,
   generateText,
-  stepCountIs,
+  isStepCount,
   type UIMessage,
   type UIMessageChunk,
 } from "ai";
@@ -561,8 +561,7 @@ export function buildTools(ctx: ChatBuildContext) {
           const { text, usage } = await generateText({
             model: provider.model,
             providerOptions: provider.providerOptions,
-            experimental_telemetry: {
-              isEnabled: true,
+            telemetry: {
               recordInputs: false,
               recordOutputs: false,
               functionId: "ask-paper-agent",
@@ -826,15 +825,14 @@ export async function handleChat(
         instructions: session.systemPrompt,
         providerOptions: provider.providerOptions,
         tools,
-        stopWhen: stepCountIs(MAX_STEPS),
-        experimental_telemetry: {
-          isEnabled: true,
+        stopWhen: isStepCount(MAX_STEPS),
+        telemetry: {
           recordInputs: false,
           recordOutputs: false,
           functionId: "chat-agent",
         },
         ...(provider.prepareStep ? { prepareStep: provider.prepareStep } : {}),
-        onStepFinish: (step) => {
+        onStepEnd: (step) => {
           console.log(
             `[chat] step finished: reason=${step.finishReason} text=${step.text.length} chars toolCalls=${step.toolCalls?.length ?? 0}`,
           );
@@ -849,7 +847,7 @@ export async function handleChat(
             })),
           });
         },
-        onFinish: async ({ text, toolCalls, usage, steps, finishReason }) => {
+        onEnd: async ({ text, toolCalls, usage, steps, finishReason }) => {
           console.log(
             `[chat] finished: ${text.length} chars, ${toolCalls?.length ?? 0} tool calls, usage=${JSON.stringify(usage)}`,
           );
@@ -867,11 +865,19 @@ export async function handleChat(
                 tokenType: "output",
                 count: usage.outputTokens,
               });
-            if (usage.cachedInputTokens)
+            const { cacheReadTokens, cacheWriteTokens } =
+              usage.inputTokenDetails;
+            if (cacheReadTokens)
               recordCachedInputTokens({
                 model: modelLabel,
                 type: "read",
-                count: usage.cachedInputTokens,
+                count: cacheReadTokens,
+              });
+            if (cacheWriteTokens)
+              recordCachedInputTokens({
+                model: modelLabel,
+                type: "write",
+                count: cacheWriteTokens,
               });
           }
           const truncated =
@@ -895,9 +901,9 @@ export async function handleChat(
       // Build the UI message stream, then intercept the `finish` chunk to
       // write the edit draft (if dirty) and attach the new
       // {version, parent_version} as message metadata. Doing the write
-      // inside this transform — rather than in onFinish — guarantees the
+      // inside this transform — rather than in onEnd — guarantees the
       // finish chunk carries the metadata: messageMetadata callbacks fire
-      // before onFinish is awaited.
+      // before onEnd is awaited.
       const baseStream = await createAgentUIStream({
         agent,
         uiMessages: augmentedMessages,
