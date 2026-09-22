@@ -378,8 +378,10 @@ export function EvidenceViewerShell({
 
   const activeDoi = active?.doi ?? "";
   const activePdfUrl = activeDoi ? pdfUrlForDoi(activeDoi) : "";
+  // A turn belongs to one paper. A moment with no focused claim leaves
+  // `activeDoi` empty and is not a change of paper.
   useEffect(() => {
-    setPdfRotation(0);
+    if (activeDoi) setPdfRotation(0);
   }, [activeDoi]);
 
   const pdfHighlights: PdfHighlight[] = useMemo(() => {

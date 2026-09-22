@@ -12,11 +12,13 @@ export function turn(rotation: Rotation, quarterTurns: 1 | -1): Rotation {
 }
 
 /**
- * Map a bbox given in the page's unrotated frame into the frame of the page
- * turned clockwise by `rotation`. Both frames are 0–SCALE on each axis, so
- * the result is still a fraction of the rendered page whatever its aspect
- * ratio after the turn. A clockwise quarter turn sends a point (x, y) to
- * (SCALE − y, x): the left edge becomes the top edge.
+ * Map a bbox given in the frame pdf.js renders the page in by default (the
+ * page's own /Rotate already applied, which is also the frame the pipeline's
+ * bboxes are in) into the frame after a further clockwise turn by
+ * `rotation`. Both frames are 0–SCALE on each axis, so the result is still a
+ * fraction of the rendered page whatever its aspect ratio after the turn. A
+ * clockwise quarter turn sends a point (x, y) to (SCALE − y, x): the left
+ * edge becomes the top edge.
  */
 export function rotateBbox(
   bbox: HighlightBbox,

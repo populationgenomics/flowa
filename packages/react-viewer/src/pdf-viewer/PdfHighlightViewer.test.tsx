@@ -16,6 +16,7 @@ import {
   describeLoadError,
 } from "./PdfHighlightViewer";
 import type { PdfHighlight } from "./types";
+import type { Rotation } from "./geometry";
 
 type DocumentProps = {
   file?: unknown;
@@ -95,6 +96,8 @@ function viewer(props: {
   pdfUrl?: string;
   highlights?: PdfHighlight[];
   onLoadError?: (error: Error, info: unknown) => void;
+  rotation?: Rotation;
+  onRotationChange?: (rotation: Rotation) => void;
 }) {
   return wrap(
     <PdfHighlightViewer
@@ -103,6 +106,8 @@ function viewer(props: {
       workerSrc={props.workerSrc}
       cMapUrl="/pdfjs/cmaps/"
       onLoadError={props.onLoadError}
+      rotation={props.rotation}
+      onRotationChange={props.onRotationChange}
     />,
   );
 }
@@ -492,21 +497,23 @@ describe("PdfHighlightViewer", () => {
    * the given own rotations; each page renders its rotation, its width and
    * its children, and reports a render once loaded.
    */
-  function mountPages(ownRotations: number[]) {
+  function mountPages(ownRotations: number[], loads = true) {
     mockState.document = (props) => {
       useEffect(() => {
-        props.onLoadSuccess?.({ numPages: ownRotations.length });
+        if (loads) props.onLoadSuccess?.({ numPages: ownRotations.length });
       }, []);
-      return <>{props.children}</>;
+      return loads ? <>{props.children}</> : <>{props.loading}</>;
     };
     mockState.page = (props) => {
+      // react-pdf remounts its canvas and fires both callbacks again on
+      // every change of rotation or width.
       useEffect(() => {
         props.onLoadSuccess?.({
           view: [0, 0, 600, 800],
           rotate: ownRotations[props.pageNumber - 1] ?? 0,
         });
         props.onRenderSuccess?.();
-      }, []);
+      }, [props.rotate, props.width]);
       return (
         <div
           data-testid={`page-${props.pageNumber}`}
@@ -570,23 +577,106 @@ describe("PdfHighlightViewer", () => {
   });
 
   it("does not scroll back to the quote on a turn", async () => {
+    const original = Element.prototype.scrollTo;
     const scrollTo = vi.fn();
     Element.prototype.scrollTo = scrollTo;
+    try {
+      mountPages([0]);
+      renderViewer({
+        workerSrc: "/w/turn-scroll.mjs",
+        highlights: [
+          {
+            bboxes: [{ page: 1, left: 100, top: 200, right: 400, bottom: 250 }],
+          },
+        ],
+      });
+      await screen.findByTestId("page-1");
+      // The first render scrolls to the quote once.
+      await waitFor(() => expect(scrollTo).toHaveBeenCalledTimes(1));
+      fireEvent.click(screen.getByRole("button", { name: "Rotate right" }));
+      await waitFor(() =>
+        expect(screen.getByTestId("page-1").dataset.rotate).toBe("90"),
+      );
+      // The page re-reported its load and render for the turn; neither
+      // counts as a fresh load, so no second scroll.
+      await new Promise((resolve) => setTimeout(resolve, 20));
+      expect(scrollTo).toHaveBeenCalledTimes(1);
+    } finally {
+      Element.prototype.scrollTo = original;
+    }
+  });
+
+  it("scrolls to the quote again when a paper is reopened after another never loaded", async () => {
+    const original = Element.prototype.scrollTo;
+    const scrollTo = vi.fn();
+    Element.prototype.scrollTo = scrollTo;
+    try {
+      const highlights = [
+        { bboxes: [{ page: 1, left: 100, top: 200, right: 400, bottom: 250 }] },
+      ];
+      mountPages([0]);
+      const { rerender } = renderViewer({
+        workerSrc: "/w/reopen.mjs",
+        pdfUrl: "/a.pdf",
+        highlights,
+      });
+      await waitFor(() => expect(scrollTo).toHaveBeenCalledTimes(1));
+
+      // The second paper never gets past loading.
+      mountPages([0], false);
+      rerender(
+        viewer({ workerSrc: "/w/reopen.mjs", pdfUrl: "/b.pdf", highlights }),
+      );
+      await screen.findByTestId("pdf-loading");
+
+      // Back to the first paper: a fresh load, so its quote is scrolled to
+      // once more.
+      mountPages([0]);
+      rerender(
+        viewer({ workerSrc: "/w/reopen.mjs", pdfUrl: "/a.pdf", highlights }),
+      );
+      await waitFor(() => expect(scrollTo).toHaveBeenCalledTimes(2));
+    } finally {
+      Element.prototype.scrollTo = original;
+    }
+  });
+
+  it("follows a controlled rotation and reports turns without applying them itself", async () => {
+    const onRotationChange = vi.fn();
     mountPages([0]);
-    renderViewer({
-      workerSrc: "/w/turn-scroll.mjs",
+    const { rerender } = renderViewer({
+      workerSrc: "/w/controlled.mjs",
+      rotation: 90,
+      onRotationChange,
       highlights: [
         { bboxes: [{ page: 1, left: 100, top: 200, right: 400, bottom: 250 }] },
       ],
     });
-    await screen.findByTestId("page-1");
-    // The first render scrolls to the quote once.
-    await waitFor(() => expect(scrollTo).toHaveBeenCalledTimes(1));
+    const page = await screen.findByTestId("page-1");
+    await waitFor(() => expect(page.dataset.rotate).toBe("90"));
+    // The overlay follows the controlled turn from the first paint.
+    const box = () =>
+      (page.firstElementChild!.firstElementChild as HTMLElement).style;
+    expect(box().left).toBe("75%");
+
     fireEvent.click(screen.getByRole("button", { name: "Rotate right" }));
-    await waitFor(() =>
-      expect(screen.getByTestId("page-1").dataset.rotate).toBe("90"),
+    expect(onRotationChange).toHaveBeenCalledWith(180);
+    await new Promise((resolve) => setTimeout(resolve, 20));
+    expect(page.dataset.rotate).toBe("90");
+
+    rerender(
+      viewer({
+        workerSrc: "/w/controlled.mjs",
+        rotation: 180,
+        onRotationChange,
+        highlights: [
+          {
+            bboxes: [{ page: 1, left: 100, top: 200, right: 400, bottom: 250 }],
+          },
+        ],
+      }),
     );
-    expect(scrollTo).toHaveBeenCalledTimes(1);
+    await waitFor(() => expect(page.dataset.rotate).toBe("180"));
   });
 
   it("resets the turn when another document opens", async () => {
