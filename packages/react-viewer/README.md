@@ -87,20 +87,24 @@ loads in the browser). No `dynamic(() => …, { ssr: false })` wrapper needed.
 
 While a document downloads, the pane shows the bytes received and, when the
 server reports a content length, the total and a progress bar. A download that
-fails, or a viewer bundle that fails to load, shows the error with a Retry
-button. A failed import of `react-pdf` is not cached, so the retry (or the next
-mount) imports again.
+fails, or a viewer bundle that fails to load, shows the cause with a Retry
+button. Retry re-uses the same `pdfUrl`; a consumer that hands out short-lived
+URLs can mint a new one from `onLoadError`, and a changed `pdfUrl` starts a
+fresh load. The package does not cache a failed import of `react-pdf`, so the
+retry (or the next mount) asks the bundler again; whether the bundler re-fetches
+a chunk that failed is up to it.
 
 pdf.js fetches a large document in byte ranges, so the first page renders after
 a few small requests, only when the response lets it: the server has to answer
 with `Accept-Ranges: bytes` and a `Content-Length`, the body must not be
 content-encoded (a gzip-compressed object disables ranges), and for a
-cross-origin file the CORS policy has to expose `Accept-Ranges` and
-`Content-Range`, which are not on the browser's safelist (S3 and MinIO need
-`ExposeHeaders` in the bucket's CORS rule for this). pdf.js also uses ranges
-only for files above twice its chunk size, about 128 KB. Otherwise the whole
-file downloads before anything renders, and a PDF that is not linearised shows
-nothing until the last byte arrives.
+cross-origin file the CORS policy has to expose `Accept-Ranges`, which is not
+on the browser's safelist (S3 and MinIO need `ExposeHeaders` in the bucket's
+CORS rule for this; exposing `Content-Range` too is harmless). pdf.js also uses
+ranges only for files above twice its chunk size, about 128 KB. Without ranges
+the file streams from the start, and a PDF that is not linearised, whose
+cross-reference table sits at the end, shows nothing until the last byte
+arrives.
 
 ## Worker assets
 

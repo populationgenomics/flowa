@@ -2,15 +2,22 @@
 
 import { useEffect } from "react";
 import { describe, it, expect, vi, beforeEach } from "vitest";
-import { render, screen, fireEvent, waitFor } from "@testing-library/react";
+import {
+  act,
+  render,
+  screen,
+  fireEvent,
+  waitFor,
+} from "@testing-library/react";
 import { MantineProvider } from "@mantine/core";
-import { PdfHighlightViewer } from "./PdfHighlightViewer";
+import { PdfHighlightViewer, describeLoadError } from "./PdfHighlightViewer";
 import type { PdfHighlight } from "./types";
 
 type DocumentProps = {
   file?: unknown;
   loading?: React.ReactNode;
   error?: React.ReactNode;
+  onLoadSuccess?(d: { numPages: number }): void;
   onLoadProgress?(p: { loaded: number; total: number }): void;
   onLoadError?(e: Error): void;
   onSourceError?(e: Error): void;
@@ -70,6 +77,7 @@ function viewer(props: {
   workerSrc: string;
   pdfUrl?: string;
   highlights?: PdfHighlight[];
+  onLoadError?: (error: Error) => void;
 }) {
   return wrap(
     <PdfHighlightViewer
@@ -77,6 +85,7 @@ function viewer(props: {
       highlights={props.highlights}
       workerSrc={props.workerSrc}
       cMapUrl="/pdfjs/cmaps/"
+      onLoadError={props.onLoadError}
     />,
   );
 }
@@ -115,12 +124,9 @@ function reportingProgress(loaded: number, total: number) {
 
 describe("PdfHighlightViewer", () => {
   it("renders the loading state before react-pdf resolves", () => {
-    const { container } = render(
-      viewer({ workerSrc: "/pdfjs/pdf.worker.min.mjs" }),
-    );
-    // Loader from @mantine/core renders a span with role="presentation"
-    // (or a div). Look for the wrapping container plus absence of error.
-    expect(container.querySelector(".relative")).not.toBeNull();
+    render(viewer({ workerSrc: "/pdfjs/pdf.worker.min.mjs" }));
+    expect(screen.getByTestId("pdf-loading")).toBeDefined();
+    expect(screen.queryByTestId("pdf-load-error")).toBeNull();
   });
 
   it("surfaces a not-found alert when a highlight has no bboxes but a label", () => {
@@ -165,10 +171,72 @@ describe("PdfHighlightViewer", () => {
     expect(await screen.findByText("512 KB received")).toBeDefined();
   });
 
-  it("caps the percentage when more arrives than was announced", async () => {
+  it("never shows more received than was announced", async () => {
+    // In range mode pdf.js counts whole chunks, so `loaded` can pass `total`.
     reportingProgress(13 * MB, 12 * MB);
     renderViewer({ workerSrc: "/w/progress-over.mjs" });
-    expect(await screen.findByText("13.0 MB of 12.0 MB (100%)")).toBeDefined();
+    expect(await screen.findByText("12.0 MB of 12.0 MB (100%)")).toBeDefined();
+  });
+
+  it("treats a zero or unparseable total as unknown", async () => {
+    reportingProgress(512 * 1024, 0);
+    renderViewer({ workerSrc: "/w/progress-zero.mjs" });
+    expect(await screen.findByText("512 KB received")).toBeDefined();
+    reportingProgress(256 * 1024, Number.NaN);
+    renderViewer({ workerSrc: "/w/progress-nan.mjs" });
+    expect(await screen.findByText("256 KB received")).toBeDefined();
+  });
+
+  it("ignores progress once the document has loaded", async () => {
+    mockState.document = (props) => {
+      useEffect(() => {
+        props.onLoadSuccess?.({ numPages: 1 });
+        props.onLoadProgress?.({ loaded: 3 * MB, total: 12 * MB });
+      }, []);
+      return <>{props.loading}</>;
+    };
+    renderViewer({ workerSrc: "/w/progress-after-load.mjs" });
+    await screen.findByTestId("pdf-loading");
+    await new Promise((resolve) => setTimeout(resolve, 20));
+    expect(screen.queryByText(/12.0 MB/)).toBeNull();
+  });
+
+  it("tells the consumer about a load failure", async () => {
+    const onLoadError = vi.fn();
+    mockState.document = (props) => {
+      useEffect(() => {
+        props.onLoadError?.(new Error("HTTP 502"));
+      }, []);
+      return <>{props.loading}</>;
+    };
+    renderViewer({ workerSrc: "/w/load-error-callback.mjs", onLoadError });
+    await screen.findByText("Could not load this PDF");
+    expect(onLoadError).toHaveBeenCalledTimes(1);
+    expect(onLoadError.mock.calls[0]![0]).toMatchObject({
+      message: "HTTP 502",
+    });
+  });
+
+  it("lets a press on Retry through instead of starting a drag", async () => {
+    const setPointerCapture = vi.fn();
+    Element.prototype.setPointerCapture = setPointerCapture;
+    Element.prototype.releasePointerCapture ??= vi.fn();
+    mockState.document = (props) => {
+      useEffect(() => {
+        props.onLoadError?.(new Error("HTTP 502"));
+      }, []);
+      return <>{props.loading}</>;
+    };
+    const { container } = renderViewer({ workerSrc: "/w/retry-press.mjs" });
+    const retry = await screen.findByRole("button", { name: "Retry" });
+    fireEvent.pointerDown(retry, { pointerId: 1, clientX: 10, clientY: 10 });
+    expect(setPointerCapture).not.toHaveBeenCalled();
+    fireEvent.pointerDown(container.querySelector(".overflow-auto")!, {
+      pointerId: 1,
+      clientX: 10,
+      clientY: 10,
+    });
+    expect(setPointerCapture).toHaveBeenCalledTimes(1);
   });
 
   it("shows the load error, then a fresh download on Retry", async () => {
@@ -256,8 +324,11 @@ describe("PdfHighlightViewer", () => {
     rerender(viewer({ workerSrc: "/w/supersede.mjs", pdfUrl: "/b.pdf" }));
     expect(await screen.findByText("1.6 MB of 4.0 MB (40%)")).toBeDefined();
 
-    // The first document's download completes after it was replaced.
-    progressFor["/a.pdf"]?.({ loaded: 12 * MB, total: 12 * MB });
+    // The first document's download completes after it was replaced. Inside
+    // act, so a state update that did land would be flushed before the read.
+    act(() => {
+      progressFor["/a.pdf"]?.({ loaded: 12 * MB, total: 12 * MB });
+    });
     expect(screen.getByText("1.6 MB of 4.0 MB (40%)")).toBeDefined();
     expect(screen.queryByText(/12.0 MB/)).toBeNull();
   });
@@ -282,5 +353,53 @@ describe("PdfHighlightViewer", () => {
     expect(
       mockState.workerSrcSets.filter((s) => s === "/w/import-fails.mjs"),
     ).toHaveLength(2);
+  });
+});
+
+describe("describeLoadError", () => {
+  const named = (name: string, message = "raw", extra: object = {}) =>
+    Object.assign(new Error(message), { name }, extra);
+
+  it("names each pdf.js failure in a line without the URL", () => {
+    expect(describeLoadError(named("MissingPDFException"))).toBe(
+      "The file was not found on the server.",
+    );
+    expect(
+      describeLoadError(
+        named("UnexpectedResponseException", "raw", { status: 403 }),
+      ),
+    ).toBe("The server answered with status 403.");
+    expect(describeLoadError(named("UnexpectedResponseException"))).toBe(
+      "The server answered unexpectedly.",
+    );
+    expect(describeLoadError(named("InvalidPDFException"))).toBe(
+      "The file is not a valid PDF.",
+    );
+    expect(describeLoadError(named("PasswordException"))).toBe(
+      "The PDF is password protected.",
+    );
+    expect(describeLoadError(named("AbortException"))).toBe(
+      "The download was interrupted.",
+    );
+  });
+
+  it("recognises a fetch that never got a response", () => {
+    expect(
+      describeLoadError(
+        named("UnknownErrorException", "Failed to fetch", {
+          details: "TypeError: Failed to fetch",
+        }),
+      ),
+    ).toBe("The download failed: a network or CORS error.");
+    expect(describeLoadError(named("UnknownErrorException", "odd"))).toBe(
+      "odd",
+    );
+  });
+
+  it("falls back to the message, or a placeholder for none", () => {
+    expect(describeLoadError(new Error("chunk load failed"))).toBe(
+      "chunk load failed",
+    );
+    expect(describeLoadError(new Error(""))).toBe("Unknown error");
   });
 });

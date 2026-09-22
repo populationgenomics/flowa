@@ -39,6 +39,12 @@ export interface PdfHighlightViewerProps {
   workerSrc: string;
   /** URL prefix for pdf.js cmaps (e.g. `/pdfjs/cmaps/`), served by the consumer. */
   cMapUrl: string;
+  /**
+   * Called when a document fails to load, with pdf.js's error. Retry
+   * re-uses the same `pdfUrl`, so a consumer that hands out short-lived
+   * URLs can mint a new one here; a changed `pdfUrl` starts a fresh load.
+   */
+  onLoadError?: (error: Error) => void;
 }
 
 /** Reference scale used by the pipeline (0–1000 normalized coordinates). */
@@ -106,8 +112,9 @@ function useReactPdf(workerSrc: string): ReactPdfLoad {
 }
 
 function formatBytes(n: number): string {
-  if (n >= 1024 * 1024) return `${(n / (1024 * 1024)).toFixed(1)} MB`;
-  if (n >= 1024) return `${Math.round(n / 1024)} KB`;
+  const kb = Math.round(n / 1024);
+  if (kb >= 1024) return `${(n / (1024 * 1024)).toFixed(1)} MB`;
+  if (kb >= 1) return `${kb} KB`;
   return `${Math.round(n)} B`;
 }
 
@@ -124,9 +131,14 @@ interface LoadProgress {
  */
 function LoadingState({ progress }: { progress: LoadProgress | null }) {
   const total = progress?.total ?? null;
-  const percent =
+  // In range mode pdf.js counts whole chunks, so `loaded` can pass `total`.
+  const loaded =
     progress && total !== null
-      ? Math.min(100, Math.round((progress.loaded / total) * 100))
+      ? Math.min(progress.loaded, total)
+      : progress?.loaded;
+  const percent =
+    loaded !== undefined && total !== null
+      ? Math.min(100, Math.round((loaded / total) * 100))
       : null;
   return (
     <div
@@ -134,11 +146,11 @@ function LoadingState({ progress }: { progress: LoadProgress | null }) {
       data-testid="pdf-loading"
     >
       <Loader size="md" />
-      {progress && (
-        <Text size="xs" c="dimmed" role="status" aria-live="polite">
+      {loaded !== undefined && (
+        <Text size="xs" c="dimmed">
           {total !== null
-            ? `${formatBytes(progress.loaded)} of ${formatBytes(total)} (${percent}%)`
-            : `${formatBytes(progress.loaded)} received`}
+            ? `${formatBytes(loaded)} of ${formatBytes(total)} (${percent}%)`
+            : `${formatBytes(loaded)} received`}
         </Text>
       )}
       {percent !== null && (
@@ -159,8 +171,9 @@ function LoadingState({ progress }: { progress: LoadProgress | null }) {
  * characters and buries the cause; the raw message stays available as the
  * line's tooltip.
  */
-function describeLoadError(error: Error): string {
+export function describeLoadError(error: Error): string {
   const status = (error as { status?: unknown }).status;
+  const details = String((error as { details?: unknown }).details ?? "");
   switch (error.name) {
     case "MissingPDFException":
       return "The file was not found on the server.";
@@ -174,6 +187,14 @@ function describeLoadError(error: Error): string {
       return "The PDF is password protected.";
     case "AbortException":
       return "The download was interrupted.";
+    case "UnknownErrorException":
+      // A fetch that never got a response (offline, or CORS refused it)
+      // comes back wrapped, with the browser's own wording inside.
+      return /TypeError|Failed to fetch|NetworkError|Load failed/.test(
+        `${error.message} ${details}`,
+      )
+        ? "The download failed: a network or CORS error."
+        : error.message || "Unknown error";
     default:
       return error.message || "Unknown error";
   }
@@ -219,8 +240,14 @@ type DocumentProps = ComponentProps<ReactPdfModule["Document"]>;
 interface PdfDocumentProps {
   reactPdf: ReactPdfModule;
   pdfUrl: string;
+  /**
+   * Must be referentially stable for one document: react-pdf restarts the
+   * load inside the same instance when this object changes, and the
+   * superseded task then still reports into this instance's state.
+   */
   options: DocumentProps["options"];
   onLoadSuccess: NonNullable<DocumentProps["onLoadSuccess"]>;
+  onLoadError?: (error: Error) => void;
   children: ReactNode;
 }
 
@@ -238,18 +265,27 @@ function PdfDocument({
   pdfUrl,
   options,
   onLoadSuccess,
+  onLoadError,
   children,
 }: PdfDocumentProps) {
   const [progress, setProgress] = useState<LoadProgress | null>(null);
   const [error, setError] = useState<Error | null>(null);
-  // Bumped by Retry; the Document's key, so a retry remounts it and starts
-  // the download over.
-  const [attempt, setAttempt] = useState(0);
+  // pdf.js keeps fetching the rest of a document after it has resolved;
+  // those reports are of no use once pages are showing.
+  const loadedRef = useRef(false);
+  // While the failure shows, the Document is unmounted; clearing the error
+  // mounts a fresh one, which starts the download over.
   const retry = useCallback(() => {
     setError(null);
     setProgress(null);
-    setAttempt((n) => n + 1);
   }, []);
+  const fail = useCallback(
+    (e: Error) => {
+      setError(e);
+      onLoadError?.(e);
+    },
+    [onLoadError],
+  );
 
   if (error) {
     return (
@@ -260,20 +296,34 @@ function PdfDocument({
       />
     );
   }
+  const loading = <LoadingState progress={progress} />;
   return (
     <reactPdf.Document
-      key={attempt}
       file={pdfUrl}
-      onLoadSuccess={onLoadSuccess}
-      onLoadProgress={({ loaded, total }) =>
+      onLoadSuccess={(doc) => {
+        loadedRef.current = true;
+        onLoadSuccess(doc);
+      }}
+      onLoadProgress={({ loaded, total }) => {
+        if (loadedRef.current) return;
         setProgress({
           loaded,
           total: Number.isFinite(total) && total > 0 ? total : null,
-        })
+        });
+      }}
+      onLoadError={fail}
+      onSourceError={fail}
+      // An encrypted file would otherwise loop through react-pdf's
+      // window.prompt; rejecting makes pdf.js report the PasswordException.
+      onPassword={(callback) =>
+        (callback as unknown as (value: Error) => void)(
+          new Error("password required"),
+        )
       }
-      onLoadError={setError}
-      onSourceError={setError}
-      loading={<LoadingState progress={progress} />}
+      loading={loading}
+      // react-pdf paints its own error slot for a frame before onLoadError
+      // fires; keep the loading state there so no foreign text shows.
+      error={loading}
       options={options}
     >
       {children}
@@ -328,6 +378,7 @@ export const PdfHighlightViewer = ({
   onZoomChange,
   workerSrc,
   cMapUrl,
+  onLoadError,
 }: PdfHighlightViewerProps) => {
   const {
     mod: reactPdf,
@@ -557,6 +608,13 @@ export const PdfHighlightViewer = ({
   const handlePointerDown = useCallback((e: React.PointerEvent) => {
     const container = containerRef.current;
     if (!container) return;
+    // Capturing the pointer would retarget the click away from a control
+    // inside the container, such as the Retry button.
+    if (
+      e.target instanceof Element &&
+      e.target.closest("button, a, input, select, textarea, [role='button']")
+    )
+      return;
     dragRef.current = {
       isDragging: true,
       startX: e.clientX,
@@ -673,6 +731,7 @@ export const PdfHighlightViewer = ({
             pdfUrl={pdfUrl}
             options={documentOptions}
             onLoadSuccess={(doc) => setNumPages(doc.numPages)}
+            onLoadError={onLoadError}
           >
             {numPages &&
               Array.from({ length: numPages }, (_, i) => {
