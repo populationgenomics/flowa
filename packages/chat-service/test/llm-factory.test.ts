@@ -76,7 +76,10 @@ describe("anthropic provider", () => {
       { role: "user", content: "hi" },
       { role: "user", content: "again" },
     ];
-    const out = provider.prepareStep!({ messages });
+    const out = provider.prepareStep!({
+      initialMessages: messages,
+      responseMessages: [],
+    });
     expect(out.messages).toHaveLength(2);
     // First message untouched.
     expect(out.messages[0]).toEqual({ role: "user", content: "hi" });
@@ -116,7 +119,10 @@ describe("bedrock provider", () => {
       { role: "user", content: "second" },
       { role: "user", content: "third" },
     ];
-    const out = provider.prepareStep!({ messages });
+    const out = provider.prepareStep!({
+      initialMessages: messages,
+      responseMessages: [],
+    });
     expect(out.messages).toHaveLength(3);
     // Earlier messages untouched.
     expect(out.messages[0]).toEqual({ role: "user", content: "first" });
@@ -141,7 +147,10 @@ describe("bedrock provider", () => {
         providerOptions: { someOther: { keep: true } },
       } as ModelMessage,
     ];
-    const out = provider.prepareStep!({ messages });
+    const out = provider.prepareStep!({
+      initialMessages: messages,
+      responseMessages: [],
+    });
     const merged = (
       out.messages[0] as ModelMessage & {
         providerOptions: Record<string, unknown>;

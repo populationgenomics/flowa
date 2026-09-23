@@ -15,6 +15,7 @@ import {
 } from "./session.js";
 import { handleChat } from "./chat.js";
 import { verifySessionToken } from "./auth/jwt.js";
+import { registerAiSdkTelemetry } from "./telemetry.js";
 
 export interface CreateAppOptions {
   storage: Storage;
@@ -48,6 +49,7 @@ export interface CreateAppOptions {
  * it. The session JWT on `/chat/:id` is enforced internally.
  */
 export function createApp(options: CreateAppOptions): Hono {
+  registerAiSdkTelemetry();
   const schema = (options.schema ?? ArtifactSchema) as z.ZodType<Artifact>;
   const sessionConfig: SessionConfig = {
     storage: options.storage,

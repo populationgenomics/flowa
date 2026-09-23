@@ -7,8 +7,8 @@ import type { JSONValue, LanguageModel, ModelMessage } from "ai";
  * - `providerOptions`: per-provider thinking/reasoning configuration that
  *   chat-service merges into every `streamText` / `generateText` call.
  * - `prepareStep`: per-step messages transformation. Used by the bedrock
- *   provider to inject a `cachePoint` on the last message for prompt
- *   caching; other providers omit it. chat-service calls this on every
+ *   and anthropic providers to put a cache marker on the last message for
+ *   prompt caching; other providers omit it. chat-service calls this on every
  *   tool-loop step if defined.
  */
 export interface LlmProvider {
@@ -36,11 +36,15 @@ export interface LlmProvider {
    * providers use this to inject a cache marker on the last message for
    * prompt caching; google and openai omit it.
    *
-   * Receives the full step options from the AI SDK (only `messages` is
-   * surfaced; the rest of the options pass through). Return a new
-   * `messages` array with provider-specific markers applied.
+   * Receives the AI SDK's step options (only the call's initial messages
+   * and the responses accumulated so far are surfaced) and returns the
+   * complete `messages` for the step, with provider-specific markers
+   * applied.
    */
-  readonly prepareStep?: (options: { messages: ModelMessage[] }) => {
+  readonly prepareStep?: (options: {
+    initialMessages: ModelMessage[];
+    responseMessages: ModelMessage[];
+  }) => {
     messages: ModelMessage[];
   };
 }

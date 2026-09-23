@@ -1,12 +1,34 @@
 /**
- * Telemetry helpers. Pure — no side effects at module load.
+ * Telemetry helpers. No side effects at module load.
  * The SDK is bootstrapped in instrumentation.ts (loaded via --import);
  * if it hasn't run, metrics.getMeter() returns a no-op meter.
  */
 
 import { metrics } from "@opentelemetry/api";
+import { OpenTelemetry } from "@ai-sdk/otel";
+import { registerTelemetry } from "ai";
 
 const meter = metrics.getMeter("chat-service");
+
+// ---------------------------------------------------------------------------
+// AI SDK spans
+// ---------------------------------------------------------------------------
+
+let aiSdkTelemetryRegistered = false;
+
+/**
+ * Route the AI SDK's model-call and tool spans to the global OpenTelemetry
+ * tracer provider. The AI SDK emits spans only through integrations
+ * registered process-wide, and every registered integration records its own
+ * copy of each span, so this registers once however many apps are created.
+ * Until an OpenTelemetry SDK is started (see instrumentation.ts) the global
+ * tracer is a no-op, and so are these spans.
+ */
+export function registerAiSdkTelemetry(): void {
+  if (aiSdkTelemetryRegistered) return;
+  aiSdkTelemetryRegistered = true;
+  registerTelemetry(new OpenTelemetry());
+}
 
 // ---------------------------------------------------------------------------
 // Token usage histogram

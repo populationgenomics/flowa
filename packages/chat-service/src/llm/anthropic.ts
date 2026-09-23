@@ -1,5 +1,5 @@
 import { createAnthropic } from "@ai-sdk/anthropic";
-import type { ModelMessage } from "ai";
+import { markLastMessageForCaching } from "./cache-prefix.js";
 import type { LlmProvider } from "./interface.js";
 
 export interface AnthropicProviderOptions {
@@ -33,20 +33,8 @@ export function createAnthropicProvider(
         thinking: { type: "adaptive" },
       },
     },
-    prepareStep: ({ messages }: { messages: ModelMessage[] }) => ({
-      messages: messages.map((msg, i) =>
-        i === messages.length - 1
-          ? {
-              ...msg,
-              providerOptions: {
-                ...(msg.providerOptions ?? {}),
-                anthropic: {
-                  cacheControl: { type: "ephemeral" as const },
-                },
-              },
-            }
-          : msg,
-      ),
+    prepareStep: markLastMessageForCaching("anthropic", {
+      cacheControl: { type: "ephemeral" },
     }),
   };
 }

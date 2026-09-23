@@ -24,11 +24,7 @@ import { encodeDoi } from "@flowajs/react-viewer";
 import { getDemoDataDir } from "./demoConfig";
 
 export type PaperStatus =
-  | "extracted"
-  | "downloaded"
-  | "needs_manual"
-  | "queried"
-  | "failed";
+  "extracted" | "downloaded" | "needs_manual" | "queried" | "failed";
 
 export interface PaperRow {
   doi: string;

@@ -1,5 +1,10 @@
-@tailwind components;
-@tailwind utilities;
+/* Utilities are emitted outside any cascade layer and with theme values
+ * inlined, so the stylesheet behaves like plain class rules in the host
+ * page: unlayered component styles (such as Mantine's) cannot outrank it
+ * by layer order, and it defines no theme variables on :root. There is no
+ * Preflight; consumers manage base and reset styles themselves. */
+@import "tailwindcss/theme.css" theme(reference inline);
+@tailwind utilities source("./");
 
 /* LLM-rendered markdown content (paragraphs, lists, bold, code, etc.).
  * Replaces @tailwindcss/typography's `.prose` / `.prose-sm` class system
