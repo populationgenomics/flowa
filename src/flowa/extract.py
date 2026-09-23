@@ -7,9 +7,9 @@ import time
 
 import typer
 from pydantic import BaseModel
-from pydantic_ai import Agent, NativeOutput
+from pydantic_ai import Agent
 
-from flowa.models import create_model, get_model_settings
+from flowa.models import create_model, drain_events, get_model_settings, structured_output
 from flowa.prompts import load_prompt_and_schema
 from flowa.settings import ModelConfig, Settings
 from flowa.storage import (
@@ -52,9 +52,10 @@ def create_extraction_agent(
     output_type: type[BaseModel],
 ) -> Agent[None, BaseModel]:
     """Create a Pydantic AI agent for evidence extraction."""
+    llm = create_model(model)
     return Agent(
-        create_model(model),
-        output_type=NativeOutput(output_type),
+        llm,
+        output_type=structured_output(llm, output_type),
         retries=3,
         model_settings=get_model_settings(model, effort='medium', max_tokens=_EXTRACT_MAX_TOKENS),
     )
@@ -101,11 +102,13 @@ async def extract_paper_async(
 
     log.info('Extracting %s (%d chars, model: %s)', doi, len(full_text), model.name)
     t0 = time.monotonic()
-    # Stream so bytes flow during extended thinking; otherwise the connection
-    # goes silent for many minutes and trips our Bedrock read_timeout.
-    async with agent.run_stream(prompt) as stream_result:
-        output = await stream_result.get_output()
-        raw_messages_json = stream_result.all_messages_json()
+    # Stream (via the event handler) so bytes flow during extended thinking;
+    # otherwise the connection goes silent for many minutes and trips our
+    # Bedrock read_timeout. `run` rather than `run_stream` so invalid output is
+    # retried instead of raised.
+    result = await agent.run(prompt, event_stream_handler=drain_events)
+    output = result.output
+    raw_messages_json = result.all_messages_json()
     elapsed = time.monotonic() - t0
 
     # Store structured extraction result

@@ -5,20 +5,19 @@ import json
 import logging
 import re
 import time
-from collections.abc import AsyncIterable
 from typing import Any
 
 import logfire
 import typer
 from botocore.exceptions import ClientError
-from pydantic_ai import Agent, ModelRetry, NativeOutput, RunContext
+from pydantic_ai import Agent, ModelRetry, RunContext
 from pydantic_ai.agent import AgentRunResult
 from tenacity import retry, retry_if_exception, stop_after_attempt, wait_random_exponential
 
 from flowa.artifact import CategoryResult
 from flowa.clinvar import format_clinvar_for_prompt, query_clinvar
 from flowa.content_validation import validate_aggregate_category
-from flowa.models import create_model, get_model_settings
+from flowa.models import create_model, drain_events, get_model_settings, structured_output
 from flowa.prompts import load_aggregation
 from flowa.resolve import (
     CitationQuery,
@@ -111,17 +110,6 @@ _aggregate_retry_counter = logfire.metric_counter(
 )
 
 
-async def _drain_events(ctx: RunContext[None], stream: AsyncIterable[Any]) -> None:
-    """No-op sink so `agent.run(..., event_stream_handler=...)` streams the model
-    request — keeping the connection alive through long extended-thinking while
-    the graph still owns the loop, so an output-validator `ModelRetry` actually
-    retries. (`agent.run_stream` streams to the caller and can't retry a
-    validated output — it raises `UnexpectedModelBehavior` instead.)
-    """
-    async for _ in stream:
-        pass
-
-
 def create_aggregate_agent(
     model: ModelConfig,
     paper_id_to_doi: dict[str, str],
@@ -137,13 +125,14 @@ def create_aggregate_agent(
     category subagent emits a single ``CategoryResult``, so the validator runs on
     that one result; the paper-id / quote inputs are whole-variant and shared
     across categories. A violation raises ModelRetry; callers must drive this
-    agent with `run` (+ `_drain_events`), not `run_stream`, for that retry to fire.
+    agent with `run` (+ `drain_events`), not `run_stream`, for that retry to fire.
     """
     valid_paper_ids = set(paper_id_to_doi)
 
+    llm = create_model(model)
     agent: Agent[None, CategoryResult] = Agent(
-        create_model(model),
-        output_type=NativeOutput(output_type),
+        llm,
+        output_type=structured_output(llm, output_type),
         retries=3,
         model_settings=get_model_settings(model, effort='medium', max_tokens=_AGGREGATE_MAX_TOKENS),
     )
@@ -190,7 +179,7 @@ async def _run_category_agent(
     concurrently-throttled subagents instead of retrying them in lockstep.
     """
     async with semaphore:
-        return await agent.run(prompt, event_stream_handler=_drain_events)
+        return await agent.run(prompt, event_stream_handler=drain_events)
 
 
 def resolve_aggregate_citations(

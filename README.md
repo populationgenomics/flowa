@@ -93,6 +93,9 @@ Optional:
 | `FLOWA_CONVERSION_MODEL__BEDROCK_INFERENCE_PROFILE`  | Bedrock application inference profile ARN for cost attribution. When set, `__NAME` must point at the underlying foundation model. |
 | `FLOWA_EXTRACTION_MODEL__BEDROCK_INFERENCE_PROFILE` | Same, for the extraction model.                                                                                             |
 | `FLOWA_AGGREGATION_MODEL__BEDROCK_INFERENCE_PROFILE` | Same, for the aggregation model.                                                                                            |
+| `FLOWA_CONVERSION_MODEL__EFFORT`                    | Thinking effort (`low`/`medium`/`high`) for conversion. Unset requests no thinking; set it (e.g. `low`) for models whose thinking can't be disabled, such as Claude Opus 5.5. |
+| `FLOWA_EXTRACTION_MODEL__EFFORT`                    | Same, for extraction. Unset: `medium`.                                                                                      |
+| `FLOWA_AGGREGATION_MODEL__EFFORT`                   | Same, for aggregation. Unset: `medium`.                                                                                     |
 | `MASTERMIND_API_TOKEN`                              | Required when querying with `--source mastermind`; use `--source litvar` (free, no token) otherwise.                        |
 | `NCBI_API_KEY`                                      | Optional NCBI key for higher PubMed rate limits.                                                                            |
 
@@ -103,6 +106,8 @@ Models use [pydantic-ai format](https://ai.pydantic.dev/models/). Examples:
 - **AWS Bedrock**: `bedrock:au.anthropic.claude-sonnet-4-6` (convert), `bedrock:au.anthropic.claude-opus-4-6` (extraction)
 - **Google Gemini**: `google:gemini-3-pro` (Gemini API), `google-cloud:gemini-3-pro` (Vertex AI)
 - **OpenAI**: `openai:gpt-5.2`
+
+Extraction and aggregation need schema-valid JSON. Where the provider supports JSON-schema structured output for the model, flowa uses it, so sampling is constrained to the schema. Where it doesn't (e.g. Claude Opus 4.7 and later on Bedrock), flowa puts the schema into the instructions, has the model answer with JSON text, and relies on validation plus retries.
 
 Provider credentials:
 

@@ -4,25 +4,29 @@ Provider-specific settings types are imported inline because only one
 provider is installed at a time (via optional extras).
 """
 
+import logging
 import os
-from typing import Literal
+from collections.abc import AsyncIterable
+from typing import Any
 
-from pydantic_ai.models import Model
+from pydantic import BaseModel
+from pydantic_ai import NativeOutput, PromptedOutput, RunContext
+from pydantic_ai.models import Model, infer_model_profile
+from pydantic_ai.output import OutputSpec
 from pydantic_ai.settings import ModelSettings
 
-from flowa.settings import ModelConfig
+from flowa.settings import EffortLevel, ModelConfig
 
-EffortLevel = Literal['low', 'medium', 'high']
+log = logging.getLogger(__name__)
 
 
 def create_model(config: ModelConfig) -> Model | str:
     """Create a pydantic-ai Model for the given config.
 
-    For Bedrock, returns a `BedrockConverseModel` so the provider can resolve
-    the per-model profile (which carries `supports_json_schema_output=True` for
-    Claude 4.5+ and the `BedrockJsonSchemaTransformer`, both required for
-    constrained sampling via `NativeOutput`). For other providers, returns the
-    plain model string and lets pydantic-ai handle resolution.
+    For Bedrock, returns a `BedrockConverseModel` built on our own boto3 client
+    (see below); the provider resolves the per-model profile, which
+    `structured_output` consults. For other providers, returns the plain model
+    string and lets pydantic-ai handle resolution.
     """
     if config.name.startswith('bedrock:'):
         import boto3
@@ -88,13 +92,16 @@ def get_model_settings(
 ) -> ModelSettings | None:
     """Build provider-specific ModelSettings.
 
-    ``effort`` enables extended thinking at the given level when set.
+    ``effort`` is the stage's default thinking level (``None``: request no
+    thinking); ``config.effort`` overrides it. A resolved level enables
+    adaptive thinking at that effort.
     ``max_tokens`` caps output length when set. Bedrock cost-attribution
     inference profiles flow through whenever set on the config, independent
     of ``effort`` and ``max_tokens``.
 
     Returns ``None`` when no provider-specific settings are needed.
     """
+    effort = config.effort or effort
     if config.name.startswith('anthropic:'):
         if effort is None and max_tokens is None:
             return None
@@ -148,3 +155,40 @@ def get_model_settings(
     if max_tokens is None:
         return None
     return ModelSettings(max_tokens=max_tokens)
+
+
+def structured_output[T: BaseModel](model: Model | str, output_type: type[T]) -> OutputSpec[T]:
+    """Pick how the agent obtains a validated ``output_type`` from ``model``.
+
+    Where the model profile reports JSON-schema output support, use
+    `NativeOutput`: the provider compiles the schema into a grammar and samples
+    against it, so the response is schema-valid by construction.
+
+    Otherwise (e.g. Claude Opus 4.7+ on Bedrock, which rejects both
+    `output_config.format` and `strict` tools), use `PromptedOutput`: the schema
+    goes into the instructions and the model answers with JSON text, which
+    pydantic validates, retrying with the errors on failure. Nothing constrains
+    the sampling, so validation plus the agent's retries are the safety net.
+    `PromptedOutput` rather than a result tool: on Opus 5.5 via Bedrock,
+    non-strict tool calls with nested arrays of objects start with a malformed
+    call almost every time (an array serialised as a string), while JSON text
+    validates on the first attempt.
+    """
+    profile = model.profile if isinstance(model, Model) else infer_model_profile(model)
+    if profile.get('supports_json_schema_output', False):
+        return NativeOutput(output_type)
+    model_name = model.model_name if isinstance(model, Model) else model
+    log.info('%s lacks native structured output; using prompted JSON output', model_name)
+    return PromptedOutput(output_type)
+
+
+async def drain_events(ctx: RunContext[Any], stream: AsyncIterable[Any]) -> None:
+    """No-op sink so `agent.run(..., event_stream_handler=...)` streams the model
+    request — keeping the connection alive through long extended-thinking while
+    the graph still owns the loop, so output retries actually happen: a
+    `ModelRetry` from an output validator, or prompted JSON output that fails
+    validation. (`agent.run_stream` streams to the caller and can't retry a
+    validated output — it raises `UnexpectedModelBehavior` instead.)
+    """
+    async for _ in stream:
+        pass

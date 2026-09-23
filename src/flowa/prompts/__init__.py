@@ -159,7 +159,7 @@ class AggregationPromptSet:
     ``categories`` is the ordered manifest (``[{id, module}, ...]``); ``modules`` maps each
     category id to its rendered domain-module text; ``authoring`` is the shared write-up
     guidance injected into every category's prompt; ``category_result`` is the set's
-    ``CategoryResult`` subclass used as the per-subagent ``NativeOutput`` type.
+    ``CategoryResult`` subclass used as the per-subagent structured output type.
     """
 
     template: jinja2.Template
