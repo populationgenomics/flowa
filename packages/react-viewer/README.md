@@ -85,7 +85,8 @@ loads in the browser). No `dynamic(() => …, { ssr: false })` wrapper needed.
 
 ## Viewing controls
 
-The toolbar in the pane zooms the document and turns it in quarter turns.
+The toolbar in the pane zooms the document and turns it counter-clockwise in
+quarter turns.
 Highlights and the scroll to a quote follow the turn. Each page keeps its own
 `/Rotate` entry and turns from there, so a landscape table page in a portrait
 paper stays upright until the user turns it. Like zoom, rotation can be

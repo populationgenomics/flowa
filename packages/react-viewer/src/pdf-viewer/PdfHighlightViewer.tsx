@@ -20,7 +20,6 @@ import {
   IconAlertTriangle,
   IconReload,
   IconRotate,
-  IconRotateClockwise,
   IconZoomIn,
   IconZoomOut,
 } from "@tabler/icons-react";
@@ -572,21 +571,18 @@ export const PdfHighlightViewer = ({
     },
     [onZoomChange],
   );
-  // A turn re-lays the pages out like a zoom does, so the same scroll
-  // ratio is captured and restored around it.
-  const rotate = useCallback(
-    (quarterTurns: 1 | -1) => {
-      const container = containerRef.current;
-      if (container && container.scrollHeight > 0) {
-        pendingScrollRatio.current =
-          container.scrollTop / container.scrollHeight;
-      }
-      const next = turn(rotationRef.current, quarterTurns);
-      setOwnRotation(next);
-      onRotationChange?.(next);
-    },
-    [onRotationChange],
-  );
+  // One counter-clockwise quarter turn; four bring the page back. A turn
+  // re-lays the pages out like a zoom does, so the same scroll ratio is
+  // captured and restored around it.
+  const rotate = useCallback(() => {
+    const container = containerRef.current;
+    if (container && container.scrollHeight > 0) {
+      pendingScrollRatio.current = container.scrollTop / container.scrollHeight;
+    }
+    const next = turn(rotationRef.current, -1);
+    setOwnRotation(next);
+    onRotationChange?.(next);
+  }, [onRotationChange]);
 
   // Highlights with no bboxes split two ways: still resolving (pending) vs
   // searched-and-not-found. The viewer surfaces them differently so an
@@ -857,20 +853,11 @@ export const PdfHighlightViewer = ({
           <ActionIcon
             variant="subtle"
             size="sm"
-            onClick={() => rotate(-1)}
+            onClick={rotate}
             aria-label="Rotate left"
             title="Rotate left"
           >
             <IconRotate size={16} />
-          </ActionIcon>
-          <ActionIcon
-            variant="subtle"
-            size="sm"
-            onClick={() => rotate(1)}
-            aria-label="Rotate right"
-            title="Rotate right"
-          >
-            <IconRotateClockwise size={16} />
           </ActionIcon>
           <span className="mx-1 h-4 w-px bg-gray-300" aria-hidden="true" />
           <ActionIcon

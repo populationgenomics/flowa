@@ -478,16 +478,21 @@ describe("PdfHighlightViewer", () => {
     expect(box().left).toBe("10%");
     expect(box().top).toBe("20%");
 
-    fireEvent.click(screen.getByRole("button", { name: "Rotate right" }));
-    await waitFor(() => expect(page.dataset.rotate).toBe("90"));
-    // A clockwise quarter turn sends (x, y) to (SCALE − y, x): the box now
-    // starts at left 1000 − 250 and top 100, with its sides swapped.
-    expect(box().left).toBe("75%");
-    expect(box().top).toBe("10%");
+    const rotateLeft = () =>
+      fireEvent.click(screen.getByRole("button", { name: "Rotate left" }));
+    rotateLeft();
+    await waitFor(() => expect(page.dataset.rotate).toBe("270"));
+    // A counter-clockwise quarter turn sends (x, y) to (y, SCALE − x): the
+    // box now starts at left 200 and top 1000 − 400, with its sides swapped.
+    expect(box().left).toBe("20%");
+    expect(box().top).toBe("60%");
     expect(box().width).toBe("5%");
     expect(box().height).toBe("30%");
 
-    fireEvent.click(screen.getByRole("button", { name: "Rotate left" }));
+    // Four turns bring the page back upright.
+    rotateLeft();
+    rotateLeft();
+    rotateLeft();
     await waitFor(() => expect(page.dataset.rotate).toBe("0"));
     expect(box().left).toBe("10%");
   });
@@ -543,10 +548,10 @@ describe("PdfHighlightViewer", () => {
     expect(box().left).toBe("10%");
     expect(box().top).toBe("20%");
 
-    fireEvent.click(screen.getByRole("button", { name: "Rotate right" }));
-    await waitFor(() => expect(page.dataset.rotate).toBe("180"));
-    expect(box().left).toBe("75%");
-    expect(box().top).toBe("10%");
+    fireEvent.click(screen.getByRole("button", { name: "Rotate left" }));
+    await waitFor(() => expect(page.dataset.rotate).toBe("0"));
+    expect(box().left).toBe("20%");
+    expect(box().top).toBe("60%");
   });
 
   it("gives each page its own rotation plus the turn", async () => {
@@ -558,10 +563,10 @@ describe("PdfHighlightViewer", () => {
       expect(first.dataset.rotate).toBe("0");
       expect(second.dataset.rotate).toBe("90");
     });
-    fireEvent.click(screen.getByRole("button", { name: "Rotate right" }));
+    fireEvent.click(screen.getByRole("button", { name: "Rotate left" }));
     await waitFor(() => {
-      expect(first.dataset.rotate).toBe("90");
-      expect(second.dataset.rotate).toBe("180");
+      expect(first.dataset.rotate).toBe("270");
+      expect(second.dataset.rotate).toBe("0");
     });
   });
 
@@ -572,7 +577,7 @@ describe("PdfHighlightViewer", () => {
     renderViewer({ workerSrc: "/w/fit.mjs" });
     const page = await screen.findByTestId("page-1");
     await waitFor(() => expect(page.dataset.width).toBe("450"));
-    fireEvent.click(screen.getByRole("button", { name: "Rotate right" }));
+    fireEvent.click(screen.getByRole("button", { name: "Rotate left" }));
     await waitFor(() => expect(page.dataset.width).toBe("800"));
   });
 
@@ -593,9 +598,9 @@ describe("PdfHighlightViewer", () => {
       await screen.findByTestId("page-1");
       // The first render scrolls to the quote once.
       await waitFor(() => expect(scrollTo).toHaveBeenCalledTimes(1));
-      fireEvent.click(screen.getByRole("button", { name: "Rotate right" }));
+      fireEvent.click(screen.getByRole("button", { name: "Rotate left" }));
       await waitFor(() =>
-        expect(screen.getByTestId("page-1").dataset.rotate).toBe("90"),
+        expect(screen.getByTestId("page-1").dataset.rotate).toBe("270"),
       );
       // The page re-reported its load and render for the turn; neither
       // counts as a fresh load, so no second scroll.
@@ -659,8 +664,8 @@ describe("PdfHighlightViewer", () => {
       (page.firstElementChild!.firstElementChild as HTMLElement).style;
     expect(box().left).toBe("75%");
 
-    fireEvent.click(screen.getByRole("button", { name: "Rotate right" }));
-    expect(onRotationChange).toHaveBeenCalledWith(180);
+    fireEvent.click(screen.getByRole("button", { name: "Rotate left" }));
+    expect(onRotationChange).toHaveBeenCalledWith(0);
     await new Promise((resolve) => setTimeout(resolve, 20));
     expect(page.dataset.rotate).toBe("90");
 
@@ -686,9 +691,9 @@ describe("PdfHighlightViewer", () => {
       pdfUrl: "/first.pdf",
     });
     await screen.findByTestId("page-1");
-    fireEvent.click(screen.getByRole("button", { name: "Rotate right" }));
+    fireEvent.click(screen.getByRole("button", { name: "Rotate left" }));
     await waitFor(() =>
-      expect(screen.getByTestId("page-1").dataset.rotate).toBe("90"),
+      expect(screen.getByTestId("page-1").dataset.rotate).toBe("270"),
     );
     rerender(viewer({ workerSrc: "/w/reset-turn.mjs", pdfUrl: "/second.pdf" }));
     await waitFor(() =>
