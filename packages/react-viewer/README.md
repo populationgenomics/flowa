@@ -83,6 +83,32 @@ loads in the browser). No `dynamic(() => …, { ssr: false })` wrapper needed.
 
 `LlmContent` is server-render-safe.
 
+## Loading feedback
+
+While a document downloads, the pane shows the bytes received and, when the
+server reports a content length, the total and a progress bar. A download that
+fails, or a viewer bundle that fails to load, shows the cause with a Retry
+button, and a download that goes quiet for fifteen seconds offers Retry too.
+Retry re-uses the same `pdfUrl`; `onLoadError` receives the error and a
+classification (`kind`, and the HTTP `status` where there is one), so a
+consumer that hands out short-lived URLs can mint a new one on a 403, and a
+changed `pdfUrl` starts a fresh load. A fresh load that fails calls
+`onLoadError` again, so the consumer bounds its own retries. The package does
+not cache a failed import of `react-pdf`, so the retry (or the next mount) asks
+the bundler again; whether the bundler re-fetches a chunk that failed is up to
+it.
+
+pdf.js fetches a large document in byte ranges, so the first page renders after
+a few small requests, only when the response lets it: the server has to answer
+with `Accept-Ranges: bytes` and a `Content-Length`, the body must not be
+content-encoded (a gzip-compressed object disables ranges), and for a
+cross-origin file the CORS policy has to expose `Accept-Ranges`, which is not
+on the browser's safelist (S3 and MinIO need `ExposeHeaders` in the bucket's
+CORS rule for this; exposing `Content-Range` too is harmless). pdf.js also uses
+ranges only for files above twice its chunk size, about 128 KB. Without ranges
+pdf.js buffers the whole body before parsing, so nothing renders until the last
+byte arrives, whether or not the file is linearised.
+
 ## Worker assets
 
 `PdfHighlightViewer` requires the consumer to serve `pdf.worker.min.mjs` and

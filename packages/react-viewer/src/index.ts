@@ -12,6 +12,9 @@ export { LlmContent, type LlmContentProps } from "./llm-content/LlmContent";
 // PDF viewer with bbox highlights
 export {
   PdfHighlightViewer,
+  classifyLoadError,
+  type LoadErrorInfo,
+  type LoadErrorKind,
   type PdfHighlightViewerProps,
 } from "./pdf-viewer/PdfHighlightViewer";
 export type { HighlightBbox, PdfHighlight } from "./pdf-viewer/types";
