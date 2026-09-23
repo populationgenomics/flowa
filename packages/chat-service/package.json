@@ -111,7 +111,7 @@
     "@ai-sdk/amazon-bedrock": "5.0.81",
     "@ai-sdk/anthropic": "4.0.52",
     "@ai-sdk/google": "4.0.67",
-    "@ai-sdk/google-vertex": "5.0.79",
+    "@ai-sdk/google-vertex": "5.0.84",
     "@ai-sdk/openai": "4.0.65",
     "@aws-sdk/client-s3": "3.1129.0",
     "@aws-sdk/credential-providers": "3.1129.0",
