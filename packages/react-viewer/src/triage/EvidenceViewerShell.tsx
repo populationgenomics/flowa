@@ -130,6 +130,16 @@ function buildVersionLabel(v: VersionEntry): string {
   return base;
 }
 
+/** In-order comment saves for one claim in one workspace. */
+interface CommentSaveQueue {
+  /** Settles when the last issued save has finished, successfully or not. */
+  tail: Promise<void>;
+  /** Sequence number of the last issued save. */
+  latest: number;
+  /** The body the backend last accepted, to roll back to on failure. */
+  confirmed: string;
+}
+
 /** Key for the pending-resolution set. Newline can't appear in a DOI. */
 function resolutionKey(doi: string, quote: string): string {
   return `${doi}\n${quote}`;
@@ -559,17 +569,50 @@ export function EvidenceViewerShell({
     [triageReady, papersDone, workspaceKeyJson, user],
   );
 
+  // The note editor saves on a typing pause and again on blur, so two saves
+  // of one comment can be issued back to back. Sent concurrently they could
+  // be applied in either order and leave the older text stored, so saves
+  // for one claim go to the backend one at a time, in the order issued.
+  const commentSaveQueues = useRef(new Map<string, CommentSaveQueue>());
+
   const handleCommentSave = useCallback(
     async (paperId: string, claimIndex: number, body: string) => {
       if (!triageReady) return;
       const claim = claimsByPaper.get(paperId)?.[claimIndex - 1];
       if (!claim) return;
       const prev = applyClaimComment(paperId, claimIndex, body);
+
+      const queues = commentSaveQueues.current;
+      const queueKey = `${workspaceKeyJson}\n${paperId}\n${claimIndex}`;
+      let queue = queues.get(queueKey);
+      if (!queue) {
+        queue = { tail: Promise.resolve(), latest: 0, confirmed: prev };
+        queues.set(queueKey, queue);
+      }
+      const seq = ++queue.latest;
+      const request = queue.tail.then(() =>
+        backend.setClaimComment(workspaceKey, paperId, claimIndex, body),
+      );
+      queue.tail = request.catch(() => {});
+
       try {
-        await backend.setClaimComment(workspaceKey, paperId, claimIndex, body);
+        await request;
+        queue.confirmed = body;
       } catch (err) {
-        applyClaimComment(paperId, claimIndex, prev);
+        // A newer save for this claim is queued behind this one and carries
+        // the curator's latest text; only the last save rolls back, and it
+        // rolls back to what the backend last accepted. After a version
+        // switch the store holds another workspace, so leave it alone.
+        const storeKey = useTriageStore.getState().workspaceKey;
+        if (
+          seq === queue.latest &&
+          JSON.stringify(storeKey) === workspaceKeyJson
+        ) {
+          applyClaimComment(paperId, claimIndex, queue.confirmed);
+        }
         throw err;
+      } finally {
+        if (seq === queue.latest) queues.delete(queueKey);
       }
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
