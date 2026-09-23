@@ -19,7 +19,7 @@
     "build": "next build"
   },
   "dependencies": {
-    "@ai-sdk/amazon-bedrock": "5.0.81",
+    "@ai-sdk/amazon-bedrock": "5.0.84",
     "@ai-sdk/anthropic": "4.0.52",
     "@ai-sdk/google": "4.0.67",
     "@ai-sdk/google-vertex": "5.0.79",
