@@ -11,6 +11,6 @@
   },
   "dependencies": {
     "@flowajs/chat-service": "workspace:*",
-    "zod": "4.6.1"
+    "zod": "4.6.5"
   }
 }
