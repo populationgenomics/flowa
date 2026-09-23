@@ -22,12 +22,12 @@ import {
   IconAlertTriangle,
   IconChevronDown,
   IconChevronUp,
+  IconMinus,
+  IconPlus,
   IconReload,
   IconRotate,
   IconSearch,
   IconX,
-  IconZoomIn,
-  IconZoomOut,
 } from "@tabler/icons-react";
 import type { HighlightBbox, PdfHighlight } from "./types";
 import { rotateBbox, turn, SCALE, type Rotation } from "./geometry";
@@ -1245,7 +1245,7 @@ export const PdfHighlightViewer = ({
             onClick={() => setZoom(Math.max(zoom / 1.25, 0.25))}
             aria-label="Zoom out"
           >
-            <IconZoomOut size={16} />
+            <IconMinus size={16} />
           </ActionIcon>
           <button
             className="min-w-[3ch] text-center text-xs text-gray-600 hover:text-gray-900"
@@ -1260,7 +1260,7 @@ export const PdfHighlightViewer = ({
             onClick={() => setZoom(Math.min(zoom * 1.25, 5))}
             aria-label="Zoom in"
           >
-            <IconZoomIn size={16} />
+            <IconPlus size={16} />
           </ActionIcon>
         </div>
       )}

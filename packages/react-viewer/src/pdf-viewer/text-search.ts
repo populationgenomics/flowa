@@ -14,6 +14,8 @@ export interface TextRun {
   height: number;
   hasEOL?: boolean;
   fontName?: string;
+  /** Writing direction: `ltr`, `rtl`, or `ttb` for vertical text. */
+  dir?: string;
 }
 
 /** The font metrics pdf.js reports per font in `getTextContent().styles`. */
@@ -23,6 +25,38 @@ export interface TextStyle {
   /** Fraction of the font size below the baseline, negative. */
   descent?: number;
   vertical?: boolean;
+  /**
+   * The generic family pdf.js substitutes for the font when it lays text
+   * out itself: `serif`, `sans-serif` or `monospace`.
+   */
+  fontFamily?: string;
+}
+
+/**
+ * How wide `text` is when set in the generic `fontFamily`, in any unit:
+ * only ratios within one run are used.
+ */
+export type MeasureText = (text: string, fontFamily: string) => number;
+
+/**
+ * A `MeasureText` backed by a 2D canvas, caching each measurement, or null
+ * where there is no canvas to measure with (a server, a test DOM).
+ */
+export function canvasMeasurer(): MeasureText | null {
+  if (typeof document === "undefined") return null;
+  const context = document.createElement("canvas").getContext("2d");
+  if (!context || typeof context.measureText !== "function") return null;
+  const cache = new Map<string, number>();
+  return (text, fontFamily) => {
+    const key = `${fontFamily}\u0000${text}`;
+    let width = cache.get(key);
+    if (width === undefined) {
+      context.font = `100px ${fontFamily}`;
+      width = context.measureText(text).width;
+      cache.set(key, width);
+    }
+    return width;
+  };
 }
 
 /** The part of a pdf.js page viewport the index needs. */
@@ -60,6 +94,13 @@ interface IndexedRun {
   ascent: number;
   descent: number;
   vertical: boolean;
+  rtl: boolean;
+  /**
+   * Where each character boundary of the run falls, as a fraction of its
+   * advance (`offsets[i]` for the boundary before character `i`, ending at
+   * 1), or null to place characters evenly.
+   */
+  offsets: number[] | null;
 }
 
 export interface PageTextIndex {
@@ -139,12 +180,42 @@ function isTextRun(item: unknown): item is TextRun {
   );
 }
 
-/** Index one page's text runs against the viewport they will be drawn in. */
+/**
+ * The character boundaries of `str` as fractions of its width in
+ * `fontFamily`, measured character by character (kerning is ignored), or
+ * null if there is nothing to measure with or the measurements are unusable.
+ * Both halves of a surrogate pair share the pair's end, since no match
+ * starts inside one.
+ */
+function charOffsets(
+  str: string,
+  fontFamily: string | undefined,
+  measure: MeasureText | null,
+): number[] | null {
+  if (!measure || !fontFamily) return null;
+  const ends: number[] = [0];
+  let total = 0;
+  for (const ch of str) {
+    const width = measure(ch, fontFamily);
+    if (!Number.isFinite(width) || width < 0) return null;
+    total += width;
+    for (let unit = 0; unit < ch.length; unit++) ends.push(total);
+  }
+  if (!(total > 0)) return null;
+  return ends.map((end) => end / total);
+}
+
+/**
+ * Index one page's text runs against the viewport they will be drawn in.
+ * With `measure`, characters are placed by their widths in the family pdf.js
+ * substitutes for each run's font; without it, evenly along the run.
+ */
 export function buildPageIndex(
   page: number,
   items: unknown[],
   viewport: ViewportLike,
   styles: Record<string, TextStyle> = {},
+  measure: MeasureText | null = null,
 ): PageTextIndex {
   let text = "";
   const runs: IndexedRun[] = [];
@@ -171,6 +242,10 @@ export function buildPageIndex(
         ascent: metric(style?.ascent, DEFAULT_ASCENT, 0.5, 1.2),
         descent: metric(style?.descent, DEFAULT_DESCENT, -0.5, -0.05),
         vertical: style?.vertical ?? false,
+        rtl: item.dir === "rtl",
+        // Measured on pdf.js's own characters: normaliseChars folds one
+        // UTF-16 unit to one, so the offsets line up with the indexed text.
+        offsets: charOffsets(item.str, style?.fontFamily, measure),
       });
     }
     // pdf.js starts a new run at every font change and emits a whitespace
@@ -184,14 +259,17 @@ export function buildPageIndex(
 
 /**
  * The box of the characters `[from, to)` of a run, in the page's 0–SCALE
- * frame. pdf.js gives no per-glyph positions, so the span is placed
- * proportionally along the run's advance, which is exact for monospaced text
- * and close enough for a highlight otherwise; vertically the box runs from
- * the font's descent to its ascent. A vertical run gets its whole box: pdf.js
- * puts its origin at the first glyph, centred on the column, and advances
- * downward, recording the advance in `height` and the em size in `width`.
- * A right-to-left run has its text in logical order while its advance runs
- * left to right, so a partial match in one is mirrored within the run.
+ * frame. pdf.js gives no per-glyph positions, only the run's advance, so the
+ * span is placed at the run's measured character boundaries scaled to that
+ * advance: the approach pdf.js's own text layer takes, close wherever the
+ * substitute family's proportions follow the embedded font's. Without
+ * measurements the characters are spread evenly, which is exact only for
+ * monospaced text. Vertically the box runs from the font's descent to its
+ * ascent. A vertical run gets its whole box: pdf.js puts its origin at the
+ * first glyph, centred on the column, and advances downward, recording the
+ * advance in `height` and the em size in `width`. A right-to-left run has its
+ * text in logical order while its advance runs left to right, so the span is
+ * mirrored within the run.
  */
 function runBbox(
   run: IndexedRun,
@@ -201,12 +279,12 @@ function runBbox(
   viewport: ViewportLike,
 ): HighlightBbox {
   const length = run.end - run.start;
-  const s = run.vertical
-    ? -run.width / 2
-    : (run.width * (from - run.start)) / length;
-  const e = run.vertical
-    ? run.width / 2
-    : (run.width * (to - run.start)) / length;
+  const boundary = (i: number): number =>
+    run.width *
+    (run.offsets ? run.offsets[i - run.start]! : (i - run.start) / length);
+  let s = run.vertical ? -run.width / 2 : boundary(from);
+  let e = run.vertical ? run.width / 2 : boundary(to);
+  if (run.rtl && !run.vertical) [s, e] = [run.width - e, run.width - s];
   const low = run.vertical ? -run.height : run.descent * run.height;
   const high = run.vertical ? 0 : run.ascent * run.height;
   const corner = (dist: number, rise: number): number[] =>
@@ -323,6 +401,7 @@ const UNREADABLE_VIEWPORT: ViewportLike = {
 export async function buildDocumentIndex(
   doc: PdfDocumentLike,
   isCancelled: () => boolean = () => false,
+  measure: MeasureText | null = canvasMeasurer(),
 ): Promise<PageTextIndex[] | null> {
   const pages: PageTextIndex[] = [];
   for (let n = 1; n <= doc.numPages; n++) {
@@ -336,6 +415,7 @@ export async function buildDocumentIndex(
           content.items,
           page.getViewport({ scale: 1 }),
           content.styles ?? {},
+          measure,
         ),
       );
     } catch {

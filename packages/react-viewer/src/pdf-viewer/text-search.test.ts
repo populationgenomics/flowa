@@ -5,6 +5,7 @@ import {
   normaliseChars,
   queryPattern,
   searchIndex,
+  type MeasureText,
   type TextRun,
   type ViewportLike,
 } from "./text-search";
@@ -105,7 +106,7 @@ describe("searchIndex", () => {
     viewport,
   );
 
-  it("places a match inside a run proportionally along its advance and over the glyph box", () => {
+  it("places a match evenly along its run's advance, over the glyph box, when nothing measures it", () => {
     const { hits } = searchIndex([page], "proband");
     expect(hits[0]!.page).toBe(2);
     // "proband" is characters 4–11 of a 19-character run 190 wide starting
@@ -115,6 +116,91 @@ describe("searchIndex", () => {
     expect(hits[0]!.bboxes).toEqual([
       { page: 2, left: 140, right: 210, top: 92, bottom: 102 },
     ]);
+  });
+
+  /** Widths for a narrow "i", a two-unit emoji and every other character. */
+  const measure: MeasureText = (text) =>
+    text === "i" ? 1 : text === "😀" ? 2 : 3;
+  const serif = { f1: { fontFamily: "serif" } };
+
+  it("places a match at the run's measured character widths", () => {
+    // Three narrow "i" (1 each) then three wide "m" (3 each): "mmm" starts a
+    // quarter of the way along the 60-wide run, not halfway.
+    const measured = buildPageIndex(
+      1,
+      [run("iiimmm", 100, 900, 60, 10, false, "f1")],
+      viewport,
+      serif,
+      measure,
+    );
+    expect(searchIndex([measured], "mmm").hits[0]!.bboxes[0]).toMatchObject({
+      left: 115,
+      right: 160,
+    });
+  });
+
+  it("measures the run's own characters, so folded ones keep their width", () => {
+    // The en dash folds to "-" in the text but is measured as itself.
+    const widths: MeasureText = (text) => (text === "–" ? 5 : 1);
+    const measured = buildPageIndex(
+      1,
+      [run("1–2", 100, 900, 70, 10, false, "f1")],
+      viewport,
+      serif,
+      widths,
+    );
+    expect(searchIndex([measured], "2").hits[0]!.bboxes[0]).toMatchObject({
+      left: 160,
+      right: 170,
+    });
+  });
+
+  it("gives both halves of a surrogate pair the pair's end", () => {
+    // "a" 3, the emoji 2, "b" 3 over a run 80 wide: "b" starts at 5/8.
+    const measured = buildPageIndex(
+      1,
+      [run("a😀b", 100, 900, 80, 10, false, "f1")],
+      viewport,
+      serif,
+      measure,
+    );
+    expect(searchIndex([measured], "b").hits[0]!.bboxes[0]).toMatchObject({
+      left: 150,
+      right: 180,
+    });
+  });
+
+  it("spreads characters evenly when the font names no family or measures to nothing", () => {
+    for (const [styles, widths] of [
+      [{}, measure],
+      [serif, () => 0],
+      [serif, () => Number.NaN],
+    ] as const) {
+      const index = buildPageIndex(
+        1,
+        [run("iiimmm", 100, 900, 60, 10, false, "f1")],
+        viewport,
+        styles,
+        widths,
+      );
+      expect(searchIndex([index], "mmm").hits[0]!.bboxes[0]).toMatchObject({
+        left: 130,
+        right: 160,
+      });
+    }
+  });
+
+  it("mirrors a match within a right-to-left run", () => {
+    // Logical order puts the first characters at the run's right end.
+    const rtl = buildPageIndex(
+      1,
+      [{ ...run("abcdef", 100, 900, 60), dir: "rtl" }],
+      viewport,
+    );
+    expect(searchIndex([rtl], "ab").hits[0]!.bboxes[0]).toMatchObject({
+      left: 140,
+      right: 160,
+    });
   });
 
   it("uses the font's own ascent and descent when the content carries them", () => {

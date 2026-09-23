@@ -812,9 +812,9 @@ describe("PdfHighlightViewer", () => {
     expect(await screen.findByText("2 of 2")).toBeDefined();
 
     // Match boxes follow a turn like the quote highlights do.
-    fireEvent.click(screen.getByRole("button", { name: "Rotate right" }));
-    await waitFor(() => expect(matchBoxes()[0]!.style.left).toBe("89.8%"));
-    expect(matchBoxes()[0]!.style.top).toBe("14%");
+    fireEvent.click(screen.getByRole("button", { name: "Rotate left" }));
+    await waitFor(() => expect(matchBoxes()[0]!.style.left).toBe("9.2%"));
+    expect(matchBoxes()[0]!.style.top).toBe("79%");
 
     fireEvent.change(input, { target: { value: "zebra" } });
     expect(await screen.findByText("No matches")).toBeDefined();
