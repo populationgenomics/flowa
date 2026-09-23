@@ -1,5 +1,7 @@
 import { Badge, Text } from "@mantine/core";
+import type { PaperIdMapping } from "../citations/types";
 import type { Claim, RankedPaper, TriageStateValue } from "./types";
+import { formatPaperIdentifier } from "./citation-utils";
 import { claimKey } from "./store";
 
 export interface PaperRailProps {
@@ -9,6 +11,22 @@ export interface PaperRailProps {
   papersDone: Record<string, { triageDoneAt: Date; triageDoneBy: string }>;
   focusedPaperId: string | null;
   onFocusPaper(paperId: string): void;
+  /**
+   * Resolves a paper's cite key to its identifiers. When given, each row
+   * shows the PubMed id, or the DOI for a paper without one, under the cite
+   * key, so the identifier can be read off the rail without focusing the
+   * paper.
+   */
+  paperIdMapping?: PaperIdMapping;
+}
+
+/** The paper's identifier line, or nothing for a paper the mapping does not know. */
+function identifierLabel(
+  paperId: string,
+  mapping: PaperIdMapping | undefined,
+): string | null {
+  const entry = mapping?.byAuthorYear[paperId];
+  return entry ? formatPaperIdentifier(entry.doi, entry.pmid) : null;
 }
 
 export function PaperRail({
@@ -18,6 +36,7 @@ export function PaperRail({
   papersDone,
   focusedPaperId,
   onFocusPaper,
+  paperIdMapping,
 }: PaperRailProps) {
   return (
     <div
@@ -49,6 +68,7 @@ export function PaperRail({
           }, 0);
           const done = papersDone[paper.paperId] != null;
           const isFocused = paper.paperId === focusedPaperId;
+          const identifier = identifierLabel(paper.paperId, paperIdMapping);
           return (
             <button
               key={paper.paperId}
@@ -63,6 +83,15 @@ export function PaperRail({
               <div className="font-medium">
                 #{i + 1} {paper.paperId}
               </div>
+              {identifier && (
+                <div
+                  className="truncate text-[11px] text-gray-500"
+                  title={identifier}
+                  data-testid={`paper-identifier-${paper.paperId}`}
+                >
+                  {identifier}
+                </div>
+              )}
               <div className="text-xs text-gray-600">
                 {decidedCount}/{group.length}
                 {acceptedHere > 0 && ` ✓${acceptedHere}`}

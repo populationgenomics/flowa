@@ -804,6 +804,7 @@ export function EvidenceViewerShell({
               papersDone={papersDone}
               focusedPaperId={focusedPaperId}
               onFocusPaper={focusPaper}
+              paperIdMapping={paperIdMapping}
             />
 
             <div className="flex min-w-0 flex-1 flex-col overflow-hidden">

@@ -241,6 +241,11 @@ describe("EvidenceViewerShell", () => {
     // Footer renders the version dropdown.
     expect(screen.getByTestId("viewer-footer")).toBeDefined();
     expect(screen.getByTestId("version-select")).toBeDefined();
+
+    // The rail shows each paper's identifier from the mapping (DOI here).
+    expect(screen.getByTestId("paper-identifier-Smith2024").textContent).toBe(
+      "10.1234/smith.2024",
+    );
   });
 
   it("does not clobber a paper the curator selected while the snapshot load was in flight", async () => {
