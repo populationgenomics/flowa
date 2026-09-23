@@ -3,6 +3,7 @@ import {
   type ReactNode,
   useCallback,
   useEffect,
+  useId,
   useLayoutEffect,
   useMemo,
   useRef,
@@ -15,16 +16,28 @@ import {
   Loader,
   Progress,
   Text,
+  TextInput,
 } from "@mantine/core";
 import {
   IconAlertTriangle,
+  IconChevronDown,
+  IconChevronUp,
+  IconMinus,
+  IconPlus,
   IconReload,
   IconRotate,
-  IconZoomIn,
-  IconZoomOut,
+  IconSearch,
+  IconX,
 } from "@tabler/icons-react";
 import type { HighlightBbox, PdfHighlight } from "./types";
 import { rotateBbox, turn, SCALE, type Rotation } from "./geometry";
+import {
+  buildDocumentIndex,
+  searchIndex,
+  type PageTextIndex,
+  type PdfDocumentLike,
+  type SearchHit,
+} from "./text-search";
 
 export interface PdfHighlightViewerProps {
   /** URL of the PDF to display (presigned, blob:, or any fetchable URL). */
@@ -59,6 +72,13 @@ export interface PdfHighlightViewerProps {
    * bounds its own retries.
    */
   onLoadError?: (error: Error, info: LoadErrorInfo) => void;
+  /**
+   * Open the find bar on Ctrl+F / Cmd+F while the pane is shown. The
+   * shortcut is taken when focus is in the pane, or on nothing in
+   * particular after the pane was the last thing pointed at or focused, so
+   * the rest of the page keeps the browser's own find. Defaults to true.
+   */
+  captureFindShortcut?: boolean;
 }
 
 type ReactPdfModule = typeof import("react-pdf");
@@ -435,8 +455,26 @@ function PdfDocument({
   );
 }
 
-/** Render bbox highlights for a page as a single overlay (non-multiplicative). */
-function HighlightOverlay({ bboxes }: { bboxes: HighlightBbox[] }) {
+const QUOTE_COLOR = "rgb(255, 210, 90)";
+const MATCH_COLOR = "rgb(180, 210, 255)";
+const CURRENT_MATCH_COLOR = "rgb(255, 165, 80)";
+
+interface OverlayLayer {
+  bboxes: HighlightBbox[];
+  color: string;
+}
+
+/**
+ * Render bbox highlights for a page as a single overlay (non-multiplicative
+ * within a layer; layers are drawn in order, so a later one wins where two
+ * cover the same text).
+ */
+/** A 0–SCALE coordinate as a CSS percentage, rounded so styles carry no floating-point noise. */
+function pct(value: number): string {
+  return `${Math.round((value / SCALE) * 100000) / 1000}%`;
+}
+
+function HighlightOverlay({ layers }: { layers: OverlayLayer[] }) {
   return (
     <div
       style={{
@@ -447,19 +485,21 @@ function HighlightOverlay({ bboxes }: { bboxes: HighlightBbox[] }) {
         mixBlendMode: "multiply",
       }}
     >
-      {bboxes.map((bbox, j) => (
-        <div
-          key={j}
-          style={{
-            position: "absolute",
-            left: `${(bbox.left / SCALE) * 100}%`,
-            top: `${(bbox.top / SCALE) * 100}%`,
-            width: `${((bbox.right - bbox.left) / SCALE) * 100}%`,
-            height: `${((bbox.bottom - bbox.top) / SCALE) * 100}%`,
-            backgroundColor: "rgb(255, 210, 90)",
-          }}
-        />
-      ))}
+      {layers.flatMap((layer, i) =>
+        layer.bboxes.map((bbox, j) => (
+          <div
+            key={`${i}-${j}`}
+            style={{
+              position: "absolute",
+              left: pct(bbox.left),
+              top: pct(bbox.top),
+              width: pct(bbox.right - bbox.left),
+              height: pct(bbox.bottom - bbox.top),
+              backgroundColor: layer.color,
+            }}
+          />
+        )),
+      )}
     </div>
   );
 }
@@ -485,6 +525,7 @@ export const PdfHighlightViewer = ({
   workerSrc,
   cMapUrl,
   onLoadError,
+  captureFindShortcut = true,
 }: PdfHighlightViewerProps) => {
   const {
     mod: reactPdf,
@@ -502,14 +543,56 @@ export const PdfHighlightViewer = ({
     loadId: number;
     url: string;
     numPages: number;
+    doc: PdfDocumentLike;
   } | null>(null);
   const currentLoad = loadedDoc?.url === pdfUrl ? loadedDoc : null;
   const numPages = currentLoad?.numPages ?? null;
   const currentLoadId = currentLoad?.loadId ?? null;
+  const pdfDoc = currentLoad?.doc ?? null;
+  const rootRef = useRef<HTMLDivElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
-  const targetPageRef = useRef<HTMLDivElement>(null);
+  const pageRefs = useRef(new Map<number, HTMLDivElement>());
   // The load whose target highlight has been scrolled to once.
   const scrolledLoadRef = useRef<number | null>(null);
+
+  // Find in document. The index belongs to one loaded document and is
+  // tagged with its proxy; the query outlives the document so the same
+  // term can be looked for in the next one.
+  const [findOpen, setFindOpen] = useState(false);
+  const [query, setQuery] = useState("");
+  const [debouncedQuery, setDebouncedQuery] = useState("");
+  // Once the bar has been opened for a document its index is wanted, even
+  // if the bar closes again before the build finishes.
+  const [indexWantedFor, setIndexWantedFor] = useState<PdfDocumentLike | null>(
+    null,
+  );
+  const [index, setIndex] = useState<{
+    doc: PdfDocumentLike;
+    /** Null when the build itself failed, as opposed to single pages. */
+    pages: PageTextIndex[] | null;
+  } | null>(null);
+  const textIndex = index?.doc === pdfDoc ? index.pages : null;
+  const indexFailed = index?.doc === pdfDoc && index.pages === null;
+  // The selection is tagged with the hits it was made in, so a new set of
+  // hits starts at the first match with no effect and no stale index.
+  const [selection, setSelection] = useState<{
+    hits: SearchHit[];
+    index: number;
+  } | null>(null);
+  // Every user action that should move the view to the current match bumps
+  // this; the scroll effect keys on it and records what it handled, so a
+  // request is acted on or superseded and never left standing for hits
+  // that arrive for another reason, such as the next document's index.
+  const [scrollRequest, setScrollRequest] = useState(0);
+  const handledScrollRequest = useRef(0);
+  const findInputRef = useRef<HTMLInputElement>(null);
+  const findBarId = useId();
+  // Whether the pane was the last thing pointed at or focused, so Ctrl+F
+  // with focus on nothing in particular can be attributed to it.
+  const paneActiveRef = useRef(false);
+  // For callbacks that must not re-subscribe when the bar opens or closes.
+  const findOpenRef = useRef(findOpen);
+  findOpenRef.current = findOpen;
   const dragRef = useRef({
     isDragging: false,
     startX: 0,
@@ -732,24 +815,37 @@ export const PdfHighlightViewer = ({
     return undefined;
   }, [highlights]);
 
-  // Scroll the container so the target highlight is visible
-  const scrollToHighlight = useCallback(() => {
-    const pageDiv = targetPageRef.current;
-    const container = containerRef.current;
-    if (!pageDiv || !container) return;
+  // Scroll the container so a bbox on a page (or, without one, the page
+  // itself) is visible.
+  const scrollToBbox = useCallback(
+    (pageNum: number, bbox: HighlightBbox | undefined) => {
+      const pageDiv = pageRefs.current.get(pageNum);
+      const container = containerRef.current;
+      if (!pageDiv || !container) return;
 
-    if (firstBbox) {
-      const turned = rotateBbox(firstBbox, rotationRef.current);
-      const pageHeight = pageDiv.offsetHeight;
-      const bboxTop = (turned.top / SCALE) * pageHeight;
-      const bboxBottom = (turned.bottom / SCALE) * pageHeight;
-      const bboxCenter = pageDiv.offsetTop + (bboxTop + bboxBottom) / 2;
-      const scrollTarget = bboxCenter - container.clientHeight / 3;
-      container.scrollTo({ top: Math.max(0, scrollTarget) });
-    } else {
-      pageDiv.scrollIntoView({ block: "start" });
-    }
-  }, [firstBbox]);
+      if (bbox) {
+        const pageHeight = pageDiv.offsetHeight;
+        const bboxTop = (bbox.top / SCALE) * pageHeight;
+        const bboxBottom = (bbox.bottom / SCALE) * pageHeight;
+        const bboxCenter = pageDiv.offsetTop + (bboxTop + bboxBottom) / 2;
+        const scrollTarget = bboxCenter - container.clientHeight / 3;
+        container.scrollTo({ top: Math.max(0, scrollTarget) });
+      } else {
+        pageDiv.scrollIntoView({ block: "start" });
+      }
+    },
+    [],
+  );
+
+  // Scroll the container so the target highlight is visible
+  const scrollToHighlight = useCallback(
+    () =>
+      scrollToBbox(
+        targetPage,
+        firstBbox && rotateBbox(firstBbox, rotationRef.current),
+      ),
+    [scrollToBbox, targetPage, firstBbox],
+  );
 
   // Scroll to the bbox location after the target page's canvas has rendered
   const handlePageRenderSuccess = useCallback(
@@ -765,6 +861,198 @@ export const PdfHighlightViewer = ({
   useEffect(() => {
     setOwnRotation(0);
   }, [pdfUrl]);
+
+  // The index is wanted once the bar has been opened with a document loaded.
+  useEffect(() => {
+    if (findOpen && pdfDoc) setIndexWantedFor(pdfDoc);
+  }, [findOpen, pdfDoc]);
+
+  // Build the index once per document, and keep building if the bar closes
+  // meanwhile. A page whose text cannot be read is indexed as empty, so one
+  // corrupt font does not switch find off for the paper.
+  useEffect(() => {
+    const doc = indexWantedFor;
+    if (!doc || doc !== pdfDoc || index?.doc === doc) return;
+    let cancelled = false;
+    buildDocumentIndex(doc, () => cancelled).then(
+      (pages) => {
+        if (!cancelled && pages) setIndex({ doc, pages });
+      },
+      () => {
+        if (!cancelled) setIndex({ doc, pages: null });
+      },
+    );
+    return () => {
+      cancelled = true;
+    };
+  }, [indexWantedFor, pdfDoc, index]);
+
+  // Search a beat after the last keystroke.
+  useEffect(() => {
+    const timer = setTimeout(() => setDebouncedQuery(query), 120);
+    return () => clearTimeout(timer);
+  }, [query]);
+
+  const search = useMemo(
+    () =>
+      textIndex
+        ? searchIndex(textIndex, debouncedQuery)
+        : { hits: [], capped: false },
+    [textIndex, debouncedQuery],
+  );
+  const hits = search.hits;
+  // A document without a text layer indexes to pages without a single run.
+  const hasText = textIndex?.some((p) => p.runs.length > 0) ?? true;
+  // Counts from the render the document lands in, before the effect that
+  // records the want has run, so a persisted query does not read as "No
+  // matches" for a document that has not been searched.
+  const indexing =
+    pdfDoc !== null &&
+    (findOpen || indexWantedFor === pdfDoc) &&
+    index?.doc !== pdfDoc;
+  const safeHitIndex =
+    selection?.hits === hits && hits.length
+      ? Math.min(selection.index, hits.length - 1)
+      : 0;
+  const currentHit = hits[safeHitIndex];
+
+  // Bring the current match into view for a request the user made. The
+  // request waits while there is no document yet, while the index builds
+  // and while the search catches up with what was typed; it is dropped
+  // once the bar is closed or the index has failed.
+  useEffect(() => {
+    if (handledScrollRequest.current === scrollRequest) return;
+    if (!findOpen || indexFailed) {
+      handledScrollRequest.current = scrollRequest;
+      return;
+    }
+    if (!pdfDoc || textIndex === null || debouncedQuery !== query) return;
+    handledScrollRequest.current = scrollRequest;
+    if (!currentHit) return;
+    const first = currentHit.bboxes[0];
+    scrollToBbox(
+      currentHit.page,
+      first ? rotateBbox(first, rotationRef.current) : undefined,
+    );
+  }, [
+    scrollRequest,
+    findOpen,
+    pdfDoc,
+    indexFailed,
+    query,
+    debouncedQuery,
+    textIndex,
+    currentHit,
+    scrollToBbox,
+  ]);
+
+  // Matches per page, the current one apart, in the frame of the page as
+  // turned. Empty while the find bar is closed so nothing is drawn.
+  const matchesByPage = useMemo(() => {
+    const map = new Map<
+      number,
+      { others: HighlightBbox[]; current: HighlightBbox[] }
+    >();
+    if (!findOpen) return map;
+    hits.forEach((hit, i) => {
+      const entry = map.get(hit.page) ?? { others: [], current: [] };
+      const target = i === safeHitIndex ? entry.current : entry.others;
+      for (const bbox of hit.bboxes) target.push(rotateBbox(bbox, rotation));
+      map.set(hit.page, entry);
+    });
+    return map;
+  }, [findOpen, hits, safeHitIndex, rotation]);
+
+  const requestScroll = useCallback(() => setScrollRequest((n) => n + 1), []);
+  const openFind = useCallback(() => {
+    // Opening moves to the current match; refocusing an open bar does not
+    // pull a reader back from where they scrolled.
+    if (!findOpenRef.current) requestScroll();
+    setFindOpen(true);
+    // The input mounts on the next render; focus it once it exists.
+    requestAnimationFrame(() => {
+      findInputRef.current?.focus();
+      findInputRef.current?.select();
+    });
+  }, [requestScroll]);
+  const closeFind = useCallback(() => {
+    setFindOpen(false);
+    // Hand focus back to the pane rather than letting it fall to the body.
+    rootRef.current?.focus();
+  }, []);
+  const stepHit = useCallback(
+    (delta: 1 | -1) => {
+      if (hits.length === 0) return;
+      setSelection({
+        hits,
+        index: (safeHitIndex + delta + hits.length) % hits.length,
+      });
+      requestScroll();
+    },
+    [hits, safeHitIndex, requestScroll],
+  );
+
+  // Ctrl+F / Cmd+F opens the find bar when focus is in the pane, or on
+  // nothing in particular after the pane was the last thing pointed at or
+  // focused. Anything else keeps the browser's own find, which can still
+  // search the rest of the page; inside the pane there is nothing else for
+  // it to search.
+  useEffect(() => {
+    if (!captureFindShortcut) return;
+    const inPane = (target: EventTarget | null) =>
+      target instanceof Node && !!rootRef.current?.contains(target);
+    const track = (e: Event) => {
+      paneActiveRef.current = inPane(e.target);
+    };
+    const onKeyDown = (e: KeyboardEvent) => {
+      // The letter decides on Latin layouts; the physical key only where
+      // the layout produces no Latin letter, so Ctrl+P on Colemak stays
+      // print rather than find.
+      const isF =
+        e.key.toLowerCase() === "f" ||
+        (!/^[a-z]$/i.test(e.key) && e.code === "KeyF");
+      if (
+        !isF ||
+        !(e.ctrlKey || e.metaKey) ||
+        e.altKey ||
+        e.shiftKey ||
+        e.isComposing ||
+        e.defaultPrevented
+      )
+        return;
+      const target = e.target;
+      const nothingFocused =
+        target === null ||
+        target === window ||
+        target === document.body ||
+        target === document.documentElement;
+      if (!inPane(target) && !(nothingFocused && paneActiveRef.current)) return;
+      // A held key must not fall through to the browser's own find either.
+      e.preventDefault();
+      if (e.repeat) return;
+      openFind();
+    };
+    window.addEventListener("pointerdown", track, true);
+    window.addEventListener("focusin", track, true);
+    window.addEventListener("keydown", onKeyDown);
+    return () => {
+      window.removeEventListener("pointerdown", track, true);
+      window.removeEventListener("focusin", track, true);
+      window.removeEventListener("keydown", onKeyDown);
+    };
+  }, [captureFindShortcut, openFind]);
+
+  const findStatus = !pdfDoc
+    ? ""
+    : indexing
+      ? "Indexing…"
+      : indexFailed || !hasText
+        ? "Text unavailable"
+        : debouncedQuery.trim() === ""
+          ? ""
+          : hits.length === 0
+            ? "No matches"
+            : `${safeHitIndex + 1} of ${hits.length}${search.capped ? "+" : ""}`;
 
   // Re-scroll when highlights change (claim navigation within the same PDF).
   // Skips a load whose target page has not rendered yet, which
@@ -846,10 +1134,101 @@ export const PdfHighlightViewer = ({
   }, []);
 
   return (
-    <div className="relative flex h-full w-full flex-col">
-      {/* Rotation and zoom controls */}
+    <div
+      ref={rootRef}
+      tabIndex={-1}
+      className="relative flex h-full w-full flex-col outline-hidden"
+      onKeyDown={(e) => {
+        if (e.key === "Escape" && findOpen && !e.nativeEvent.isComposing) {
+          // Ours to close; a dialog around the pane should not close too.
+          e.preventDefault();
+          e.stopPropagation();
+          closeFind();
+        }
+      }}
+    >
+      {/* Find bar */}
+      {findOpen && (
+        <div
+          id={findBarId}
+          role="search"
+          className="absolute left-4 top-2 z-10 flex items-center gap-1 rounded bg-white/95 px-2 py-1 shadow"
+          data-testid="pdf-find-bar"
+        >
+          <TextInput
+            ref={findInputRef}
+            size="xs"
+            placeholder="Find in document"
+            aria-label="Search text"
+            value={query}
+            onChange={(e) => {
+              setQuery(e.currentTarget.value);
+              requestScroll();
+            }}
+            onKeyDown={(e) => {
+              if (e.key === "Enter" && !e.nativeEvent.isComposing) {
+                e.preventDefault();
+                stepHit(e.shiftKey ? -1 : 1);
+              }
+            }}
+            autoFocus
+            className="w-56"
+          />
+          <Text
+            size="xs"
+            c="dimmed"
+            className="min-w-[9ch] text-center"
+            role="status"
+            aria-live="polite"
+            data-testid="pdf-find-status"
+          >
+            {findStatus}
+          </Text>
+          <ActionIcon
+            variant="subtle"
+            size="sm"
+            onClick={() => stepHit(-1)}
+            disabled={hits.length === 0}
+            aria-label="Previous match"
+          >
+            <IconChevronUp size={16} />
+          </ActionIcon>
+          <ActionIcon
+            variant="subtle"
+            size="sm"
+            onClick={() => stepHit(1)}
+            disabled={hits.length === 0}
+            aria-label="Next match"
+          >
+            <IconChevronDown size={16} />
+          </ActionIcon>
+          <ActionIcon
+            variant="subtle"
+            size="sm"
+            onClick={closeFind}
+            aria-label="Close find"
+          >
+            <IconX size={16} />
+          </ActionIcon>
+        </div>
+      )}
+
+      {/* Find, rotation and zoom controls */}
       {pageWidth && (
         <div className="absolute right-4 top-2 z-10 flex items-center gap-1 rounded bg-white/90 px-1 py-0.5 shadow">
+          <ActionIcon
+            variant="subtle"
+            size="sm"
+            onClick={openFind}
+            aria-label="Find in document"
+            title="Find in document"
+            aria-expanded={findOpen}
+            aria-controls={findBarId}
+            aria-keyshortcuts="Control+F Meta+F"
+          >
+            <IconSearch size={16} />
+          </ActionIcon>
+          <span className="mx-1 h-4 w-px bg-gray-300" aria-hidden="true" />
           <ActionIcon
             variant="subtle"
             size="sm"
@@ -866,7 +1245,7 @@ export const PdfHighlightViewer = ({
             onClick={() => setZoom(Math.max(zoom / 1.25, 0.25))}
             aria-label="Zoom out"
           >
-            <IconZoomOut size={16} />
+            <IconMinus size={16} />
           </ActionIcon>
           <button
             className="min-w-[3ch] text-center text-xs text-gray-600 hover:text-gray-900"
@@ -881,7 +1260,7 @@ export const PdfHighlightViewer = ({
             onClick={() => setZoom(Math.min(zoom * 1.25, 5))}
             aria-label="Zoom in"
           >
-            <IconZoomIn size={16} />
+            <IconPlus size={16} />
           </ActionIcon>
         </div>
       )}
@@ -941,7 +1320,12 @@ export const PdfHighlightViewer = ({
             pdfUrl={pdfUrl}
             options={documentOptions}
             onLoadSuccess={(doc, loadId) =>
-              setLoadedDoc({ loadId, url: pdfUrl, numPages: doc.numPages })
+              setLoadedDoc({
+                loadId,
+                url: pdfUrl,
+                numPages: doc.numPages,
+                doc,
+              })
             }
             onLoadError={onLoadError}
           >
@@ -949,7 +1333,18 @@ export const PdfHighlightViewer = ({
               numPages &&
               Array.from({ length: numPages }, (_, i) => {
                 const pageNum = i + 1;
-                const bboxes = highlightsByPage.get(pageNum);
+                const quoteBboxes = highlightsByPage.get(pageNum);
+                const matches = matchesByPage.get(pageNum);
+                const layers: OverlayLayer[] = [];
+                if (quoteBboxes)
+                  layers.push({ bboxes: quoteBboxes, color: QUOTE_COLOR });
+                if (matches?.others.length)
+                  layers.push({ bboxes: matches.others, color: MATCH_COLOR });
+                if (matches?.current.length)
+                  layers.push({
+                    bboxes: matches.current,
+                    color: CURRENT_MATCH_COLOR,
+                  });
                 const pageRotate = rotateFor(loadId, pageNum);
                 return (
                   // `safe center` keeps the page reachable when zoomed wider than the
@@ -958,7 +1353,10 @@ export const PdfHighlightViewer = ({
                   // so the left edge becomes unreachable by scrollbar or drag-to-pan.
                   <div
                     key={pageNum}
-                    ref={pageNum === targetPage ? targetPageRef : undefined}
+                    ref={(el) => {
+                      if (el) pageRefs.current.set(pageNum, el);
+                      else pageRefs.current.delete(pageNum);
+                    }}
                     className="flex"
                     style={{ justifyContent: "safe center" }}
                   >
@@ -975,8 +1373,8 @@ export const PdfHighlightViewer = ({
                         handlePageRenderSuccess(loadId, pageNum)
                       }
                     >
-                      {bboxes && pageRotate !== undefined && (
-                        <HighlightOverlay bboxes={bboxes} />
+                      {layers.length > 0 && pageRotate !== undefined && (
+                        <HighlightOverlay layers={layers} />
                       )}
                     </reactPdf.Page>
                   </div>
