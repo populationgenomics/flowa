@@ -19,10 +19,12 @@ import {
 import {
   IconAlertTriangle,
   IconReload,
+  IconRotate,
   IconZoomIn,
   IconZoomOut,
 } from "@tabler/icons-react";
 import type { HighlightBbox, PdfHighlight } from "./types";
+import { rotateBbox, turn, SCALE, type Rotation } from "./geometry";
 
 export interface PdfHighlightViewerProps {
   /** URL of the PDF to display (presigned, blob:, or any fetchable URL). */
@@ -35,6 +37,15 @@ export interface PdfHighlightViewerProps {
   zoom?: number;
   /** Called when the user changes zoom via the built-in controls. */
   onZoomChange?: (zoom: number) => void;
+  /**
+   * Controlled rotation, a quarter turn applied on top of each page's own.
+   * When provided, overrides internal state. The pane resets its own
+   * rotation when another document opens; a controlled consumer does the
+   * same, as the shell does when the paper changes.
+   */
+  rotation?: Rotation;
+  /** Called when the user turns the document via the built-in controls. */
+  onRotationChange?: (rotation: Rotation) => void;
   /** URL of pdf.js worker (`pdf.worker.min.mjs`), served by the consumer. */
   workerSrc: string;
   /** URL prefix for pdf.js cmaps (e.g. `/pdfjs/cmaps/`), served by the consumer. */
@@ -49,9 +60,6 @@ export interface PdfHighlightViewerProps {
    */
   onLoadError?: (error: Error, info: LoadErrorInfo) => void;
 }
-
-/** Reference scale used by the pipeline (0–1000 normalized coordinates). */
-const SCALE = 1000;
 
 type ReactPdfModule = typeof import("react-pdf");
 
@@ -308,6 +316,9 @@ function LoadFailure({
 
 type DocumentProps = ComponentProps<ReactPdfModule["Document"]>;
 
+/** Numbers PdfDocument mounts, so one load can be told from another of the same URL. */
+let nextLoadId = 1;
+
 interface PdfDocumentProps {
   reactPdf: ReactPdfModule;
   pdfUrl: string;
@@ -317,9 +328,13 @@ interface PdfDocumentProps {
    * then still reports into this instance's state.
    */
   options: DocumentProps["options"];
-  onLoadSuccess: NonNullable<DocumentProps["onLoadSuccess"]>;
+  onLoadSuccess: (
+    doc: Parameters<NonNullable<DocumentProps["onLoadSuccess"]>>[0],
+    loadId: number,
+  ) => void;
   onLoadError?: (error: Error, info: LoadErrorInfo) => void;
-  children: ReactNode;
+  /** Rendered inside the document, with the id of this load. */
+  children: (loadId: number) => ReactNode;
 }
 
 /**
@@ -339,6 +354,9 @@ function PdfDocument({
   onLoadError,
   children,
 }: PdfDocumentProps) {
+  // One id per mount: state a page reports under it can be told from the
+  // same URL's previous load.
+  const [loadId] = useState(() => nextLoadId++);
   const [progress, setProgress] = useState<LoadProgress | null>(null);
   const [error, setError] = useState<Error | null>(null);
   const [stalled, setStalled] = useState(false);
@@ -388,7 +406,7 @@ function PdfDocument({
       file={pdfUrl}
       onLoadSuccess={(doc) => {
         loadedRef.current = true;
-        onLoadSuccess(doc);
+        onLoadSuccess(doc, loadId);
       }}
       onLoadProgress={({ loaded, total }) => {
         if (loadedRef.current) return;
@@ -412,7 +430,7 @@ function PdfDocument({
       error={loading}
       options={optionsRef.current}
     >
-      {children}
+      {children(loadId)}
     </reactPdf.Document>
   );
 }
@@ -462,6 +480,8 @@ export const PdfHighlightViewer = ({
   initialPage,
   zoom: externalZoom,
   onZoomChange,
+  rotation: externalRotation,
+  onRotationChange,
   workerSrc,
   cMapUrl,
   onLoadError,
@@ -472,10 +492,24 @@ export const PdfHighlightViewer = ({
     retry: retryModule,
   } = useReactPdf(workerSrc);
 
-  const [numPages, setNumPages] = useState<number | null>(null);
+  // Per-load state is tagged with the load it came from and read only while
+  // that load is the current one, rather than reset in an effect: the new
+  // document's own callbacks can run in the same commit as the URL change,
+  // and an effect that ran after them would wipe what they set. The URL
+  // guards against the previous document's values, the load id against a
+  // previous load of the same URL.
+  const [loadedDoc, setLoadedDoc] = useState<{
+    loadId: number;
+    url: string;
+    numPages: number;
+  } | null>(null);
+  const currentLoad = loadedDoc?.url === pdfUrl ? loadedDoc : null;
+  const numPages = currentLoad?.numPages ?? null;
+  const currentLoadId = currentLoad?.loadId ?? null;
   const containerRef = useRef<HTMLDivElement>(null);
   const targetPageRef = useRef<HTMLDivElement>(null);
-  const hasScrolledRef = useRef(false);
+  // The load whose target highlight has been scrolled to once.
+  const scrolledLoadRef = useRef<number | null>(null);
   const dragRef = useRef({
     isDragging: false,
     startX: 0,
@@ -488,8 +522,30 @@ export const PdfHighlightViewer = ({
     height: number;
   } | null>(null);
 
-  // Aspect ratio of the first page (width / height in PDF points)
-  const [pageAspectRatio, setPageAspectRatio] = useState<number | null>(null);
+  // The first page's unrotated aspect ratio (width / height in PDF points)
+  // and its own /Rotate entry. The ratio the document displays at follows
+  // from both together with the user's turn.
+  const [firstPageState, setFirstPageState] = useState<{
+    loadId: number;
+    ratio: number;
+    rotate: number;
+  } | null>(null);
+  const firstPage =
+    firstPageState !== null && firstPageState.loadId === currentLoadId
+      ? firstPageState
+      : null;
+  // Each page's own /Rotate entry, recorded as it loads and tagged with the
+  // load it belongs to. react-pdf's `rotate` prop is absolute, so a page is
+  // handed its own rotation plus the user's turn, never another page's.
+  const [pageRotations, setPageRotations] = useState<{
+    loadId: number;
+    byPage: Record<number, number>;
+  }>({ loadId: 0, byPage: {} });
+  const [ownRotation, setOwnRotation] = useState<Rotation>(0);
+  const rotation = externalRotation ?? ownRotation;
+  // For callbacks that must not re-subscribe on every turn.
+  const rotationRef = useRef(rotation);
+  rotationRef.current = rotation;
   const [ownZoom, setOwnZoom] = useState(1);
   const zoom = externalZoom ?? ownZoom;
   /**
@@ -515,6 +571,18 @@ export const PdfHighlightViewer = ({
     },
     [onZoomChange],
   );
+  // One counter-clockwise quarter turn; four bring the page back. A turn
+  // re-lays the pages out like a zoom does, so the same scroll ratio is
+  // captured and restored around it.
+  const rotate = useCallback(() => {
+    const container = containerRef.current;
+    if (container && container.scrollHeight > 0) {
+      pendingScrollRatio.current = container.scrollTop / container.scrollHeight;
+    }
+    const next = turn(rotationRef.current, -1);
+    setOwnRotation(next);
+    onRotationChange?.(next);
+  }, [onRotationChange]);
 
   // Highlights with no bboxes split two ways: still resolving (pending) vs
   // searched-and-not-found. The viewer surfaces them differently so an
@@ -534,19 +602,20 @@ export const PdfHighlightViewer = ({
     [highlights],
   );
 
-  // Group highlights by page number (1-indexed, matching PDF conventions)
+  // Group highlights by page number (1-indexed, matching PDF conventions),
+  // in the frame of the page as currently turned.
   const highlightsByPage = useMemo(() => {
     const map = new Map<number, HighlightBbox[]>();
     for (const h of highlights ?? []) {
       for (const bbox of h.bboxes) {
         const pageNum = bbox.page;
         const list = map.get(pageNum) ?? [];
-        list.push(bbox);
+        list.push(rotateBbox(bbox, rotation));
         map.set(pageNum, list);
       }
     }
     return map;
-  }, [highlights]);
+  }, [highlights, rotation]);
 
   // Determine target page for initial scroll
   const targetPage = useMemo(() => {
@@ -583,28 +652,67 @@ export const PdfHighlightViewer = ({
     return () => observer.disconnect();
   }, []);
 
-  // Capture first page's aspect ratio for sizing calculations.
-  //
-  // ``originalWidth`` / ``originalHeight`` are react-pdf's ``page.view[2]`` /
-  // ``page.view[3]`` — the *unrotated* viewbox dims. For a ``/Rotate=90`` or
-  // ``270`` page the actual rendered Page div is landscape (react-pdf creates
-  // its viewport with ``rotation: page.rotate``), so the unrotated ratio
-  // would size the page too small inside the container. Swap when rotated.
-  const handleFirstPageLoad = useCallback(
-    (page: {
-      originalWidth: number;
-      originalHeight: number;
-      rotate: number;
-    }) => {
-      if (pageAspectRatio === null) {
-        const rotated = page.rotate === 90 || page.rotate === 270;
-        const w = rotated ? page.originalHeight : page.originalWidth;
-        const h = rotated ? page.originalWidth : page.originalHeight;
-        setPageAspectRatio(w / h);
+  // Record each page's own rotation as it loads, and page 1's view box for
+  // the fit. ``view`` is [x0, y0, x1, y1] in PDF points before rotation, so
+  // the extents are differences, not the far corner; ``rotate`` is the page's
+  // own /Rotate entry, which react-pdf applies unless told otherwise.
+  // react-pdf fires this again on every re-render of the page, so both
+  // updates keep the previous state when nothing changed.
+  const handlePageLoad = useCallback(
+    (
+      loadId: number,
+      pageNum: number,
+      page: { view: number[]; rotate: number },
+    ) => {
+      setPageRotations((prev) =>
+        prev.loadId === loadId && prev.byPage[pageNum] === page.rotate
+          ? prev
+          : {
+              loadId,
+              byPage: {
+                ...(prev.loadId === loadId ? prev.byPage : {}),
+                [pageNum]: page.rotate,
+              },
+            },
+      );
+      if (pageNum === 1) {
+        const width = (page.view[2] ?? 0) - (page.view[0] ?? 0);
+        const height = (page.view[3] ?? 0) - (page.view[1] ?? 0);
+        setFirstPageState((prev) =>
+          prev?.loadId === loadId
+            ? prev
+            : {
+                loadId,
+                ratio: height > 0 ? width / height : 1,
+                rotate: page.rotate,
+              },
+        );
       }
     },
-    [pageAspectRatio],
+    [],
   );
+
+  // Rotation a page renders at: its own plus the user's turn. Undefined
+  // until that page has loaded, so react-pdf keeps applying the page's own
+  // rotation meanwhile; a page loading under a non-zero turn therefore
+  // renders once at its own rotation and once more turned, and its overlay
+  // is withheld until the frame is known.
+  const rotateFor = (loadId: number, pageNum: number): number | undefined => {
+    const own =
+      pageRotations.loadId === loadId
+        ? pageRotations.byPage[pageNum]
+        : undefined;
+    return own === undefined ? undefined : (own + rotation) % 360;
+  };
+
+  // Aspect ratio of the page as displayed. A quarter turn from either
+  // source swaps the sides; a /Rotate=90 page turned once more is upright
+  // again.
+  const pageAspectRatio = useMemo(() => {
+    if (!firstPage) return null;
+    const quarterTurned = (firstPage.rotate + rotation) % 180 === 90;
+    return quarterTurned ? 1 / firstPage.ratio : firstPage.ratio;
+  }, [firstPage, rotation]);
 
   // Compute page render width: fit one full page in the viewport, then apply zoom
   const pageWidth = useMemo(() => {
@@ -614,7 +722,9 @@ export const PdfHighlightViewer = ({
     return baseWidth * zoom;
   }, [containerSize, pageAspectRatio, zoom]);
 
-  // First bbox on the target page (for sub-page scroll positioning)
+  // First bbox on the target page (for sub-page scroll positioning), in the
+  // page's own frame. The turn is applied when scrolling, from the ref, so
+  // that turning the document does not count as the highlight changing.
   const firstBbox = useMemo(() => {
     for (const h of highlights ?? []) {
       if (h.bboxes.length > 0) return h.bboxes[0]!;
@@ -629,9 +739,10 @@ export const PdfHighlightViewer = ({
     if (!pageDiv || !container) return;
 
     if (firstBbox) {
+      const turned = rotateBbox(firstBbox, rotationRef.current);
       const pageHeight = pageDiv.offsetHeight;
-      const bboxTop = (firstBbox.top / SCALE) * pageHeight;
-      const bboxBottom = (firstBbox.bottom / SCALE) * pageHeight;
+      const bboxTop = (turned.top / SCALE) * pageHeight;
+      const bboxBottom = (turned.bottom / SCALE) * pageHeight;
       const bboxCenter = pageDiv.offsetTop + (bboxTop + bboxBottom) / 2;
       const scrollTarget = bboxCenter - container.clientHeight / 3;
       container.scrollTo({ top: Math.max(0, scrollTarget) });
@@ -642,39 +753,41 @@ export const PdfHighlightViewer = ({
 
   // Scroll to the bbox location after the target page's canvas has rendered
   const handlePageRenderSuccess = useCallback(
-    (pageNum: number) => {
-      if (pageNum !== targetPage || hasScrolledRef.current) return;
-      hasScrolledRef.current = true;
+    (loadId: number, pageNum: number) => {
+      if (pageNum !== targetPage || scrolledLoadRef.current === loadId) return;
+      scrolledLoadRef.current = loadId;
       scrollToHighlight();
     },
     [targetPage, scrollToHighlight],
   );
 
-  // Reset state when PDF URL changes (zoom intentionally preserved).
-  // Must be defined before the re-scroll effect so hasScrolledRef is reset
-  // before the re-scroll guard checks it.
+  // The turn was chosen for the previous document; zoom is kept on purpose.
   useEffect(() => {
-    setNumPages(null);
-    setPageAspectRatio(null);
-    hasScrolledRef.current = false;
+    setOwnRotation(0);
   }, [pdfUrl]);
 
   // Re-scroll when highlights change (claim navigation within the same PDF).
-  // Skips initial load (hasScrolledRef is false) and PDF URL changes (which
-  // reset hasScrolledRef) — both are handled by handlePageRenderSuccess.
+  // Skips a load whose target page has not rendered yet, which
+  // handlePageRenderSuccess handles when it does. The current load is read
+  // through a ref so that a load completing does not itself run this: the
+  // pages mount in that same commit and scroll on their own render.
+  const currentLoadIdRef = useRef(currentLoadId);
+  currentLoadIdRef.current = currentLoadId;
   useEffect(() => {
-    if (!hasScrolledRef.current) return;
+    const loadId = currentLoadIdRef.current;
+    if (loadId === null || scrolledLoadRef.current !== loadId) return;
     scrollToHighlight();
   }, [targetPage, firstBbox, scrollToHighlight]);
 
-  // Restore scroll position proportionally after a zoom-driven re-layout.
-  // Runs on every pageWidth change; the guard on pendingScrollRatio.current
-  // ensures it only fires when a zoom actually triggered it (not on initial
-  // load or container resize). Uses useLayoutEffect so the scroll jump is
-  // applied before the browser paints — users don't see the flash to top.
-  // A rAF-delayed second application catches the case where react-pdf's
-  // canvases are still resizing when the first attempt ran; by the next
-  // frame, scrollHeight reflects the final layout.
+  // Restore scroll position proportionally after a zoom- or rotation-driven
+  // re-layout. Runs on every pageWidth or rotation change; the guard on
+  // pendingScrollRatio.current ensures it only fires when a zoom or a turn
+  // actually triggered it (not on initial load or container resize). Uses
+  // useLayoutEffect so the scroll jump is applied before the browser paints
+  // — users don't see the flash to top. A rAF-delayed second application
+  // catches the case where react-pdf's canvases are still resizing when the
+  // first attempt ran; by the next frame, scrollHeight reflects the final
+  // layout.
   useLayoutEffect(() => {
     const ratio = pendingScrollRatio.current;
     if (ratio === null) return;
@@ -688,7 +801,7 @@ export const PdfHighlightViewer = ({
       pendingScrollRatio.current = null;
     });
     return () => cancelAnimationFrame(raf);
-  }, [pageWidth]);
+  }, [pageWidth, rotation]);
 
   // Drag-to-pan handlers
   const handlePointerDown = useCallback((e: React.PointerEvent) => {
@@ -734,9 +847,19 @@ export const PdfHighlightViewer = ({
 
   return (
     <div className="relative flex h-full w-full flex-col">
-      {/* Zoom controls */}
+      {/* Rotation and zoom controls */}
       {pageWidth && (
         <div className="absolute right-4 top-2 z-10 flex items-center gap-1 rounded bg-white/90 px-1 py-0.5 shadow">
+          <ActionIcon
+            variant="subtle"
+            size="sm"
+            onClick={rotate}
+            aria-label="Rotate left"
+            title="Rotate left"
+          >
+            <IconRotate size={16} />
+          </ActionIcon>
+          <span className="mx-1 h-4 w-px bg-gray-300" aria-hidden="true" />
           <ActionIcon
             variant="subtle"
             size="sm"
@@ -817,13 +940,17 @@ export const PdfHighlightViewer = ({
             reactPdf={reactPdf}
             pdfUrl={pdfUrl}
             options={documentOptions}
-            onLoadSuccess={(doc) => setNumPages(doc.numPages)}
+            onLoadSuccess={(doc, loadId) =>
+              setLoadedDoc({ loadId, url: pdfUrl, numPages: doc.numPages })
+            }
             onLoadError={onLoadError}
           >
-            {numPages &&
+            {(loadId) =>
+              numPages &&
               Array.from({ length: numPages }, (_, i) => {
                 const pageNum = i + 1;
                 const bboxes = highlightsByPage.get(pageNum);
+                const pageRotate = rotateFor(loadId, pageNum);
                 return (
                   // `safe center` keeps the page reachable when zoomed wider than the
                   // viewport; plain `justify-content: center` puts the page at a negative
@@ -838,16 +965,24 @@ export const PdfHighlightViewer = ({
                     <reactPdf.Page
                       pageNumber={pageNum}
                       width={pageWidth}
+                      rotate={pageRotate}
                       renderTextLayer={false}
                       renderAnnotationLayer={false}
-                      onLoadSuccess={handleFirstPageLoad}
-                      onRenderSuccess={() => handlePageRenderSuccess(pageNum)}
+                      onLoadSuccess={(page) =>
+                        handlePageLoad(loadId, pageNum, page)
+                      }
+                      onRenderSuccess={() =>
+                        handlePageRenderSuccess(loadId, pageNum)
+                      }
                     >
-                      {bboxes && <HighlightOverlay bboxes={bboxes} />}
+                      {bboxes && pageRotate !== undefined && (
+                        <HighlightOverlay bboxes={bboxes} />
+                      )}
                     </reactPdf.Page>
                   </div>
                 );
-              })}
+              })
+            }
           </PdfDocument>
         )}
       </div>

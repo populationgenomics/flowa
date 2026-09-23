@@ -19,6 +19,7 @@ import { IconAlertCircle } from "@tabler/icons-react";
 import type { PaperIdMapping } from "../citations/types";
 import { PdfHighlightViewer } from "../pdf-viewer/PdfHighlightViewer";
 import type { PdfHighlight } from "../pdf-viewer/types";
+import type { Rotation } from "../pdf-viewer/geometry";
 import { MarkdownHighlightViewer } from "../markdown-viewer/MarkdownHighlightViewer";
 import { groupClaimsByPaper, resolveClaimForCitation } from "./claim-refs";
 import { flattenClaimCitations, type FlatCitation } from "./citation-utils";
@@ -325,6 +326,9 @@ export function EvidenceViewerShell({
     quote: string;
   } | null>(null);
   const [pdfZoom, setPdfZoom] = useState(1);
+  // Held here like the zoom so the turn survives the PDF/Markdown toggle,
+  // which unmounts the pane; unlike the zoom it belongs to one document.
+  const [pdfRotation, setPdfRotation] = useState<Rotation>(0);
   // The user's explicit PDF/MD choice, tagged with the citation it applies to;
   // navigating to another citation falls back to that citation's default mode.
   const [modeOverride, setModeOverride] = useState<{
@@ -374,6 +378,11 @@ export function EvidenceViewerShell({
 
   const activeDoi = active?.doi ?? "";
   const activePdfUrl = activeDoi ? pdfUrlForDoi(activeDoi) : "";
+  // A turn belongs to one paper. A moment with no focused claim leaves
+  // `activeDoi` empty and is not a change of paper.
+  useEffect(() => {
+    if (activeDoi) setPdfRotation(0);
+  }, [activeDoi]);
 
   const pdfHighlights: PdfHighlight[] = useMemo(() => {
     if (!active) return [];
@@ -949,6 +958,8 @@ export function EvidenceViewerShell({
                     highlights={pdfHighlights}
                     zoom={pdfZoom}
                     onZoomChange={setPdfZoom}
+                    rotation={pdfRotation}
+                    onRotationChange={setPdfRotation}
                     workerSrc={pdfWorkerSrc}
                     cMapUrl={pdfCMapUrl}
                   />

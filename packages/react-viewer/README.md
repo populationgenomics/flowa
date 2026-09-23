@@ -83,6 +83,16 @@ loads in the browser). No `dynamic(() => …, { ssr: false })` wrapper needed.
 
 `LlmContent` is server-render-safe.
 
+## Viewing controls
+
+The toolbar in the pane zooms the document and turns it counter-clockwise in
+quarter turns.
+Highlights and the scroll to a quote follow the turn. Each page keeps its own
+`/Rotate` entry and turns from there, so a landscape table page in a portrait
+paper stays upright until the user turns it. Like zoom, rotation can be
+controlled from outside through `rotation` and `onRotationChange`; it resets
+when another document opens.
+
 ## Loading feedback
 
 While a document downloads, the pane shows the bytes received and, when the
