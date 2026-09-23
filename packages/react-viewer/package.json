@@ -64,7 +64,7 @@
     "zustand": "^4.5.0"
   },
   "devDependencies": {
-    "@ai-sdk/react": "4.0.100",
+    "@ai-sdk/react": "4.0.105",
     "@mantine/core": "8.3.18",
     "@mantine/hooks": "8.3.18",
     "@tabler/icons-react": "3.46.0",
@@ -74,7 +74,7 @@
     "@types/mdast": "4.0.4",
     "@types/react": "18.3.18",
     "@types/react-dom": "18.3.5",
-    "ai": "7.0.97",
+    "ai": "7.0.102",
     "happy-dom": "20.14.5",
     "react": "18.3.1",
     "react-dom": "18.3.1",
