@@ -611,4 +611,127 @@ describe("EvidenceViewerShell", () => {
       expect(container.querySelector("mark.anchor-highlight")).not.toBeNull(),
     );
   });
+
+  it("puts the consumer's title first in the header and the window title", async () => {
+    render(
+      wrap(
+        <EvidenceViewerShell
+          {...baseProps}
+          artifact={ARTIFACT}
+          backend={makeBackend({ claims: [], papers: [], comments: [] })}
+          chatSessionFactory={NEVER_SESSION}
+          onVersionChange={vi.fn()}
+          title="Subject under review"
+          categoryName="Functional evidence"
+        />,
+      ),
+    );
+    expect((await screen.findByTestId("viewer-title")).textContent).toBe(
+      "Subject under review",
+    );
+    expect(screen.getByTestId("viewer-header").textContent).toContain(
+      "Evidence Viewer — Functional evidence",
+    );
+    expect(document.title).toBe(
+      "Subject under review — Evidence Viewer — Functional evidence",
+    );
+  });
+
+  it("renders a title slot in place of the plain title", async () => {
+    render(
+      wrap(
+        <EvidenceViewerShell
+          {...baseProps}
+          artifact={ARTIFACT}
+          backend={makeBackend({ claims: [], papers: [], comments: [] })}
+          chatSessionFactory={NEVER_SESSION}
+          onVersionChange={vi.fn()}
+          title="Subject under review"
+          titleSlot={<span data-testid="custom-title">Custom markup</span>}
+        />,
+      ),
+    );
+    expect((await screen.findByTestId("custom-title")).textContent).toBe(
+      "Custom markup",
+    );
+    expect(screen.queryByTestId("viewer-title")).toBeNull();
+    expect(document.title).toBe("Subject under review — Evidence Viewer");
+  });
+
+  it("keeps the generic header without a title", async () => {
+    render(
+      wrap(
+        <EvidenceViewerShell
+          {...baseProps}
+          artifact={ARTIFACT}
+          backend={makeBackend({ claims: [], papers: [], comments: [] })}
+          chatSessionFactory={NEVER_SESSION}
+          onVersionChange={vi.fn()}
+        />,
+      ),
+    );
+    expect((await screen.findByTestId("viewer-header")).textContent).toBe(
+      "Evidence Viewer",
+    );
+    expect(screen.queryByTestId("viewer-title")).toBeNull();
+    expect(document.title).toBe("Evidence Viewer");
+  });
+
+  /** The shell with a real artifact and a quiet backend, plus overrides. */
+  const shell = (
+    props: Partial<React.ComponentProps<typeof EvidenceViewerShell>>,
+  ) =>
+    wrap(
+      <EvidenceViewerShell
+        {...baseProps}
+        artifact={ARTIFACT}
+        backend={makeBackend({ claims: [], papers: [], comments: [] })}
+        chatSessionFactory={NEVER_SESSION}
+        onVersionChange={vi.fn()}
+        {...props}
+      />,
+    );
+
+  it("renders the title as the document's heading", async () => {
+    render(shell({ title: "Subject under review" }));
+    const heading = await screen.findByRole("heading", { level: 1 });
+    expect(heading.textContent).toBe("Subject under review");
+  });
+
+  it("falls back to the plain title when the slot is a false conditional", async () => {
+    render(shell({ title: "Subject under review", titleSlot: false }));
+    expect((await screen.findByTestId("viewer-title")).textContent).toBe(
+      "Subject under review",
+    );
+  });
+
+  it("shows no title line and no leading separator for an empty title", async () => {
+    render(shell({ title: "", categoryName: "Functional evidence" }));
+    expect((await screen.findByTestId("viewer-header")).textContent).toBe(
+      "Evidence Viewer — Functional evidence",
+    );
+    expect(screen.queryByTestId("viewer-title")).toBeNull();
+    expect(document.title).toBe("Evidence Viewer — Functional evidence");
+  });
+
+  it("gives a slot-only header the generic window title", async () => {
+    render(
+      shell({ titleSlot: <span data-testid="custom-title">Custom</span> }),
+    );
+    await screen.findByTestId("custom-title");
+    expect(document.title).toBe("Evidence Viewer");
+  });
+
+  it("follows a changed title into the window title and restores the host's on unmount", async () => {
+    document.title = "Host page";
+    const { rerender, unmount } = render(shell({ title: "First" }));
+    await screen.findByTestId("viewer-title");
+    expect(document.title).toBe("First — Evidence Viewer");
+    rerender(shell({ title: "Second" }));
+    await waitFor(() =>
+      expect(document.title).toBe("Second — Evidence Viewer"),
+    );
+    unmount();
+    expect(document.title).toBe("Host page");
+  });
 });

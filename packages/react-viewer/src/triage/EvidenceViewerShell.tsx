@@ -103,7 +103,24 @@ export interface EvidenceViewerShellProps {
   /** When true, hides chat surface + Rewrite affordance. */
   readOnly?: boolean;
 
-  /** Title bar text. Defaults to a generic "Evidence Viewer". */
+  /**
+   * What the evidence under review is about, as the consumer names it.
+   * Rendered as the document's heading on the header's first line and put
+   * first in the window title, so two viewers open side by side can be
+   * told apart. Pass it even when `titleSlot` supplies the markup: the
+   * window title has only this string to go on.
+   */
+  title?: string;
+  /**
+   * Custom markup for the header's first line, in place of `title`
+   * rendered as a plain heading. The slot is the document's heading, so it
+   * should contain an `h1`.
+   */
+  titleSlot?: ReactNode;
+  /**
+   * The category under review. Follows "Evidence Viewer" in the header's
+   * second line and in the window title.
+   */
   categoryName?: string;
 }
 
@@ -142,6 +159,8 @@ export function EvidenceViewerShell({
   initialFocusTarget = null,
   onCitationClick,
   readOnly = false,
+  title,
+  titleSlot,
   categoryName,
 }: EvidenceViewerShellProps) {
   // ── Derived structure from the parsed artifact ────────────────────
@@ -733,13 +752,20 @@ export function EvidenceViewerShell({
     },
   });
 
-  // ── Document title ────────────────────────────────────────────────
-  const titleParts: string[] = ["Evidence Viewer"];
-  if (categoryName) titleParts.push(categoryName);
-  const title = titleParts.join(" — ");
+  // ── Header and document title ─────────────────────────────────────
+  const viewerLabel = ["Evidence Viewer", categoryName]
+    .filter(Boolean)
+    .join(" — ");
+  const windowTitle = [title, viewerLabel].filter(Boolean).join(" — ");
+  // The shell owns the window title while mounted and hands the previous
+  // one back on unmount, so a host page that embeds it keeps its own.
   useEffect(() => {
-    if (typeof document !== "undefined") document.title = title;
-  }, [title]);
+    const previous = document.title;
+    document.title = windowTitle;
+    return () => {
+      document.title = previous;
+    };
+  }, [windowTitle]);
 
   // ── Render guards ─────────────────────────────────────────────────
   if (!artifact) {
@@ -784,9 +810,24 @@ export function EvidenceViewerShell({
 
   return (
     <div className="flex h-full flex-col">
-      <div className="border-b border-gray-200 bg-gray-50 px-4 py-2">
+      <div
+        className="border-b border-gray-200 bg-gray-50 px-4 py-2"
+        data-testid="viewer-header"
+      >
+        {titleSlot ||
+          (title ? (
+            <Text
+              component="h1"
+              size="md"
+              fw={700}
+              className="m-0 text-gray-900"
+              data-testid="viewer-title"
+            >
+              {title}
+            </Text>
+          ) : null)}
         <Text size="sm" fw={600} className="text-gray-700">
-          {title}
+          {viewerLabel}
         </Text>
       </div>
 
