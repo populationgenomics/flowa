@@ -5,12 +5,13 @@ export default defineConfig({
   format: ["esm", "cjs"],
   dts: true,
   sourcemap: true,
-  // Clean only our own JS/DTS/map outputs, not the whole dir: the `build:css`
-  // step (Tailwind) writes `dist/styles.css` into the same directory, and a
-  // blanket clean deletes it mid-watch — `tsup --watch` cleans on startup but
-  // Tailwind's watcher only rebuilds on a `src/styles.css` change, so the file
-  // stays gone and consumers' `@flowajs/react-viewer/styles.css` import 404s.
-  clean: ["index.*"],
+  // Clean everything except the stylesheet: the `build:css` step (Tailwind)
+  // writes `dist/styles.css` into the same directory, and `tsup --watch`
+  // cleans on startup while Tailwind's watcher only rebuilds on a source
+  // change, so a deleted stylesheet stays gone and consumers'
+  // `@flowajs/react-viewer/styles.css` import fails. tsup deletes
+  // `**/*` plus these patterns, so keeping a file takes a negated pattern.
+  clean: ["!styles.css"],
   treeshake: true,
   outExtension({ format }) {
     return { js: format === "cjs" ? ".cjs" : ".mjs" };
