@@ -1,5 +1,7 @@
 """Centralized configuration via environment variables."""
 
+from typing import Literal
+
 from pydantic import BaseModel
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
@@ -8,6 +10,8 @@ from pydantic_settings import BaseSettings, SettingsConfigDict
 # non-LLM download stage keeps its own, lighter bound.
 DEFAULT_DOWNLOAD_CONCURRENCY = 5
 LLM_CONCURRENCY = 20
+
+EffortLevel = Literal['low', 'medium', 'high']
 
 
 class ModelConfig(BaseModel):
@@ -30,6 +34,12 @@ class ModelConfig(BaseModel):
     """Bedrock application inference profile ARN, used as the wire-level modelId for
     cost attribution. When set, `name` must point to the underlying foundation model
     so the correct Bedrock profile (with constrained-sampling support) resolves."""
+
+    effort: EffortLevel | None = None
+    """Thinking effort for this stage, overriding the stage's built-in default
+    (`medium` for extraction and aggregation; conversion requests no thinking).
+    Needed for models whose thinking can't be disabled, e.g. Claude Opus 5.5:
+    without it, conversion runs at the model's own default effort."""
 
 
 class Settings(BaseSettings):

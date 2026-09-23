@@ -4,7 +4,8 @@ The LLM is never called. `_run_category_agent` is mocked at its seam so the
 tests exercise *our* orchestration — one subagent dispatched per declared
 category, authoritative `category` stamping, manifest-order assembly, the
 no-empty-short-circuit behaviour — without re-testing pydantic-ai's
-`NativeOutput` / streaming / `ModelRetry` machinery (covered by pydantic-ai).
+structured-output / streaming / `ModelRetry` machinery (covered by pydantic-ai
+and `tests/test_models.py`).
 `query_clinvar` and the citation resolver are mocked too, so no network and no
 PDF index loads. The throttle predicate and the multi-category loader get direct
 unit tests.
