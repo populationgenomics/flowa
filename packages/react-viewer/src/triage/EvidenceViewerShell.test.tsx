@@ -348,6 +348,111 @@ describe("EvidenceViewerShell", () => {
     });
   });
 
+  describe("claim comment saves", () => {
+    /** Backend whose setClaimComment calls stay pending until settled by hand. */
+    function makeCommentBackend() {
+      const calls: Array<{
+        body: string;
+        resolve: () => void;
+        reject: (err: Error) => void;
+      }> = [];
+      const backend = makeBackend({ claims: [], papers: [], comments: [] });
+      backend.setClaimComment = (_key, _paperId, _claimIndex, body) =>
+        new Promise<void>((resolve, reject) => {
+          calls.push({ body, resolve, reject });
+        });
+      return { backend, calls };
+    }
+
+    async function renderAndSaveTwice(backend: TriageBackend) {
+      render(
+        wrap(
+          <EvidenceViewerShell
+            {...baseProps}
+            artifact={ARTIFACT}
+            backend={backend}
+            chatSessionFactory={NEVER_SESSION}
+            onVersionChange={vi.fn()}
+          />,
+        ),
+      );
+      await waitFor(() =>
+        expect(
+          screen.getByTestId("comment-textarea").hasAttribute("disabled"),
+        ).toBe(false),
+      );
+      const textarea = screen.getByTestId("comment-textarea");
+      fireEvent.change(textarea, { target: { value: "first" } });
+      fireEvent.blur(textarea);
+      fireEvent.change(textarea, { target: { value: "first, edited" } });
+      fireEvent.blur(textarea);
+    }
+
+    it("sends a claim's saves one at a time, in the order issued", async () => {
+      const { backend, calls } = makeCommentBackend();
+      await renderAndSaveTwice(backend);
+
+      await waitFor(() => expect(calls.length).toBe(1));
+      expect(calls[0]!.body).toBe("first");
+      // The second save waits for the first to settle.
+      await new Promise((r) => setTimeout(r, 0));
+      expect(calls.length).toBe(1);
+
+      calls[0]!.resolve();
+      await waitFor(() => expect(calls.length).toBe(2));
+      expect(calls[1]!.body).toBe("first, edited");
+      calls[1]!.resolve();
+
+      await waitFor(() =>
+        expect(
+          screen.getByTestId("comment-status").getAttribute("data-state"),
+        ).toBe("saved"),
+      );
+      expect(useTriageStore.getState().comments["Smith2024\n1"]).toBe(
+        "first, edited",
+      );
+    });
+
+    it("keeps the newer text when an earlier save fails", async () => {
+      const { backend, calls } = makeCommentBackend();
+      await renderAndSaveTwice(backend);
+
+      await waitFor(() => expect(calls.length).toBe(1));
+      calls[0]!.reject(new Error("network"));
+      await waitFor(() => expect(calls.length).toBe(2));
+      expect(useTriageStore.getState().comments["Smith2024\n1"]).toBe(
+        "first, edited",
+      );
+      calls[1]!.resolve();
+
+      await waitFor(() =>
+        expect(
+          screen.getByTestId("comment-status").getAttribute("data-state"),
+        ).toBe("saved"),
+      );
+      expect(useTriageStore.getState().comments["Smith2024\n1"]).toBe(
+        "first, edited",
+      );
+    });
+
+    it("rolls back to the last accepted text when the latest save fails", async () => {
+      const { backend, calls } = makeCommentBackend();
+      await renderAndSaveTwice(backend);
+
+      await waitFor(() => expect(calls.length).toBe(1));
+      calls[0]!.resolve();
+      await waitFor(() => expect(calls.length).toBe(2));
+      calls[1]!.reject(new Error("network"));
+
+      await waitFor(() =>
+        expect(
+          screen.getByTestId("comment-status").getAttribute("data-state"),
+        ).toBe("error"),
+      );
+      expect(useTriageStore.getState().comments["Smith2024\n1"]).toBe("first");
+    });
+  });
+
   it("rewrite button is disabled until at least one claim is triaged", async () => {
     const backend = makeBackend({ claims: [], papers: [], comments: [] });
     render(
