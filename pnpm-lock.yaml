@@ -54,7 +54,7 @@ importers:
         version: link:../../packages/react-viewer
       '@hono/node-server':
         specifier: 2.1.6
-        version: 2.1.6(hono@4.13.11)
+        version: 2.1.6(hono@4.13.16)
       '@mantine/core':
         specifier: 8.3.18
         version: 8.3.18(@mantine/hooks@8.3.18(react@18.3.1))(@types/react@18.3.18)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
@@ -142,7 +142,7 @@ importers:
         version: 1.0.163(zod@4.6.5)
       '@hono/node-server':
         specifier: 2.1.6
-        version: 2.1.6(hono@4.13.11)
+        version: 2.1.6(hono@4.13.16)
       '@opentelemetry/api':
         specifier: 1.9.1
         version: 1.9.1
@@ -177,8 +177,8 @@ importers:
         specifier: 1.0.20
         version: 1.0.20
       hono:
-        specifier: 4.13.11
-        version: 4.13.11
+        specifier: 4.13.16
+        version: 4.13.16
       jose:
         specifier: 6.2.12
         version: 6.2.12
@@ -2488,8 +2488,8 @@ packages:
   hast-util-whitespace@3.0.0:
     resolution: {integrity: sha512-88JUN06ipLwsnv+dVn+OIYOvAuvBMy/Qoi6O7mQHxdPXpjy+Cd6xRkWwux7DKO+4sYILtLBRIKgsdpS2gQc7qw==}
 
-  hono@4.13.11:
-    resolution: {integrity: sha512-/SMX/RQNJn7oNmFwH6DtwDqcrzZU2otm1FD6OJe2cWF6cfy/F8hq0XVBv7xW3FTJshRQwuBnXHDq2kNsdZnshg==}
+  hono@4.13.16:
+    resolution: {integrity: sha512-AOLOEhvrV+iH92xXCnFr/5+3KjPKcI3xP63XJtX5spAnkznPdHijlIsUTpi7/9EhWqrTCekw5c5zh1K+YsVw7A==}
     engines: {node: '>=16.9.0'}
 
   html-entities@2.6.0:
@@ -4353,9 +4353,9 @@ snapshots:
       protobufjs: 7.6.3
       yargs: 17.7.3
 
-  '@hono/node-server@2.1.6(hono@4.13.11)':
+  '@hono/node-server@2.1.6(hono@4.13.16)':
     dependencies:
-      hono: 4.13.11
+      hono: 4.13.16
 
   '@img/colour@1.1.0':
     optional: true
@@ -5892,7 +5892,7 @@ snapshots:
     dependencies:
       '@types/hast': 3.0.5
 
-  hono@4.13.11: {}
+  hono@4.13.16: {}
 
   html-entities@2.6.0: {}
 
