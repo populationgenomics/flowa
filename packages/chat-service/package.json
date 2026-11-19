@@ -52,7 +52,7 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
-    "@ai-sdk/otel": "1.0.163",
+    "@ai-sdk/otel": "1.0.170",
     "@hono/node-server": "2.1.6",
     "@opentelemetry/api": "1.9.1",
     "@opentelemetry/core": "2.11.0",
@@ -63,7 +63,7 @@
     "@opentelemetry/sdk-metrics": "2.11.0",
     "@opentelemetry/sdk-node": "0.222.0",
     "@opentelemetry/sdk-trace-base": "2.11.0",
-    "ai": "7.0.163",
+    "ai": "7.0.170",
     "aws4fetch": "1.0.20",
     "hono": "4.13.16",
     "jose": "6.2.12",
@@ -108,11 +108,11 @@
     }
   },
   "devDependencies": {
-    "@ai-sdk/amazon-bedrock": "5.0.133",
-    "@ai-sdk/anthropic": "4.0.97",
-    "@ai-sdk/google": "4.0.112",
-    "@ai-sdk/google-vertex": "5.0.132",
-    "@ai-sdk/openai": "4.0.109",
+    "@ai-sdk/amazon-bedrock": "5.0.139",
+    "@ai-sdk/anthropic": "4.0.102",
+    "@ai-sdk/google": "4.0.118",
+    "@ai-sdk/google-vertex": "5.0.138",
+    "@ai-sdk/openai": "4.0.115",
     "@aws-sdk/client-s3": "3.1134.0",
     "@aws-sdk/credential-providers": "3.1134.0",
     "@google-cloud/storage": "7.21.0",
