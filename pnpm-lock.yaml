@@ -21,22 +21,22 @@ importers:
     dependencies:
       '@ai-sdk/amazon-bedrock':
         specifier: 5.0.139
-        version: 5.0.139(zod@4.6.5)
+        version: 5.0.139(zod@4.6.6)
       '@ai-sdk/anthropic':
         specifier: 4.0.102
-        version: 4.0.102(zod@4.6.5)
+        version: 4.0.102(zod@4.6.6)
       '@ai-sdk/google':
         specifier: 4.0.118
-        version: 4.0.118(zod@4.6.5)
+        version: 4.0.118(zod@4.6.6)
       '@ai-sdk/google-vertex':
         specifier: 5.0.138
-        version: 5.0.138(zod@4.6.5)
+        version: 5.0.138(zod@4.6.6)
       '@ai-sdk/openai':
         specifier: 4.0.115
-        version: 4.0.115(zod@4.6.5)
+        version: 4.0.115(zod@4.6.6)
       '@ai-sdk/react':
         specifier: 4.0.174
-        version: 4.0.174(react@18.3.1)(zod@4.6.5)
+        version: 4.0.174(react@18.3.1)(zod@4.6.6)
       '@aws-sdk/client-s3':
         specifier: 3.1134.0
         version: 3.1134.0
@@ -66,7 +66,7 @@ importers:
         version: 3.49.0(react@18.3.1)
       ai:
         specifier: 7.0.170
-        version: 7.0.170(zod@4.6.5)
+        version: 7.0.170(zod@4.6.6)
       formidable:
         specifier: 3.5.4
         version: 3.5.4
@@ -80,8 +80,8 @@ importers:
         specifier: 18.3.1
         version: 18.3.1(react@18.3.1)
       zod:
-        specifier: 4.6.5
-        version: 4.6.5
+        specifier: 4.6.6
+        version: 4.6.6
       zustand:
         specifier: 5.0.15
         version: 5.0.15(@types/react@18.3.18)(react@18.3.1)(use-sync-external-store@1.7.0(react@18.3.1))
@@ -139,7 +139,7 @@ importers:
     dependencies:
       '@ai-sdk/otel':
         specifier: 1.0.170
-        version: 1.0.170(zod@4.6.5)
+        version: 1.0.170(zod@4.6.6)
       '@hono/node-server':
         specifier: 2.1.6
         version: 2.1.6(hono@4.13.16)
@@ -172,7 +172,7 @@ importers:
         version: 2.11.0(@opentelemetry/api@1.9.1)
       ai:
         specifier: 7.0.170
-        version: 7.0.170(zod@4.6.5)
+        version: 7.0.170(zod@4.6.6)
       aws4fetch:
         specifier: 1.0.20
         version: 1.0.20
@@ -189,24 +189,24 @@ importers:
         specifier: 2.9.1
         version: 2.9.1
       zod:
-        specifier: 4.6.5
-        version: 4.6.5
+        specifier: 4.6.6
+        version: 4.6.6
     devDependencies:
       '@ai-sdk/amazon-bedrock':
         specifier: 5.0.139
-        version: 5.0.139(zod@4.6.5)
+        version: 5.0.139(zod@4.6.6)
       '@ai-sdk/anthropic':
         specifier: 4.0.102
-        version: 4.0.102(zod@4.6.5)
+        version: 4.0.102(zod@4.6.6)
       '@ai-sdk/google':
         specifier: 4.0.118
-        version: 4.0.118(zod@4.6.5)
+        version: 4.0.118(zod@4.6.6)
       '@ai-sdk/google-vertex':
         specifier: 5.0.138
-        version: 5.0.138(zod@4.6.5)
+        version: 5.0.138(zod@4.6.6)
       '@ai-sdk/openai':
         specifier: 4.0.115
-        version: 4.0.115(zod@4.6.5)
+        version: 4.0.115(zod@4.6.6)
       '@aws-sdk/client-s3':
         specifier: 3.1134.0
         version: 3.1134.0
@@ -249,7 +249,7 @@ importers:
     devDependencies:
       '@ai-sdk/react':
         specifier: 4.0.174
-        version: 4.0.174(react@18.3.1)(zod@4.6.5)
+        version: 4.0.174(react@18.3.1)(zod@4.6.6)
       '@mantine/core':
         specifier: 8.3.18
         version: 8.3.18(@mantine/hooks@8.3.18(react@18.3.1))(@types/react@18.3.18)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
@@ -279,7 +279,7 @@ importers:
         version: 18.3.5(@types/react@18.3.18)
       ai:
         specifier: 7.0.170
-        version: 7.0.170(zod@4.6.5)
+        version: 7.0.170(zod@4.6.6)
       happy-dom:
         specifier: 20.14.5
         version: 20.14.5
@@ -314,8 +314,8 @@ importers:
         specifier: workspace:*
         version: link:../packages/chat-service
       zod:
-        specifier: 4.6.5
-        version: 4.6.5
+        specifier: 4.6.6
+        version: 4.6.6
 
 packages:
 
@@ -3895,8 +3895,8 @@ packages:
     resolution: {integrity: sha512-rVksvsnNCdJ/ohGc6xgPwyN8eheCxsiLM8mxuE/t/mOVqJewPuO1miLpTHQiRgTKCLexL4MeAFVagts7HmNZ2Q==}
     engines: {node: '>=10'}
 
-  zod@4.6.5:
-    resolution: {integrity: sha512-v5l/aFXZQeai4awLbOpSoHecE9UiMrnfx75tEXLjNonXVARxQ5mOeipTjROUchszUNCqnE+hqAMujRsRHsut2Q==}
+  zod@4.6.6:
+    resolution: {integrity: sha512-4UmzQUF5fxvfcYHlbjBmejU+w+hbDnWFx4aS8kBx7nPBHcO2SqPbpAG8snbdg+Xse4pRefR98hgjFgIMCI/UhA==}
 
   zustand@5.0.15:
     resolution: {integrity: sha512-MpSEjRiBkA9crSYeOUH32rJC7SVqAbm0Fqcqge/bUi2PPoLcBWKOsG+C8mevmpr8TwXHBVkChbbJiyvkE+i/3A==}
@@ -3923,95 +3923,95 @@ snapshots:
 
   '@adobe/css-tools@4.4.4': {}
 
-  '@ai-sdk/amazon-bedrock@5.0.139(zod@4.6.5)':
+  '@ai-sdk/amazon-bedrock@5.0.139(zod@4.6.6)':
     dependencies:
-      '@ai-sdk/anthropic': 4.0.102(zod@4.6.5)
-      '@ai-sdk/openai': 4.0.115(zod@4.6.5)
+      '@ai-sdk/anthropic': 4.0.102(zod@4.6.6)
+      '@ai-sdk/openai': 4.0.115(zod@4.6.6)
       '@ai-sdk/provider': 4.0.37
-      '@ai-sdk/provider-utils': 5.0.79(zod@4.6.5)
+      '@ai-sdk/provider-utils': 5.0.79(zod@4.6.6)
       '@smithy/eventstream-codec': 4.5.2
       '@smithy/util-utf8': 4.5.2
       aws4fetch: 1.0.20
-      zod: 4.6.5
+      zod: 4.6.6
 
-  '@ai-sdk/anthropic@4.0.102(zod@4.6.5)':
+  '@ai-sdk/anthropic@4.0.102(zod@4.6.6)':
     dependencies:
       '@ai-sdk/provider': 4.0.37
-      '@ai-sdk/provider-utils': 5.0.79(zod@4.6.5)
-      zod: 4.6.5
+      '@ai-sdk/provider-utils': 5.0.79(zod@4.6.6)
+      zod: 4.6.6
 
-  '@ai-sdk/gateway@4.0.143(zod@4.6.5)':
+  '@ai-sdk/gateway@4.0.143(zod@4.6.6)':
     dependencies:
       '@ai-sdk/provider': 4.0.37
-      '@ai-sdk/provider-utils': 5.0.79(zod@4.6.5)
+      '@ai-sdk/provider-utils': 5.0.79(zod@4.6.6)
       '@vercel/oidc': 3.2.0
-      zod: 4.6.5
+      zod: 4.6.6
 
-  '@ai-sdk/google-vertex@5.0.138(zod@4.6.5)':
+  '@ai-sdk/google-vertex@5.0.138(zod@4.6.6)':
     dependencies:
-      '@ai-sdk/anthropic': 4.0.102(zod@4.6.5)
-      '@ai-sdk/google': 4.0.118(zod@4.6.5)
-      '@ai-sdk/openai-compatible': 3.0.90(zod@4.6.5)
+      '@ai-sdk/anthropic': 4.0.102(zod@4.6.6)
+      '@ai-sdk/google': 4.0.118(zod@4.6.6)
+      '@ai-sdk/openai-compatible': 3.0.90(zod@4.6.6)
       '@ai-sdk/provider': 4.0.37
-      '@ai-sdk/provider-utils': 5.0.79(zod@4.6.5)
+      '@ai-sdk/provider-utils': 5.0.79(zod@4.6.6)
       google-auth-library: 11.3.4
-      zod: 4.6.5
+      zod: 4.6.6
     transitivePeerDependencies:
       - supports-color
 
-  '@ai-sdk/google@4.0.118(zod@4.6.5)':
+  '@ai-sdk/google@4.0.118(zod@4.6.6)':
     dependencies:
       '@ai-sdk/provider': 4.0.37
-      '@ai-sdk/provider-utils': 5.0.79(zod@4.6.5)
-      zod: 4.6.5
+      '@ai-sdk/provider-utils': 5.0.79(zod@4.6.6)
+      zod: 4.6.6
 
-  '@ai-sdk/mcp@2.0.97(zod@4.6.5)':
+  '@ai-sdk/mcp@2.0.97(zod@4.6.6)':
     dependencies:
       '@ai-sdk/provider': 4.0.37
-      '@ai-sdk/provider-utils': 5.0.79(zod@4.6.5)
+      '@ai-sdk/provider-utils': 5.0.79(zod@4.6.6)
       cross-spawn: 7.0.6
       pkce-challenge: 5.0.1
-      zod: 4.6.5
+      zod: 4.6.6
 
-  '@ai-sdk/openai-compatible@3.0.90(zod@4.6.5)':
+  '@ai-sdk/openai-compatible@3.0.90(zod@4.6.6)':
     dependencies:
       '@ai-sdk/provider': 4.0.37
-      '@ai-sdk/provider-utils': 5.0.79(zod@4.6.5)
-      zod: 4.6.5
+      '@ai-sdk/provider-utils': 5.0.79(zod@4.6.6)
+      zod: 4.6.6
 
-  '@ai-sdk/openai@4.0.115(zod@4.6.5)':
+  '@ai-sdk/openai@4.0.115(zod@4.6.6)':
     dependencies:
       '@ai-sdk/provider': 4.0.37
-      '@ai-sdk/provider-utils': 5.0.79(zod@4.6.5)
-      zod: 4.6.5
+      '@ai-sdk/provider-utils': 5.0.79(zod@4.6.6)
+      zod: 4.6.6
 
-  '@ai-sdk/otel@1.0.170(zod@4.6.5)':
+  '@ai-sdk/otel@1.0.170(zod@4.6.6)':
     dependencies:
       '@ai-sdk/provider': 4.0.37
       '@opentelemetry/api': 1.9.1
-      ai: 7.0.170(zod@4.6.5)
+      ai: 7.0.170(zod@4.6.6)
     transitivePeerDependencies:
       - zod
 
-  '@ai-sdk/provider-utils@5.0.79(zod@4.6.5)':
+  '@ai-sdk/provider-utils@5.0.79(zod@4.6.6)':
     dependencies:
       '@ai-sdk/provider': 4.0.37
       '@standard-schema/spec': 1.1.0
       '@workflow/serde': 4.1.0
       eventsource-parser: 3.1.1
       undici: 7.30.2
-      zod: 4.6.5
+      zod: 4.6.6
 
   '@ai-sdk/provider@4.0.37':
     dependencies:
       json-schema: 0.4.0
 
-  '@ai-sdk/react@4.0.174(react@18.3.1)(zod@4.6.5)':
+  '@ai-sdk/react@4.0.174(react@18.3.1)(zod@4.6.6)':
     dependencies:
-      '@ai-sdk/mcp': 2.0.97(zod@4.6.5)
+      '@ai-sdk/mcp': 2.0.97(zod@4.6.6)
       '@ai-sdk/provider': 4.0.37
-      '@ai-sdk/provider-utils': 5.0.79(zod@4.6.5)
-      ai: 7.0.170(zod@4.6.5)
+      '@ai-sdk/provider-utils': 5.0.79(zod@4.6.6)
+      ai: 7.0.170(zod@4.6.6)
       react: 18.3.1
       swr: 2.5.1(react@18.3.1)
       throttleit: 2.1.0
@@ -5469,12 +5469,12 @@ snapshots:
 
   agent-base@7.1.4: {}
 
-  ai@7.0.170(zod@4.6.5):
+  ai@7.0.170(zod@4.6.6):
     dependencies:
-      '@ai-sdk/gateway': 4.0.143(zod@4.6.5)
+      '@ai-sdk/gateway': 4.0.143(zod@4.6.6)
       '@ai-sdk/provider': 4.0.37
-      '@ai-sdk/provider-utils': 5.0.79(zod@4.6.5)
-      zod: 4.6.5
+      '@ai-sdk/provider-utils': 5.0.79(zod@4.6.6)
+      zod: 4.6.6
 
   ansi-regex@5.0.1: {}
 
@@ -7611,7 +7611,7 @@ snapshots:
 
   yocto-queue@0.1.0: {}
 
-  zod@4.6.5: {}
+  zod@4.6.6: {}
 
   zustand@5.0.15(@types/react@18.3.18)(react@18.3.1)(use-sync-external-store@1.7.0(react@18.3.1)):
     optionalDependencies:
